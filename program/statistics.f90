@@ -7,7 +7,7 @@
     integer, intent(in) :: iblck
     integer             :: j, iobs
     double precision :: nor
-    do iobs = 1, NObs_b
+    do iobs = 1, NObs
       Obs(iobs, iblck) = Quan(iobs)
     enddo
   END SUBROUTINE coll_data 
@@ -21,14 +21,14 @@
 
     ! -- calculate average -------------------------------------------
     nor  = 1.d0/(NBlck*1.d0)
-    do j = 1, NObs_b
+    do j = 1, NObs
       Ave(j) = nor*Sum(Obs(j,1:NBlck))
     enddo
 
     Coarsen: do
       ! -- calculate error and t=1 correlation for basics obs.--------
       prt = .true.
-      DO j = 1, NObs_b
+      DO j = 1, NObs
         devp = 0.d0;  Cor(j) = 0.d0;  Dev(j) = 0.d0
         do k = 1,  NBlck
           devn   = Obs(j,k)-Ave(j)
@@ -49,7 +49,7 @@
 
       ! -- coarsen blocking ------------------------------------------
       NBlck = NBlck/2;      nor = nor*2.d0
-      DO j = 1, NObs_b
+      DO j = 1, NObs
         k0 = 1
         do k   = 1, NBlck
           Obs(j,k) = (Obs(j,k0)+Obs(j,k0+1))*0.5d0
@@ -62,7 +62,7 @@
     !call cal_Obs_comp
 
     ! -- calculate error and t=1 correlation for composite obs.-----
-    !do j = 1+NObs_b, NObs
+    !do j = 1+NObs, NObs
       !devp = 0.d0;  Cor(j) = 0.d0;  Dev(j) = 0.d0
       !DO k = 1,  NBlck
         !devn   = Obs(j,k)-Ave(j)

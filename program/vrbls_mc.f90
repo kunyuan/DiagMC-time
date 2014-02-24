@@ -15,10 +15,6 @@ MODULE vrbls_mc
   integer, parameter :: MxT   = 10000               ! the maximum number of time segments
   integer, parameter :: MxK   = 1000000             ! the maximum momentum
 
-  !integer, parameter :: MxOmega =  600000           ! the maximum omega used in MC
-  !integer, parameter :: MxOmegaBasis = 2048         ! the maximum omega used in basis
-  !integer, parameter :: MxOmegaDiag = 32            ! the maximum omega of the measured diagram
-
   double precision, parameter :: MxError = 0.25     ! the maximum error for MC
   integer, parameter          :: MxNblck = 10240    ! the maximum blocks in MC simulations
 
@@ -27,6 +23,10 @@ MODULE vrbls_mc
   integer, parameter :: MxNGLn = 2*MxOrder+2        ! the maximum number of glines
   integer, parameter :: MxNWLn = MxOrder+1          ! the maximum number of wlines
   integer, parameter :: MxNVertex = 2*MxOrder+2     ! the maximum number of vertexes
+
+  !integer, parameter :: MxOmega =  600000           ! the maximum omega used in MC
+  !integer, parameter :: MxOmegaBasis = 2048         ! the maximum omega used in basis
+  !integer, parameter :: MxOmegaDiag = 32            ! the maximum omega of the measured diagram
   !=======================================================================
 
   character*100 :: title1
@@ -71,7 +71,6 @@ MODULE vrbls_mc
 
   !double precision :: GamCoefPN(nbasisGamma, nbasisGamma)  ! coeffecients for tail of Gamma
   !double precision :: GamCoefNP(nbasisGamma, nbasisGamma)  !coeffecients for the tail of Gamma
-
   !=======================================================================
 
   !========================= Self-consistent loop ========================
@@ -93,7 +92,6 @@ MODULE vrbls_mc
 
   !integer, parameter :: MxOmegaChi = 16             ! maximum blocks of the tail
   !integer, parameter :: MxOmegaSigma = 1024         ! maximum blocks of the tail
-
 
   integer, parameter :: NTypeG = 2                   ! types of G  
   !----------------------------------------------------------------------------
@@ -154,8 +152,8 @@ MODULE vrbls_mc
   integer, parameter :: NtypeSigma = 2               ! types of Sigma
 
 
-  !double precision   :: GI(NtypG, -MxOmegaG1:MxOmegaG1)      ! matrix of G
-  !double precision   :: GITailP(NtypG,Nbasis),GITailN(NtypG,Nbasis)   ! positive and negative tails of G         
+  !double precision :: GI(NtypG, -MxOmegaG1:MxOmegaG1) ! matrix of G
+  !double precision :: GITailP(NtypG,Nbasis),GITailN(NtypG,Nbasis)! positive and negative tails of G      
   !double precision, allocatable   :: WR(:, :, :, :)         ! matrix of W        
   !double precision, allocatable   :: WRTailP(:, :, :, :)    ! positive tail of W
   !double precision, allocatable   :: WRTailC(:, :, :)       ! constant for the tail of W
@@ -187,24 +185,15 @@ MODULE vrbls_mc
   !=======================================================================
 
   !====================== MC Simulation ==================================
-  double precision, allocatable   :: Gam1MR(:, :, :, :, :)       ! matrix of Gamma 
-  double precision :: Gam2MR(2, -MxOmegaDiag:MxOmegaDiag, -MxOmegaDiag:MxOmegaDiag)  ! matrix of Gamma 
-
-  double precision :: GamNorm, GamNormWeight            ! the weight of the normalization diagram
-  double precision, allocatable   :: GamMC(:,:,:,:,:,:,:) ! the measurement of Gamma in MC
-  double precision, allocatable   :: GamSqMC(:,:,:,:,:,:,:) ! the measurement of Gamma in MC
+  double precision :: GamNorm, GamNormWeight              ! the weight of the normalization diagram
   double precision :: GamOrder(0:MxOrder)  ! the configuration number of different orders
-  double precision :: GamWormOrder(0:MxOrder)  ! the configuration number of different orders in worm section
-  !double precision :: Gam0Bubble
-  !double precision :: Gam2Topo(2, -MxOmegaDiag:MxOmegaDiag)
-
-  !double precision :: AveWeightRatio(0:MxOrder, 2)
-  !double precision :: HistoOmegaW(-MxOmega: MxOmega)
+  double precision :: GamWormOrder(0:MxOrder)  ! the configuration number in worm section
+  double precision, allocatable :: GamMC(:,:,:,:,:,:,:) ! the measurement of Gamma in MC
 
   double precision :: WeightCurrent                  ! the current weight of the configuration
-  double precision, allocatable :: CoefOfSymmetry(:,:)
   double precision :: CoefOfWorm
   double precision :: CoefOfWeight(0:MxOrder)  ! the coeffecients for different orders and worm section
+  double precision :: CoefOfSymmetry(MxLx, MxLy)
 
   !------------- MC steps -----------------------------------
   integer          :: iupdate           ! the update
@@ -235,11 +224,11 @@ MODULE vrbls_mc
   integer, dimension(MxNLn) :: KindLn               ! kind of a line: 1 Glines; 2 Wlines
   integer, dimension(MxNLn) :: TypeLn               ! type of a line: 1-2 Glines; 1-6 Wlines
   integer, dimension(2,MxNLn) :: NeighLn            ! 1: begin gamma; 2: end gamma 
-  double precision, dimension(MxNLn) :: WeightLn    ! weight of glines and wlines
   integer, dimension(MxNLn) :: StatusLn             ! 2:I&M; 0:normal; 1: measure; -1: empty
-  integer, dimension(MxNLn) :: NextLn, List4Ln        ! the next empty block;  the
+  integer, dimension(MxNLn) :: NextLn, List4Ln      ! the next empty block;  the
                                                     ! location in OccuGLn and OccuWLn
-  !!! the properties of Lines !!!!!!!!!!!!!!!!!!!!!!
+  double precision, dimension(MxNLn) :: WeightLn    ! weight of glines and wlines
+
   integer                   :: TailLn               ! the tail of the link
   integer, dimension(MxNGLn) :: Ln4GList             ! the occupied lines
   integer, dimension(MxNWLn) :: Ln4WList             ! the occupied lines
@@ -256,7 +245,6 @@ MODULE vrbls_mc
   integer, dimension(MxNVertex):: StatusVertex              ! 2:I&M; 0:normal; 1: measure; -1: empty
   integer, dimension(MxNVertex) :: NextVertex, List4Vertex  ! NextVertex:  the next empty block
                                                     ! List4Vertex: the location of gammas in List 
-  !!! the properties of Gamma(Vertex) !!!!!!!!!!!!!!!!!!!!!!
   integer                   :: TailGam                ! the tail of the link
   integer, dimension(MxNVertex):: Vertex4GamList         ! the occupied gammas
 
@@ -286,10 +274,10 @@ MODULE vrbls_mc
   double precision,parameter :: lamy = 1.d0
   double precision, dimension(-MxLy+1:MxLy-1) :: Py, Fy
 
-  integer, parameter :: Nobs_b = 67
   logical :: prt
-  double precision :: Obs(Nobs_b, MxNblck)
-  double precision , dimension(1:Nobs_b) :: Quan, Ave, Dev, Cor
+  integer, parameter :: Nobs = 67
+  double precision :: Obs(Nobs, MxNblck)
+  double precision , dimension(1:Nobs) :: Quan, Ave, Dev, Cor
   
   !=======================================================================
 

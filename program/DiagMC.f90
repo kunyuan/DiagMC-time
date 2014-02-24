@@ -66,11 +66,6 @@ PROGRAM MAIN
 
   allocate(GamMC(0:MCOrder, 0:1, ntypGa/2, 0:Lx-1, 0:Ly-1, -MxOmegaDiag:MxOmegaDiag, &
     & -MxOmegaDiag:MxOmegaDiag))
-  allocate(GamSqMC(0:MCOrder, 0:1, ntypGa/2, 0:Lx-1, 0:Ly-1, -MxOmegaDiag:MxOmegaDiag, &
-    & -MxOmegaDiag:MxOmegaDiag))
-  allocate(CoefOfSymmetry(0:Lx-1, 0:Ly-1))
-
-  allocate(Gam1MR(0:Lx-1, 0:Ly-1, ntypGa, -MxOmegaDiag:MxOmegaDiag, -MxOmegaDiag:MxOmegaDiag))
 
   !----------------------------------------------------------
 
