@@ -14,7 +14,7 @@ MODULE vrbls_mc
 
   integer, parameter          :: MxK   =  1000000
   integer, parameter :: MxOmega =  600000           ! the maximum omega used in MC
-  integer, parameter :: MxOmegaBasis = 2048         ! the maximum omega used in MC
+  integer, parameter :: MxOmegaBasis = 2048         ! the maximum omega used in basis
   integer, parameter :: MxOmegaDiag = 32            ! the maximum omega of the measured diagram
   integer, parameter :: MxOrder =  10               ! the maximum order of the diagram
   integer, parameter :: MxNLn  = 3*MxOrder+3        ! the maximum number of lines
