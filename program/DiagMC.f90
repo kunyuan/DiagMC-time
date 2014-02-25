@@ -10,6 +10,7 @@ PROGRAM MAIN
 
   print *, 'Lx, Ly, Ntoss, Nsamp, nw, Nblck, Jcp, beta, MCOrder, Seed, ISub, InpMC, title'
   read  *,  Lx, Ly, Ntoss, Nsamp, nw, Nblck, Jcp, beta, MCOrder, Seed, ISub, InpMC, title
+
   do i = 1, MCOrder
     read *, CoefOfWeight(i)
   enddo
@@ -85,11 +86,8 @@ PROGRAM MAIN
 
 CONTAINS
 INCLUDE "basic_function.f90"
-INCLUDE "my_time.f90"
 INCLUDE "self_consistent.f90"
 INCLUDE "monte_carlo.f90"
-INCLUDE "fourier.f90"
-INCLUDE "print.f90"
 INCLUDE "check_conf.f90"
 INCLUDE "first_order_integration.f90"
 INCLUDE "read_write_data.f90"

@@ -10,13 +10,11 @@ MODULE vrbls_mc
   integer, parameter          :: Mnint =-2147483647
 
   integer, parameter :: D = 2                       ! 2-dimensional system
-  integer, parameter :: MxLx  = 64, MxLy = 64       ! the largest system size
+  integer, parameter :: MxLx  = 16, MxLy = 16       ! the largest system size
   integer, parameter :: MxVol = MxLx**D             ! the maximum system volume
   integer, parameter :: MxT   = 128                 ! the maximum number of time segments
   integer, parameter :: MxK   = 1000000             ! the maximum momentum
-  !integer, parameter :: MxOmega =  600000           ! the maximum omega used in MC
   !integer, parameter :: MxOmegaBasis = 2048         ! the maximum omega used in basis
-  !integer, parameter :: MxOmegaDiag = 32            ! the maximum omega of the measured diagram
 
   double precision, parameter :: MxError = 0.25     ! the maximum error for MC
   integer, parameter          :: MxNblck = 10240    ! the maximum blocks in MC simulations
@@ -104,11 +102,16 @@ MODULE vrbls_mc
   !----- type = 3:  a = up;   b = down  ---------------------------------------
   !----- type = 4:  a = down; b = up  -----------------------------------------
   !----------------------------------------------------------------------------
-  integer, parameter :: NtypeSigma = 2               ! types of Sigma
   !=======================================================================
 
 
   !========================= Self-consistent loop ========================
+  double precision :: GI(NtypeG, MxT)
+  double precision :: WR(NtypeW, MxLx, MxLy, MxT)
+  double precision :: GamR(NtypeGam, MxLx, MxLy, MxT, MxT)
+  double precision :: SigmaI(MxT)
+  double precision :: PiR(NtypePi, MxLx, MxLy, MxT)
+  double precision :: ChiR(NtypeChi, MxLx, MxLy, MxT)
   !=======================================================================
 
   !====================== MC Simulation ==================================
