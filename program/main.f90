@@ -43,7 +43,7 @@ CONTAINS
 !INCLUDE "check_conf.f90"
 !INCLUDE "statistics.f90"
 !INCLUDE "read_write_data.f90"
-!INCLUDE "first_order_integration.f90"
+!INCLUDE "analytic_integration.f90"
 
 
 !SUBROUTINE self_consistent
