@@ -853,21 +853,6 @@ SUBROUTINE transfer_Gamma(BackForth)
 
     call FFT(GamR,NtypGa,(2*MxOmegaGamG1+1)*(2*MxOmegaGamG1+1),BackForth)
 
-    call FFT(GamRTailNP,NtypGa,NbasisGamma,BackForth)
-    call FFT(GamRTailPN,NtypGa,NbasisGamma,BackForth)
-    call FFT(GamRTailPPR,NtypGa,NbasisGamma,BackForth)
-    call FFT(GamRTailNNR,NtypGa,NbasisGamma,BackForth)
-    call FFT(GamRTailPPL,NtypGa,NbasisGamma,BackForth)
-    call FFT(GamRTailNNL,NtypGa,NbasisGamma,BackForth)
-
-    call FFT(GamRTailDiagP,NtypGa,Nbasis,BackForth)
-    call FFT(GamRTailDiagN,NtypGa,Nbasis,BackForth)
-
-    call FFT(GamRTailMP,NtypGa,Nbasis*(2*MxOmegaGamG1+1),BackForth)
-    call FFT(GamRTailMN,NtypGa,Nbasis*(2*MxOmegaGamG1+1),BackForth)
-    call FFT(GamRTailPM,NtypGa,Nbasis*(2*MxOmegaGamG1+1),BackForth)
-    call FFT(GamRTailNM,NtypGa,Nbasis*(2*MxOmegaGamG1+1),BackForth)
-    call FFT(GamRTailC,NtypGa,1,BackForth)
 END SUBROUTINE
 
 SUBROUTINE transfer_Pi(BackForth)
@@ -971,7 +956,6 @@ end SUBROUTINE FFT
 !                                                             c
 !  The backward transform computes                            c
 !     x(j) = (1/N) * sum_{k=0}^{N-1} X(k)*exp(2ijk*pi/N)      c
-!                                                             c
 !                                                             c
 !  Requires standard FORTRAN functions - sin, cos             c
 !                                                             c
