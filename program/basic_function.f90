@@ -833,38 +833,36 @@ END SUBROUTINE test_basis_Gamma
 
 !CONTAINS
 
-SUBROUTINE transfer_W0(BackForth)
-  implicit none
-  integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
-  call FFT(W0InMoment, NtypW,1, BackForth)
-END SUBROUTINE
+!SUBROUTINE transfer_W0(BackForth)
+  !implicit none
+  !integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
+  !call FFT(W0InMoment, NtypW,1, BackForth)
+!END SUBROUTINE
 
 SUBROUTINE transfer_W(BackForth)
     implicit none
     integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
-    call FFT(WR,NtypW,MxOmegaW1+1,BackForth)
-    call FFT(WRTailP,NtypW,Nbasis,BackForth)
-    call FFT(WRTailC,NtypW,1,BackForth)
+    call FFT(W,NtypW,MxOmegaW1+1,BackForth)
 END SUBROUTINE
 
 SUBROUTINE transfer_Gamma(BackForth)
     implicit none
     integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
 
-    call FFT(GamR,NtypGa,(2*MxOmegaGamG1+1)*(2*MxOmegaGamG1+1),BackForth)
+    call FFT(Gam,NtypGa,(2*MxOmegaGamG1+1)*(2*MxOmegaGamG1+1),BackForth)
 
 END SUBROUTINE
 
 SUBROUTINE transfer_Pi(BackForth)
     implicit none
     integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
-    call FFT(PiR,ntypPi,2*MxOmegaChi+1,BackForth)
+    call FFT(Polar,ntypPi,2*MxOmegaChi+1,BackForth)
 END SUBROUTINE
 
 SUBROUTINE transfer_Chi(BackForth)
     implicit none
     integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
-    call FFT(ChiR,ntypCh,2*MxOmegaChi+1,BackForth)
+    call FFT(Chi,ntypCh,2*MxOmegaChi+1,BackForth)
 END SUBROUTINE
 
 
