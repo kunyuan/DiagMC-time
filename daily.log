@@ -1,0 +1,27 @@
+Feb 25, 2014
+讨论了程序的框架和命名规则,定义虚时表象下的各个物理量,开始self-consistant loop程序
+
+tips:
+1.如何提高数组循环的效率:
+do i=1:100
+	do j=1:100
+		do k=1:100
+			a(k,j,i)=10     !不要a(i,j,k)=10
+		enddo
+	enddo
+enddo
+Fortran 中的数组存储是Column Major方式排列（与C相反。与MATLAB相同，No 应该说MATLAB与之相同），所以按上面顺序循环，效率会比较高。即，即按维数由低到高的顺序循环访问数组。上面的例子仅是说明数组访问效率问题，其实可以直接a=10对整个数组赋值。
+
+2.如何存储一个复数:
+!复数由实部和虚部组成，Fortran中用两个浮点数来保存
+	complex(kind=4) a_single !单精度，Fortran 90
+	complex(kind=8) a_double !双精度， Fortran 90
+							
+!设置一个复数数值的方法
+	a=(x,y) ! x为实部，y为虚部, x,y为constant
+	a=cmplx(x,y) ! x为实部，y为虚部, x,y不是constant
+
+3.how to discrete the continuous imaginary time
+See note Gamma_Diagrammatic_Monte_Carlo_Feb_19_2014.pdf
+====================================================
+

@@ -2,34 +2,16 @@ INCLUDE "vrbls_mc.f90"
 PROGRAM MAIN
   USE vrbls_mc
   implicit none
-  integer ::  i, j, iloop, sciloop, iblck, istep
-  double precision :: scWOldR, scWWR
-  integer :: flag
-  integer :: ISub, InpMC
-  integer :: isamp, imeas
 
-  !print *, 'Lx, Ly, Ntoss, Nsamp, nw, Nblck, Jcp, beta, MCOrder, Seed, ISub, InpMC, title'
-  !read  *,  Lx, Ly, Ntoss, Nsamp, nw, Nblck, Jcp, beta, MCOrder, Seed, ISub, InpMC, title
 
-  !do i = 1, MCOrder
-    !read *, CoefOfWeight(i)
-  !enddo
-  !read *, CoefOfWorm
+  Mu(:)  = 1.d0
 
-  !write(title1, '(f4.2)') beta
-  !write(title2, '(i2)')  MCOrder
-  !write(title3, '(i14)') Seed
+  Lx = 4
+  Ly = 4
+  Vol = Lx*Ly
 
-  !title2 = trim(adjustl(title1))//'_'//trim(adjustl(title2))
-  !title3 = trim(adjustl(title2))//'_'//trim(adjustl(title3))
-
-  !!!================= INITIALIZATION =======================================
-  !Mu(1)  = 1.d0
-  !Mu(2)  = 1.d0
-
-  !Vol = Lx*Ly
-  !dLx = Floor(Lx/2.d0)
-  !dLy = Floor(Ly/2.d0)
+  Beta = 0.5d0
+  call initialize_self_consistent
 
   !CoefOfWeight(0) = 1.d0
 
@@ -38,7 +20,7 @@ PROGRAM MAIN
 
 CONTAINS
 !INCLUDE "basic_function.f90"
-!INCLUDE "self_consistent.f90"
+INCLUDE "self_consistent.f90"
 !INCLUDE "monte_carlo.f90"
 !INCLUDE "check_conf.f90"
 !INCLUDE "statistics.f90"
