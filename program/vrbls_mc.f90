@@ -106,21 +106,22 @@ MODULE vrbls_mc
 
 
   !========================= Self-consistent loop ========================
-  double precision :: GI(NtypeG, MxT)
-  double precision :: WR(NtypeW, MxLx, MxLy, MxT)
-  double precision :: GamR(NtypeGam, MxLx, MxLy, MxT, MxT)
-  double precision :: SigmaI(MxT)
-  double precision :: PiR(NtypePi, MxLx, MxLy, MxT)
-  double precision :: ChiR(NtypeChi, MxLx, MxLy, MxT)
+  !============== unfinished =============================================
+  complex(kind=8) :: G(NtypeG, MxT)
+  complex(kind=8) :: W(NtypeW, MxLx, MxLy, MxT)
+  complex(kind=8) :: Gam(NtypeGam, MxLx, MxLy, MxT, MxT)
+  complex(kind=8) :: Sigma(MxT)
+  complex(kind=8) :: Polar(NtypePi, MxLx, MxLy, MxT)
+  complex(kind=8) :: Chi(NtypeChi, MxLx, MxLy, MxT)
   !=======================================================================
 
   !====================== MC Simulation ==================================
-  double precision :: GamNorm, GamNormWeight              ! the weight of the normalization diagram
-  double precision :: GamOrder(0:MxOrder)      ! the configuration number of different orders
-  double precision :: GamWormOrder(0:MxOrder)  ! the configuration number in worm section
-  double precision, allocatable :: GamMC(:,:,:,:,:,:,:) ! the measurement of Gamma in MC
+  double precision :: GamNorm, GamNormWeight           ! the weight of the normalization diagram
+  double precision :: GamOrder(0:MxOrder)              ! the configuration number of different orders
+  double precision :: GamWormOrder(0:MxOrder)          ! the configuration number in worm section
+  double precision, allocatable :: GamMC(:,:,:,:,:,:,:)! the measurement of Gamma in MC
 
-  double precision :: WeightCurrent                  ! the current weight of the configuration
+  double precision :: WeightCurrent            ! the current weight of the configuration
   double precision :: CoefOfWorm
   double precision :: CoefOfWeight(0:MxOrder)  ! the coeffecients for different orders and worm section
   double precision :: CoefOfSymmetry(MxLx, MxLy)
