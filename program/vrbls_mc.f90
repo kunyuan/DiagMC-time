@@ -13,7 +13,7 @@ MODULE vrbls_mc
   integer, parameter :: D = 2                       ! 2-dimensional system
   integer, parameter :: MxLx  = 16, MxLy = 16       ! the largest system size
   integer, parameter :: MxVol = MxLx**D             ! the maximum system volume
-  integer, parameter :: MxT   = 128                 ! the maximum number of time segments
+  integer, parameter :: MxT   = 16                  ! the maximum number of time segments
   integer, parameter :: MxK   = 1000000             ! the maximum momentum
   !integer, parameter :: MxOmegaBasis = 2048         ! the maximum omega used in basis
 
@@ -37,6 +37,7 @@ MODULE vrbls_mc
 
   !======================== Input parameter ==============================
   integer          ::  Lx, Ly, Vol                ! System size
+  integer          ::  dLx, dLy
   double precision ::  Jcp                        ! interaction
   double precision ::  Mu(2)                      ! Chem. potential for spin down & up
   double precision ::  Beta                       ! inverse temperature
@@ -92,7 +93,7 @@ MODULE vrbls_mc
   !----- type = 3:  a = up;   b = down  ---------------------------------------
   !----- type = 4:  a = down; b = up  -----------------------------------------
   !----------------------------------------------------------------------------
-  integer, parameter :: NTypePi = 4                  ! types of Pi 
+  integer, parameter :: NTypePolar = 4                  ! types of Polar 
   !----------------------------------------------------------------------------
   !          a------------------b
   !          |                  |
@@ -112,7 +113,7 @@ MODULE vrbls_mc
   complex(kind=8) :: W(NtypeW, 0:MxLx-1, 0:MxLy-1, 0:MxT-1)
   complex(kind=8) :: Gam(NtypeGam, 0:MxLx-1, 0:MxLy-1, 0:MxT-1, 0:MxT-1)
   complex(kind=8) :: Sigma(0:MxT-1)
-  complex(kind=8) :: Polar(NtypePi, 0:MxLx-1, 0:MxLy-1, 0:MxT-1)
+  complex(kind=8) :: Polar(NtypePolar, 0:MxLx-1, 0:MxLy-1, 0:MxT-1)
   complex(kind=8) :: Chi(NtypeChi, 0:MxLx-1, 0:MxLy-1, 0:MxT-1)
   !=======================================================================
 
