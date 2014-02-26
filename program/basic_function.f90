@@ -870,6 +870,13 @@ SUBROUTINE transfer_W_t(BackForth)
     call FFT_tau_single(W,NtypeW,MxLx*MxLy,BackForth)
 END SUBROUTINE
 
+SUBROUTINE transfer_W0(BackForth)
+    implicit none
+    integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
+    call FFT_r(W0P,1,MxT,BackForth)
+    call FFT_tau_single(W0P,1,MxLx*MxLy,BackForth)
+END SUBROUTINE
+
 SUBROUTINE transfer_Gam_r(BackForth)
     implicit none
     integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
@@ -904,13 +911,13 @@ END SUBROUTINE
 SUBROUTINE transfer_Polar_r(BackForth)
     implicit none
     integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
-    call FFT_r(Polar,NtypePolar,MxT,BackForth)
+    call FFT_r(Polar,1,MxT,BackForth)
 END SUBROUTINE
 
 SUBROUTINE transfer_Polar_t(BackForth)
     implicit none
     integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
-    call FFT_tau_single(Polar,NtypePolar,MxLx*MxLy,BackForth)
+    call FFT_tau_single(Polar,1,MxLx*MxLy,BackForth)
 END SUBROUTINE
 
 SUBROUTINE transfer_Chi_r(BackForth)

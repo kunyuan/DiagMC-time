@@ -9,11 +9,8 @@ SUBROUTINE initialize_self_consistent
   call initialize_G
   call initialize_W
   call initialize_Gam
-  !call initialize_Polar
 
-  !!------ Initialization of W0 in p domain ----------------------
-  !call initialize_W0InMoment
-
+  call initialize_W0P
   
 END SUBROUTINE initialize_self_consistent
 
@@ -23,7 +20,7 @@ SUBROUTINE initialize_G
   implicit none
   integer :: typ, t
 
-  G(:,:) = (0.d0, 0.d0)
+  G = (0.d0, 0.d0)
 
   do t = 0, MxT-1
     do typ = 1, NTypeG
@@ -37,6 +34,7 @@ SUBROUTINE initialize_W
   implicit none
   integer :: typ, t, dx, dy
 
+  W = (0.d0, 0.d0)
   do t = 0, MxT-1
     do dy = 0, Ly-1
       do dx = 0, Lx-1
@@ -53,7 +51,7 @@ SUBROUTINE initialize_Gam
   implicit none
   integer :: ityp, it1, it2
 
-  Gam(:,:,:,:,:) = 0.d0
+  Gam = (0.d0, 0.d0)
   do it2 = 0, MxT-1
     do it1 = 0, MxT-1
       do ityp = 1, NTypeGam
@@ -64,90 +62,76 @@ SUBROUTINE initialize_Gam
   return
 END SUBROUTINE initialize_Gam
  
-!!--------------- Initialization of Pi -----------------------
-!SUBROUTINE initialize_Pi
-  !implicit none
-  !integer :: typ, omega
-  !double precision :: G2R
+!!------------------- Initialization of W ----------------------
+SUBROUTINE initialize_W0P
+  implicit none
+  integer :: typ, t, dx, dy
 
-  !PiR(:,:,:,:) = 0.d0
-  !do typ = 1, ntypPi
-    !G2R = weight_G2(0)
-    !PiR(typ, 0, 0, 0) = G2R/Beta
-  !enddo
-!END SUBROUTINE initialize_Pi
-
-!!--------------- Initialization of Pi -----------------------
-!SUBROUTINE initialize_W0InMoment
-  !implicit none
-  !integer :: typ, dx, dy, omega
-  !double precision :: W0R
-
-  !do typ = 1, ntypW
-    !do dx = 0, Lx-1
-      !do dy = 0, Ly-1
-        !W0InMoment(typ, dx, dy) = weight_W0(dx, dy, 0, typ)
-      !enddo
-    !enddo
-  !enddo
-
-  !call transfer_W0(1)
-!END SUBROUTINE initialize_W0InMoment
-
+  W0P = (0.d0, 0.d0)
+  do t = 0, MxT-1
+    do dy = 0, Ly-1
+      do dx = 0, Lx-1
+        W0P(dx, dy, t) = weight_W0(1, dx, dy, t)
+      enddo
+    enddo
+  enddo
+  call transfer_W0(1)
+END SUBROUTINE initialize_W0P
 
 !!============== WEIGHT CALCULATING ==================================
 
-!!--------- calculate weight for W matrix ---------
-!SUBROUTINE calculate_W
-  !implicit none
-  !integer :: iloop, px, py, omega, ib, jb, ityp
-  !integer :: omegaGin, omegaGout
-  !double precision :: W0R, W01R, GinI, GoutI, GaR1, GaR2
-  !double precision :: Gin0I, Gout0I, Ga0R, G2R
-  !double precision :: WintR, GGGaR
-  !double precision :: WMR(ntypW,0:dLx,0:dLy,-MxOmegaW2:MxOmegaW2)
-  !double precision :: WOldR
-  !double precision :: err
+SUBROUTINE calculate_Polar
+  implicit none
+  integer :: px, py, omega
+  integer :: omegaGin, omegaGout
+  complex(kind=8) :: Gin, Gout, Gam1, Gam2
 
-  !!-------- calculate W = W0/(1-W0*G^2*Gamma) ----------------------------
-  !WMR(:,:,:,:) = 0.d0
-  !do px = 0, dLx
-    !do py = 0, dLy
-      !do omega = 0, MxOmegaW2
-      
-        !WintR = 0.d0
+  Polar(:,:,:) = (0.d0, 0.d0)
+  do omega = 0, MxT-1
+    do omegaGin = 0, MxT-1
+      do px = 0, Lx-1
+        do py = 0, Ly-1
+          omegaGout = omegaGin - omega
+          if(omegaGout<0 .or. omegaGout>=MxT) cycle
 
-        !GGGaR = 0.d0
-        !do omegaGin = -MxOmegaWInt, MxOmegaWInt
-          !omegaGout = omegaGin -omega
-
-          !GinI = weight_G(omegaGin, 1)
-          !GoutI = weight_G(omegaGout, 1)
-          !GaR1 = weight_Gamma(px, py, omegaGin, omegaGout, 1)
-          !GaR2 = weight_Gamma(px, py, omegaGin, omegaGout, 3)
-
-          !Gin0I = weight_G0up(omegaGin, 1)
-          !Gout0I = weight_G0up(omegaGout, 1)
+          Gin = weight_G0(1, omegaGin)
+          Gout = weight_G0(1, omegaGout)
+          Gam1 = weight_Gam0(1, px, py, omegaGin, omegaGout)
+          Gam2 = weight_Gam0(3, px, py, omegaGin, omegaGout)
           
-          !GGGaR = GGGaR + (-GinI *GoutI *(GaR1+(-1.d0)*GaR2) +Gin0I *Gout0I)/Beta
-        !enddo
+          !Gin = weight_G(1, omegaGin)
+          !Gout = weight_G(1, omegaGout)
+          !Gam1 = weight_Gam(1, px, py, omegaGin, omegaGout)
+          !Gam2 = weight_Gam(3, px, py, omegaGin, omegaGout)
+          
+          Polar(px, py, omega) = Polar(px, py, omega)-Gin*Gout*(Gam1-Gam2)/Beta
 
-        !W01R = W0InMoment(1, px, py)
-        !G2R = weight_G2(omega)
+          !Gin0 = weight_G0(1, omegaGin)
+          !Gout0 = weight_G0(1, omegaGout)
+          !Polar(px, py, omega) = Polar(px, py, omega)-(GinI*GoutI*(GaR1-GaR2) -Gin0I*Gout0I)/Beta
+        enddo
+      enddo
+    enddo
+  enddo
+  return
+END SUBROUTINE calculate_Polar
 
-        !GGGaR = GGGaR + G2R/Beta
-        !WintR = W01R/(1.d0-2.d0*W01R*GGGaR)
 
-        !WMR(1, px, py, omega) =       WintR
-        !WMR(3, px, py, omega) = -1.d0*WintR
-        !WMR(5, px, py, omega) =  2.d0*WintR
 
-        !do ityp = 2, 6, 2
-          !WMR(ityp, px, py, omega) = WMR(ityp-1, px, py, omega)
-        !enddo
-      !enddo
-    !enddo
-  !enddo
+!!--------- calculate weight for W matrix ---------
+SUBROUTINE calculate_W
+  implicit none
+
+  !-------- calculate W = W0/(1-W0*G^2*Gamma) ----------------------------
+  W(:,:,:,:) = 0.d0
+  W(1,:,:,:) = W0P(:,:,:)/(1.d0-2.d0*W0P(:,:,:)*Polar(:,:,:))
+
+  W(3,:,:,:) = -1.d0*W(1,:,:,:)
+  W(5,:,:,:) = 2.d0*W(1,:,:,:)
+
+  W(2,:,:,:) = W(1,:,:,:)
+  W(4,:,:,:) = W(3,:,:,:)
+  W(6,:,:,:) = W(5,:,:,:)
 
   !!-------------- update the matrix and tail ------------
   !WRTailP(:,:,:,:) = 0.d0
@@ -169,7 +153,7 @@ END SUBROUTINE initialize_Gam
     !enddo
   !enddo
 
-!END SUBROUTINE calculate_W
+END SUBROUTINE calculate_W
 
 
 
@@ -474,7 +458,7 @@ END SUBROUTINE initialize_Gam
 
 !!======================== WEIGHT EXTRACTING =========================
 
-!--------- weight for 1-order propagator ----------------
+!--------- weight for bare propagator ----------------
 Complex FUNCTION weight_G0(typ, t)
   implicit none
   integer, intent(in)  :: typ, t  
@@ -491,18 +475,8 @@ Complex FUNCTION weight_G0(typ, t)
   return
 END FUNCTION weight_G0
 
-!!---------- G^2 -----------------------------------------
-!DOUBLE PRECISION FUNCTION weight_G2(omega1)
-  !implicit none
-  !integer, intent(in)  :: omega1  
-  !if(omega1 == 0 ) then
-    !weight_G2 = -0.5d0*Beta**2.d0
-  !else
-    !weight_G2 = 0.d0
-  !endif
-!END FUNCTION weight_G2
 
-!!--------- calculate weight for 1-order interaction ----
+!!--------- calculate weight for bare interaction ----
 Complex FUNCTION weight_W0(typ, dx, dy, t)
   implicit none
   integer, intent(in) :: dx, dy, typ, t
@@ -533,7 +507,7 @@ Complex FUNCTION weight_W0(typ, dx, dy, t)
 
 END FUNCTION weight_W0
 
-!!--------- calculate weight for 1-order Gamma ---------
+!!--------- calculate weight for bare Gamma ---------
 COMPLEX FUNCTION weight_Gam0(typ, dx, dy, t1, t2)
   implicit none
   integer, intent(in)  :: dx, dy, t1, t2, typ

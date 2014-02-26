@@ -16,10 +16,6 @@ PROGRAM MAIN
   Beta = 0.5d0
   call initialize_self_consistent
 
-  !CoefOfWeight(0) = 1.d0
-
-  !call set_time_elapse
-  !call set_RNG
 
 CONTAINS
 INCLUDE "basic_function.f90"
