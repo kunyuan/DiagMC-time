@@ -6,6 +6,7 @@ MODULE vrbls_mc
   double precision, parameter :: Pi    = 3.14159265358979323846d0
   double precision, parameter :: Pi2   = 6.2831853071795865d0
   double precision, parameter :: Pi4   = 2.0d0*Pi2
+  double precision, parameter :: tm32  = 1.d0/(2.d0**32)
   integer, parameter          :: Mxint = 2147483647
   integer, parameter          :: Mnint =-2147483647
 
@@ -107,12 +108,12 @@ MODULE vrbls_mc
 
   !========================= Self-consistent loop ========================
   !============== unfinished =============================================
-  complex(kind=8) :: G(NtypeG, MxT)
-  complex(kind=8) :: W(NtypeW, MxLx, MxLy, MxT)
-  complex(kind=8) :: Gam(NtypeGam, MxLx, MxLy, MxT, MxT)
-  complex(kind=8) :: Sigma(MxT)
-  complex(kind=8) :: Polar(NtypePi, MxLx, MxLy, MxT)
-  complex(kind=8) :: Chi(NtypeChi, MxLx, MxLy, MxT)
+  complex(kind=8) :: G(NtypeG, 0:MxT-1)
+  complex(kind=8) :: W(NtypeW, 0:MxLx-1, 0:MxLy-1, 0:MxT-1)
+  complex(kind=8) :: Gam(NtypeGam, 0:MxLx-1, 0:MxLy-1, 0:MxT-1, 0:MxT-1)
+  complex(kind=8) :: Sigma(0:MxT-1)
+  complex(kind=8) :: Polar(NtypePi, 0:MxLx-1, 0:MxLy-1, 0:MxT-1)
+  complex(kind=8) :: Chi(NtypeChi, 0:MxLx-1, 0:MxLy-1, 0:MxT-1)
   !=======================================================================
 
   !====================== MC Simulation ==================================
