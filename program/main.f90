@@ -9,6 +9,9 @@ PROGRAM MAIN
   Lx = 4
   Ly = 4
   Vol = Lx*Ly
+  dLx = floor(Lx/2.d0)
+  dLy = floor(Ly/2.d0)
+  Jcp = 1.d0
 
   Beta = 0.5d0
   call initialize_self_consistent
