@@ -30,7 +30,8 @@ See note Gamma_Diagrammatic_Monte_Carlo_Feb_19_2014.pdf
 Feb 26, 2014
 测试了FFT部分对虚时－频率转换的程序；
 加入了对W,Gam初始化的程序；
-将Pi改名为Polar(避免与3.14159发生冲突)
+将Pi改名为Polar(避免与3.14159发生冲突);
+加入了对W, Polar的计算部分
 
 tips:
 1.real(a); dimag(a) !对复数ａ取实部和虚部
