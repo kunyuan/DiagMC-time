@@ -2,16 +2,19 @@
 !============ Initialization of the self consistent loop ==========
 SUBROUTINE initialize_self_consistent
   implicit none
+  integer :: it, ityp, ix, iy
+  integer :: it1, it2
 
   !------- Initialization of the self-consistent loop ------------
   call initialize_G
   call initialize_W
-  !call initialize_Gam
-  !call initialize_Pi
+  call initialize_Gam
+  !call initialize_Polar
 
   !!------ Initialization of W0 in p domain ----------------------
   !call initialize_W0InMoment
 
+  
 END SUBROUTINE initialize_self_consistent
 
 
@@ -38,7 +41,7 @@ SUBROUTINE initialize_W
     do dy = 0, Ly-1
       do dx = 0, Lx-1
         do typ = 1, NtypeW
-          WR(typ, dx, dy, t) = weight_W0(typ, dx, dy, t)
+          W(typ, dx, dy, t) = weight_W0(typ, dx, dy, t)
         enddo
       enddo
     enddo
@@ -46,40 +49,20 @@ SUBROUTINE initialize_W
 END SUBROUTINE initialize_W
 
 !!--------------- Initialization of Gamma -----------------------
-!SUBROUTINE initialize_Gamma
-  !implicit none
-  !integer :: typ, omega, omega2, dx, dy
-  !double precision :: Ga0R
+SUBROUTINE initialize_Gam
+  implicit none
+  integer :: ityp, it1, it2
 
-  !GamR(:,:,:,:,:) = 0.d0
-  !GamRTailC(:,:,:) = 0.d0
-  
-  !GamRTailPPR(:,:,:,:) = 0.d0
-  !GamRTailNNR(:,:,:,:) = 0.d0
-  !GamRTailPPL(:,:,:,:) = 0.d0
-  !GamRTailNNL(:,:,:,:) = 0.d0
-
-  !GamRTailDiagP(:,:,:,:) = 0.d0
-  !GamRTailDiagN(:,:,:,:) = 0.d0
-
-  !GamRTailNP(:,:,:,:) = 0.d0
-  !GamRTailPN(:,:,:,:) = 0.d0
-
-  !GamRTailMP(:,:,:,:,:) = 0.d0
-  !GamRTailMN(:,:,:,:,:) = 0.d0
-  !GamRTailPM(:,:,:,:,:) = 0.d0
-  !GamRTailNM(:,:,:,:,:) = 0.d0
-
-  !do typ = 1, ntypGa
-    !GamRTailC(typ, 0, 0) = weight_Gamma0(0, 0, 0, 0, typ)
-    !do omega = -MxOmegaGamG1, MxOmegaGamG1
-      !do omega2 = -MxOmegaGamG1, MxOmegaGamG1
-        !GamR(typ,0,0,omega,omega2) = weight_Gamma0(0,0, omega, omega2, typ)
-      !enddo
-    !enddo
-  !enddo
-  !return
-!END SUBROUTINE initialize_Gamma
+  Gam(:,:,:,:,:) = 0.d0
+  do it2 = 0, MxT-1
+    do it1 = 0, MxT-1
+      do ityp = 1, NTypeGam
+        Gam(ityp,0,0,it1,it2) = weight_Gam0(ityp, 0, 0, it1, it2)
+      enddo
+    enddo
+  enddo
+  return
+END SUBROUTINE initialize_Gam
  
 !!--------------- Initialization of Pi -----------------------
 !SUBROUTINE initialize_Pi
@@ -499,13 +482,12 @@ Complex FUNCTION weight_G0(typ, t)
   complex(kind=8)      :: muc  
 
   muc = cmplx(0.d0, Mu(1)*pi/(2.d0*Beta))
-  tau = t*Beta/MxT
+  tau = (t+0.5d0)*Beta/MxT
   if(tau>=0) then
     weight_G0 = exp(muc*tau)/(1.d0, 1.d0) 
   else if(tau>=-MxT) then
     weight_G0 = -exp(muc*(tau+Beta))/(1.d0, 1.d0) 
   endif
-  write(*, *) weight_G0
   return
 END FUNCTION weight_G0
 
@@ -535,12 +517,12 @@ Complex FUNCTION weight_W0(typ, dx, dy, t)
 
     if(t==0) then
       if((dx1==1.and.dy1==0).or.(dx1==0.and.dy1==1)) then
-        if(typ1 ==1 .or. typ1 == 2) then
-          W0R = cmplx(0.25d0*Jcp, 0.d0)
-        else if(typ1 == 3 .or. typ1 == 4) then
-          W0R = cmplx(-0.25d0*Jcp, 0.d0)
-        else if(typ1 == 5 .or. typ1 == 6) then
-          W0R = cmplx(0.5d0*Jcp, 0.d0)
+        if(typ ==1 .or. typ == 2) then
+          weight_W0 = cmplx(0.25d0*Jcp, 0.d0)
+        else if(typ == 3 .or. typ == 4) then
+          weight_W0 = cmplx(-0.25d0*Jcp, 0.d0)
+        else if(typ == 5 .or. typ == 6) then
+          weight_W0 = cmplx(0.5d0*Jcp, 0.d0)
         endif
       endif
     endif
@@ -549,36 +531,28 @@ Complex FUNCTION weight_W0(typ, dx, dy, t)
     stop
   endif
 
-  weight_W0 = W0R
 END FUNCTION weight_W0
 
 !!--------- calculate weight for 1-order Gamma ---------
-!DOUBLE PRECISION FUNCTION weight_Gamma0(dx1, dy1, omega1, omega2, typ1)
-  !implicit none
-  !integer, intent(in)  :: dx1, dy1, omega1, omega2, typ1
-  !double precision :: Gamma0R
-  !integer :: dx, dy
+COMPLEX FUNCTION weight_Gam0(typ, dx, dy, t1, t2)
+  implicit none
+  integer, intent(in)  :: dx, dy, t1, t2, typ
 
-  !dx = dx1;      dy = dy1
-  !if(dx>=0 .and. dx<Lx .and. dy>=0 .and. dy<Ly) then
-    !if(dx>dLx)     dx = Lx-dx
-    !if(dy>dLy)     dy = Ly-dy
-
-    !if(dx==0.and.dy==0) then
-      !if(typ1==1 .or. typ1==2 .or. typ1==5 .or. typ1==6) then
-        !Gamma0R = 1.d0
-      !else
-        !Gamma0R = 0.d0
-      !endif
-    !else
-      !Gamma0R = 0.d0
-    !endif
-  !else
-    !write(*, *) dx1, dy1, "dx, dy bigger than system size!"
-    !stop
-  !endif
-  !weight_Gamma0 = Gamma0R
-!END FUNCTION weight_Gamma0
+  if(dx>=0 .and. dx<Lx .and. dy>=0 .and. dy<Ly) then
+    if(t1==0 .and. t2==0 .and. dx==0.and.dy==0) then
+      if(typ==1 .or. typ==2 .or. typ==5 .or. typ==6) then
+        weight_Gam0 = (1.d0, 0.d0)
+      else
+        weight_Gam0 = (0.d0, 0.d0)
+      endif
+    else
+      weight_Gam0 = (0.d0, 0.d0)
+    endif
+  else
+    write(*, *) dx, dy, "dx, dy bigger than system size!"
+    stop
+  endif
+END FUNCTION weight_Gam0
 
 !!--------- extract weight for G ---------
 !DOUBLE PRECISION FUNCTION weight_G(omega1, typ1)
