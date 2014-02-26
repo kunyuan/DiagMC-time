@@ -24,7 +24,7 @@ SUBROUTINE initialize_G
 
   G(:,:) = (0.d0, 0.d0)
 
-  do t = -MxT, MxT
+  do t = 0, MxT-1
     do typ = 1, NTypeG
       G(typ, t) = weight_G0(typ, t)
     enddo
