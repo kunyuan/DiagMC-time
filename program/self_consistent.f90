@@ -5,14 +5,12 @@ SUBROUTINE initialize_self_consistent
 
   !------- Initialization of the self-consistent loop ------------
   call initialize_G
-  !call initialize_W
+  call initialize_W
   !call initialize_Gam
   !call initialize_Pi
 
   !!------ Initialization of W0 in p domain ----------------------
   !call initialize_W0InMoment
-
-  !!------ Initialization of Basis ----------------------
 
 END SUBROUTINE initialize_self_consistent
 
@@ -32,26 +30,20 @@ SUBROUTINE initialize_G
 END SUBROUTINE initialize_G
 
 !!------------------- Initialization of W ----------------------
-!SUBROUTINE initialize_W
-  !implicit none
-  !integer :: typ, omega, dx, dy
-  !double precision :: W0R
+SUBROUTINE initialize_W
+  implicit none
+  integer :: typ, t, dx, dy
 
-  !WRTailP(:,:,:,:) = 0.d0
-  !WRTailC(:,:,:) = 0.d0
-
-  !do typ = 1, ntypW
-    !do dx = 0, dLx
-      !do dy = 0, dLy
-        !WRTailC(typ, dx, dy) = weight_W0(dx, dy, 0, typ)
-        !do omega = 0, MxOmegaW1
-          !WR(typ, dx, dy, omega) = weight_W0(dx, dy, omega, typ)
-        !enddo
-      !enddo
-    !enddo
-  !enddo
-  !call calculate_W1
-!END SUBROUTINE initialize_W
+  do t = 0, MxT-1
+    do dy = 0, Ly-1
+      do dx = 0, Lx-1
+        do typ = 1, NtypeW
+          WR(typ, dx, dy, t) = weight_W0(typ, dx, dy, t)
+        enddo
+      enddo
+    enddo
+  enddo
+END SUBROUTINE initialize_W
 
 !!--------------- Initialization of Gamma -----------------------
 !SUBROUTINE initialize_Gamma
@@ -529,35 +521,36 @@ END FUNCTION weight_G0
 !END FUNCTION weight_G2
 
 !!--------- calculate weight for 1-order interaction ----
-!DOUBLE PRECISION FUNCTION weight_W0(dx1, dy1, omega1, typ1)
-  !implicit none
-  !integer, intent(in) :: dx1, dy1, typ1, omega1
-  !double precision :: W0R
-  !integer :: dx, dy
+Complex FUNCTION weight_W0(typ, dx, dy, t)
+  implicit none
+  integer, intent(in) :: dx, dy, typ, t
+  integer :: dx1, dy1
 
-  !dx = dx1;       dy = dy1
-  !if(dx>=0  .and. dx<Lx .and. dy>=0 .and. dy<Ly) then
-    !if(dx>dLx)     dx = Lx-dx
-    !if(dy>dLy)     dy = Ly-dy
+  dx1 = dx;       dy1 = dy
+  if(dx1>=0  .and. dx1<Lx .and. dy1>=0 .and. dy1<Ly) then
+    if(dx1>dLx)     dx1 = Lx-dx1
+    if(dy1>dLy)     dy1 = Ly-dy1
 
-    !if((dx==1.and.dy==0).or.(dx==0.and.dy==1)) then
-      !if(typ1 ==1 .or. typ1 == 2) then
-        !W0R = 0.25d0*Jcp
-      !else if(typ1 == 3 .or. typ1 == 4) then
-        !W0R = -0.25d0*Jcp
-      !else if(typ1 == 5 .or. typ1 == 6) then
-        !W0R = 0.5d0*Jcp
-      !endif
-    !else
-      !W0R = 0.d0
-    !endif
-  !else
-    !write(*, *) dx1, dy1, "dx, dy bigger than system size!"
-    !stop
-  !endif
+    weight_W0 = (0.d0, 0.d0)
 
-  !weight_W0 = W0R
-!END FUNCTION weight_W0
+    if(t==0) then
+      if((dx1==1.and.dy1==0).or.(dx1==0.and.dy1==1)) then
+        if(typ1 ==1 .or. typ1 == 2) then
+          W0R = cmplx(0.25d0*Jcp, 0.d0)
+        else if(typ1 == 3 .or. typ1 == 4) then
+          W0R = cmplx(-0.25d0*Jcp, 0.d0)
+        else if(typ1 == 5 .or. typ1 == 6) then
+          W0R = cmplx(0.5d0*Jcp, 0.d0)
+        endif
+      endif
+    endif
+  else
+    write(*, *) dx1, dy1, "dx, dy bigger than system size!"
+    stop
+  endif
+
+  weight_W0 = W0R
+END FUNCTION weight_W0
 
 !!--------- calculate weight for 1-order Gamma ---------
 !DOUBLE PRECISION FUNCTION weight_Gamma0(dx1, dy1, omega1, omega2, typ1)
