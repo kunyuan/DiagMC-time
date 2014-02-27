@@ -1,4 +1,8 @@
+
+====================================================
 ======================== TEST ======================
+====================================================
+
 1. FFT for complex quantities in r and tau representation
 
 Report:
@@ -6,4 +10,9 @@ The transform for G(t), W(t) and Gam(t) can all give the correct answer based on
 But the form of G(omega) is not the same with the answer from continuous FFT .
 Periodic : W, Chi, Polar
 Anti-Periodic : G, Gam, Sigma
+====================================================
+
+2. self-consistent integral in momentum and frequency domain
+
+Report:
 ====================================================
