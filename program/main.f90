@@ -14,6 +14,7 @@ PROGRAM MAIN
   Jcp = 1.d0
 
   Beta = 0.5d0
+
   call initialize_self_consistent
 
   call calculate_Sigma

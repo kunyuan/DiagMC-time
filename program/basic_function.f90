@@ -1,13 +1,13 @@
 !============== BASIC PROCEDURES IN UPDATE ==========================
 
 !--------- exchange the location of Ira and Masha  -----
-SUBROUTINE switch_ira_and_masha
-  implicit none
-  integer  :: k
-  if(IsWormPresent .eqv. .false.)  return
-  k=Ira;   Ira=Masha; Masha=k
-  kMasha=-kMasha;     SpinMasha=-SpinMasha
-END SUBROUTINE switch_ira_and_masha
+!SUBROUTINE switch_ira_and_masha
+  !implicit none
+  !integer  :: k
+  !if(IsWormPresent .eqv. .false.)  return
+  !k=Ira;   Ira=Masha; Masha=k
+  !kMasha=-kMasha;     SpinMasha=-SpinMasha
+!END SUBROUTINE switch_ira_and_masha
 
 !====================================================================
 
@@ -798,6 +798,14 @@ END SUBROUTINE switch_ira_and_masha
 !END SUBROUTINE test_basis_Gamma
 !====================================================================
 
+!======================= Complex Operations =============================
+COMPLEX*16 FUNCTION d_times_cd(nd, ncd)
+  implicit none 
+  double precision, intent(in) :: nd
+  complex*16, intent(in) :: ncd
+  d_times_cd = dcmplx(nd*real(ncd), nd*dimag(ncd))
+  return
+END FUNCTION d_times_cd
 
 !!=======================================================================
 !!======================= Fourier Transformation ========================
@@ -846,7 +854,7 @@ SUBROUTINE transfer_G0(BackForth)
     integer :: it
     if(BackForth/=-1) then
       do it = 0, MxT-1
-        G0F(it) = G0F(it)* exp(cmplx(0.d0,-Pi/real(MxT))*real(it))
+        G0F(it) = G0F(it)* cdexp(dcmplx(0.d0,-Pi/real(MxT))*real(it))
       enddo
 
       call FFT_tau_single(G0F,1,1,BackForth)
@@ -854,7 +862,7 @@ SUBROUTINE transfer_G0(BackForth)
       call FFT_tau_single(G0F,1,1,BackForth)
 
       do it = 0, MxT-1
-        G0F(it) = G0F(it)* exp(cmplx(0.d0,Pi/real(MxT))*real(it))
+        G0F(it) = G0F(it)* cdexp(dcmplx(0.d0,Pi/real(MxT))*real(it))
       enddo
     endif
 END SUBROUTINE
@@ -865,7 +873,7 @@ SUBROUTINE transfer_G_t(BackForth)
     integer            :: it
     if(BackForth/=-1) then
       do it = 0, MxT-1
-        G(:,it) = G(:,it)* exp(cmplx(0.d0,-Pi/real(MxT))*real(it))
+        G(:,it) = G(:,it)* cdexp(dcmplx(0.d0,-Pi/real(MxT))*real(it))
       enddo
 
       call FFT_tau_single(G,NtypeG,1,BackForth)
@@ -873,7 +881,7 @@ SUBROUTINE transfer_G_t(BackForth)
       call FFT_tau_single(G,NtypeG,1,BackForth)
 
       do it = 0, MxT-1
-        G(:,it) = G(:,it)* exp(cmplx(0.d0,Pi/real(MxT))*real(it))
+        G(:,it) = G(:,it)* cdexp(dcmplx(0.d0,Pi/real(MxT))*real(it))
       enddo
     endif
 END SUBROUTINE
@@ -903,8 +911,8 @@ SUBROUTINE transfer_Gam_t(BackForth)
     if(BackForth/=-1) then
       do it2 = 0, MxT-1
         do it1 = 0, MxT-1
-          Gam(:,:,:,it1,it2) = Gam(:,:,:,it1,it2)* exp(cmplx(0.d0,-Pi/real(MxT))*real(it1))
-          Gam(:,:,:,it1,it2) = Gam(:,:,:,it1,it2)* exp(cmplx(0.d0,-Pi/real(MxT))*real(it2))
+          Gam(:,:,:,it1,it2) = Gam(:,:,:,it1,it2)* cdexp(dcmplx(0.d0,-Pi/real(MxT))*real(it1))
+          Gam(:,:,:,it1,it2) = Gam(:,:,:,it1,it2)* cdexp(dcmplx(0.d0,-Pi/real(MxT))*real(it2))
         enddo
       enddo
 
@@ -914,8 +922,8 @@ SUBROUTINE transfer_Gam_t(BackForth)
 
       do it2 = 0, MxT-1
         do it1 = 0, MxT-1
-          Gam(:,:,:,it1,it2) = Gam(:,:,:,it1,it2)* exp(cmplx(0.d0,Pi/real(MxT))*real(it1))
-          Gam(:,:,:,it1,it2) = Gam(:,:,:,it1,it2)* exp(cmplx(0.d0,Pi/real(MxT))*real(it2))
+          Gam(:,:,:,it1,it2) = Gam(:,:,:,it1,it2)* cdexp(dcmplx(0.d0,Pi/real(MxT))*real(it1))
+          Gam(:,:,:,it1,it2) = Gam(:,:,:,it1,it2)* cdexp(dcmplx(0.d0,Pi/real(MxT))*real(it2))
         enddo
       enddo
     endif
@@ -951,13 +959,13 @@ SUBROUTINE transfer_Sigma_t(BackForth)
     integer       :: it
     if(BackForth/=-1) then
       do it = 0, MxT-1
-        Sigma(it) = Sigma(it)* exp(cmplx(0.d0,-Pi/real(MxT))*real(it))
+        Sigma(it) = Sigma(it)* cdexp(dcmplx(0.d0,-Pi/real(MxT))*real(it))
       enddo
       call FFT_tau_single(Sigma,1,MxLx*MxLy,BackForth)
     else if(BackForth==-1) then
       call FFT_tau_single(Sigma,1,MxLx*MxLy,BackForth)
       do it = 0, MxT-1
-        Sigma(it) = Sigma(it)* exp(cmplx(0.d0,Pi/real(MxT))*real(it))
+        Sigma(it) = Sigma(it)* cdexp(dcmplx(0.d0,Pi/real(MxT))*real(it))
       enddo
     endif
 
@@ -995,7 +1003,7 @@ SUBROUTINE FFT_r(XR,Ntype,Nz,BackForth)
            Real1(:)=real(XR(it,:,iy,iz))
            Im1(:)=dimag(XR(it,:,iy,iz))
            call sffteu(Real1, Im1, Noma, Power, BackForth)
-           XR(it,:,iy,iz)=cmplx(Real1(:), Im1(:))
+           XR(it,:,iy,iz)=dcmplx(Real1(:), Im1(:))
          enddo
       enddo
     enddo
@@ -1012,7 +1020,7 @@ SUBROUTINE FFT_r(XR,Ntype,Nz,BackForth)
            Real1(:)=real(XR(it,ix,:,iz))
            Im1(:)=dimag(XR(it,ix,:,iz))
            call sffteu(Real1, Im1, Noma, Power, BackForth)
-           XR(it,ix,:,iz)=cmplx(Real1(:), Im1(:))
+           XR(it,ix,:,iz)=dcmplx(Real1(:), Im1(:))
          enddo
       enddo
     enddo
@@ -1039,7 +1047,7 @@ SUBROUTINE FFT_tau_single(XR,Ntype,Nz,BackForth)
         Real1(:)=real(XR(it,iz,:))
         Im1(:)=dimag(XR(it,iz,:))
         call sffteu(Real1, Im1, Noma, Power, BackForth)
-        XR(it,iz,:)=cmplx(Real1(:), Im1(:))
+        XR(it,iz,:)=dcmplx(Real1(:), Im1(:))
        enddo
     enddo
     deallocate(Real1,Im1)
@@ -1066,7 +1074,7 @@ SUBROUTINE FFT_tau_double(XR,Ntype,Nz,BackForth)
           Real1(:)=real(XR(it,iz,:,itau2))
           Im1(:)=dimag(XR(it,iz,:,itau2))
           call sffteu(Real1, Im1, Noma, Power, BackForth)
-          XR(it,iz,:,itau2)=cmplx(Real1(:),Im1(:))
+          XR(it,iz,:,itau2)=dcmplx(Real1(:),Im1(:))
         enddo
       enddo
     enddo
@@ -1082,7 +1090,7 @@ SUBROUTINE FFT_tau_double(XR,Ntype,Nz,BackForth)
             Real1(:)=real(XR(it,iz,itau1,:))
             Im1(:)=dimag(XR(it,iz,itau1,:))
             call sffteu(Real1, Im1, Noma, Power, BackForth)
-            XR(it,iz,itau1,:)=cmplx(Real1(:),Im1(:))
+            XR(it,iz,itau1,:)=dcmplx(Real1(:),Im1(:))
         enddo
       enddo
     enddo
