@@ -104,7 +104,8 @@ MODULE vrbls_mc
   complex(kind=8) :: Sigma(0:MxT-1)
   complex(kind=8) :: Polar(0:MxLx-1, 0:MxLy-1, 0:MxT-1)
   complex(kind=8) :: Chi(NtypeChi, 0:MxLx-1, 0:MxLy-1, 0:MxT-1)
-  complex(kind=8) :: W0P(0:MxLx-1, 0:MxLy-1, 0:MxT-1)
+  complex(kind=8) :: W0PF(0:MxLx-1, 0:MxLy-1, 0:MxT-1)
+  complex(kind=8) :: G0F(0:MxT-1)
   !=======================================================================
 
   !====================== MC Simulation ==================================

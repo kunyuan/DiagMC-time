@@ -833,11 +833,31 @@ END SUBROUTINE switch_ira_and_masha
 
 !CONTAINS
 
-!SUBROUTINE transfer_W0(BackForth)
-  !implicit none
-  !integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
-  !call FFT(W0InMoment, NtypW,1, BackForth)
-!END SUBROUTINE
+SUBROUTINE transfer_W0(BackForth)
+    implicit none
+    integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
+    call FFT_r(W0PF,1,MxT,BackForth)
+    call FFT_tau_single(W0PF,1,MxLx*MxLy,BackForth)
+END SUBROUTINE
+
+SUBROUTINE transfer_G0(BackForth)
+    implicit none
+    integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
+    integer :: it
+    if(BackForth/=-1) then
+      do it = 0, MxT-1
+        G0F(it) = G0F(it)* exp(cmplx(0.d0,-Pi/real(MxT))*real(it))
+      enddo
+
+      call FFT_tau_single(G0F,1,1,BackForth)
+    else if(BackForth ==-1) then
+      call FFT_tau_single(G0F,1,1,BackForth)
+
+      do it = 0, MxT-1
+        G0F(it) = G0F(it)* exp(cmplx(0.d0,Pi/real(MxT))*real(it))
+      enddo
+    endif
+END SUBROUTINE
 
 SUBROUTINE transfer_G_t(BackForth)
     implicit none
@@ -868,13 +888,6 @@ SUBROUTINE transfer_W_t(BackForth)
     implicit none
     integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
     call FFT_tau_single(W,NtypeW,MxLx*MxLy,BackForth)
-END SUBROUTINE
-
-SUBROUTINE transfer_W0(BackForth)
-    implicit none
-    integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
-    call FFT_r(W0P,1,MxT,BackForth)
-    call FFT_tau_single(W0P,1,MxLx*MxLy,BackForth)
 END SUBROUTINE
 
 SUBROUTINE transfer_Gam_r(BackForth)
