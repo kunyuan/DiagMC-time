@@ -99,7 +99,9 @@ SUBROUTINE calculate_Polar
   integer :: px, py, omega
   integer :: omegaGin, omegaGout
   complex(kind=8) :: Gin, Gout, Gam1, Gam2
+  double precision :: ratio
 
+  ratio = 1.d0/Beta
   Polar(:,:,:) = (0.d0, 0.d0)
   do omega = 0, MxT-1
     do omegaGin = 0, MxT-1
@@ -108,17 +110,13 @@ SUBROUTINE calculate_Polar
           omegaGout = omegaGin - omega
           if(omegaGout<0 .or. omegaGout>=MxT) cycle
 
-          !Gin = weight_G0(1, omegaGin)
-          !Gout = weight_G0(1, omegaGout)
-          !Gam1 = weight_Gam0(1, px, py, omegaGin, omegaGout)
-          !Gam2 = weight_Gam0(3, px, py, omegaGin, omegaGout)
-          
           Gin = weight_G(1, omegaGin)
           Gout = weight_G(1, omegaGout)
           Gam1 = weight_Gam(1, px, py, omegaGin, omegaGout)
           Gam2 = weight_Gam(3, px, py, omegaGin, omegaGout)
           
-          Polar(px, py, omega) = Polar(px, py, omega)-Gin*Gout*(Gam1-Gam2)/Beta
+          Polar(px, py, omega) = Polar(px, py, omega)-cmplx(ratio*real(Gin*Gout* &
+            & (Gam1-Gam2)), ratio*dimag(Gin*Gout*(Gam1-Gam2)))
         enddo
       enddo
     enddo
@@ -132,7 +130,9 @@ SUBROUTINE calculate_Sigma
   integer :: px, py, omega
   integer :: omegaG, omegaW
   complex(kind=8) :: G1, W1, Gam1, Gam2
+  double precision :: ratio
 
+  ratio = 3.d0/(real(Lx)*real(Ly)*Beta)
   Sigma(:) = (0.d0, 0.d0)
 
   do omega = 0, MxT-1
@@ -146,13 +146,9 @@ SUBROUTINE calculate_Sigma
           W1 = weight_W0(1, px, py, omegaW)
           Gam1 = weight_Gam0(1, px, py, omegaG, omega)
           Gam2 = weight_Gam0(3, px, py, omegaG, omega)
-
-          !G1 = weight_G(1, omegaG)
-          !W1 = weight_W(1, px, py, omegaW)
-          !Gam1 = weight_Gam(1, px, py, omegaG, omega)
-          !Gam2 = weight_Gam(3, px, py, omegaG, omega)
-
-          Sigma(omega) = Sigma(omega) + G1*W1*3.d0*(Gam1-Gam2)/(real(Lx)*real(Ly)*Beta)
+          
+          Sigma(omega) = Sigma(omega) + cmplx(ratio*real(G1*W1*(Gam1-Gam2)), &
+            & ratio*dimag(G1*W1*(Gam1-Gam2)))
         enddo
       enddo
     enddo
@@ -166,11 +162,12 @@ SUBROUTINE calculate_W
   implicit none
 
   !-------- calculate W = W0/(1-W0*G^2*Gamma) ----------------------------
-  W(:,:,:,:) = 0.d0
-  W(1,:,:,:) = W0PF(:,:,:)/(1.d0-2.d0*W0PF(:,:,:)*Polar(:,:,:))
+  W(:,:,:,:) = (0.d0, 0.d0)
+  W(1,:,:,:) = W0PF(:,:,:)/((1.d0, 0.d0)-cmplx(2.d0*real(W0PF(:,:,:))*real(Polar(:,:,:)), &
+    & 2.d0*dimag(W0PF(:,:,:))*dimag(Polar(:,:,:))))
 
-  W(3,:,:,:) = -1.d0*W(1,:,:,:)
-  W(5,:,:,:) = 2.d0*W(1,:,:,:)
+  W(3,:,:,:) = cmplx(-1.d0*real(W(1,:,:,:)), -1.d0*dimag(W(1,:,:,:)))
+  W(5,:,:,:) = cmplx(2.d0*real(W(1,:,:,:)), 2.d0*dimag(W(1,:,:,:)))
 
   W(2,:,:,:) = W(1,:,:,:)
   W(4,:,:,:) = W(3,:,:,:)
@@ -184,15 +181,11 @@ END SUBROUTINE calculate_W
 SUBROUTINE calculate_G
   implicit none
   complex(kind=8) :: G0
-  integer :: omega
 
   G(:,:) = (0.d0, 0.d0)
 
-  !--------- G = G0/(1+G0*G*W*Gamma)----------------------
-  do omega = 0, MxT-1
-    G0 = weight_G0(1, omega)
-    G(1, omega) =  G0/(1.d0 - Sigma(omega) *G0)
-  enddo
+  !--------- G = G0/(1-G0*Sigma)----------------------
+  G(1, :) =  G0F(:)/((1.d0,0.d0)-G0F(:)*Sigma(:))
   G(2, :) =  G(1, :)
 
   !!-------------- update the matrix and tail ------------
