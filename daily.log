@@ -44,6 +44,11 @@ tips:
 
 Feb 27, 2014
 
+添加了G，Sigma的迭代计算部分
+改进复数乘以实数的效率(添加函数d_times_cd)
+将cmplx, exp 改成 dcmplx, cdexp
 
 tips:
 1.复数乘除法很浪费时间，能简化的尽量自己简化
+
+2.要用dcmplx, cdexp, cdlog才能得到kind=8的复数

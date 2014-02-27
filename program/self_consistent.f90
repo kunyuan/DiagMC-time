@@ -101,7 +101,7 @@ SUBROUTINE calculate_Polar
   complex(kind=8) :: Gin, Gout, Gam1, Gam2
   double precision :: ratio
 
-  ratio = 1.d0/Beta
+  ratio = 2.d0/Beta
   Polar(:,:,:) = (0.d0, 0.d0)
   do omega = 0, MxT-1
     do omegaGin = 0, MxT-1
@@ -115,8 +115,8 @@ SUBROUTINE calculate_Polar
           Gam1 = weight_Gam(1, px, py, omegaGin, omegaGout)
           Gam2 = weight_Gam(3, px, py, omegaGin, omegaGout)
           
-          Polar(px, py, omega) = Polar(px, py, omega)-cmplx(ratio*real(Gin*Gout* &
-            & (Gam1-Gam2)), ratio*dimag(Gin*Gout*(Gam1-Gam2)))
+          Polar(px, py, omega) = Polar(px, py, omega)-d_times_cd(ratio, Gin*Gout* &
+            & (Gam1-Gam2))
         enddo
       enddo
     enddo
@@ -147,8 +147,7 @@ SUBROUTINE calculate_Sigma
           Gam1 = weight_Gam0(1, px, py, omegaG, omega)
           Gam2 = weight_Gam0(3, px, py, omegaG, omega)
           
-          Sigma(omega) = Sigma(omega) + cmplx(ratio*real(G1*W1*(Gam1-Gam2)), &
-            & ratio*dimag(G1*W1*(Gam1-Gam2)))
+          Sigma(omega) = Sigma(omega)+d_times_cd(ratio, G1*W1*(Gam1-Gam2))
         enddo
       enddo
     enddo
@@ -160,14 +159,20 @@ END SUBROUTINE calculate_Sigma
 !!--------- calculate weight for W matrix ---------
 SUBROUTINE calculate_W
   implicit none
+  integer :: omega, px, py
 
   !-------- calculate W = W0/(1-W0*G^2*Gamma) ----------------------------
   W(:,:,:,:) = (0.d0, 0.d0)
-  W(1,:,:,:) = W0PF(:,:,:)/((1.d0, 0.d0)-cmplx(2.d0*real(W0PF(:,:,:))*real(Polar(:,:,:)), &
-    & 2.d0*dimag(W0PF(:,:,:))*dimag(Polar(:,:,:))))
+  W(1,:,:,:) = W0PF(:,:,:)/((1.d0, 0.d0)-W0PF(:,:,:)*Polar(:,:,:))
 
-  W(3,:,:,:) = cmplx(-1.d0*real(W(1,:,:,:)), -1.d0*dimag(W(1,:,:,:)))
-  W(5,:,:,:) = cmplx(2.d0*real(W(1,:,:,:)), 2.d0*dimag(W(1,:,:,:)))
+  do  omega = 0, MxT-1
+    do py = 0, Ly-1
+      do px = 0, Lx-1
+        W(3,px,py,omega) = d_times_cd(-1.d0,W(1,px,py,omega))
+        W(5,px,py,omega) = d_times_cd( 2.d0,W(1,px,py,omega))
+      enddo
+    enddo
+  enddo
 
   W(2,:,:,:) = W(1,:,:,:)
   W(4,:,:,:) = W(3,:,:,:)
@@ -272,25 +277,25 @@ END SUBROUTINE calculate_G
 !!======================== WEIGHT EXTRACTING =========================
 
 !--------- weight for bare propagator ----------------
-Complex FUNCTION weight_G0(typ, t)
+Complex*16 FUNCTION weight_G0(typ, t)
   implicit none
   integer, intent(in)  :: typ, t  
   double precision     :: tau
   complex(kind=8)      :: muc  
 
-  muc = cmplx(0.d0, Mu(1)*pi/(2.d0*Beta))
+  muc = dcmplx(0.d0, Mu(1)*pi/(2.d0*Beta))
   tau = (t+0.5d0)*Beta/MxT
   if(tau>=0) then
-    weight_G0 = exp(muc*tau)/(1.d0, 1.d0) 
+    weight_G0 = cdexp(muc*tau)/(1.d0, 1.d0) 
   else if(tau>=-MxT) then
-    weight_G0 = -exp(muc*(tau+Beta))/(1.d0, 1.d0) 
+    weight_G0 = -cdexp(muc*(tau+Beta))/(1.d0, 1.d0) 
   endif
   return
 END FUNCTION weight_G0
 
 
 !!--------- calculate weight for bare interaction ----
-Complex FUNCTION weight_W0(typ, dx, dy, t)
+Complex*16 FUNCTION weight_W0(typ, dx, dy, t)
   implicit none
   integer, intent(in) :: dx, dy, typ, t
   integer :: dx1, dy1
@@ -305,11 +310,11 @@ Complex FUNCTION weight_W0(typ, dx, dy, t)
     if(t==0) then
       if((dx1==1.and.dy1==0).or.(dx1==0.and.dy1==1)) then
         if(typ ==1 .or. typ == 2) then
-          weight_W0 = cmplx(0.25d0*Jcp, 0.d0)
+          weight_W0 = dcmplx(0.25d0*Jcp, 0.d0)
         else if(typ == 3 .or. typ == 4) then
-          weight_W0 = cmplx(-0.25d0*Jcp, 0.d0)
+          weight_W0 = dcmplx(-0.25d0*Jcp, 0.d0)
         else if(typ == 5 .or. typ == 6) then
-          weight_W0 = cmplx(0.5d0*Jcp, 0.d0)
+          weight_W0 = dcmplx(0.5d0*Jcp, 0.d0)
         endif
       endif
     endif
@@ -321,7 +326,7 @@ Complex FUNCTION weight_W0(typ, dx, dy, t)
 END FUNCTION weight_W0
 
 !!--------- calculate weight for bare Gamma ---------
-COMPLEX FUNCTION weight_Gam0(typ, dx, dy, t1, t2)
+COMPLEX*16 FUNCTION weight_Gam0(typ, dx, dy, t1, t2)
   implicit none
   integer, intent(in)  :: dx, dy, t1, t2, typ
 
@@ -342,7 +347,7 @@ COMPLEX FUNCTION weight_Gam0(typ, dx, dy, t1, t2)
 END FUNCTION weight_Gam0
 
 !!--------- extract weight for G ---------
-COMPLEX FUNCTION weight_G(typ1, t1)
+COMPLEX*16 FUNCTION weight_G(typ1, t1)
   implicit none
   integer, intent(in)  :: t1, typ1
   double precision:: GGI
@@ -366,7 +371,7 @@ COMPLEX FUNCTION weight_G(typ1, t1)
 END FUNCTION weight_G
 
 !!--------- extract weight for W ---------
-COMPLEX FUNCTION weight_W(typ1, dx1, dy1, t1)
+COMPLEX*16 FUNCTION weight_W(typ1, dx1, dy1, t1)
   implicit none
   integer, intent(in)  :: dx1, dy1, t1, typ1
   double precision :: WWR
@@ -396,7 +401,7 @@ COMPLEX FUNCTION weight_W(typ1, dx1, dy1, t1)
 END FUNCTION weight_W
 
 !!--------- extract weight for Gamma ---------
-COMPLEX FUNCTION weight_Gam(typ1, dx1, dy1, t1, t2)
+COMPLEX*16 FUNCTION weight_Gam(typ1, dx1, dy1, t1, t2)
   implicit none
   integer, intent(in)  :: dx1, dy1, t1, t2, typ1
   double precision :: GaR
