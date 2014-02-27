@@ -2,6 +2,7 @@ INCLUDE "vrbls_mc.f90"
 PROGRAM MAIN
   USE vrbls_mc
   implicit none
+  integer :: it
 
 
   Mu(:)  = 1.d0
@@ -17,10 +18,25 @@ PROGRAM MAIN
 
   call initialize_self_consistent
 
-  call calculate_Sigma
-  call calculate_Polar
-  call calculate_G
-  call calculate_W
+  open(20, file="G_t.dat")
+  open(21, file="G_omega.dat")
+
+  do it = 0, MxT-1
+    write(20, *) G(1, it)
+  enddo
+  call transfer_G_t(1)
+  do it = 0, MxT-1
+    write(21, *) G(1, it)
+  enddo
+
+  close(20)
+  close(21)
+  
+
+  !call calculate_Sigma
+  !call calculate_Polar
+  !call calculate_G
+  !call calculate_W
 
 
 CONTAINS
