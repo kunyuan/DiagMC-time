@@ -20,12 +20,10 @@ PROGRAM MAIN
   Gam0(0,0) = (1.d0, 0.d0)
 
   !-------- integral ------------
-  do iloop = 1, 10
-    do it = 0, Nt-1
-      G(it) = G0(it)
-      do it1 = 0, it
-        G(it) = G(it) - 3.d0*G0(it1)*G(0)*G(it-it1)*W0(0)*Gam0(0,0)
-      enddo
+  do it = 0, Nt-1
+    G(it) = G0(it)
+    do it1 = 0, it
+      G(it) = G(it) - 3.d0*G0(it1)*G0(0)*G0(it-it1)*W0(0)*Gam0(0,0)
     enddo
   enddo
 
