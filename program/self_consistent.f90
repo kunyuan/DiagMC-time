@@ -7,11 +7,11 @@ SUBROUTINE initialize_self_consistent
 
   !------- Initialization of the self-consistent loop ------------
   call initialize_G
-  call initialize_W
-  call initialize_Gam
+  !call initialize_W
+  !call initialize_Gam
 
-  call initialize_G0F
-  call initialize_W0PF
+  !call initialize_G0F
+  !call initialize_W0PF
   
 END SUBROUTINE initialize_self_consistent
 
