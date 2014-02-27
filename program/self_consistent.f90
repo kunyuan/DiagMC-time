@@ -98,10 +98,10 @@ SUBROUTINE calculate_Polar
   implicit none
   integer :: px, py, omega
   integer :: omegaGin, omegaGout
-  complex(kind=8) :: Gin, Gout, Gam1, Gam2
+  complex(kind=8) :: Gin, Gout, Gam1
   double precision :: ratio
 
-  ratio = 2.d0/Beta
+  ratio = -2.d0/Beta
   Polar(:,:,:) = (0.d0, 0.d0)
   do omega = 0, MxT-1
     do omegaGin = 0, MxT-1
@@ -112,11 +112,9 @@ SUBROUTINE calculate_Polar
 
           Gin = weight_G(1, omegaGin)
           Gout = weight_G(1, omegaGout)
-          Gam1 = weight_Gam(1, px, py, omegaGin, omegaGout)
-          Gam2 = weight_Gam(3, px, py, omegaGin, omegaGout)
+          Gam1 = weight_Gam(5, px, py, omegaGin, omegaGout)
           
-          Polar(px, py, omega) = Polar(px, py, omega)-d_times_cd(ratio, Gin*Gout* &
-            & (Gam1-Gam2))
+          Polar(px, py, omega) = Polar(px, py, omega)+d_times_cd(ratio, Gin*Gout*Gam1)
         enddo
       enddo
     enddo
@@ -129,7 +127,7 @@ SUBROUTINE calculate_Sigma
   implicit none
   integer :: px, py, omega
   integer :: omegaG, omegaW
-  complex(kind=8) :: G1, W1, Gam1, Gam2
+  complex(kind=8) :: G1, W1, Gam1
   double precision :: ratio
 
   ratio = 3.d0/(real(Lx)*real(Ly)*Beta)
@@ -144,10 +142,9 @@ SUBROUTINE calculate_Sigma
 
           G1 = weight_G0(1, omegaG)
           W1 = weight_W0(1, px, py, omegaW)
-          Gam1 = weight_Gam0(1, px, py, omegaG, omega)
-          Gam2 = weight_Gam0(3, px, py, omegaG, omega)
+          Gam1 = weight_Gam0(5, px, py, omegaG, omega)
           
-          Sigma(omega) = Sigma(omega)+d_times_cd(ratio, G1*W1*(Gam1-Gam2))
+          Sigma(omega) = Sigma(omega)+d_times_cd(ratio, G1*W1*Gam1)
         enddo
       enddo
     enddo
@@ -179,7 +176,6 @@ SUBROUTINE calculate_W
   W(6,:,:,:) = W(5,:,:,:)
 
   !!-------------- update the matrix and tail ------------
-
 END SUBROUTINE calculate_W
 
 !!--------- calculate weight for G matrix ---------
