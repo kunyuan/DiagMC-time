@@ -101,14 +101,13 @@ SUBROUTINE calculate_Polar
   complex(kind=8) :: Gin, Gout, Gam1
   double precision :: ratio
 
-  ratio = -2.d0/Beta
+  ratio = 2.d0/Beta
   Polar(:,:,:) = (0.d0, 0.d0)
   do omega = 0, MxT-1
-    do omegaGin = 0, MxT-1
+    do omegaGin = omega, MxT-1
       do px = 0, Lx-1
         do py = 0, Ly-1
           omegaGout = omegaGin - omega
-          if(omegaGout<0 .or. omegaGout>=MxT) cycle
 
           Gin = weight_G(1, omegaGin)
           Gout = weight_G(1, omegaGout)
@@ -130,15 +129,14 @@ SUBROUTINE calculate_Sigma
   complex(kind=8) :: G1, W1, Gam1
   double precision :: ratio
 
-  ratio = 3.d0/(real(Lx)*real(Ly)*Beta)
+  ratio = -3.d0/(real(Lx)*real(Ly)*Beta)
   Sigma(:) = (0.d0, 0.d0)
 
   do omega = 0, MxT-1
-    do omegaG = 0, MxT-1
+    do omegaG = 0, omega
       do py = 0, Ly-1
         do px = 0, Lx-1
           omegaW = omega-omegaG
-          if(omegaW<0 .or. omegaW>=MxT) cycle
 
           G1 = weight_G0(1, omegaG)
           W1 = weight_W0(1, px, py, omegaW)
@@ -304,7 +302,8 @@ Complex*16 FUNCTION weight_W0(typ, dx, dy, t)
     weight_W0 = (0.d0, 0.d0)
 
     if(t==0) then
-      if((dx1==1.and.dy1==0).or.(dx1==0.and.dy1==1)) then
+      !if((dx1==1.and.dy1==0).or.(dx1==0.and.dy1==1)) then
+      if(dx1==0.and.dy1==0) then
         if(typ ==1 .or. typ == 2) then
           weight_W0 = dcmplx(0.25d0*Jcp, 0.d0)
         else if(typ == 3 .or. typ == 4) then

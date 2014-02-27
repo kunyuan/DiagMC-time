@@ -2,6 +2,7 @@ INCLUDE "vrbls_mc.f90"
 PROGRAM MAIN
   USE vrbls_mc
   implicit none
+  integer :: it, it2
 
 
   Mu(:)  = 1.d0
@@ -15,13 +16,36 @@ PROGRAM MAIN
 
   Beta = 0.5d0
 
+  open(10, file="G0_t.dat")
+  open(11, file="G_omega.dat")
+  open(12, file="G_t.dat")
+
   call initialize_self_consistent
 
-  call calculate_Sigma
-  call calculate_Polar
-  call calculate_G
-  call calculate_W
+  do it = 0, MxT-1
+    write(10, *) G(1, it)
+  enddo
 
+  call transfer_t(1)
+  call transfer_r(1)
+
+  call calculate_Sigma
+  call calculate_G
+
+  do it = 0, MxT-1
+    write(11, *) G(1, it)
+  enddo
+
+  call transfer_r(-1)
+  call transfer_t(-1)
+
+  do it = 0, MxT-1
+    write(12, *) G(1, it)
+  enddo
+
+  close(10)
+  close(11)
+  close(12)
 
 CONTAINS
 INCLUDE "basic_function.f90"
@@ -32,6 +56,22 @@ INCLUDE "self_consistent.f90"
 !INCLUDE "read_write_data.f90"
 !INCLUDE "analytic_integration.f90"
 
+SUBROUTINE transfer_r(Backforth)
+  implicit none
+  integer , intent(in) :: Backforth
+
+  call transfer_W_r(Backforth)
+  call transfer_Gam_r(Backforth)
+END SUBROUTINE
+
+SUBROUTINE transfer_t(Backforth)
+  implicit none
+  integer , intent(in) :: Backforth
+
+  call transfer_G_t(Backforth)
+  call transfer_W_t(Backforth)
+  call transfer_Gam_t(Backforth)
+END SUBROUTINE
 
 !SUBROUTINE self_consistent
   !implicit none
