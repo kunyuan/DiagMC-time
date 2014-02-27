@@ -5,179 +5,138 @@
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
 !_TAG_PROGRAM_VERSION	5.8	//
 10	monte_carlo.f90	/^  10 format(' Line:',i2,2x,'kind:',i2,2x,'type:',i2,2x,'k:',i8,2x,'omega:',i6,2x,'stat:',i2, 2x,&$/;"	l	subroutine:print_config	file:
-100	collapse_statistics.f90	/^100 close(11)$/;"	l	program:MAIN	file:
-100	fourier.f90	/^100 J = 1$/;"	l	subroutine:SFFTEU	file:
-101	fourier.f90	/^101    K = N \/ 2$/;"	l	subroutine:SFFTEU	file:
-102	fourier.f90	/^102    if ( K .ge. J ) goto 103$/;"	l	subroutine:SFFTEU	file:
-103	fourier.f90	/^103    J = J + K$/;"	l	subroutine:SFFTEU	file:
+100	basic_function.f90	/^100 J = 1$/;"	l	subroutine:SFFTEU	file:
+100	data_process/collapse_data.f90	/^100 continue$/;"	l	program:main	file:
+100	data_process/collapse_statistics.f90	/^100 close(11)$/;"	l	program:MAIN	file:
+101	basic_function.f90	/^101    K = N \/ 2$/;"	l	subroutine:SFFTEU	file:
+102	basic_function.f90	/^102    if ( K .ge. J ) goto 103$/;"	l	subroutine:SFFTEU	file:
+103	basic_function.f90	/^103    J = J + K$/;"	l	subroutine:SFFTEU	file:
 12	monte_carlo.f90	/^  12 format('Gamma:',i2,2x,'type:',i2,2x,'typein:',i2,2x,'typeout:',i2,2x,'gr:(',i4,i4,'), wr:(',i4,i4,')',&$/;"	l	subroutine:print_config	file:
-40	fourier.f90	/^40        do I0 = IS, N-1, ID$/;"	l	subroutine:SFFTEU	file:
-50	fourier.f90	/^50  do I0 = IS, N, ID$/;"	l	subroutine:SFFTEU	file:
+40	basic_function.f90	/^40        do I0 = IS, N-1, ID$/;"	l	subroutine:SFFTEU	file:
+50	basic_function.f90	/^50  do I0 = IS, N, ID$/;"	l	subroutine:SFFTEU	file:
 51	DiagMC.f90	/^  51 format(\/'simulation time:',f16.7,2x,'s')$/;"	l	subroutine:monte_carlo	file:
 52	DiagMC.f90	/^    52 format(\/'thermalization time:',f16.7,2x,'s')$/;"	l	subroutine:monte_carlo	file:
-Ave	collapse_statistics.f90	/^    double precision :: Obs(1:Nobs_b, 12000), Ave(/;"	v	program:MAIN
-Ave	vrbls_mc.f90	/^  double precision , dimension(1:Nobs_b) :: Quan, Ave,/;"	v	module:vrbls_mc
-AveWeightRatio	vrbls_mc.f90	/^  double precision :: AveWeightRatio(/;"	v	module:vrbls_mc
-Beta	collapse_statistics.f90	/^    double precision :: Beta,/;"	v	program:MAIN
+Ave	data_process/collapse_statistics.f90	/^    double precision :: Obs(1:Nobs_b, 12000), Ave(/;"	v	program:MAIN
+Ave	vrbls_mc.f90	/^  double precision , dimension(1:Nobs) :: Quan, Ave,/;"	v	module:vrbls_mc
+Beta	data_process/collapse_statistics.f90	/^    double precision :: Beta,/;"	v	program:MAIN
 Beta	vrbls_mc.f90	/^  double precision ::  Beta /;"	v	module:vrbls_mc
 CheckG	vrbls_mc.f90	/^  logical          ::  CheckG,/;"	v	module:vrbls_mc
-CheckGamma	vrbls_mc.f90	/^  logical          ::  CheckG, CheckW, CheckGamma /;"	v	module:vrbls_mc
+CheckGam	vrbls_mc.f90	/^  logical          ::  CheckG, CheckW, CheckGam /;"	v	module:vrbls_mc
 CheckW	vrbls_mc.f90	/^  logical          ::  CheckG, CheckW,/;"	v	module:vrbls_mc
-ChiR	vrbls_mc.f90	/^  double precision, allocatable   :: ChiR(/;"	v	module:vrbls_mc
-CoefOfSymmetry	vrbls_mc.f90	/^  double precision, allocatable :: CoefOfSymmetry(/;"	v	module:vrbls_mc
+Chi	vrbls_mc.f90	/^  complex(kind=8) :: Chi(/;"	v	module:vrbls_mc
+CoefOfSymmetry	vrbls_mc.f90	/^  double precision :: CoefOfSymmetry(/;"	v	module:vrbls_mc
 CoefOfWeight	vrbls_mc.f90	/^  double precision :: CoefOfWeight(/;"	v	module:vrbls_mc
 CoefOfWorm	vrbls_mc.f90	/^  double precision :: CoefOfWorm$/;"	v	module:vrbls_mc
-Cor	collapse_statistics.f90	/^    double precision :: Obs(1:Nobs_b, 12000), Ave(1:Nobs_b), Dev(1:Nobs_b), Cor(/;"	v	program:MAIN
-Cor	vrbls_mc.f90	/^  double precision , dimension(1:Nobs_b) :: Quan, Ave, Dev, Cor$/;"	v	module:vrbls_mc
+Cor	data_process/collapse_statistics.f90	/^    double precision :: Obs(1:Nobs_b, 12000), Ave(1:Nobs_b), Dev(1:Nobs_b), Cor(/;"	v	program:MAIN
+Cor	vrbls_mc.f90	/^  double precision , dimension(1:Nobs) :: Quan, Ave, Dev, Cor$/;"	v	module:vrbls_mc
 D	vrbls_mc.f90	/^  integer, parameter :: D /;"	v	module:vrbls_mc
-Dev	collapse_statistics.f90	/^    double precision :: Obs(1:Nobs_b, 12000), Ave(1:Nobs_b), Dev(/;"	v	program:MAIN
-Dev	vrbls_mc.f90	/^  double precision , dimension(1:Nobs_b) :: Quan, Ave, Dev,/;"	v	module:vrbls_mc
+Dev	data_process/collapse_statistics.f90	/^    double precision :: Obs(1:Nobs_b, 12000), Ave(1:Nobs_b), Dev(/;"	v	program:MAIN
+Dev	vrbls_mc.f90	/^  double precision , dimension(1:Nobs) :: Quan, Ave, Dev,/;"	v	module:vrbls_mc
 DirecVertex	vrbls_mc.f90	/^  integer, dimension(MxNVertex) :: DirecVertex /;"	v	module:vrbls_mc
-FFT	fourier.f90	/^SUBROUTINE FFT(/;"	s
-Fomega	vrbls_mc.f90	/^  double precision, dimension(-MxOmega:MxOmega) :: Pomega, Fomega$/;"	v	module:vrbls_mc
+FFT_r	basic_function.f90	/^SUBROUTINE FFT_r(/;"	s
+FFT_tau_double	basic_function.f90	/^SUBROUTINE FFT_tau_double(/;"	s
+FFT_tau_single	basic_function.f90	/^SUBROUTINE FFT_tau_single(/;"	s
 Fupdate	vrbls_mc.f90	/^  double precision :: Fupdate(/;"	v	module:vrbls_mc
-Fx	vrbls_mc.f90	/^  double precision, dimension(-MxLx+1:MxLx-1) :: Px, Fx$/;"	v	module:vrbls_mc
-Fy	vrbls_mc.f90	/^  double precision, dimension(-MxLy+1:MxLy-1) :: Py, Fy$/;"	v	module:vrbls_mc
-G0I	self_consistent.f90	/^  double precision :: GintI, G0I$/;"	v
-G1I	self_consistent.f90	/^  double precision :: G1I,/;"	v
-G2I	self_consistent.f90	/^  double precision :: G2I,/;"	v
-G3I	self_consistent.f90	/^  double precision :: G2I, G3I,/;"	v
-GCoefN	vrbls_mc.f90	/^  double precision :: GCoefN(/;"	v	module:vrbls_mc
-GCoefP	vrbls_mc.f90	/^  double precision :: GCoefP(/;"	v	module:vrbls_mc
-GI	vrbls_mc.f90	/^  double precision   :: GI(/;"	v	module:vrbls_mc
-GITailN	vrbls_mc.f90	/^  double precision   :: GITailP(NtypG,Nbasis),GITailN(/;"	v	module:vrbls_mc
-GITailP	vrbls_mc.f90	/^  double precision   :: GITailP(/;"	v	module:vrbls_mc
-GTN	vrbls_mc.f90	/^  double precision :: GTP(nbasis), GTN(/;"	v	module:vrbls_mc
-GTP	vrbls_mc.f90	/^  double precision :: GTP(/;"	v	module:vrbls_mc
-GWGaI	self_consistent.f90	/^  double precision :: G1I, WWR, GaR1, GaR2, GWGaI$/;"	v
+G	vrbls_mc.f90	/^  complex(kind=8) :: G(/;"	v	module:vrbls_mc
+G0F	vrbls_mc.f90	/^  complex(kind=8) :: G0F(/;"	v	module:vrbls_mc
 GXVertex	vrbls_mc.f90	/^  integer, dimension(MxNVertex) :: GXVertex,/;"	v	module:vrbls_mc
 GYVertex	vrbls_mc.f90	/^  integer, dimension(MxNVertex) :: GXVertex, GYVertex /;"	v	module:vrbls_mc
-GaR1	self_consistent.f90	/^  double precision :: G1I, WWR, GaR1,/;"	v
-GaR2	self_consistent.f90	/^  double precision :: G1I, WWR, GaR1, GaR2,/;"	v
-Gam0Bubble	vrbls_mc.f90	/^  double precision :: Gam0Bubble$/;"	v	module:vrbls_mc
-Gam1MR	vrbls_mc.f90	/^  double precision, allocatable   :: Gam1MR(/;"	v	module:vrbls_mc
-Gam2Topo	vrbls_mc.f90	/^  double precision :: Gam2Topo(/;"	v	module:vrbls_mc
-GamGinCoefN	vrbls_mc.f90	/^  double precision :: GamGinCoefN(/;"	v	module:vrbls_mc
-GamGinCoefP	vrbls_mc.f90	/^  double precision :: GamGinCoefP(/;"	v	module:vrbls_mc
-GamGinTN	vrbls_mc.f90	/^  double precision :: GamGinTP(nbasis), GamGinTN(/;"	v	module:vrbls_mc
-GamGinTP	vrbls_mc.f90	/^  double precision :: GamGinTP(/;"	v	module:vrbls_mc
-GamGoutCoefN	vrbls_mc.f90	/^  double precision :: GamGoutCoefN(/;"	v	module:vrbls_mc
-GamGoutCoefP	vrbls_mc.f90	/^  double precision :: GamGoutCoefP(/;"	v	module:vrbls_mc
-GamGoutTN	vrbls_mc.f90	/^  double precision :: GamGoutTP(nbasis), GamGoutTN(/;"	v	module:vrbls_mc
-GamGoutTP	vrbls_mc.f90	/^  double precision :: GamGoutTP(/;"	v	module:vrbls_mc
-GamMC	collapse_statistics.f90	/^    double precision :: GamMC(/;"	v	program:MAIN
-GamMC	vrbls_mc.f90	/^  double precision, allocatable   :: GamMC(/;"	v	module:vrbls_mc
-GamNorm	collapse_statistics.f90	/^    double precision :: GamMC(1:Nobs_b-1, 12000), GamNorm(/;"	v	program:MAIN
+Gam	vrbls_mc.f90	/^  complex(kind=8) :: Gam(/;"	v	module:vrbls_mc
+Gam1	data_process/collapse_data.f90	/^    double precision :: Gam1,/;"	v	program:main
+Gam1MR	data_process/collapse_data.f90	/^    double precision :: Gam1MR,/;"	v	program:main
+Gam2	data_process/collapse_data.f90	/^    double precision :: Gam1, Gam2,/;"	v	program:main
+Gam2Topo	data_process/collapse_data.f90	/^    double precision :: Gam2Topo(/;"	v	program:main
+Gam3	data_process/collapse_data.f90	/^    double precision :: Gam1, Gam2, Gam3$/;"	v	program:main
+GamMC	data_process/collapse_statistics.f90	/^    double precision :: GamMC(/;"	v	program:MAIN
+GamMC	vrbls_mc.f90	/^  double precision, allocatable :: GamMC(/;"	v	module:vrbls_mc
+GamMC1	data_process/collapse_data.f90	/^    double precision :: GamMC1(/;"	v	program:main
+GamMC2	data_process/collapse_data.f90	/^    double precision :: GamMC2(/;"	v	program:main
+GamNorm	data_process/collapse_data.f90	/^    double precision :: Gam1MR, GamNorm(/;"	v	program:main
+GamNorm	data_process/collapse_statistics.f90	/^    double precision :: GamMC(1:Nobs_b-1, 12000), GamNorm(/;"	v	program:MAIN
 GamNorm	vrbls_mc.f90	/^  double precision :: GamNorm,/;"	v	module:vrbls_mc
-GamNormWeight	collapse_statistics.f90	/^    double precision :: GamMC(1:Nobs_b-1, 12000), GamNorm(12000), GamNormWeight$/;"	v	program:MAIN
+GamNormWeight	data_process/collapse_statistics.f90	/^    double precision :: GamMC(1:Nobs_b-1, 12000), GamNorm(12000), GamNormWeight$/;"	v	program:MAIN
 GamNormWeight	vrbls_mc.f90	/^  double precision :: GamNorm, GamNormWeight /;"	v	module:vrbls_mc
 GamOrder	vrbls_mc.f90	/^  double precision :: GamOrder(/;"	v	module:vrbls_mc
-GamR	vrbls_mc.f90	/^  double precision, allocatable   :: GamR(/;"	v	module:vrbls_mc
-GamRTailC	vrbls_mc.f90	/^  double precision, allocatable   :: GamRTailC(/;"	v	module:vrbls_mc
-GamRTailMN	vrbls_mc.f90	/^  double precision, allocatable   :: GamRTailMN(/;"	v	module:vrbls_mc
-GamRTailMP	vrbls_mc.f90	/^  double precision, allocatable   :: GamRTailMP(/;"	v	module:vrbls_mc
-GamRTailNM	vrbls_mc.f90	/^  double precision, allocatable   :: GamRTailNM(/;"	v	module:vrbls_mc
-GamRTailNN	vrbls_mc.f90	/^  double precision, allocatable   :: GamRTailNN(/;"	v	module:vrbls_mc
-GamRTailNP	vrbls_mc.f90	/^  double precision, allocatable   :: GamRTailNP(/;"	v	module:vrbls_mc
-GamRTailPM	vrbls_mc.f90	/^  double precision, allocatable   :: GamRTailPM(/;"	v	module:vrbls_mc
-GamRTailPN	vrbls_mc.f90	/^  double precision, allocatable   :: GamRTailPN(/;"	v	module:vrbls_mc
-GamRTailPP	vrbls_mc.f90	/^  double precision, allocatable   :: GamRTailPP(/;"	v	module:vrbls_mc
-GamSqMC	vrbls_mc.f90	/^  double precision, allocatable   :: GamSqMC(/;"	v	module:vrbls_mc
+GamSqMC1	data_process/collapse_data.f90	/^    double precision :: GamSqMC1(/;"	v	program:main
+GamSqMC2	data_process/collapse_data.f90	/^    double precision :: GamSqMC2(/;"	v	program:main
 GamWormOrder	vrbls_mc.f90	/^  double precision :: GamWormOrder(/;"	v	module:vrbls_mc
-Gamma_mc2matrix_mc	self_consistent.f90	/^SUBROUTINE Gamma_mc2matrix_mc$/;"	s
-GintI	self_consistent.f90	/^  double precision :: GintI,/;"	v
 Hash4G	vrbls_mc.f90	/^  integer, dimension(-MxK:MxK) ::  Hash4G /;"	v	module:vrbls_mc
 Hash4W	vrbls_mc.f90	/^  integer, dimension(0:MxK) ::     Hash4W /;"	v	module:vrbls_mc
-HistoOmegaW	vrbls_mc.f90	/^  double precision :: HistoOmegaW(/;"	v	module:vrbls_mc
 Ira	vrbls_mc.f90	/^  integer          :: Ira,/;"	v	module:vrbls_mc
 IsWormPresent	vrbls_mc.f90	/^  logical          :: IsWormPresent /;"	v	module:vrbls_mc
-Is_delta_omega_not_valid	basic_function.f90	/^LOGICAL FUNCTION Is_delta_omega_not_valid(/;"	f
-Is_k_valid	basic_function.f90	/^LOGICAL FUNCTION Is_k_valid(/;"	f
-Is_omega_not_valid	basic_function.f90	/^LOGICAL FUNCTION Is_omega_not_valid(/;"	f
 Is_reducible_G	monte_carlo.f90	/^LOGICAL FUNCTION Is_reducible_G(/;"	f
 Is_reducible_G_Gamma	monte_carlo.f90	/^LOGICAL FUNCTION Is_reducible_G_Gamma(/;"	f
 Is_reducible_W	monte_carlo.f90	/^LOGICAL FUNCTION Is_reducible_W(/;"	f
 Is_reducible_W_Gamma	monte_carlo.f90	/^LOGICAL FUNCTION Is_reducible_W_Gamma(/;"	f
-Is_x_valid	basic_function.f90	/^LOGICAL FUNCTION Is_x_valid(/;"	f
-Is_y_valid	basic_function.f90	/^LOGICAL FUNCTION Is_y_valid(/;"	f
 Jcp	vrbls_mc.f90	/^  double precision ::  Jcp /;"	v	module:vrbls_mc
 KindLn	vrbls_mc.f90	/^  integer, dimension(MxNLn) :: KindLn /;"	v	module:vrbls_mc
 List4Ln	vrbls_mc.f90	/^  integer, dimension(MxNLn) :: NextLn, List4Ln /;"	v	module:vrbls_mc
 List4Vertex	vrbls_mc.f90	/^  integer, dimension(MxNVertex) :: NextVertex, List4Vertex /;"	v	module:vrbls_mc
 Ln4GList	vrbls_mc.f90	/^  integer, dimension(MxNGLn) :: Ln4GList /;"	v	module:vrbls_mc
 Ln4WList	vrbls_mc.f90	/^  integer, dimension(MxNWLn) :: Ln4WList /;"	v	module:vrbls_mc
-Lx	collapse_statistics.f90	/^    integer :: Lx,/;"	v	program:MAIN
+Lx	data_process/collapse_statistics.f90	/^    integer :: Lx,/;"	v	program:MAIN
 Lx	vrbls_mc.f90	/^  integer          ::  Lx,/;"	v	module:vrbls_mc
-Ly	collapse_statistics.f90	/^    integer :: Lx, Ly,/;"	v	program:MAIN
+Ly	data_process/collapse_statistics.f90	/^    integer :: Lx, Ly,/;"	v	program:MAIN
 Ly	vrbls_mc.f90	/^  integer          ::  Lx, Ly,/;"	v	module:vrbls_mc
-MAIN	collapse_statistics.f90	/^  PROGRAM MAIN$/;"	p
-MCOrder	collapse_statistics.f90	/^    integer :: Lx, Ly, MCOrder,/;"	v	program:MAIN
+MAIN	data_process/collapse_statistics.f90	/^  PROGRAM MAIN$/;"	p
+MCOrder	data_process/collapse_data.f90	/^    integer :: MCOrder$/;"	v	program:main
+MCOrder	data_process/collapse_statistics.f90	/^    integer :: Lx, Ly, MCOrder,/;"	v	program:MAIN
 MCOrder	vrbls_mc.f90	/^  integer          ::  MCOrder /;"	v	module:vrbls_mc
 Masha	vrbls_mc.f90	/^  integer          :: Ira, Masha /;"	v	module:vrbls_mc
-MeasGamma	vrbls_mc.f90	/^  integer          :: MeasGamma /;"	v	module:vrbls_mc
+MeasureGam	vrbls_mc.f90	/^  integer          :: MeasureGam /;"	v	module:vrbls_mc
 Mnint	vrbls_mc.f90	/^  integer, parameter          :: Mnint /;"	v	module:vrbls_mc
 Mu	vrbls_mc.f90	/^  double precision ::  Mu(/;"	v	module:vrbls_mc
 MxError	vrbls_mc.f90	/^  double precision, parameter :: MxError /;"	v	module:vrbls_mc
-MxK	vrbls_mc.f90	/^  integer, parameter          :: MxK /;"	v	module:vrbls_mc
+MxK	vrbls_mc.f90	/^  integer, parameter :: MxK /;"	v	module:vrbls_mc
 MxLx	vrbls_mc.f90	/^  integer, parameter :: MxLx /;"	v	module:vrbls_mc
-MxLy	vrbls_mc.f90	/^  integer, parameter :: MxLx  = 64, MxLy /;"	v	module:vrbls_mc
+MxLy	vrbls_mc.f90	/^  integer, parameter :: MxLx  = 16, MxLy /;"	v	module:vrbls_mc
 MxNGLn	vrbls_mc.f90	/^  integer, parameter :: MxNGLn /;"	v	module:vrbls_mc
 MxNLn	vrbls_mc.f90	/^  integer, parameter :: MxNLn /;"	v	module:vrbls_mc
 MxNVertex	vrbls_mc.f90	/^  integer, parameter :: MxNVertex /;"	v	module:vrbls_mc
 MxNWLn	vrbls_mc.f90	/^  integer, parameter :: MxNWLn /;"	v	module:vrbls_mc
 MxNblck	vrbls_mc.f90	/^  integer, parameter          :: MxNblck /;"	v	module:vrbls_mc
-MxOmega	collapse_statistics.f90	/^    integer, parameter :: MxOmega /;"	v	program:MAIN
-MxOmega	vrbls_mc.f90	/^  integer, parameter :: MxOmega /;"	v	module:vrbls_mc
-MxOmegaChi	vrbls_mc.f90	/^  integer, parameter :: MxOmegaChi /;"	v	module:vrbls_mc
-MxOmegaDiag	vrbls_mc.f90	/^  integer, parameter :: MxOmegaDiag /;"	v	module:vrbls_mc
-MxOmegaG1	vrbls_mc.f90	/^  integer, parameter :: MxOmegaG1 /;"	v	module:vrbls_mc
-MxOmegaG2	vrbls_mc.f90	/^  integer, parameter :: MxOmegaG2 /;"	v	module:vrbls_mc
-MxOmegaGInt	vrbls_mc.f90	/^  integer, parameter :: MxOmegaGInt /;"	v	module:vrbls_mc
-MxOmegaGamG1	vrbls_mc.f90	/^  integer, parameter :: MxOmegaGamG1 /;"	v	module:vrbls_mc
-MxOmegaGamG2	vrbls_mc.f90	/^  integer, parameter :: MxOmegaGamG2 /;"	v	module:vrbls_mc
-MxOmegaGamInt	vrbls_mc.f90	/^  integer, parameter :: MxOmegaGamInt /;"	v	module:vrbls_mc
-MxOmegaPiInt	vrbls_mc.f90	/^  integer, parameter :: MxOmegaPiInt /;"	v	module:vrbls_mc
-MxOmegaSigma	vrbls_mc.f90	/^  integer, parameter :: MxOmegaSigma /;"	v	module:vrbls_mc
-MxOmegaSigmaInt	vrbls_mc.f90	/^  integer, parameter :: MxOmegaSigmaInt /;"	v	module:vrbls_mc
-MxOmegaW1	vrbls_mc.f90	/^  integer, parameter :: MxOmegaW1 /;"	v	module:vrbls_mc
-MxOmegaW2	vrbls_mc.f90	/^  integer, parameter :: MxOmegaW2 /;"	v	module:vrbls_mc
-MxOmegaWInt	vrbls_mc.f90	/^  integer, parameter :: MxOmegaWInt /;"	v	module:vrbls_mc
+MxOmega	data_process/collapse_data.f90	/^    integer, parameter :: MxOmega /;"	v	program:main
+MxOmega	data_process/collapse_statistics.f90	/^    integer, parameter :: MxOmega /;"	v	program:MAIN
 MxOrder	vrbls_mc.f90	/^  integer, parameter :: MxOrder /;"	v	module:vrbls_mc
+MxT	vrbls_mc.f90	/^  integer, parameter :: MxT /;"	v	module:vrbls_mc
 MxVol	vrbls_mc.f90	/^  integer, parameter :: MxVol /;"	v	module:vrbls_mc
 Mxint	vrbls_mc.f90	/^  integer, parameter          :: Mxint /;"	v	module:vrbls_mc
-NFermiLoop	vrbls_mc.f90	/^  integer          :: NFermiLoop /;"	v	module:vrbls_mc
+NBlck	vrbls_mc.f90	/^  integer          :: NBlck /;"	v	module:vrbls_mc
 NGLn	vrbls_mc.f90	/^  integer          :: NGLn,/;"	v	module:vrbls_mc
-NGam	vrbls_mc.f90	/^  integer          :: NGLn, NWLn, NGam /;"	v	module:vrbls_mc
+NSamp	vrbls_mc.f90	/^  integer          :: NSamp /;"	v	module:vrbls_mc
+NToss	vrbls_mc.f90	/^  integer          :: NToss /;"	v	module:vrbls_mc
+NTypeChi	vrbls_mc.f90	/^  integer, parameter :: NTypeChi /;"	v	module:vrbls_mc
+NTypeG	vrbls_mc.f90	/^  integer, parameter :: NTypeG /;"	v	module:vrbls_mc
+NTypeGam	vrbls_mc.f90	/^  integer, parameter :: NTypeGam /;"	v	module:vrbls_mc
+NTypeW	vrbls_mc.f90	/^  integer, parameter :: NTypeW /;"	v	module:vrbls_mc
+NVertex	vrbls_mc.f90	/^  integer          :: NGLn, NWLn, NVertex /;"	v	module:vrbls_mc
 NWLn	vrbls_mc.f90	/^  integer          :: NGLn, NWLn,/;"	v	module:vrbls_mc
-Nblck	collapse_statistics.f90	/^    integer :: iblck, omega, ityp, iobs, Nblck$/;"	v	program:MAIN
-Nblck	vrbls_mc.f90	/^  integer          :: Nblck /;"	v	module:vrbls_mc
+Nblck	data_process/collapse_statistics.f90	/^    integer :: iblck, omega, ityp, iobs, Nblck$/;"	v	program:MAIN
 NeighLn	vrbls_mc.f90	/^  integer, dimension(2,MxNLn) :: NeighLn /;"	v	module:vrbls_mc
 NeighVertex	vrbls_mc.f90	/^  integer, dimension(3,MxNVertex) :: NeighVertex /;"	v	module:vrbls_mc
 NextLn	vrbls_mc.f90	/^  integer, dimension(MxNLn) :: NextLn,/;"	v	module:vrbls_mc
 NextVertex	vrbls_mc.f90	/^  integer, dimension(MxNVertex) :: NextVertex,/;"	v	module:vrbls_mc
-Nobs_b	collapse_statistics.f90	/^    integer, parameter :: Nobs_b /;"	v	program:MAIN
-Nobs_b	vrbls_mc.f90	/^  integer, parameter :: Nobs_b /;"	v	module:vrbls_mc
-Nsamp	vrbls_mc.f90	/^  integer          :: Nsamp /;"	v	module:vrbls_mc
-Ntoss	vrbls_mc.f90	/^  integer          :: Ntoss /;"	v	module:vrbls_mc
+Nobs	vrbls_mc.f90	/^  integer, parameter :: Nobs /;"	v	module:vrbls_mc
+Nobs_b	data_process/collapse_statistics.f90	/^    integer, parameter :: Nobs_b /;"	v	program:MAIN
 Nupdate	vrbls_mc.f90	/^  integer, parameter :: Nupdate /;"	v	module:vrbls_mc
-Obs	collapse_statistics.f90	/^    double precision :: Obs(/;"	v	program:MAIN
+Obs	data_process/collapse_statistics.f90	/^    double precision :: Obs(/;"	v	program:MAIN
 Obs	vrbls_mc.f90	/^  double precision :: Obs(/;"	v	module:vrbls_mc
 OmegaLn	vrbls_mc.f90	/^  integer, dimension(MxNLn) :: OmegaLn /;"	v	module:vrbls_mc
-OmegaMasha	vrbls_mc.f90	/^  integer          :: OmegaMasha /;"	v	module:vrbls_mc
 Order	vrbls_mc.f90	/^  integer          :: Order /;"	v	module:vrbls_mc
 Phase	vrbls_mc.f90	/^  double precision :: Phase /;"	v	module:vrbls_mc
-PiR	vrbls_mc.f90	/^  double precision, allocatable   :: PiR(/;"	v	module:vrbls_mc
-Pomega	vrbls_mc.f90	/^  double precision, dimension(-MxOmega:MxOmega) :: Pomega,/;"	v	module:vrbls_mc
+Pi	vrbls_mc.f90	/^  double precision, parameter :: Pi /;"	v	module:vrbls_mc
+Pi2	vrbls_mc.f90	/^  double precision, parameter :: Pi2 /;"	v	module:vrbls_mc
+Pi4	vrbls_mc.f90	/^  double precision, parameter :: Pi4 /;"	v	module:vrbls_mc
+Polar	vrbls_mc.f90	/^  complex(kind=8) :: Polar(/;"	v	module:vrbls_mc
 ProbAcc	vrbls_mc.f90	/^  double precision :: ProbAcc(/;"	v	module:vrbls_mc
 ProbProp	vrbls_mc.f90	/^  double precision :: ProbProp(/;"	v	module:vrbls_mc
 Pupdate	vrbls_mc.f90	/^  double precision :: Pupdate(/;"	v	module:vrbls_mc
-Px	vrbls_mc.f90	/^  double precision, dimension(-MxLx+1:MxLx-1) :: Px,/;"	v	module:vrbls_mc
-Py	vrbls_mc.f90	/^  double precision, dimension(-MxLy+1:MxLy-1) :: Py,/;"	v	module:vrbls_mc
-Quan	vrbls_mc.f90	/^  double precision , dimension(1:Nobs_b) :: Quan,/;"	v	module:vrbls_mc
-SFFTEU	fourier.f90	/^subroutine SFFTEU(/;"	s
-Seed	collapse_statistics.f90	/^    integer :: Lx, Ly, MCOrder, Seed$/;"	v	program:MAIN
+Quan	vrbls_mc.f90	/^  double precision , dimension(1:Nobs) :: Quan,/;"	v	module:vrbls_mc
+SFFTEU	basic_function.f90	/^subroutine SFFTEU(/;"	s
+Seed	data_process/collapse_statistics.f90	/^    integer :: Lx, Ly, MCOrder, Seed$/;"	v	program:MAIN
 Seed	vrbls_mc.f90	/^  integer                      :: Seed /;"	v	module:vrbls_mc
-SigmaI	vrbls_mc.f90	/^  double precision, allocatable   :: SigmaI(/;"	v	module:vrbls_mc
+Sigma	vrbls_mc.f90	/^  complex(kind=8) :: Sigma(/;"	v	module:vrbls_mc
+SignFermiLoop	vrbls_mc.f90	/^  integer          :: SignFermiLoop /;"	v	module:vrbls_mc
 SpinMasha	vrbls_mc.f90	/^  integer          :: SpinMasha /;"	v	module:vrbls_mc
 StatusLn	vrbls_mc.f90	/^  integer, dimension(MxNLn) :: StatusLn /;"	v	module:vrbls_mc
 StatusVertex	vrbls_mc.f90	/^  integer, dimension(MxNVertex):: StatusVertex /;"	v	module:vrbls_mc
@@ -191,17 +150,8 @@ TypeVertexIn	vrbls_mc.f90	/^  integer, dimension(MxNVertex) :: TypeVertexIn,/;"	
 TypeVertexOut	vrbls_mc.f90	/^  integer, dimension(MxNVertex) :: TypeVertexIn, TypeVertexOut /;"	v	module:vrbls_mc
 Vertex4GamList	vrbls_mc.f90	/^  integer, dimension(MxNVertex):: Vertex4GamList /;"	v	module:vrbls_mc
 Vol	vrbls_mc.f90	/^  integer          ::  Lx, Ly, Vol /;"	v	module:vrbls_mc
-W0InMoment	vrbls_mc.f90	/^  double precision, allocatable   :: W0InMoment(/;"	v	module:vrbls_mc
-W1R	self_consistent.f90	/^  double precision :: G2I, G3I, W1R,/;"	v
-W2R	self_consistent.f90	/^  double precision :: G2I, G3I, W1R, W2R$/;"	v
-WCoefN	vrbls_mc.f90	/^  double precision :: WCoefN(/;"	v	module:vrbls_mc
-WCoefP	vrbls_mc.f90	/^  double precision :: WCoefP(/;"	v	module:vrbls_mc
-WR	vrbls_mc.f90	/^  double precision, allocatable   :: WR(/;"	v	module:vrbls_mc
-WRTailC	vrbls_mc.f90	/^  double precision, allocatable   :: WRTailC(/;"	v	module:vrbls_mc
-WRTailP	vrbls_mc.f90	/^  double precision, allocatable   :: WRTailP(/;"	v	module:vrbls_mc
-WTN	vrbls_mc.f90	/^  double precision :: WTP(nbasis), WTN(/;"	v	module:vrbls_mc
-WTP	vrbls_mc.f90	/^  double precision :: WTP(/;"	v	module:vrbls_mc
-WWR	self_consistent.f90	/^  double precision :: G1I, WWR,/;"	v
+W	vrbls_mc.f90	/^  complex(kind=8) :: W(/;"	v	module:vrbls_mc
+W0PF	vrbls_mc.f90	/^  complex(kind=8) :: W0PF(/;"	v	module:vrbls_mc
 WXVertex	vrbls_mc.f90	/^  integer, dimension(MxNVertex) :: WXVertex,/;"	v	module:vrbls_mc
 WYVertex	vrbls_mc.f90	/^  integer, dimension(MxNVertex) :: WXVertex, WYVertex /;"	v	module:vrbls_mc
 WeightCurrent	vrbls_mc.f90	/^  double precision :: WeightCurrent /;"	v	module:vrbls_mc
@@ -213,16 +163,14 @@ add_Hash4W	monte_carlo.f90	/^SUBROUTINE add_Hash4W(/;"	s
 add_interaction	monte_carlo.f90	/^SUBROUTINE add_interaction$/;"	s
 add_interaction_cross	monte_carlo.f90	/^SUBROUTINE add_interaction_cross$/;"	s
 add_ira_stat	monte_carlo.f90	/^INTEGER FUNCTION add_ira_stat(/;"	f
-add_k	basic_function.f90	/^INTEGER FUNCTION add_k(/;"	f
 add_mea_stat	monte_carlo.f90	/^INTEGER FUNCTION add_mea_stat(/;"	f
-calculate_Chi	self_consistent.f90	/^SUBROUTINE calculate_Chi$/;"	s
 calculate_G	self_consistent.f90	/^SUBROUTINE calculate_G$/;"	s
-calculate_GamNormWeight	basic_function.f90	/^SUBROUTINE calculate_GamNormWeight$/;"	s
-calculate_Gamma1	first_order_integration.f90	/^SUBROUTINE calculate_Gamma1$/;"	s
-calculate_Pi	self_consistent.f90	/^SUBROUTINE calculate_Pi$/;"	s
+calculate_Gamma1	analytic_integration.f90	/^SUBROUTINE calculate_Gamma1$/;"	s
+calculate_Gamma2	analytic_integration.f90	/^SUBROUTINE calculate_Gamma2$/;"	s
+calculate_Polar	self_consistent.f90	/^SUBROUTINE calculate_Polar$/;"	s
+calculate_Sigma	self_consistent.f90	/^SUBROUTINE calculate_Sigma$/;"	s
 calculate_W	self_consistent.f90	/^SUBROUTINE calculate_W$/;"	s
-calculate_W1	first_order_integration.f90	/^SUBROUTINE calculate_W1$/;"	s
-calculate_basis	basic_function.f90	/^SUBROUTINE calculate_basis(/;"	s
+calculate_W1	analytic_integration.f90	/^SUBROUTINE calculate_W1$/;"	s
 change_Gamma_type	monte_carlo.f90	/^SUBROUTINE change_Gamma_type$/;"	s
 check_config	check_conf.f90	/^SUBROUTINE check_config$/;"	s
 check_irreducibility	check_conf.f90	/^SUBROUTINE check_irreducibility$/;"	s
@@ -236,13 +184,11 @@ coll_data	statistics.f90	/^  SUBROUTINE coll_data(/;"	s
 create_worm_along_gline	monte_carlo.f90	/^SUBROUTINE create_worm_along_gline$/;"	s
 create_worm_along_wline	monte_carlo.f90	/^SUBROUTINE create_worm_along_wline$/;"	s
 dLx	vrbls_mc.f90	/^  integer          ::  dLx,/;"	v	module:vrbls_mc
-dLy	vrbls_mc.f90	/^  integer          ::  dLx, dLy /;"	v	module:vrbls_mc
+dLy	vrbls_mc.f90	/^  integer          ::  dLx, dLy$/;"	v	module:vrbls_mc
 date	vrbls_mc.f90	/^  character( 8)         :: date$/;"	v	module:vrbls_mc
 def_conf	monte_carlo.f90	/^subroutine def_conf$/;"	s
 def_diagram	monte_carlo.f90	/^SUBROUTINE def_diagram$/;"	s
-def_prob	basic_function.f90	/^SUBROUTINE def_prob$/;"	s
 def_spin	monte_carlo.f90	/^SUBROUTINE def_spin$/;"	s
-def_symmetry	basic_function.f90	/^SUBROUTINE def_symmetry$/;"	s
 delete_Hash4G	monte_carlo.f90	/^SUBROUTINE delete_Hash4G(/;"	s
 delete_Hash4W	monte_carlo.f90	/^SUBROUTINE delete_Hash4W(/;"	s
 delete_gamma	monte_carlo.f90	/^SUBROUTINE delete_gamma(/;"	s
@@ -251,41 +197,37 @@ delete_line	monte_carlo.f90	/^SUBROUTINE delete_line(/;"	s
 delete_mea_stat	monte_carlo.f90	/^INTEGER FUNCTION delete_mea_stat(/;"	f
 delete_worm_along_gline	monte_carlo.f90	/^SUBROUTINE delete_worm_along_gline$/;"	s
 delete_worm_along_wline	monte_carlo.f90	/^SUBROUTINE delete_worm_along_wline$/;"	s
-diff_x	basic_function.f90	/^INTEGER FUNCTION diff_x(/;"	f
-diff_y	basic_function.f90	/^INTEGER FUNCTION diff_y(/;"	f
+file1	data_process/collapse.py	/^file1 = title + "_Gamma_MC.dat"$/;"	v
+file2	data_process/collapse.py	/^file2 = title + "_-*_Gamma_MC.dat"$/;"	v
+file3	data_process/collapse.py	/^file3 = title + "_monte_carlo_data.dat"$/;"	v
+file4	data_process/collapse.py	/^file4 = title + "_-*_monte_carlo_data.dat"$/;"	v
 file_version	vrbls_mc.f90	/^  integer:: file_version$/;"	v	module:vrbls_mc
 find_config	monte_carlo.f90	/^INTEGER FUNCTION find_config(/;"	f
-find_neigh_x	basic_function.f90	/^INTEGER FUNCTION find_neigh_x(/;"	f
-find_neigh_y	basic_function.f90	/^INTEGER FUNCTION find_neigh_y(/;"	f
-generate_gamma	basic_function.f90	/^INTEGER FUNCTION generate_gamma(/;"	f
-generate_gline	basic_function.f90	/^INTEGER FUNCTION generate_gline(/;"	f
-generate_k	basic_function.f90	/^INTEGER FUNCTION generate_k(/;"	f
-generate_omega	basic_function.f90	/^INTEGER FUNCTION generate_omega(/;"	f
-generate_wline	basic_function.f90	/^INTEGER FUNCTION generate_wline(/;"	f
-generate_x	basic_function.f90	/^INTEGER FUNCTION generate_x(/;"	f
-generate_y	basic_function.f90	/^INTEGER FUNCTION generate_y(/;"	f
 h_curr	vrbls_mc.f90	/^  integer               :: h_prev, h_curr$/;"	v	module:vrbls_mc
 h_prev	vrbls_mc.f90	/^  integer               :: h_prev,/;"	v	module:vrbls_mc
-ib	self_consistent.f90	/^  integer :: ib,/;"	v
-iblck	collapse_statistics.f90	/^    integer :: iblck,/;"	v	program:MAIN
+i	data_process/collapse_data.f90	/^    in/;"	v	program:main
+ibasis	data_process/collapse_data.f90	/^    integer :: itopo, ix, iy, ityp, ibasis,/;"	v	program:main
+ibasis2	data_process/collapse_data.f90	/^    integer :: itopo, ix, iy, ityp, ibasis, ibasis2,/;"	v	program:main
+iblck	data_process/collapse_statistics.f90	/^    integer :: iblck,/;"	v	program:MAIN
 ifd1	vrbls_mc.f90	/^  integer, parameter           :: len1=9689,    ifd1=/;"	v	module:vrbls_mc
 ifd2	vrbls_mc.f90	/^  integer, parameter           :: len2=127,     ifd2=/;"	v	module:vrbls_mc
-imc	vrbls_mc.f90	/^  double precision :: imc,/;"	v	module:vrbls_mc
-ime	vrbls_mc.f90	/^  double precision :: imc, ime /;"	v	module:vrbls_mc
+ifile	data_process/collapse_data.f90	/^    integer :: ifile$/;"	v	program:main
+imc	vrbls_mc.f90	/^  double precision :: imc /;"	v	module:vrbls_mc
+ime	data_process/collapse_data.f90	/^    double precision :: ime(/;"	v	program:main
 initialize_G	self_consistent.f90	/^SUBROUTINE initialize_G$/;"	s
-initialize_Gamma	self_consistent.f90	/^SUBROUTINE initialize_Gamma$/;"	s
-initialize_Pi	self_consistent.f90	/^SUBROUTINE initialize_Pi$/;"	s
+initialize_G0F	self_consistent.f90	/^SUBROUTINE initialize_G0F$/;"	s
+initialize_Gam	self_consistent.f90	/^SUBROUTINE initialize_Gam$/;"	s
 initialize_W	self_consistent.f90	/^SUBROUTINE initialize_W$/;"	s
-initialize_W0InMoment	self_consistent.f90	/^SUBROUTINE initialize_W0InMoment$/;"	s
+initialize_W0PF	self_consistent.f90	/^SUBROUTINE initialize_W0PF$/;"	s
 initialize_self_consistent	self_consistent.f90	/^SUBROUTINE initialize_self_consistent$/;"	s
-inner_productN	basic_function.f90	/^DOUBLE PRECISION FUNCTION inner_productN(/;"	f
-inner_productP	basic_function.f90	/^DOUBLE PRECISION FUNCTION inner_productP(/;"	f
 insert_gamma	monte_carlo.f90	/^SUBROUTINE insert_gamma(/;"	s
 insert_line	monte_carlo.f90	/^SUBROUTINE insert_line(/;"	s
 inxt1	vrbls_mc.f90	/^  integer, dimension(1:len1)   :: inxt1$/;"	v	module:vrbls_mc
 inxt2	vrbls_mc.f90	/^  integer, dimension(1:len2)   :: inxt2$/;"	v	module:vrbls_mc
-iobs	collapse_statistics.f90	/^    integer :: iblck, omega, ityp, iobs,/;"	v	program:MAIN
-iorder	self_consistent.f90	/^  integer :: iorder$/;"	v
+iobs	data_process/collapse_statistics.f90	/^    integer :: iblck, omega, ityp, iobs,/;"	v	program:MAIN
+iomega1	data_process/collapse_data.f90	/^    integer :: itopo, ix, iy, ityp, ibasis, ibasis2, iomega1,/;"	v	program:main
+iomega2	data_process/collapse_data.f90	/^    integer :: itopo, ix, iy, ityp, ibasis, ibasis2, iomega1, iomega2$/;"	v	program:main
+iorder	data_process/collapse_data.f90	/^    integer :: i, itot, iorder$/;"	v	program:main
 ipnf1	vrbls_mc.f90	/^  integer                      :: ipnt1, ipnf1$/;"	v	module:vrbls_mc
 ipnf2	vrbls_mc.f90	/^  integer                      :: ipnt2, ipnf2$/;"	v	module:vrbls_mc
 ipnt1	vrbls_mc.f90	/^  integer                      :: ipnt1,/;"	v	module:vrbls_mc
@@ -295,17 +237,19 @@ ir2	vrbls_mc.f90	/^  integer, dimension(1:len2)   :: ir2$/;"	v	module:vrbls_mc
 irn	vrbls_mc.f90	/^  integer, dimension(1:mxrn)   :: irn(/;"	v	module:vrbls_mc
 is_topo_1	monte_carlo.f90	/^LOGICAL FUNCTION is_topo_1(/;"	f
 is_topo_2	monte_carlo.f90	/^LOGICAL FUNCTION is_topo_2(/;"	f
-it	self_consistent.f90	/^  integer :: ib, xw, yw, omega, omega1, omega2, omegaW, omegaG1, ity/;"	v
-ityp	collapse_statistics.f90	/^    integer :: iblck, omega, ityp,/;"	v	program:MAIN
-ityp	self_consistent.f90	/^  integer :: ib, xw, yw, omega, omega1, omega2, omegaW, omegaG1, ityp,/;"	v
+itopo	data_process/collapse_data.f90	/^    integer :: itopo,/;"	v	program:main
+itot	data_process/collapse_data.f90	/^    integer :: i, itot,/;"	v	program:main
+ityp	data_process/collapse_data.f90	/^    integer :: itopo, ix, iy, ityp,/;"	v	program:main
+ityp	data_process/collapse_statistics.f90	/^    integer :: iblck, omega, ityp,/;"	v	program:MAIN
 iupdate	vrbls_mc.f90	/^  integer          :: iupdate /;"	v	module:vrbls_mc
+ix	data_process/collapse_data.f90	/^    integer :: itopo, ix,/;"	v	program:main
+iy	data_process/collapse_data.f90	/^    integer :: itopo, ix, iy,/;"	v	program:main
 kLn	vrbls_mc.f90	/^  integer, dimension(MxNLn) :: kLn /;"	v	module:vrbls_mc
 kMasha	vrbls_mc.f90	/^  integer          :: kMasha /;"	v	module:vrbls_mc
-lamx	vrbls_mc.f90	/^  double precision,parameter :: lamx /;"	v	module:vrbls_mc
-lamy	vrbls_mc.f90	/^  double precision,parameter :: lamy /;"	v	module:vrbls_mc
 len1	vrbls_mc.f90	/^  integer, parameter           :: len1=/;"	v	module:vrbls_mc
 len2	vrbls_mc.f90	/^  integer, parameter           :: len2=/;"	v	module:vrbls_mc
 line_stat	monte_carlo.f90	/^INTEGER FUNCTION line_stat(/;"	f
+main	data_process/collapse_data.f90	/^  program main$/;"	p
 markov	monte_carlo.f90	/^SUBROUTINE markov$/;"	s
 measure	monte_carlo.f90	/^SUBROUTINE measure$/;"	s
 mod2	vrbls_mc.f90	/^  integer, parameter           :: mod2=/;"	v	module:vrbls_mc
@@ -316,40 +260,20 @@ move_worm_along_wline	monte_carlo.f90	/^SUBROUTINE move_worm_along_wline$/;"	s
 mul2	vrbls_mc.f90	/^  integer, parameter           :: mod2=2796203, mul2=/;"	v	module:vrbls_mc
 mult	vrbls_mc.f90	/^  integer, parameter           :: mult=/;"	v	module:vrbls_mc
 mxrn	vrbls_mc.f90	/^  integer, parameter           :: mxrn /;"	v	module:vrbls_mc
-nbasis	vrbls_mc.f90	/^  integer, parameter :: nbasis /;"	v	module:vrbls_mc
-norm_data	collapse_statistics.f90	/^  SUBROUTINE norm_data$/;"	s	program:MAIN
+nme	data_process/collapse_data.f90	/^    double precision :: ime(100), nme$/;"	v	program:main
+norm_data	data_process/collapse_statistics.f90	/^  SUBROUTINE norm_data$/;"	s	program:MAIN
 norm_data	statistics.f90	/^  SUBROUTINE norm_data$/;"	s
 nrannr	vrbls_mc.f90	/^  integer                      :: nrannr /;"	v	module:vrbls_mc
-ntypCh	vrbls_mc.f90	/^  integer, parameter :: ntypCh /;"	v	module:vrbls_mc
-ntypG	vrbls_mc.f90	/^  integer, parameter :: ntypG /;"	v	module:vrbls_mc
-ntypGa	vrbls_mc.f90	/^  integer, parameter :: ntypGa /;"	v	module:vrbls_mc
-ntypPi	vrbls_mc.f90	/^  integer, parameter :: ntypPi /;"	v	module:vrbls_mc
-ntypSigma	vrbls_mc.f90	/^  integer, parameter :: ntypSigma /;"	v	module:vrbls_mc
-ntypW	vrbls_mc.f90	/^  integer, parameter :: ntypW /;"	v	module:vrbls_mc
-nw	vrbls_mc.f90	/^  integer          :: nw /;"	v	module:vrbls_mc
-omega	collapse_statistics.f90	/^    integer :: iblck, omega,/;"	v	program:MAIN
-omega	self_consistent.f90	/^  integer :: ib, xw, yw, omega,/;"	v
-omega1	self_consistent.f90	/^  integer :: ib, xw, yw, omega, omega1,/;"	v
-omega2	self_consistent.f90	/^  integer :: ib, xw, yw, omega, omega1, omega2,/;"	v
-omegaG1	self_consistent.f90	/^  integer :: ib, xw, yw, omega, omega1, omega2, omegaW, omegaG1,/;"	v
-omegaG2	self_consistent.f90	/^  integer :: omegaG2,/;"	v
-omegaG3	self_consistent.f90	/^  integer :: omegaG2, omegaG3$/;"	v
-omegaW	self_consistent.f90	/^  integer :: ib, xw, yw, omega, omega1, omega2, omegaW,/;"	v
-output_GamMC	collapse_statistics.f90	/^  SUBROUTINE output_GamMC$/;"	s	program:MAIN
-output_GamMC	print.f90	/^SUBROUTINE output_GamMC$/;"	s
-output_Quantities	print.f90	/^SUBROUTINE output_Quantities$/;"	s
-output_prob_MC	print.f90	/^SUBROUTINE output_prob_MC$/;"	s
-pi	vrbls_mc.f90	/^  double precision, parameter :: pi /;"	v	module:vrbls_mc
-pi2	vrbls_mc.f90	/^  double precision, parameter :: pi2 /;"	v	module:vrbls_mc
-pi4	vrbls_mc.f90	/^  double precision, parameter :: pi4 /;"	v	module:vrbls_mc
+omega	data_process/collapse_statistics.f90	/^    integer :: iblck, omega,/;"	v	program:MAIN
+order	data_process/collapse_data.f90	/^    character*1 :: order$/;"	v	program:main
+os	data_process/collapse.py	/^import os$/;"	i
+output_GamMC	data_process/collapse_statistics.f90	/^  SUBROUTINE output_GamMC$/;"	s	program:MAIN
+output_GamMC	read_write_data.f90	/^SUBROUTINE output_GamMC$/;"	s
+output_Quantities	read_write_data.f90	/^SUBROUTINE output_Quantities$/;"	s
+output_prob_MC	read_write_data.f90	/^SUBROUTINE output_prob_MC$/;"	s
 print_config	monte_carlo.f90	/^SUBROUTINE print_config$/;"	s
 print_updates	monte_carlo.f90	/^SUBROUTINE print_updates$/;"	s
-prob_omega	basic_function.f90	/^DOUBLE PRECISION FUNCTION prob_omega(/;"	f
-prob_x	basic_function.f90	/^DOUBLE PRECISION FUNCTION prob_x(/;"	f
-prob_y	basic_function.f90	/^DOUBLE PRECISION FUNCTION prob_y(/;"	f
-projectorN	basic_function.f90	/^DOUBLE PRECISION FUNCTION projectorN(/;"	f
-projectorP	basic_function.f90	/^DOUBLE PRECISION FUNCTION projectorP(/;"	f
-prt	collapse_statistics.f90	/^    logical :: prt$/;"	v	program:MAIN
+prt	data_process/collapse_statistics.f90	/^    logical :: prt$/;"	v	program:MAIN
 prt	vrbls_mc.f90	/^  logical :: prt$/;"	v	module:vrbls_mc
 read_GWGamma	read_write_data.f90	/^SUBROUTINE read_GWGamma$/;"	s
 read_flag	DiagMC.f90	/^SUBROUTINE read_flag$/;"	s
@@ -362,12 +286,12 @@ rn	basic_function.f90	/^DOUBLE PRECISION FUNCTION rn(/;"	f
 self_consistent	DiagMC.f90	/^SUBROUTINE self_consistent$/;"	s
 self_consistent_GW	DiagMC.f90	/^LOGICAL FUNCTION self_consistent_GW(/;"	f
 set_RNG	basic_function.f90	/^SUBROUTINE set_RNG$/;"	s
-set_time_elapse	my_time.f90	/^  SUBROUTINE set_time_elapse$/;"	s
+set_time_elapse	basic_function.f90	/^SUBROUTINE set_time_elapse$/;"	s
 shift_gline_in_space	monte_carlo.f90	/^SUBROUTINE shift_gline_in_space$/;"	s
 shift_wline_in_space	monte_carlo.f90	/^SUBROUTINE shift_wline_in_space$/;"	s
-stat_analy	collapse_statistics.f90	/^  SUBROUTINE stat_analy$/;"	s	program:MAIN
+stat_analy	data_process/collapse_statistics.f90	/^  SUBROUTINE stat_analy$/;"	s	program:MAIN
 stat_analy	statistics.f90	/^  SUBROUTINE stat_analy$/;"	s
-str	collapse_statistics.f90	/^    character*100 :: str,/;"	v	program:MAIN
+str	data_process/collapse_statistics.f90	/^    character*100 :: str,/;"	v	program:MAIN
 switch_ira_and_masha	basic_function.f90	/^SUBROUTINE switch_ira_and_masha$/;"	s
 t_curr	vrbls_mc.f90	/^  double precision      :: t_prev, t_curr,/;"	v	module:vrbls_mc
 t_elap	vrbls_mc.f90	/^  double precision      :: t_prev, t_curr, t_elap$/;"	v	module:vrbls_mc
@@ -376,54 +300,48 @@ t_meas	vrbls_mc.f90	/^  double precision      :: t_init, t_simu, t_meas,/;"	v	mo
 t_prev	vrbls_mc.f90	/^  double precision      :: t_prev,/;"	v	module:vrbls_mc
 t_simu	vrbls_mc.f90	/^  double precision      :: t_init, t_simu,/;"	v	module:vrbls_mc
 t_toss	vrbls_mc.f90	/^  double precision      :: t_init, t_simu, t_meas, t_toss$/;"	v	module:vrbls_mc
-temp	collapse_statistics.f90	/^    double precision :: Beta, temp$/;"	v	program:MAIN
-test_basis	basic_function.f90	/^SUBROUTINE test_basis(/;"	s
+temp	data_process/collapse_statistics.f90	/^    double precision :: Beta, temp$/;"	v	program:MAIN
 time	vrbls_mc.f90	/^  character(10)         :: time$/;"	v	module:vrbls_mc
-time_elapse	my_time.f90	/^  SUBROUTINE time_elapse$/;"	s
-title	collapse_statistics.f90	/^    character*100 :: str, title$/;"	v	program:MAIN
+time_elapse	basic_function.f90	/^SUBROUTINE time_elapse$/;"	s
+title	data_process/collapse.py	/^title = "0.50_2"$/;"	v
+title	data_process/collapse_data.f90	/^    character*100 title$/;"	v	program:main
+title	data_process/collapse_statistics.f90	/^    character*100 :: str, title$/;"	v	program:MAIN
 title	vrbls_mc.f90	/^  character*100 :: title$/;"	v	module:vrbls_mc
 title1	vrbls_mc.f90	/^  character*100 :: title1$/;"	v	module:vrbls_mc
 title2	vrbls_mc.f90	/^  character*100 :: title2$/;"	v	module:vrbls_mc
 title3	vrbls_mc.f90	/^  character*100 :: title3$/;"	v	module:vrbls_mc
 tm32	vrbls_mc.f90	/^  double precision, parameter :: tm32 /;"	v	module:vrbls_mc
-trChiR	vrbls_mc.f90	/^  double precision, allocatable   :: trChiR(/;"	v	module:vrbls_mc
-transfer_Chi	fourier.f90	/^SUBROUTINE transfer_Chi(/;"	s
-transfer_Gamma	fourier.f90	/^SUBROUTINE transfer_Gamma(/;"	s
-transfer_Pi	fourier.f90	/^SUBROUTINE transfer_Pi(/;"	s
-transfer_W	fourier.f90	/^SUBROUTINE transfer_W(/;"	s
-transfer_W0	fourier.f90	/^SUBROUTINE transfer_W0(/;"	s
+transfer_Chi_r	basic_function.f90	/^SUBROUTINE transfer_Chi_r(/;"	s
+transfer_Chi_t	basic_function.f90	/^SUBROUTINE transfer_Chi_t(/;"	s
+transfer_G0	basic_function.f90	/^SUBROUTINE transfer_G0(/;"	s
+transfer_G_t	basic_function.f90	/^SUBROUTINE transfer_G_t(/;"	s
+transfer_Gam_r	basic_function.f90	/^SUBROUTINE transfer_Gam_r(/;"	s
+transfer_Gam_t	basic_function.f90	/^SUBROUTINE transfer_Gam_t(/;"	s
+transfer_Polar_r	basic_function.f90	/^SUBROUTINE transfer_Polar_r(/;"	s
+transfer_Polar_t	basic_function.f90	/^SUBROUTINE transfer_Polar_t(/;"	s
+transfer_Sigma_t	basic_function.f90	/^SUBROUTINE transfer_Sigma_t(/;"	s
+transfer_W0	basic_function.f90	/^SUBROUTINE transfer_W0(/;"	s
+transfer_W_r	basic_function.f90	/^SUBROUTINE transfer_W_r(/;"	s
+transfer_W_t	basic_function.f90	/^SUBROUTINE transfer_W_t(/;"	s
 tval	vrbls_mc.f90	/^  integer, dimension(8) :: tval$/;"	v	module:vrbls_mc
 undo_delete_gamma	monte_carlo.f90	/^SUBROUTINE undo_delete_gamma(/;"	s
 undo_delete_line	monte_carlo.f90	/^SUBROUTINE undo_delete_line(/;"	s
 undo_insert_line	monte_carlo.f90	/^SUBROUTINE undo_insert_line(/;"	s
-update_Gamma_matrix	self_consistent.f90	/^SUBROUTINE update_Gamma_matrix(/;"	s
 update_Hash4G	monte_carlo.f90	/^SUBROUTINE update_Hash4G(/;"	s
 update_Hash4W	monte_carlo.f90	/^SUBROUTINE update_Hash4W(/;"	s
-update_WeightCurrent	basic_function.f90	/^SUBROUTINE update_WeightCurrent$/;"	s
 update_flag	DiagMC.f90	/^SUBROUTINE update_flag$/;"	s
 update_weight	monte_carlo.f90	/^SUBROUTINE update_weight(/;"	s
 vrbls_mc	vrbls_mc.f90	/^MODULE vrbls_mc$/;"	m
-weight_G	self_consistent.f90	/^DOUBLE PRECISION FUNCTION weight_G(/;"	f
-weight_G0up	self_consistent.f90	/^DOUBLE PRECISION FUNCTION weight_G0up(/;"	f
-weight_G2	self_consistent.f90	/^DOUBLE PRECISION FUNCTION weight_G2(/;"	f
-weight_Gamma	self_consistent.f90	/^DOUBLE PRECISION FUNCTION weight_Gamma(/;"	f
-weight_Gamma0	self_consistent.f90	/^DOUBLE PRECISION FUNCTION weight_Gamma0(/;"	f
-weight_W	self_consistent.f90	/^DOUBLE PRECISION FUNCTION weight_W(/;"	f
-weight_W0	self_consistent.f90	/^DOUBLE PRECISION FUNCTION weight_W0(/;"	f
-weight_basisN	basic_function.f90	/^DOUBLE PRECISION FUNCTION weight_basisN(/;"	f
-weight_basisP	basic_function.f90	/^DOUBLE PRECISION FUNCTION weight_basisP(/;"	f
+weight_G	self_consistent.f90	/^COMPLEX FUNCTION weight_G(/;"	f
+weight_G0	self_consistent.f90	/^Complex FUNCTION weight_G0(/;"	f
+weight_Gam	self_consistent.f90	/^COMPLEX FUNCTION weight_Gam(/;"	f
+weight_Gam0	self_consistent.f90	/^COMPLEX FUNCTION weight_Gam0(/;"	f
+weight_W	self_consistent.f90	/^COMPLEX FUNCTION weight_W(/;"	f
+weight_W0	self_consistent.f90	/^Complex FUNCTION weight_W0(/;"	f
 weight_line	monte_carlo.f90	/^DOUBLE PRECISION FUNCTION weight_line(/;"	f
-weight_meas_G	basic_function.f90	/^DOUBLE PRECISION FUNCTION weight_meas_G(/;"	f
-weight_meas_Gamma	basic_function.f90	/^DOUBLE PRECISION FUNCTION weight_meas_Gamma(/;"	f
-weight_meas_W	basic_function.f90	/^DOUBLE PRECISION FUNCTION weight_meas_W(/;"	f
 weight_ratio	monte_carlo.f90	/^SUBROUTINE weight_ratio(/;"	s
 weight_vertex	monte_carlo.f90	/^DOUBLE PRECISION FUNCTION weight_vertex(/;"	f
-weight_worm	basic_function.f90	/^DOUBLE PRECISION FUNCTION weight_worm(/;"	f
-weight_worm_Gamma	basic_function.f90	/^DOUBLE PRECISION FUNCTION weight_worm_Gamma(/;"	f
-weight_worm_W	basic_function.f90	/^DOUBLE PRECISION FUNCTION weight_worm_W(/;"	f
 write_GWGamma	read_write_data.f90	/^SUBROUTINE write_GWGamma$/;"	s
 write_monte_carlo_conf	read_write_data.f90	/^SUBROUTINE write_monte_carlo_conf$/;"	s
 write_monte_carlo_data	read_write_data.f90	/^SUBROUTINE write_monte_carlo_data$/;"	s
-xw	self_consistent.f90	/^  integer :: ib, xw,/;"	v
-yw	self_consistent.f90	/^  integer :: ib, xw, yw,/;"	v
 zone	vrbls_mc.f90	/^  character(5 )         :: zone$/;"	v	module:vrbls_mc
