@@ -129,7 +129,7 @@ SUBROUTINE calculate_Sigma
   complex(kind=8) :: G1, W1, Gam1
   double precision :: ratio
 
-  ratio = -3.d0/(real(Lx)*real(Ly)*Beta)
+  ratio = -3.d0/(real(Lx)*real(Ly)*MxT)
   Sigma(:) = (0.d0, 0.d0)
 
   do omega = 0, MxT-1
