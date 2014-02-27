@@ -1,6 +1,11 @@
 ======================== TEST ======================
 1. FFT for complex quantities in r and tau representation
 
+Test examples:
+for N_t = 16
+W(t) = delta(t) ==> W(omega) = 1 for all omega
+G_0(t) ==> G_0(omega)    compared with hand-written test code result, the same 
+
 Report:
 The transform for G(t), W(t) and Gam(t) can all give the correct answer based on discrete FFT.
 But the form of G(omega) is not the same with the answer from continuous FFT .
