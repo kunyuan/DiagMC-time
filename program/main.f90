@@ -16,6 +16,13 @@ PROGRAM MAIN
 
   Beta = 0.5d0
 
+  allocate(W(NTypeW, 0:Lx-1, 0:Ly-1, 0:MxT-1))
+  allocate(Gam(NTypeGam, 0:Lx-1, 0:Ly-1, 0:MxT-1, 0:MxT-1))
+
+  allocate(W0PF(0:Lx-1, 0:Ly-1, 0:MxT-1))
+  allocate(Polar(0:Lx-1, 0:Ly-1, 0:MxT-1))
+  allocate(Chi(0:Lx-1, 0:Ly-1, 0:MxT-1))
+
   open(10, file="G0_t.dat")
   open(11, file="G_omega.dat")
   open(12, file="G_t.dat")
