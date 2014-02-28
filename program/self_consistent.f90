@@ -130,7 +130,6 @@ SUBROUTINE calculate_Sigma
   double precision :: ratio
 
   ratio = 3.d0/(real(Lx)*real(Ly)*real(MxT))
-
   Sigma(:) = (0.d0, 0.d0)
 
   do omega = 0, MxT-1
