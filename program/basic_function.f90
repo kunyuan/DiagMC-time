@@ -845,7 +845,7 @@ SUBROUTINE transfer_W0(BackForth)
     implicit none
     integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
     call FFT_r(W0PF,1,MxT,BackForth)
-    call FFT_tau_single(W0PF,1,MxLx*MxLy,BackForth)
+    call FFT_tau_single(W0PF,1,Lx*Ly,BackForth)
 END SUBROUTINE
 
 SUBROUTINE transfer_G0(BackForth)
@@ -889,13 +889,16 @@ END SUBROUTINE
 SUBROUTINE transfer_W_r(BackForth)
     implicit none
     integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
+    integer :: ix, iy
+
     call FFT_r(W,NtypeW,MxT,BackForth)
+
 END SUBROUTINE
 
 SUBROUTINE transfer_W_t(BackForth)
     implicit none
     integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
-    call FFT_tau_single(W,NtypeW,MxLx*MxLy,BackForth)
+    call FFT_tau_single(W,NtypeW,Lx*Ly,BackForth)
 END SUBROUTINE
 
 SUBROUTINE transfer_Gam_r(BackForth)
@@ -916,9 +919,9 @@ SUBROUTINE transfer_Gam_t(BackForth)
         enddo
       enddo
 
-      call FFT_tau_double(Gam,NtypeGam,MxLx*MxLy,BackForth)
+      call FFT_tau_double(Gam,NtypeGam,Lx*Ly,BackForth)
     else if(BackForth ==-1) then
-      call FFT_tau_double(Gam,NtypeGam,MxLx*MxLy,BackForth)
+      call FFT_tau_double(Gam,NtypeGam,Lx*Ly,BackForth)
 
       do it2 = 0, MxT-1
         do it1 = 0, MxT-1
@@ -929,60 +932,56 @@ SUBROUTINE transfer_Gam_t(BackForth)
     endif
 END SUBROUTINE
 
-SUBROUTINE transfer_Polar_r(BackForth)
+SUBROUTINE transfer_Chi(BackForth)
     implicit none
     integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
-    call FFT_r(Polar,1,MxT,BackForth)
+    call FFT_r(Chi,1,MxT,BackForth)
+    call FFT_tau_single(Chi,1,Lx*Ly,BackForth)
 END SUBROUTINE
 
-SUBROUTINE transfer_Polar_t(BackForth)
-    implicit none
-    integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
-    call FFT_tau_single(Polar,1,MxLx*MxLy,BackForth)
-END SUBROUTINE
+!SUBROUTINE transfer_Polar_r(BackForth)
+    !implicit none
+    !integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
+    !call FFT_r(Polar,1,MxT,BackForth)
+!END SUBROUTINE
 
-SUBROUTINE transfer_Chi_r(BackForth)
-    implicit none
-    integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
-    call FFT_r(Chi,NtypeChi,MxT,BackForth)
-END SUBROUTINE
+!SUBROUTINE transfer_Polar_t(BackForth)
+    !implicit none
+    !integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
+    !call FFT_tau_single(Polar,1,Lx*Ly,BackForth)
+!END SUBROUTINE
 
-SUBROUTINE transfer_Chi_t(BackForth)
-    implicit none
-    integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
-    call FFT_tau_single(Chi,NtypeChi,MxLx*MxLy,BackForth)
-END SUBROUTINE
+!SUBROUTINE transfer_Sigma_t(BackForth)
+    !implicit none
+    !integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
+    !integer       :: it
+    !if(BackForth/=-1) then
+      !do it = 0, MxT-1
+        !Sigma(it) = Sigma(it)* cdexp(dcmplx(0.d0,-Pi/real(MxT))*real(it))
+      !enddo
+      !call FFT_tau_single(Sigma,1,Lx*Ly,BackForth)
+    !else if(BackForth==-1) then
+      !call FFT_tau_single(Sigma,1,Lx*Ly,BackForth)
+      !do it = 0, MxT-1
+        !Sigma(it) = Sigma(it)* cdexp(dcmplx(0.d0,Pi/real(MxT))*real(it))
+      !enddo
+    !endif
 
-SUBROUTINE transfer_Sigma_t(BackForth)
-    implicit none
-    integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
-    integer       :: it
-    if(BackForth/=-1) then
-      do it = 0, MxT-1
-        Sigma(it) = Sigma(it)* cdexp(dcmplx(0.d0,-Pi/real(MxT))*real(it))
-      enddo
-      call FFT_tau_single(Sigma,1,MxLx*MxLy,BackForth)
-    else if(BackForth==-1) then
-      call FFT_tau_single(Sigma,1,MxLx*MxLy,BackForth)
-      do it = 0, MxT-1
-        Sigma(it) = Sigma(it)* cdexp(dcmplx(0.d0,Pi/real(MxT))*real(it))
-      enddo
-    endif
+!END SUBROUTINE
 
-END SUBROUTINE
 
 SUBROUTINE FFT_r(XR,Ntype,Nz,BackForth)
     implicit none
     integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
     integer,intent(in) :: Nz
     integer,intent(in) :: Ntype
-    complex(kind=8)    :: XR(Ntype,0:Lx-1,0:Ly-1,0:Nz-1)
+    complex*16    :: XR(Ntype,0:Lx-1,0:Ly-1,0:Nz-1)
     integer :: Power,Noma
-    integer :: ix,iy,iz,ixt,iyt,it
+    integer :: ix,iy,iz,it
     double precision,allocatable ::   Real1(:), Im1(:)
 
-    do ix=0,Lx-1
-      do iy=0,Ly-1
+    do iy=0,Ly-1
+      do ix=0,Lx-1
         if(ix>Lx/2 .and. iy<=Ly/2) then
           XR(:,ix,iy,:)=XR(:,Lx-ix,iy,:)
         else if(ix<=Lx/2 .and. iy>Ly/2) then
@@ -1010,7 +1009,6 @@ SUBROUTINE FFT_r(XR,Ntype,Nz,BackForth)
     deallocate(Real1,Im1)
 
     !do FFT in y direction
-
     power=log(Ly*1.d0)/log(2.d0)+1.d-14  
     Noma=2**Power
     allocate(Real1(0:Noma-1),Im1(0:Noma-1))
