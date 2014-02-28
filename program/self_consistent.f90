@@ -101,7 +101,7 @@ SUBROUTINE calculate_Polar
   complex(kind=8) :: Gin, Gout, Gam1
   double precision :: ratio
 
-  ratio = -2.d0/Beta
+  ratio = -2.d0/real(MxT)
   Polar(:,:,:) = (0.d0, 0.d0)
   do omega = 0, MxT-1
     do omegaGin = 0, MxT-1
@@ -130,7 +130,7 @@ SUBROUTINE calculate_Sigma
   complex(kind=8) :: G1, W1, Gam1
   double precision :: ratio
 
-  ratio = 3.d0/(real(Lx)*real(Ly)*Beta)
+  ratio = 3.d0/(real(Lx)*real(Ly)*real(MxT))
   Sigma(:) = (0.d0, 0.d0)
 
   do omega = 0, MxT-1
@@ -196,76 +196,27 @@ END SUBROUTINE calculate_G
 
 
 !!------------- calculate the susceptibility ---------------------------
-!SUBROUTINE calculate_Chi
-  !implicit none
-  !integer :: px, py, omega, ityp
-  !double precision :: Pi1, Pi2, W1, W2
-  !double precision :: PiW1, PiW2, temp
-  !double precision :: coef1, coef2
-  !integer :: dx, dy
-  !double precision :: W0R, ChR, W0ChR
-  !double precision :: trChR
-
-
+SUBROUTINE calculate_Chi
+  implicit none
+  integer :: px, py, omega
+  double precision :: ratio
 
   !!-------- calculate Chi = Pi/(1 - W0 * Pi) ------------------
-  !ChiR(:,:,:,:) = 0.d0
+  !!--------- already sum over the spins -----------------------
+  Chi(:,:,:) = 0.d0
 
-  !call transfer_Pi(1)
-  !call transfer_Chi(1)
+  Chi(:,:,:) = Polar(:,:,:)/((1.d0,0.d0)-W0PF(:,:,:)*Polar(:,:,:))
 
-  !do px = 0, dLx
-    !do py = 0, dLy
-      !do omega = -MxOmegaChi, MxOmegaChi
+  do omega = 0, MxT-1
+    do py = 0, Ly-1
+      do px = 0, Lx-1
+        Chi(px, py, omega) = d_times_cd(3.d0, Chi(px, py, omega))
+      enddo
+    enddo
+  enddo
 
-        !W1 = W0InMoment(1, px, py)
-        !W2 = W0InMoment(3, px, py)
-        !Pi1 = PiR(1, px, py, omega)
-        !Pi2 = PiR(3, px, py, omega)
-
-        !PiW1 = Pi1*W1 + Pi2*W2
-        !PiW2 = Pi1*W2 + Pi2*W1
-        !temp = (1.d0-PiW1)**2.d0-PiW2**2.d0
-
-        !coef1 = (1.d0-PiW1)/temp
-        !coef2 = PiW2/temp
-
-        !ChiR(1, px, py, omega) = coef1*Pi1 + coef2*Pi2
-        !ChiR(3, px, py, omega) = coef1*Pi2 + coef2*Pi1
-
-        !do ityp = 2, 4, 2
-          !ChiR(ityp, px, py, omega) = ChiR(ityp-1, px, py, omega)
-        !enddo
-
-      !enddo
-    !enddo
-  !enddo
-
-  !call transfer_Pi(-1)
-  !call transfer_Chi(-1)
-
-  !trChiR(:,:,:) = 0.d0
-  !do dx = 0, dLx
-    !do dy = 0, dLy
-      !do omega = -MxOmegaChi, MxOmegaChi
-
-        !trChR = 0.d0
-        !do ityp = 1, 4
-          !if(ityp<=2) then
-            !W0R = 0.25
-          !else
-            !W0R = -0.25
-          !endif
-          !ChR = ChiR(ityp, dx, dy, omega)
-          !W0ChR = ChR *W0R
-
-          !trChR = trChR + W0ChR
-        !enddo
-        !trChiR(dx, dy, omega) = trChR
-      !enddo
-    !enddo
-  !enddo
-!END SUBROUTINE calculate_Chi
+  return
+END SUBROUTINE calculate_Chi
 
 !!====================================================================
 

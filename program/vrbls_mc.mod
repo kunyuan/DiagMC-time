@@ -1,5 +1,5 @@
 GFORTRAN module version '9' created from main.f90
-MD5:4aadbe77aaaf5932412b4c99f5d83e4c -- If you edit this, you'll get what you deserve.
+MD5:987a7fff30116a6a16254905897efabb -- If you edit this, you'll get what you deserve.
 
 (() () () () () () () () () () () () () () () () () () () () () () () ()
 () () ())
@@ -33,13 +33,12 @@ UNKNOWN IMPLICIT-SAVE 0 0) (LOGICAL 4 0 0 0 LOGICAL ()) 0 0 () () 0 () ()
 UNKNOWN IMPLICIT-SAVE 0 0) (LOGICAL 4 0 0 0 LOGICAL ()) 0 0 () () 0 () ()
 () 0 0)
 8 'chi' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
-IMPLICIT-SAVE 0 0 DIMENSION) (COMPLEX 8 0 0 0 COMPLEX ()) 0 0 () (4 0
-EXPLICIT (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '1') (CONSTANT (
-INTEGER 4 0 0 0 INTEGER ()) 0 '4') (CONSTANT (INTEGER 4 0 0 0 INTEGER ())
+IMPLICIT-SAVE 0 0 DIMENSION) (COMPLEX 8 0 0 0 COMPLEX ()) 0 0 () (3 0
+EXPLICIT (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '0') (CONSTANT (
+INTEGER 4 0 0 0 INTEGER ()) 0 '15') (CONSTANT (INTEGER 4 0 0 0 INTEGER ())
 0 '0') (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '15') (CONSTANT (
 INTEGER 4 0 0 0 INTEGER ()) 0 '0') (CONSTANT (INTEGER 4 0 0 0 INTEGER ())
-0 '15') (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '0') (CONSTANT (
-INTEGER 4 0 0 0 INTEGER ()) 0 '15')) 0 () () () 0 0)
+0 '15')) 0 () () () 0 0)
 9 'coefofsymmetry' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT
 UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0 DIMENSION) (REAL 8 0 0 0 REAL ())
 0 0 () (2 0 EXPLICIT (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '1') (
