@@ -45,7 +45,6 @@ SUBROUTINE initialize_W
       enddo
     enddo
   enddo
-  write(*, *) W(1,1,0,0)
 END SUBROUTINE initialize_W
 
 !!--------------- Initialization of Gamma -----------------------

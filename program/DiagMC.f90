@@ -33,6 +33,13 @@ PROGRAM MAIN
 
   InpMC = 0
 
+  allocate(W(NTypeW, 0:Lx-1, 0:Ly-1, 0:MxT-1))
+  allocate(Gam(NTypeGam, 0:Lx-1, 0:Ly-1, 0:MxT-1, 0:MxT-1))
+
+  allocate(W0PF(0:Lx-1, 0:Ly-1, 0:MxT-1))
+  allocate(Polar(0:Lx-1, 0:Ly-1, 0:MxT-1))
+  allocate(Chi(0:Lx-1, 0:Ly-1, 0:MxT-1))
+
   call set_time_elapse
   call set_RNG
   call initialize_self_consistent
@@ -73,8 +80,8 @@ SUBROUTINE self_consistent
 
     flag = self_consistent_GW(1.d-8)
 
-    call calculate_Chi
-    call transfer_Chi(-1)
+    !call calculate_Chi
+    !call transfer_Chi(-1)
 
     !call output_Quantities
 
@@ -146,32 +153,37 @@ LOGICAL FUNCTION self_consistent_GW(err)
   implicit none
   double precision, intent(in) :: err
   integer :: iloop
-  complex*16 :: WOldR, WWR
+  integer :: px, py
+  complex*16 :: WOld, WNow
 
   call transfer_r(1)
   call transfer_t(1)
 
   !!------ calculate G, W in momentum domain --------------
-  WOldR = (10.d0, 0.d0)
-  WWR = weight_W(1, 0, 0, 0)
+  WOld = (10.d0, 0.d0)
+  WNow = weight_W(1, 0, 0, 0)
   self_consistent_GW = .true.
 
   if(InpMC==0) then
     iloop = 0
-    write(*, *) "G-W loop:", iloop, WOldR, WWR
-    do while(abs(WWR-WOldR)>err) 
-      WOldR = WWR
+    write(*, *) "G-W loop:", iloop, real(Wold), real(WNow)
+
+    call calculate_Polar
+    call calculate_W
+
+    do while(abs(real(WNow)-real(WOld))>err) 
+      WOld = WNow
       iloop = iloop + 1
 
       call calculate_Sigma
       call calculate_Polar
 
-      call calculate_W
       call calculate_G
+      call calculate_W
 
-      WWR = weight_W(1, 0, 0, 0)
+      WNow = weight_W(1, 0, 0, 0)
 
-      write(*, *) "G-W loop:", iloop, WOldR, WWR
+      write(*, *) "G-W loop:", iloop, real(WOld), real(WNow)
     enddo
   !else
     !do iloop = 1, 10 
