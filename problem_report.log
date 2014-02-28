@@ -15,9 +15,17 @@ The transform for G(t), W(t) and Gam(t) can all give the correct answer based on
 But the form of G(omega) is not the same with the answer from continuous FFT .
 Periodic : W, Chi, Polar
 Anti-Periodic : G, Gam, Sigma
-
 ====================================================
 
 2. self-consistent integrals in k and omega representation
+====================================================
 
+
+
+====================================================
+======================== BUGS ======================
+====================================================
+
+1. The matrix W,Pi,Chi,Gam in r should be (L*L), not (MXL*MXL), otherwise the fourier
+transformation would fail
 
