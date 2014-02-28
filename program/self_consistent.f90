@@ -21,7 +21,7 @@ SUBROUTINE initialize_G
   implicit none
   integer :: typ, t
 
-  G = (0.d0, 0.d0)
+  G(:,:) = (0.d0, 0.d0)
 
   do t = 0, MxT-1
     do typ = 1, NTypeG
@@ -35,7 +35,7 @@ SUBROUTINE initialize_W
   implicit none
   integer :: typ, t, dx, dy
 
-  W = (0.d0, 0.d0)
+  W(:,:,:,:) = (0.d0, 0.d0)
   do t = 0, MxT-1
     do dy = 0, Ly-1
       do dx = 0, Lx-1
@@ -45,6 +45,7 @@ SUBROUTINE initialize_W
       enddo
     enddo
   enddo
+  write(*, *) W(1,1,0,0)
 END SUBROUTINE initialize_W
 
 !!--------------- Initialization of Gamma -----------------------
@@ -52,7 +53,7 @@ SUBROUTINE initialize_Gam
   implicit none
   integer :: ityp, it1, it2
 
-  Gam = (0.d0, 0.d0)
+  Gam(:,:,:,:,:) = (0.d0, 0.d0)
   do it2 = 0, MxT-1
     do it1 = 0, MxT-1
       do ityp = 1, NTypeGam
@@ -297,34 +298,16 @@ END FUNCTION weight_Gam0
 COMPLEX*16 FUNCTION weight_G(typ1, t1)
   implicit none
   integer, intent(in)  :: t1, typ1
-  double precision:: GGI
-  integer :: ib
 
-  weight_G = weight_G0(typ1, t1)
-  !if(omega1>=-MxOmegaG1 .and. omega1<=MxOmegaG1) then
-    !GGI = GI(typ1, omega1)
-  !else if(omega1<-MxOmegaG1) then
-    !GGI = 0.d0
-    !do ib = 1, nbasis
-      !GGI = GGI +GITailN(typ1, ib)*weight_basis(GCoefN(ib,:),omega1)
-    !enddo
-  !else if(omega1>MxOmegaG1) then
-    !GGI = 0.d0
-    !do ib = 1, nbasis
-      !GGI = GGI +GITailP(typ1, ib)*weight_basis(GCoefP(ib,:),omega1)
-    !enddo
-  !endif
-  !weight_G = GGI
+  weight_G = G(typ1, t1)
 END FUNCTION weight_G
 
 !!--------- extract weight for W ---------
 COMPLEX*16 FUNCTION weight_W(typ1, dx1, dy1, t1)
   implicit none
   integer, intent(in)  :: dx1, dy1, t1, typ1
-  double precision :: WWR
-  integer :: dx, dy, ib
 
-  weight_W = weight_W0(typ1, dx1, dy1, t1)
+  weight_W = W(typ1, dx1, dy1, t1)
 
   !dx = dx1;      dy = dy1
   !if(dx>=0 .and. dx<Lx .and. dy>=0 .and. dy<Ly) then
