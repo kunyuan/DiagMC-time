@@ -144,7 +144,6 @@ MODULE vrbls_mc
   double precision :: WeightWorm        ! weight for worm sector
 
   !----------- data structure for lines -------------------------------------
-  integer, dimension(MxNLn) :: OmegaLn              ! frequency of a line
   integer, dimension(MxNLn) :: kLn                  ! momentum of a line
   integer, dimension(MxNLn) :: KindLn               ! kind of a line: 1 Glines; 2 Wlines
   integer, dimension(MxNLn) :: TypeLn               ! type of a line: 1-2 Glines; 1-6 Wlines
@@ -161,6 +160,7 @@ MODULE vrbls_mc
   !----------- data structure for vertexes -------------------------------------
   integer, dimension(MxNVertex) :: GXVertex, GYVertex       ! gline sites for Gamma
   integer, dimension(MxNVertex) :: WXVertex, WYVertex       ! wline sites for Gamma
+  integer, dimension(MxNVertex) :: T1Vertex, T2Vertex, T3Vertex ! times for Gamma
   integer, dimension(MxNVertex) :: DirecVertex              ! Gamma is 1: left, 2: right
   integer, dimension(MxNVertex) :: TypeVertex               ! type of Gamma: 1-6
   integer, dimension(MxNVertex) :: TypeVertexIn, TypeVertexOut ! type of Gamma inside spin: 1-2

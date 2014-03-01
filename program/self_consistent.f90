@@ -262,8 +262,7 @@ Complex*16 FUNCTION weight_W0(typ, dx, dy, t)
     weight_W0 = (0.d0, 0.d0)
 
     if(t==0) then
-      !if((dx1==1.and.dy1==0).or.(dx1==0.and.dy1==1)) then
-      if(dx1==0.and.dy1==0) then
+      if((dx1==1.and.dy1==0).or.(dx1==0.and.dy1==1)) then
         if(typ ==1 .or. typ == 2) then
           weight_W0 = dcmplx(0.25d0*Jcp, 0.d0)
         else if(typ == 3 .or. typ == 4) then

@@ -932,10 +932,15 @@ SUBROUTINE transfer_Gam_t(BackForth)
     endif
 END SUBROUTINE
 
-SUBROUTINE transfer_Chi(BackForth)
+SUBROUTINE transfer_Chi_r(BackForth)
     implicit none
     integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
     call FFT_r(Chi,1,MxT,BackForth)
+END SUBROUTINE
+
+SUBROUTINE transfer_Chi_t(BackForth)
+    implicit none
+    integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
     call FFT_tau_single(Chi,1,Lx*Ly,BackForth)
 END SUBROUTINE
 
