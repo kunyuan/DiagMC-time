@@ -101,17 +101,22 @@ SUBROUTINE calculate_Polar
   complex(kind=8) :: Gin, Gout, Gam1
   double precision :: ratio
 
-  ratio = -2.d0/real(MxT)
+  ratio = -2.d0*Beta**2.d0/real(MxT)**3.d0
   Polar(:,:,:) = (0.d0, 0.d0)
   do omega = 0, MxT-1
-    do omegaGin = omega, MxT-1
+    do omegaGin = 0, MxT-1
       do px = 0, Lx-1
         do py = 0, Ly-1
           omegaGout = omegaGin - omega
 
           Gin = weight_G(1, omegaGin)
-          Gout = weight_G(1, omegaGout)
-          Gam1 = weight_Gam(5, px, py, omegaGin, omegaGout)
+          if(omegaGout>=0) then
+            Gout = weight_G(1, omegaGout)
+            Gam1 = weight_Gam(5, px, py, omegaGin, omegaGout)
+          else
+            Gout = weight_G(1, omegaGout+MxT)
+            Gam1 = weight_Gam(5, px, py, omegaGin, omegaGout+MxT)
+          endif
           
           Polar(px, py, omega) = Polar(px, py, omega)+d_times_cd(ratio, Gin*Gout*Gam1)
         enddo
@@ -129,18 +134,23 @@ SUBROUTINE calculate_Sigma
   complex(kind=8) :: G1, W1, Gam1
   double precision :: ratio
 
-  ratio = 3.d0/(real(Lx)*real(Ly)*real(MxT))
+  ratio = 3.d0*Beta**2.d0/(real(Lx)*real(Ly)*(real(MxT)**3.d0))
+  !ratio = 3.d0/(real(Lx)*real(Ly)*real(MxT))
   Sigma(:) = (0.d0, 0.d0)
 
   do omega = 0, MxT-1
-    do omegaG = 0, omega
+    do omegaG = 0, MxT-1
       do py = 0, Ly-1
         do px = 0, Lx-1
           omegaW = omega-omegaG
 
-          G1 = weight_G0(1, omegaG)
-          W1 = weight_W0(1, px, py, omegaW)
-          Gam1 = weight_Gam0(5, px, py, omegaG, omega)
+          G1 = weight_G(1, omegaG)
+          if(omegaW>=0) then
+            W1 = weight_W(1, px, py, omegaW)
+          else
+            W1 = weight_W(1, px, py, omegaW+MxT)
+          endif
+          Gam1 = weight_Gam(5, px, py, omegaG, omega)
           
           Sigma(omega) = Sigma(omega)+d_times_cd(ratio, G1*W1*Gam1)
         enddo
@@ -335,7 +345,7 @@ COMPLEX*16 FUNCTION weight_Gam(typ1, dx1, dy1, t1, t2)
   double precision :: GaR
   integer :: ib, jb, dx, dy
   
-  weight_Gam = weight_Gam0(typ1, dx1, dy1, t1, t2)
+  weight_Gam = Gam(typ1, dx1, dy1, t1, t2)
 
   
   !dx = dx1;      dy = dy1
