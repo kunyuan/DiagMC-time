@@ -24,8 +24,11 @@ PROGRAM MAIN
   allocate(Chi(0:Lx-1, 0:Ly-1, 0:MxT-1))
 
   open(10, file="G0_t.dat")
-  open(11, file="G_omega.dat")
-  open(12, file="G_t.dat")
+  open(11, file="Sigma_omega.dat")
+  open(12, file="Sigma_t.dat")
+  open(13, file="G_omega.dat")
+  open(14, file="W_omega.dat")
+  open(15, file="Gam_omega.dat")
 
   call initialize_self_consistent
 
@@ -36,23 +39,40 @@ PROGRAM MAIN
   call transfer_t(1)
   call transfer_r(1)
 
-  call calculate_Sigma
-  call calculate_G
-
   do it = 0, MxT-1
-    write(11, *) G(1, it)
+    write(13, *) G(1, it)
   enddo
 
-  call transfer_r(-1)
-  call transfer_t(-1)
+  do it = 0, MxT-1
+    write(14, *) W(1, 0, 0, it)
+  enddo
 
   do it = 0, MxT-1
-    write(12, *) G(1, it)
+    write(15, *) Gam(1, 0, 0, it, 0)
+  enddo
+
+  call calculate_Sigma
+  !call calculate_G
+
+  do it = 0, MxT-1
+    write(11, *) Sigma(it)
+  enddo
+
+  !call transfer_r(-1)
+  !call transfer_t(-1)
+
+  call transfer_Sigma_t(-1)
+
+  do it = 0, MxT-1
+    write(12, *) Sigma(it)
   enddo
 
   close(10)
   close(11)
   close(12)
+  close(13)
+  close(14)
+  close(15)
 
 CONTAINS
 INCLUDE "basic_function.f90"
