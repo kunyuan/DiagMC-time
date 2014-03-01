@@ -33,12 +33,16 @@ PROGRAM MAIN
 
   InpMC = 0
 
+  write(title1, '(f4.2)') beta
+
   allocate(W(NTypeW, 0:Lx-1, 0:Ly-1, 0:MxT-1))
   allocate(Gam(NTypeGam, 0:Lx-1, 0:Ly-1, 0:MxT-1, 0:MxT-1))
 
   allocate(W0PF(0:Lx-1, 0:Ly-1, 0:MxT-1))
   allocate(Polar(0:Lx-1, 0:Ly-1, 0:MxT-1))
   allocate(Chi(0:Lx-1, 0:Ly-1, 0:MxT-1))
+
+  allocate(GamMC(0:MCOrder,0:1,1:NTypeGam/2, 0:Lx-1, 0:Ly-1, 0:MxT-1, 0:MxT-1))
 
   call set_time_elapse
   call set_RNG
@@ -65,7 +69,7 @@ INCLUDE "self_consistent.f90"
 !INCLUDE "monte_carlo.f90"
 !INCLUDE "check_conf.f90"
 !INCLUDE "analytic_integration.f90"
-!INCLUDE "read_write_data.f90"
+INCLUDE "read_write_data.f90"
 !INCLUDE "statistics.f90"
 
 
@@ -80,10 +84,11 @@ SUBROUTINE self_consistent
 
     flag = self_consistent_GW(1.d-8)
 
-    !call calculate_Chi
-    !call transfer_Chi(-1)
+    call calculate_Chi
+    call transfer_Chi_r(-1)
+    call transfer_Chi_t(-1)
 
-    !call output_Quantities
+    call output_Quantities
 
     !call write_GWGamma
 
@@ -164,7 +169,7 @@ LOGICAL FUNCTION self_consistent_GW(err)
   WNow = weight_W(1, 0, 0, 0)
   self_consistent_GW = .true.
 
-  if(InpMC==0) then
+  !if(InpMC==0) then
     iloop = 0
     write(*, *) "G-W loop:", iloop, real(Wold), real(WNow)
 
@@ -195,7 +200,7 @@ LOGICAL FUNCTION self_consistent_GW(err)
 
       !write(*, *) "G-W loop:", iloop, WOldR, WWR
     !enddo
-  endif
+  !endif
 
   !!-------------------------------------------------------
 
