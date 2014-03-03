@@ -22,7 +22,7 @@ Anti-Periodic : G, Gam, Sigma
 Test example:
 Sigma(t) = (beta/N)**2.d0* \sum_{t1,t2} G(t1) W(t2) Gam(t2-t1, t-t2) direct integral compared with
 FFT(Sigma(omega)) = FFT( beta**2.d0/N**3.d0 *\sum_{omega1} G(omega1) W(omega-omega1) Gam(omega1, omega))
-the same
+Sigma(t) and FFT(Sigma(omega)) are the same
 
 Report:
 The self-consistent integrals can give the right answer when they are transferred back to t domain

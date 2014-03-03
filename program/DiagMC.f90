@@ -84,8 +84,8 @@ SUBROUTINE self_consistent
 
     flag = self_consistent_GW(1.d-8)
 
-    call transfer_Sigma_t(-1)
-    call output_Quantities
+    !call transfer_Sigma_t(-1)
+    !call output_Quantities
 
     !call write_GWGamma
 
