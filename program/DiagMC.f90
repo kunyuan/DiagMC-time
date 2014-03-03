@@ -84,10 +84,7 @@ SUBROUTINE self_consistent
 
     flag = self_consistent_GW(1.d-8)
 
-    call calculate_Chi
-    call transfer_Chi_r(-1)
-    call transfer_Chi_t(-1)
-
+    call transfer_Sigma_t(-1)
     call output_Quantities
 
     !call write_GWGamma
@@ -175,21 +172,22 @@ LOGICAL FUNCTION self_consistent_GW(err)
 
     call calculate_Polar
     call calculate_W
+    call calculate_Sigma
 
-    do while(abs(real(WNow)-real(WOld))>err) 
-      WOld = WNow
-      iloop = iloop + 1
+    !do while(abs(real(WNow)-real(WOld))>err) 
+      !WOld = WNow
+      !iloop = iloop + 1
 
-      call calculate_Sigma
-      call calculate_Polar
+      !call calculate_Sigma
+      !call calculate_Polar
 
-      call calculate_G
-      call calculate_W
+      !call calculate_G
+      !call calculate_W
 
-      WNow = weight_W(1, 0, 0, 0)
+      !WNow = weight_W(1, 0, 0, 0)
 
-      write(*, *) "G-W loop:", iloop, real(WOld), real(WNow)
-    enddo
+      !write(*, *) "G-W loop:", iloop, real(WOld), real(WNow)
+    !enddo
   !else
     !do iloop = 1, 10 
       !WOldR = WWR
