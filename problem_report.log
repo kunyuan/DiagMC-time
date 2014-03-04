@@ -24,6 +24,12 @@ Sigma(t) = (beta/N)**2.d0* \sum_{t1,t2} G(t1) W(t2) Gam(t2-t1, t-t2) direct inte
 FFT(Sigma(omega)) = FFT( beta**2.d0/N**3.d0 *\sum_{omega1} G(omega1) W(omega-omega1) Gam(omega1, omega))
 Sigma(t) and FFT(Sigma(omega)) are the same
 
+G(t) from old code and FFT(G(omega)) from the current code are the same with error 1% after several 
+self-consistent loops
+
+W(t) from old code and FFT(W(omega)) from the current code are the same with error 5% after several 
+self-consistent loops except for the tau=0 point
+
 Report:
 The self-consistent integrals can give the right answer when they are transferred back to t domain
 
@@ -37,6 +43,8 @@ The self-consistent integrals can give the right answer when they are transferre
 1. The matrix W,Pi,Chi,Gam in r should be (L*L), not (MXL*MXL), otherwise the fourier
 transformation would fail
 
-2. The coeffecient in self-consistent integrals should be multiplied by (Beta/N)**2.d0
+2. The coeffecient in self-consistent integrals should be multiplied by (Beta/N)**4.d0
+The delta function in discrete tau domain should be multiplied by (N/Beta)
 
 3. A bug in transfer_Sigma_t (dimension is 1, not Lx*Ly)
+
