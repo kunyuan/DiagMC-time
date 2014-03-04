@@ -13,7 +13,7 @@ MODULE vrbls_mc
   integer, parameter :: D = 2                       ! 2-dimensional system
   integer, parameter :: MxLx  = 16, MxLy = 16       ! the largest system size
   integer, parameter :: MxVol = MxLx**D             ! the maximum system volume
-  integer, parameter :: MxT   = 32                   ! the maximum number of time segments
+  integer, parameter :: MxT   = 128                  ! the maximum number of time segments
   integer, parameter :: MxK   = 1000000             ! the maximum momentum
   !integer, parameter :: MxOmegaBasis = 2048         ! the maximum omega used in basis
 
@@ -106,6 +106,7 @@ MODULE vrbls_mc
   complex(kind=8), allocatable :: Gam(:,:,:,:,:)
 
   complex(kind=8), allocatable :: W0PF(:,:,:)
+  complex(kind=8), allocatable :: Gam0PF(:,:,:,:)
 
   complex(kind=8), allocatable :: Polar(:,:,:)
   complex(kind=8), allocatable :: Chi(:,:,:)
