@@ -30,6 +30,9 @@ self-consistent loops
 W(t) from old code and FFT(W(omega)) from the current code are the same with error 5% after several 
 self-consistent loops except for the tau=0 point
 
+After adding the correction term in Polar, W(t) from old code and FFT(W(omega)) from the current 
+code are the same with error 5% for r=(0,0) and r=(1,1); but r=(1,0) still need to be checked
+
 Report:
 The self-consistent integrals can give the right answer when they are transferred back to t domain
 
