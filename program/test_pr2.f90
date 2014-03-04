@@ -14,14 +14,16 @@ PROGRAM MAIN
   enddo
   close(10)
 
-  W0(:) = (0.25d0, 0.d0)
+  W0(:) = (0.d0, 0.d0)
+  W0(0) = (0.25d0, 0.d0)
+
   Gam0(:,:) = (0.d0, 0.d0)
   Gam0(0,0) = (1.d0, 0.d0)
 
   !-------- integral ------------
-  ratio = -2.d0
+  ratio = -2.d0*(0.5d0/Nt)
   do it = 0, Nt-1
-    Polar(it) = Polar(it) - ratio*G0(it)*G0(-it+Nt)
+    Polar(it) = Polar(it) - ratio*G0(it)*G0(-it-1+Nt)
   enddo
 
   do it = 0, Nt-1
