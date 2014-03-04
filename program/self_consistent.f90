@@ -101,7 +101,8 @@ SUBROUTINE calculate_Polar
   complex(kind=8) :: Gin, Gout, Gam1
   double precision :: ratio
 
-  ratio = -2.d0*Beta**2.d0/real(MxT)**3.d0
+  !ratio = -2.d0/real(MxT)*(Beta/real(MxT))**4.d0
+  ratio = 2.d0/real(MxT)*(Beta/real(MxT))**4.d0
   Polar(:,:,:) = (0.d0, 0.d0)
   do omega = 0, MxT-1
     do omegaGin = 0, MxT-1
@@ -134,8 +135,8 @@ SUBROUTINE calculate_Sigma
   complex(kind=8) :: G1, W1, Gam1
   double precision :: ratio
 
-  ratio = 3.d0*Beta**2.d0/(real(Lx)*real(Ly)*(real(MxT)**3.d0))
-  !ratio = 3.d0/(real(Lx)*real(Ly)*real(MxT))
+  !ratio = 3.d0/(real(Lx)*real(Ly)*real(MxT))*(Beta/real(MxT))**4.d0
+  ratio = -3.d0/(real(Lx)*real(Ly)*real(MxT))*(Beta/real(MxT))**4.d0
   Sigma(:) = (0.d0, 0.d0)
 
   do omega = 0, MxT-1
@@ -254,7 +255,9 @@ Complex*16 FUNCTION weight_W0(typ, dx, dy, t)
   implicit none
   integer, intent(in) :: dx, dy, typ, t
   integer :: dx1, dy1
+  double precision :: ratio
 
+  ratio = Jcp*real(MxT)/Beta
   dx1 = dx;       dy1 = dy
   if(dx1>=0  .and. dx1<Lx .and. dy1>=0 .and. dy1<Ly) then
     if(dx1>dLx)     dx1 = Lx-dx1
@@ -263,14 +266,13 @@ Complex*16 FUNCTION weight_W0(typ, dx, dy, t)
     weight_W0 = (0.d0, 0.d0)
 
     if(t==0) then
-      !if((dx1==1.and.dy1==0).or.(dx1==0.and.dy1==1)) then
-      if(dx1==0.and.dy1==0) then
+      if((dx1==1.and.dy1==0).or.(dx1==0.and.dy1==1)) then
         if(typ ==1 .or. typ == 2) then
-          weight_W0 = dcmplx(0.25d0*Jcp, 0.d0)
+          weight_W0 = dcmplx(0.25d0*ratio, 0.d0)
         else if(typ == 3 .or. typ == 4) then
-          weight_W0 = dcmplx(-0.25d0*Jcp, 0.d0)
+          weight_W0 = dcmplx(-0.25d0*ratio, 0.d0)
         else if(typ == 5 .or. typ == 6) then
-          weight_W0 = dcmplx(0.5d0*Jcp, 0.d0)
+          weight_W0 = dcmplx(0.5d0*ratio, 0.d0)
         endif
       endif
     endif
@@ -285,11 +287,14 @@ END FUNCTION weight_W0
 COMPLEX*16 FUNCTION weight_Gam0(typ, dx, dy, t1, t2)
   implicit none
   integer, intent(in)  :: dx, dy, t1, t2, typ
+  double precision :: ratio
+
+  ratio = (real(MxT)/Beta)**2.d0
 
   if(dx>=0 .and. dx<Lx .and. dy>=0 .and. dy<Ly) then
     if(t1==0 .and. t2==0 .and. dx==0.and.dy==0) then
       if(typ==1 .or. typ==2 .or. typ==5 .or. typ==6) then
-        weight_Gam0 = (1.d0, 0.d0)
+        weight_Gam0 = dcmplx(ratio, 0.d0)
       else
         weight_Gam0 = (0.d0, 0.d0)
       endif
