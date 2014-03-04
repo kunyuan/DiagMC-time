@@ -15,8 +15,8 @@ PROGRAM MAIN
   integer :: col
 
   do i = 0, lent-1
-    !tau(i) = beta/(2.d0*real(lent))+beta*real(i)/real(lent)
     tau(i) = beta*real(i)/real(lent)
+    !tau(i) = beta*real(i)/real(lent)
   enddo
 
   print *, "title"

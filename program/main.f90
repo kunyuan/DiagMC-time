@@ -20,11 +20,14 @@ PROGRAM MAIN
   allocate(Gam(NTypeGam, 0:Lx-1, 0:Ly-1, 0:MxT-1, 0:MxT-1))
 
   allocate(W0PF(0:Lx-1, 0:Ly-1, 0:MxT-1))
+  allocate(Gam0PF(0:Lx-1, 0:Ly-1, 0:MxT-1, 0:MxT-1))
   allocate(Polar(0:Lx-1, 0:Ly-1, 0:MxT-1))
   allocate(Chi(0:Lx-1, 0:Ly-1, 0:MxT-1))
 
   open(11, file="G0_t.dat")
-  open(14, file="W_omega.dat")
+  open(12, file="Polar_omega.dat")
+  open(13, file="Gam0_omega.dat")
+  open(14, file="W0_omega.dat")
   open(15, file="G_t.dat")
   open(16, file="W_t.dat")
 
@@ -37,6 +40,9 @@ PROGRAM MAIN
   call transfer_t(1)
   call transfer_r(1)
 
+  call plus_minus_W0(1)
+  call plus_minus_Gam0(1)
+
   do iloop = 1, 20
     call calculate_Polar
     call calculate_W
@@ -45,24 +51,17 @@ PROGRAM MAIN
     call calculate_G
   enddo
 
-  call transfer_r(-1)
+  call plus_minus_W0(-1)
+  call plus_minus_Gam0(-1)
 
   do it = 0, MxT-1
     write(14, *) it, real(W(1, 0, 0,it)), dimag(W(1, 0, 0, it))
   enddo
   write(14, *)
 
-  do it = 0, MxT-1
-    write(14, *) it, real(W(1, 1, 0,it)), dimag(W(1, 1, 0, it))
-  enddo
-  write(14, *)
 
 
-  do it = 0, MxT-1
-    write(14, *) it, real(W(1, 1, 1,it)), dimag(W(1, 1, 1, it))
-  enddo
-
-
+  call transfer_r(-1)
   call transfer_t(-1)
 
   do it = 0, MxT-1
@@ -71,20 +70,20 @@ PROGRAM MAIN
 
   write(16, *) "r = (0,0)"
   do it = 0, MxT-1
-    write(16, *) real(it)*Beta/real(MxT), real(W(1,0,0,it)), dimag(W(1,0,0,it))
+    write(16, *) (real(it)+0.5d0)*Beta/real(MxT), real(W(1,0,0,it)), dimag(W(1,0,0,it))
   enddo
-
   write(16, *) "r = (1,0)"
   do it = 0, MxT-1
-    write(16, *) real(it)*Beta/real(MxT), real(W(1,1,0,it)), dimag(W(1,1,0,it))
+    write(16, *) (real(it)+0.5d0)*Beta/real(MxT), real(W(1,1,0,it)), dimag(W(1,1,0,it))
   enddo
-
   write(16, *) "r = (1,1)"
   do it = 0, MxT-1
-    write(16, *) real(it)*Beta/real(MxT), real(W(1,1,1,it)), dimag(W(1,1,1,it))
+    write(16, *) (real(it)+0.5d0)*Beta/real(MxT), real(W(1,1,1,it)), dimag(W(1,1,1,it))
   enddo
 
   close(11)
+  close(12)
+  close(13)
   close(14)
   close(15)
   close(16)
