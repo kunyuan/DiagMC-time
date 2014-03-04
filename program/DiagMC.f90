@@ -2,7 +2,7 @@ INCLUDE "vrbls_mc.f90"
 PROGRAM MAIN
   USE vrbls_mc
   implicit none
-  integer :: InpMC
+  integer :: InpMC, it
 
   !print *, 'Lx, Ly, Ntoss, Nsamp, nw, Nblck, Jcp, beta, MCOrder, Seed, ISub, InpMC, title'
   !read  *,  Lx, Ly, Ntoss, Nsamp, nw, Nblck, Jcp, beta, MCOrder, Seed, ISub, InpMC, title
@@ -45,6 +45,13 @@ PROGRAM MAIN
   call initialize_self_consistent
 
   call self_consistent
+
+  open(15, file="G_t.dat")
+  
+  do it = 0, MxT-1
+    write(15, *) (real(it)+0.5d0)*Beta/real(MxT), real(G(1, it)), dimag(G(1, it))
+  enddo
+  close(15)
 
 
   !call def_symmetry

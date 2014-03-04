@@ -2,7 +2,7 @@ INCLUDE "vrbls_mc.f90"
 PROGRAM MAIN
   USE vrbls_mc
   implicit none
-  integer :: it, it2
+  integer :: iloop, it, it2
 
 
   Mu(:)  = 1.d0
@@ -23,56 +23,71 @@ PROGRAM MAIN
   allocate(Polar(0:Lx-1, 0:Ly-1, 0:MxT-1))
   allocate(Chi(0:Lx-1, 0:Ly-1, 0:MxT-1))
 
-  open(10, file="G0_t.dat")
-  open(11, file="Sigma_omega.dat")
-  open(12, file="Sigma_t.dat")
-  open(13, file="G_omega.dat")
+  open(11, file="G0_t.dat")
   open(14, file="W_omega.dat")
-  open(15, file="Gam_omega.dat")
+  open(15, file="G_t.dat")
+  open(16, file="W_t.dat")
 
   call initialize_self_consistent
 
   do it = 0, MxT-1
-    write(10, *) G(1, it)
+    write(11, *) G(1, it)
   enddo
 
   call transfer_t(1)
   call transfer_r(1)
 
-  do it = 0, MxT-1
-    write(13, *) G(1, it)
+  do iloop = 1, 20
+    call calculate_Polar
+    call calculate_W
+
+    call calculate_Sigma
+    call calculate_G
   enddo
 
-  do it = 0, MxT-1
-    write(14, *) W(1, 0, 0, it)
-  enddo
+  call transfer_r(-1)
 
   do it = 0, MxT-1
-    write(15, *) Gam(1, 0, 0, it, 0)
+    write(14, *) it, real(W(1, 0, 0,it)), dimag(W(1, 0, 0, it))
   enddo
-
-  call calculate_Sigma
-  !call calculate_G
+  write(14, *)
 
   do it = 0, MxT-1
-    write(11, *) Sigma(it)
+    write(14, *) it, real(W(1, 1, 0,it)), dimag(W(1, 1, 0, it))
   enddo
+  write(14, *)
 
-  !call transfer_r(-1)
-  !call transfer_t(-1)
-
-  call transfer_Sigma_t(-1)
 
   do it = 0, MxT-1
-    write(12, *) Sigma(it)
+    write(14, *) it, real(W(1, 1, 1,it)), dimag(W(1, 1, 1, it))
   enddo
 
-  close(10)
+
+  call transfer_t(-1)
+
+  do it = 0, MxT-1
+    write(15, *) (real(it)+0.5d0)*Beta/real(MxT), real(G(1, it)), dimag(G(1, it))
+  enddo
+
+  write(16, *) "r = (0,0)"
+  do it = 0, MxT-1
+    write(16, *) real(it)*Beta/real(MxT), real(W(1,0,0,it)), dimag(W(1,0,0,it))
+  enddo
+
+  write(16, *) "r = (1,0)"
+  do it = 0, MxT-1
+    write(16, *) real(it)*Beta/real(MxT), real(W(1,1,0,it)), dimag(W(1,1,0,it))
+  enddo
+
+  write(16, *) "r = (1,1)"
+  do it = 0, MxT-1
+    write(16, *) real(it)*Beta/real(MxT), real(W(1,1,1,it)), dimag(W(1,1,1,it))
+  enddo
+
   close(11)
-  close(12)
-  close(13)
   close(14)
   close(15)
+  close(16)
 
 CONTAINS
 INCLUDE "basic_function.f90"

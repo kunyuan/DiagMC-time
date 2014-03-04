@@ -1,5 +1,5 @@
-GFORTRAN module version '9' created from DiagMC.f90
-MD5:d0ad898b7a6f6dc453cff7576287beee -- If you edit this, you'll get what you deserve.
+GFORTRAN module version '9' created from main.f90
+MD5:f760c8a7e377c3264863038dc23915e9 -- If you edit this, you'll get what you deserve.
 
 (() () () () () () () () () () () () () () () () () () () () () () () ()
 () () ())
@@ -81,11 +81,11 @@ INTEGER 4 0 0 0 INTEGER ()) 0 '15')) 0 () () () 0 0)
 IMPLICIT-SAVE 0 0 DIMENSION) (COMPLEX 8 0 0 0 COMPLEX ()) 0 0 () (2 0
 EXPLICIT (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '1') (CONSTANT (
 INTEGER 4 0 0 0 INTEGER ()) 0 '2') (CONSTANT (INTEGER 4 0 0 0 INTEGER ())
-0 '0') (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '15')) 0 () () () 0 0)
+0 '0') (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '31')) 0 () () () 0 0)
 22 'g0f' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
 IMPLICIT-SAVE 0 0 DIMENSION) (COMPLEX 8 0 0 0 COMPLEX ()) 0 0 () (1 0
 EXPLICIT (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '0') (CONSTANT (
-INTEGER 4 0 0 0 INTEGER ()) 0 '15')) 0 () () () 0 0)
+INTEGER 4 0 0 0 INTEGER ()) 0 '31')) 0 () () () 0 0)
 23 'gam' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
 IMPLICIT-SAVE 0 0 ALLOCATABLE DIMENSION) (COMPLEX 8 0 0 0 COMPLEX ()) 0
 0 () (5 0 DEFERRED () () () () () () () () () ()) 0 () () () 0 0)
@@ -279,7 +279,7 @@ UNKNOWN IMPLICIT-SAVE 0 0) (INTEGER 4 0 0 0 INTEGER ()) 0 0 () (
 CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '10000') () 0 () () () 0 0)
 82 'mxt' 'vrbls_mc' '' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
 IMPLICIT-SAVE 0 0) (INTEGER 4 0 0 0 INTEGER ()) 0 0 () (CONSTANT (
-INTEGER 4 0 0 0 INTEGER ()) 0 '16') () 0 () () () 0 0)
+INTEGER 4 0 0 0 INTEGER ()) 0 '32') () 0 () () () 0 0)
 83 'mxvol' 'vrbls_mc' '' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0) (INTEGER 4 0 0 0 INTEGER ()) 0 0 () (
 CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '256') () 0 () () () 0 0)
@@ -392,7 +392,7 @@ UNKNOWN IMPLICIT-SAVE 0 0) (INTEGER 4 0 0 0 INTEGER ()) 0 0 () () 0 () ()
 115 'sigma' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0 DIMENSION) (COMPLEX 8 0 0 0 COMPLEX ()) 0 0 ()
 (1 0 EXPLICIT (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '0') (CONSTANT (
-INTEGER 4 0 0 0 INTEGER ()) 0 '15')) 0 () () () 0 0)
+INTEGER 4 0 0 0 INTEGER ()) 0 '31')) 0 () () () 0 0)
 116 'signfermiloop' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT
 UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0) (INTEGER 4 0 0 0 INTEGER ()) 0 0
 () () 0 () () () 0 0)
