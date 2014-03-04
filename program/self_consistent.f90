@@ -12,6 +12,7 @@ SUBROUTINE initialize_self_consistent
 
   call initialize_G0F
   call initialize_W0PF
+  call initialize_Gam0PF
   
 END SUBROUTINE initialize_self_consistent
 
@@ -36,15 +37,6 @@ SUBROUTINE initialize_W
   integer :: typ, t, dx, dy
 
   W(:,:,:,:) = (0.d0, 0.d0)
-  do t = 0, MxT-1
-    do dy = 0, Ly-1
-      do dx = 0, Lx-1
-        do typ = 1, NtypeW
-          W(typ, dx, dy, t) = weight_W0(typ, dx, dy, t)
-        enddo
-      enddo
-    enddo
-  enddo
 END SUBROUTINE initialize_W
 
 !!--------------- Initialization of Gamma -----------------------
@@ -53,14 +45,6 @@ SUBROUTINE initialize_Gam
   integer :: ityp, it1, it2
 
   Gam(:,:,:,:,:) = (0.d0, 0.d0)
-  do it2 = 0, MxT-1
-    do it1 = 0, MxT-1
-      do ityp = 1, NTypeGam
-        Gam(ityp,0,0,it1,it2) = weight_Gam0(ityp, 0, 0, it1, it2)
-      enddo
-    enddo
-  enddo
-  return
 END SUBROUTINE initialize_Gam
  
 !!------- Initialization of G0 in frequency ----------
@@ -81,7 +65,7 @@ SUBROUTINE initialize_W0PF
   implicit none
   integer :: typ, t, dx, dy
 
-  W0PF = (0.d0, 0.d0)
+  W0PF(:,:,:) = (0.d0, 0.d0)
   do t = 0, MxT-1
     do dy = 0, Ly-1
       do dx = 0, Lx-1
@@ -92,6 +76,21 @@ SUBROUTINE initialize_W0PF
   call transfer_W0(1)
 END SUBROUTINE initialize_W0PF
 
+!!------- Initialization of Gam0 in monmentum and frequency ----------
+SUBROUTINE initialize_Gam0PF
+  implicit none
+  integer :: ityp, it1, it2
+
+  Gam0PF(:,:,:,:) = (0.d0, 0.d0)
+  do it2 = 0, MxT-1
+    do it1 = 0, MxT-1
+      Gam0PF(0,0,it1,it2) = weight_Gam0(1, 0, 0, it1, it2)
+    enddo
+  enddo
+
+  call transfer_Gam0(1)
+END SUBROUTINE initialize_Gam0PF
+ 
 !!============== WEIGHT CALCULATING ==================================
 
 SUBROUTINE calculate_Polar
@@ -101,9 +100,9 @@ SUBROUTINE calculate_Polar
   complex(kind=8) :: Gin, Gout, Gam1
   double precision :: ratio
 
-  !ratio = -2.d0/real(MxT)*(Beta/real(MxT))**4.d0
-  ratio = 2.d0/real(MxT)*(Beta/real(MxT))**4.d0
   Polar(:,:,:) = (0.d0, 0.d0)
+
+  ratio = 2.d0/real(MxT)*(Beta/real(MxT))**4.d0
   do omega = 0, MxT-1
     do omegaGin = 0, MxT-1
       do px = 0, Lx-1
@@ -119,7 +118,8 @@ SUBROUTINE calculate_Polar
             Gam1 = weight_Gam(5, px, py, omegaGin, omegaGout+MxT)
           endif
           
-          Polar(px, py, omega) = Polar(px, py, omega)+d_times_cd(ratio, Gin*Gout*Gam1)
+          Polar(px, py, omega) = Polar(px, py, omega)+d_times_cd(ratio, cdexp((0.d0, -1.d0) &
+            & *2.d0*omegaGout*Pi/MxT)*Gin*Gout*Gam1)
         enddo
       enddo
     enddo
@@ -135,10 +135,9 @@ SUBROUTINE calculate_Sigma
   complex(kind=8) :: G1, W1, Gam1
   double precision :: ratio
 
-  !ratio = 3.d0/(real(Lx)*real(Ly)*real(MxT))*(Beta/real(MxT))**4.d0
-  ratio = -3.d0/(real(Lx)*real(Ly)*real(MxT))*(Beta/real(MxT))**4.d0
   Sigma(:) = (0.d0, 0.d0)
 
+  ratio = -3.d0/(real(Lx)*real(Ly)*real(MxT))*(Beta/real(MxT))**4.d0
   do omega = 0, MxT-1
     do omegaG = 0, MxT-1
       do py = 0, Ly-1
@@ -282,6 +281,54 @@ Complex*16 FUNCTION weight_W0(typ, dx, dy, t)
   endif
 
 END FUNCTION weight_W0
+
+
+SUBROUTINE plus_minus_W0(Backforth)
+  implicit none
+  integer, intent(in) :: Backforth
+  integer :: ityp, px, py, omega
+
+  if(Backforth/=-1) then
+    W(1,:,:,:) = W(1,:,:,:) + W0PF(:,:,:)
+  else 
+    W(1,:,:,:) = W(1,:,:,:) - W0PF(:,:,:)
+  endif
+
+  do  omega = 0, MxT-1
+    do py = 0, Ly-1
+      do px = 0, Lx-1
+        W(3,px,py,omega) = d_times_cd(-1.d0,W(1,px,py,omega))
+        W(5,px,py,omega) = d_times_cd( 2.d0,W(1,px,py,omega))
+      enddo
+    enddo
+  enddo
+
+  W(2,:,:,:) = W(1,:,:,:)
+  W(4,:,:,:) = W(3,:,:,:)
+  W(6,:,:,:) = W(5,:,:,:)
+
+  return
+END SUBROUTINE
+
+SUBROUTINE plus_minus_Gam0(Backforth)
+  implicit none
+  integer, intent(in) :: Backforth
+  integer :: ityp, px, py, omega1, omega2
+
+  if(Backforth/=-1) then
+    Gam(1,:,:,:,:) = Gam(1,:,:,:,:) + Gam0PF(:,:,:,:)
+    Gam(2,:,:,:,:) = Gam(2,:,:,:,:) + Gam0PF(:,:,:,:)
+    Gam(5,:,:,:,:) = Gam(5,:,:,:,:) + Gam0PF(:,:,:,:)
+    Gam(6,:,:,:,:) = Gam(6,:,:,:,:) + Gam0PF(:,:,:,:)
+  else 
+    Gam(1,:,:,:,:) = Gam(1,:,:,:,:) - Gam0PF(:,:,:,:)
+    Gam(2,:,:,:,:) = Gam(2,:,:,:,:) - Gam0PF(:,:,:,:)
+    Gam(5,:,:,:,:) = Gam(5,:,:,:,:) - Gam0PF(:,:,:,:)
+    Gam(6,:,:,:,:) = Gam(6,:,:,:,:) - Gam0PF(:,:,:,:)
+  endif
+
+  return
+END SUBROUTINE
 
 !!--------- calculate weight for bare Gamma ---------
 COMPLEX*16 FUNCTION weight_Gam0(typ, dx, dy, t1, t2)
