@@ -3,6 +3,7 @@ PROGRAM MAIN
   USE vrbls_mc
   implicit none
   integer :: iloop, it, it2
+  integer :: ix, iy
 
 
   Mu(:)  = 1.d0
@@ -25,10 +26,8 @@ PROGRAM MAIN
   allocate(Chi(0:Lx-1, 0:Ly-1, 0:MxT-1))
 
   open(11, file="G0_t.dat")
-  open(12, file="Polar_omega.dat")
-  open(13, file="Gam0_omega.dat")
-  open(14, file="W0_omega.dat")
-  open(15, file="G_t.dat")
+  open(12, file="Polar_t.dat")
+  !open(15, file="G_t.dat")
   open(16, file="W_t.dat")
 
   call initialize_self_consistent
@@ -54,38 +53,32 @@ PROGRAM MAIN
   call plus_minus_W0(-1)
   call plus_minus_Gam0(-1)
 
-  do it = 0, MxT-1
-    write(14, *) it, real(W(1, 0, 0,it)), dimag(W(1, 0, 0, it))
-  enddo
-  write(14, *)
-
-
-
   call transfer_r(-1)
   call transfer_t(-1)
 
-  do it = 0, MxT-1
-    write(15, *) (real(it)+0.5d0)*Beta/real(MxT), real(G(1, it)), dimag(G(1, it))
-  enddo
+  call transfer_Polar_r(-1)
+  call transfer_Polar_t(-1)
 
-  write(16, *) "r = (0,0)"
   do it = 0, MxT-1
-    write(16, *) (real(it)+0.5d0)*Beta/real(MxT), real(W(1,0,0,it)), dimag(W(1,0,0,it))
+    write(12, *) it, real(Polar(0, 0, it)), dimag(Polar(0, 0, it))
   enddo
-  write(16, *) "r = (1,0)"
-  do it = 0, MxT-1
-    write(16, *) (real(it)+0.5d0)*Beta/real(MxT), real(W(1,1,0,it)), dimag(W(1,1,0,it))
-  enddo
-  write(16, *) "r = (1,1)"
-  do it = 0, MxT-1
-    write(16, *) (real(it)+0.5d0)*Beta/real(MxT), real(W(1,1,1,it)), dimag(W(1,1,1,it))
+  write(12, *)
+
+  !do it = 0, MxT-1
+    !write(15, *) (real(it)+0.5d0)*Beta/real(MxT), real(G(1, it)), dimag(G(1, it))
+  !enddo
+
+  do iy = 0, Ly-1
+    do ix = 0, Lx-1
+      write(16, *) ix, iy, real(W(1,ix,iy,0)), dimag(W(1,ix,iy,0))
+    enddo
   enddo
 
   close(11)
   close(12)
-  close(13)
-  close(14)
-  close(15)
+  !close(13)
+  !close(14)
+  !close(15)
   close(16)
 
 CONTAINS

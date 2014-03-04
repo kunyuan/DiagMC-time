@@ -968,17 +968,17 @@ SUBROUTINE transfer_Chi(BackForth)
     call FFT_tau_single(Chi,1,Lx*Ly,BackForth)
 END SUBROUTINE
 
-!SUBROUTINE transfer_Polar_r(BackForth)
-    !implicit none
-    !integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
-    !call FFT_r(Polar,1,MxT,BackForth)
-!END SUBROUTINE
+SUBROUTINE transfer_Polar_r(BackForth)
+    implicit none
+    integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
+    call FFT_r(Polar,1,MxT,BackForth)
+END SUBROUTINE
 
-!SUBROUTINE transfer_Polar_t(BackForth)
-    !implicit none
-    !integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
-    !call FFT_tau_single(Polar,1,Lx*Ly,BackForth)
-!END SUBROUTINE
+SUBROUTINE transfer_Polar_t(BackForth)
+    implicit none
+    integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
+    call FFT_tau_single(Polar,1,Lx*Ly,BackForth)
+END SUBROUTINE
 
 SUBROUTINE transfer_Sigma_t(BackForth)
     implicit none
