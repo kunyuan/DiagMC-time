@@ -39,6 +39,7 @@ PROGRAM MAIN
   allocate(Gam(NTypeGam, 0:Lx-1, 0:Ly-1, 0:MxT-1, 0:MxT-1))
 
   allocate(W0PF(0:Lx-1, 0:Ly-1, 0:MxT-1))
+  allocate(Gam0PF(0:Lx-1, 0:Ly-1, 0:MxT-1, 0:MxT-1))
   allocate(Polar(0:Lx-1, 0:Ly-1, 0:MxT-1))
   allocate(Chi(0:Lx-1, 0:Ly-1, 0:MxT-1))
 
@@ -50,10 +51,10 @@ PROGRAM MAIN
 
   call self_consistent
 
-  open(15, file="G_t.dat")
+  open(15, file="W_t.dat")
   
   do it = 0, MxT-1
-    write(15, *) (real(it)+0.5d0)*Beta/real(MxT), real(G(1, it)), dimag(G(1, it))
+    write(15, *) (real(it)+0.5d0)*Beta/real(MxT), real(W(1,1,0,it)), dimag(W(1,1,0,it))
   enddo
   close(15)
 
@@ -91,8 +92,11 @@ SUBROUTINE self_consistent
 
     flag = self_consistent_GW(1.d-8)
 
-    !call transfer_Sigma_t(-1)
-    !call output_Quantities
+    call calculate_Chi
+    call transfer_Chi_r(-1)
+    call transfer_Chi_t(-1)
+
+    call output_Quantities
 
     !call write_GWGamma
 
@@ -168,6 +172,9 @@ LOGICAL FUNCTION self_consistent_GW(err)
   call transfer_r(1)
   call transfer_t(1)
 
+  call plus_minus_W0(1)
+  call plus_minus_Gam0(1)
+
   !!------ calculate G, W in momentum domain --------------
   WOld = (10.d0, 0.d0)
   WNow = weight_W(1, 0, 0, 0)
@@ -175,26 +182,24 @@ LOGICAL FUNCTION self_consistent_GW(err)
 
   !if(InpMC==0) then
     iloop = 0
-    write(*, *) "G-W loop:", iloop, real(Wold), real(WNow)
 
     call calculate_Polar
     call calculate_W
-    call calculate_Sigma
 
-    !do while(abs(real(WNow)-real(WOld))>err) 
-      !WOld = WNow
-      !iloop = iloop + 1
+    do while(abs(real(WNow)-real(WOld))>err) 
+      WOld = WNow
+      iloop = iloop + 1
 
-      !call calculate_Sigma
-      !call calculate_Polar
+      call calculate_Sigma
+      call calculate_Polar
 
-      !call calculate_G
-      !call calculate_W
+      call calculate_G
+      call calculate_W
 
-      !WNow = weight_W(1, 0, 0, 0)
+      WNow = weight_W(1, 0, 0, 0)
 
-      !write(*, *) "G-W loop:", iloop, real(WOld), real(WNow)
-    !enddo
+      write(*, *) "G-W loop:", iloop, real(WOld), real(WNow)
+    enddo
   !else
     !do iloop = 1, 10 
       !WOldR = WWR
@@ -208,6 +213,8 @@ LOGICAL FUNCTION self_consistent_GW(err)
   !endif
 
   !!-------------------------------------------------------
+  call plus_minus_W0(-1)
+  call plus_minus_Gam0(-1)
 
   call transfer_r(-1)
   call transfer_t(-1)

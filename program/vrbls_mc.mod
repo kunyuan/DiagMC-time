@@ -1,14 +1,5 @@
-<<<<<<< HEAD
 GFORTRAN module version '9' created from DiagMC.f90
-MD5:5680df8033cd48efdc31594f77bf8d7b -- If you edit this, you'll get what you deserve.
-=======
-GFORTRAN module version '9' created from main.f90
-<<<<<<< HEAD
-MD5:f760c8a7e377c3264863038dc23915e9 -- If you edit this, you'll get what you deserve.
->>>>>>> test/pr-2
-=======
-MD5:592c98c5afed861f62465ec88800377c -- If you edit this, you'll get what you deserve.
->>>>>>> test/pr-2
+MD5:3e1dbcdfda1cdf31bc791c55feb67ef7 -- If you edit this, you'll get what you deserve.
 
 (() () () () () () () () () () () () () () () () () () () () () () () ()
 () () ())
@@ -356,255 +347,132 @@ IMPLICIT-SAVE 0 0 DIMENSION) (REAL 8 0 0 0 REAL ()) 0 0 () (2 0 EXPLICIT
 (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '1') (CONSTANT (INTEGER 4 0 0 0
 INTEGER ()) 0 '67') (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '1') (
 CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '10240')) 0 () () () 0 0)
-<<<<<<< HEAD
-102 'order' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+103 'order' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0) (INTEGER 4 0 0 0 INTEGER ()) 0 0 () () 0 () ()
 () 0 0)
-103 'phase' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+104 'phase' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0) (REAL 8 0 0 0 REAL ()) 0 0 () () 0 () () () 0
 0)
-104 'pi' 'vrbls_mc' '' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
+105 'pi' 'vrbls_mc' '' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
 IMPLICIT-SAVE 0 0) (REAL 8 0 0 0 REAL ()) 0 0 () (CONSTANT (REAL 8 0 0 0
 REAL ()) 0 '0.3243f6a8885a30@1') () 0 () () () 0 0)
-105 'pi2' 'vrbls_mc' '' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC
+106 'pi2' 'vrbls_mc' '' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0) (REAL 8 0 0 0 REAL ()) 0 0 () (CONSTANT (
 REAL 8 0 0 0 REAL ()) 0 '0.6487ed5110b460@1') () 0 () () () 0 0)
-106 'pi4' 'vrbls_mc' '' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC
+107 'pi4' 'vrbls_mc' '' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0) (REAL 8 0 0 0 REAL ()) 0 0 () (CONSTANT (
 REAL 8 0 0 0 REAL ()) 0 '0.c90fdaa22168c0@1') () 0 () () () 0 0)
-107 'polar' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+108 'polar' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0 ALLOCATABLE DIMENSION) (COMPLEX 8 0 0 0
 COMPLEX ()) 0 0 () (3 0 DEFERRED () () () () () ()) 0 () () () 0 0)
-108 'probacc' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
-=======
-103 'omegaln' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
-UNKNOWN IMPLICIT-SAVE 0 0 DIMENSION) (INTEGER 4 0 0 0 INTEGER ()) 0 0 ()
-(1 0 EXPLICIT (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '1') (CONSTANT (
-INTEGER 4 0 0 0 INTEGER ()) 0 '33')) 0 () () () 0 0)
-104 'order' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
-UNKNOWN IMPLICIT-SAVE 0 0) (INTEGER 4 0 0 0 INTEGER ()) 0 0 () () 0 () ()
-() 0 0)
-105 'phase' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
-UNKNOWN IMPLICIT-SAVE 0 0) (REAL 8 0 0 0 REAL ()) 0 0 () () 0 () () () 0
-0)
-106 'pi' 'vrbls_mc' '' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
-IMPLICIT-SAVE 0 0) (REAL 8 0 0 0 REAL ()) 0 0 () (CONSTANT (REAL 8 0 0 0
-REAL ()) 0 '0.3243f6a8885a30@1') () 0 () () () 0 0)
-107 'pi2' 'vrbls_mc' '' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC
-UNKNOWN IMPLICIT-SAVE 0 0) (REAL 8 0 0 0 REAL ()) 0 0 () (CONSTANT (
-REAL 8 0 0 0 REAL ()) 0 '0.6487ed5110b460@1') () 0 () () () 0 0)
-108 'pi4' 'vrbls_mc' '' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC
-UNKNOWN IMPLICIT-SAVE 0 0) (REAL 8 0 0 0 REAL ()) 0 0 () (CONSTANT (
-REAL 8 0 0 0 REAL ()) 0 '0.c90fdaa22168c0@1') () 0 () () () 0 0)
-109 'polar' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
-UNKNOWN IMPLICIT-SAVE 0 0 ALLOCATABLE DIMENSION) (COMPLEX 8 0 0 0
-COMPLEX ()) 0 0 () (3 0 DEFERRED () () () () () ()) 0 () () () 0 0)
-110 'probacc' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
->>>>>>> test/pr-2
+109 'probacc' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0 DIMENSION) (REAL 8 0 0 0 REAL ()) 0 0 () (2 0
 EXPLICIT (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '0') (CONSTANT (
 INTEGER 4 0 0 0 INTEGER ()) 0 '10') (CONSTANT (INTEGER 4 0 0 0 INTEGER ())
 0 '1') (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '15')) 0 () () () 0 0)
-<<<<<<< HEAD
-109 'probprop' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
-=======
-111 'probprop' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
->>>>>>> test/pr-2
+110 'probprop' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0 DIMENSION) (REAL 8 0 0 0 REAL ()) 0 0 () (2 0
 EXPLICIT (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '0') (CONSTANT (
 INTEGER 4 0 0 0 INTEGER ()) 0 '10') (CONSTANT (INTEGER 4 0 0 0 INTEGER ())
 0 '1') (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '15')) 0 () () () 0 0)
-<<<<<<< HEAD
-110 'prt' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
+111 'prt' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
 IMPLICIT-SAVE 0 0) (LOGICAL 4 0 0 0 LOGICAL ()) 0 0 () () 0 () () () 0 0)
-111 'pupdate' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+112 'pupdate' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0 DIMENSION) (REAL 8 0 0 0 REAL ()) 0 0 () (1 0
 EXPLICIT (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '1') (CONSTANT (
 INTEGER 4 0 0 0 INTEGER ()) 0 '15')) 0 () () () 0 0)
-112 'quan' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+113 'quan' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0 DIMENSION) (REAL 8 0 0 0 REAL ()) 0 0 () (1 0
 EXPLICIT (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '1') (CONSTANT (
 INTEGER 4 0 0 0 INTEGER ()) 0 '67')) 0 () () () 0 0)
-113 'seed' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+114 'seed' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0) (INTEGER 4 0 0 0 INTEGER ()) 0 0 () () 0 () ()
 () 0 0)
-114 'sigma' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
-UNKNOWN IMPLICIT-SAVE 0 0 DIMENSION) (COMPLEX 8 0 0 0 COMPLEX ()) 0 0 ()
-(1 0 EXPLICIT (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '0') (CONSTANT (
-<<<<<<< HEAD
-INTEGER 4 0 0 0 INTEGER ()) 0 '15')) 0 () () () 0 0)
-115 'signfermiloop' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT
-=======
-INTEGER 4 0 0 0 INTEGER ()) 0 '31')) 0 () () () 0 0)
-116 'signfermiloop' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT
->>>>>>> test/pr-2
-UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0) (INTEGER 4 0 0 0 INTEGER ()) 0 0
-() () 0 () () () 0 0)
-116 'spinmasha' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
-UNKNOWN IMPLICIT-SAVE 0 0) (INTEGER 4 0 0 0 INTEGER ()) 0 0 () () 0 () ()
-() 0 0)
-117 'statusln' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
-UNKNOWN IMPLICIT-SAVE 0 0 DIMENSION) (INTEGER 4 0 0 0 INTEGER ()) 0 0 ()
-(1 0 EXPLICIT (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '1') (CONSTANT (
-INTEGER 4 0 0 0 INTEGER ()) 0 '33')) 0 () () () 0 0)
-118 'statusvertex' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT
-UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0 DIMENSION) (INTEGER 4 0 0 0
-INTEGER ()) 0 0 () (1 0 EXPLICIT (CONSTANT (INTEGER 4 0 0 0 INTEGER ())
-0 '1') (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '22')) 0 () () () 0 0)
-119 't1vertex' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
-UNKNOWN IMPLICIT-SAVE 0 0 DIMENSION) (INTEGER 4 0 0 0 INTEGER ()) 0 0 ()
-(1 0 EXPLICIT (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '1') (CONSTANT (
-INTEGER 4 0 0 0 INTEGER ()) 0 '22')) 0 () () () 0 0)
-120 't2vertex' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
-UNKNOWN IMPLICIT-SAVE 0 0 DIMENSION) (INTEGER 4 0 0 0 INTEGER ()) 0 0 ()
-(1 0 EXPLICIT (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '1') (CONSTANT (
-INTEGER 4 0 0 0 INTEGER ()) 0 '22')) 0 () () () 0 0)
-121 't3vertex' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
-UNKNOWN IMPLICIT-SAVE 0 0 DIMENSION) (INTEGER 4 0 0 0 INTEGER ()) 0 0 ()
-(1 0 EXPLICIT (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '1') (CONSTANT (
-INTEGER 4 0 0 0 INTEGER ()) 0 '22')) 0 () () () 0 0)
-122 't_curr' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
-UNKNOWN IMPLICIT-SAVE 0 0) (REAL 8 0 0 0 REAL ()) 0 0 () () 0 () () () 0
-0)
-123 't_elap' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
-UNKNOWN IMPLICIT-SAVE 0 0) (REAL 8 0 0 0 REAL ()) 0 0 () () 0 () () () 0
-0)
-124 't_init' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
-UNKNOWN IMPLICIT-SAVE 0 0) (REAL 8 0 0 0 REAL ()) 0 0 () () 0 () () () 0
-0)
-125 't_meas' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
-UNKNOWN IMPLICIT-SAVE 0 0) (REAL 8 0 0 0 REAL ()) 0 0 () () 0 () () () 0
-0)
-126 't_prev' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
-UNKNOWN IMPLICIT-SAVE 0 0) (REAL 8 0 0 0 REAL ()) 0 0 () () 0 () () () 0
-0)
-127 't_simu' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
-UNKNOWN IMPLICIT-SAVE 0 0) (REAL 8 0 0 0 REAL ()) 0 0 () () 0 () () () 0
-0)
-128 't_toss' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
-UNKNOWN IMPLICIT-SAVE 0 0) (REAL 8 0 0 0 REAL ()) 0 0 () () 0 () () () 0
-0)
-129 'tailgam' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
-UNKNOWN IMPLICIT-SAVE 0 0) (INTEGER 4 0 0 0 INTEGER ()) 0 0 () () 0 () ()
-() 0 0)
-130 'tailln' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
-UNKNOWN IMPLICIT-SAVE 0 0) (INTEGER 4 0 0 0 INTEGER ()) 0 0 () () 0 () ()
-() 0 0)
-131 'time' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
-UNKNOWN IMPLICIT-SAVE 0 0) (CHARACTER 1 0 0 0 CHARACTER ((CONSTANT (
-INTEGER 4 0 0 0 INTEGER ()) 0 '10'))) 0 0 () () 0 () () () 0 0)
-132 'title' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
-UNKNOWN IMPLICIT-SAVE 0 0) (CHARACTER 1 0 0 0 CHARACTER ((CONSTANT (
-INTEGER 4 0 0 0 INTEGER ()) 0 '100'))) 0 0 () () 0 () () () 0 0)
-133 'title1' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
-UNKNOWN IMPLICIT-SAVE 0 0) (CHARACTER 1 0 0 0 CHARACTER ((CONSTANT (
-INTEGER 4 0 0 0 INTEGER ()) 0 '100'))) 0 0 () () 0 () () () 0 0)
-134 'title2' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
-UNKNOWN IMPLICIT-SAVE 0 0) (CHARACTER 1 0 0 0 CHARACTER ((CONSTANT (
-INTEGER 4 0 0 0 INTEGER ()) 0 '100'))) 0 0 () () 0 () () () 0 0)
-135 'title3' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
-UNKNOWN IMPLICIT-SAVE 0 0) (CHARACTER 1 0 0 0 CHARACTER ((CONSTANT (
-INTEGER 4 0 0 0 INTEGER ()) 0 '100'))) 0 0 () () 0 () () () 0 0)
-136 'tm32' 'vrbls_mc' '' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC
-UNKNOWN IMPLICIT-SAVE 0 0) (REAL 8 0 0 0 REAL ()) 0 0 () (CONSTANT (
-REAL 8 0 0 0 REAL ()) 0 '0.10000000000000@-7') () 0 () () () 0 0)
-137 'tval' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
-UNKNOWN IMPLICIT-SAVE 0 0 DIMENSION) (INTEGER 4 0 0 0 INTEGER ()) 0 0 ()
-(1 0 EXPLICIT (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '1') (CONSTANT (
-INTEGER 4 0 0 0 INTEGER ()) 0 '8')) 0 () () () 0 0)
-138 'typegam2w' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
-=======
-112 'prt' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
-IMPLICIT-SAVE 0 0) (LOGICAL 4 0 0 0 LOGICAL ()) 0 0 () () 0 () () () 0 0)
-113 'pupdate' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
-UNKNOWN IMPLICIT-SAVE 0 0 DIMENSION) (REAL 8 0 0 0 REAL ()) 0 0 () (1 0
-EXPLICIT (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '1') (CONSTANT (
-INTEGER 4 0 0 0 INTEGER ()) 0 '15')) 0 () () () 0 0)
-114 'quan' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
-UNKNOWN IMPLICIT-SAVE 0 0 DIMENSION) (REAL 8 0 0 0 REAL ()) 0 0 () (1 0
-EXPLICIT (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '1') (CONSTANT (
-INTEGER 4 0 0 0 INTEGER ()) 0 '67')) 0 () () () 0 0)
-115 'seed' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
-UNKNOWN IMPLICIT-SAVE 0 0) (INTEGER 4 0 0 0 INTEGER ()) 0 0 () () 0 () ()
-() 0 0)
-116 'sigma' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+115 'sigma' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0 DIMENSION) (COMPLEX 8 0 0 0 COMPLEX ()) 0 0 ()
 (1 0 EXPLICIT (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '0') (CONSTANT (
 INTEGER 4 0 0 0 INTEGER ()) 0 '127')) 0 () () () 0 0)
-117 'signfermiloop' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT
+116 'signfermiloop' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT
 UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0) (INTEGER 4 0 0 0 INTEGER ()) 0 0
 () () 0 () () () 0 0)
-118 'spinmasha' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+117 'spinmasha' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0) (INTEGER 4 0 0 0 INTEGER ()) 0 0 () () 0 () ()
 () 0 0)
-119 'statusln' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+118 'statusln' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0 DIMENSION) (INTEGER 4 0 0 0 INTEGER ()) 0 0 ()
 (1 0 EXPLICIT (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '1') (CONSTANT (
 INTEGER 4 0 0 0 INTEGER ()) 0 '33')) 0 () () () 0 0)
-120 'statusvertex' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT
+119 'statusvertex' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT
 UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0 DIMENSION) (INTEGER 4 0 0 0
 INTEGER ()) 0 0 () (1 0 EXPLICIT (CONSTANT (INTEGER 4 0 0 0 INTEGER ())
 0 '1') (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '22')) 0 () () () 0 0)
-121 't_curr' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+120 't1vertex' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0 DIMENSION) (INTEGER 4 0 0 0 INTEGER ()) 0 0 ()
+(1 0 EXPLICIT (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '1') (CONSTANT (
+INTEGER 4 0 0 0 INTEGER ()) 0 '22')) 0 () () () 0 0)
+121 't2vertex' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0 DIMENSION) (INTEGER 4 0 0 0 INTEGER ()) 0 0 ()
+(1 0 EXPLICIT (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '1') (CONSTANT (
+INTEGER 4 0 0 0 INTEGER ()) 0 '22')) 0 () () () 0 0)
+122 't3vertex' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+UNKNOWN IMPLICIT-SAVE 0 0 DIMENSION) (INTEGER 4 0 0 0 INTEGER ()) 0 0 ()
+(1 0 EXPLICIT (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '1') (CONSTANT (
+INTEGER 4 0 0 0 INTEGER ()) 0 '22')) 0 () () () 0 0)
+123 't_curr' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0) (REAL 8 0 0 0 REAL ()) 0 0 () () 0 () () () 0
 0)
-122 't_elap' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+124 't_elap' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0) (REAL 8 0 0 0 REAL ()) 0 0 () () 0 () () () 0
 0)
-123 't_init' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+125 't_init' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0) (REAL 8 0 0 0 REAL ()) 0 0 () () 0 () () () 0
 0)
-124 't_meas' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+126 't_meas' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0) (REAL 8 0 0 0 REAL ()) 0 0 () () 0 () () () 0
 0)
-125 't_prev' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+127 't_prev' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0) (REAL 8 0 0 0 REAL ()) 0 0 () () 0 () () () 0
 0)
-126 't_simu' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+128 't_simu' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0) (REAL 8 0 0 0 REAL ()) 0 0 () () 0 () () () 0
 0)
-127 't_toss' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+129 't_toss' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0) (REAL 8 0 0 0 REAL ()) 0 0 () () 0 () () () 0
 0)
-128 'tailgam' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+130 'tailgam' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0) (INTEGER 4 0 0 0 INTEGER ()) 0 0 () () 0 () ()
 () 0 0)
-129 'tailln' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+131 'tailln' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0) (INTEGER 4 0 0 0 INTEGER ()) 0 0 () () 0 () ()
 () 0 0)
-130 'time' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+132 'time' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0) (CHARACTER 1 0 0 0 CHARACTER ((CONSTANT (
 INTEGER 4 0 0 0 INTEGER ()) 0 '10'))) 0 0 () () 0 () () () 0 0)
-131 'title' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+133 'title' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0) (CHARACTER 1 0 0 0 CHARACTER ((CONSTANT (
 INTEGER 4 0 0 0 INTEGER ()) 0 '100'))) 0 0 () () 0 () () () 0 0)
-132 'title1' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+134 'title1' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0) (CHARACTER 1 0 0 0 CHARACTER ((CONSTANT (
 INTEGER 4 0 0 0 INTEGER ()) 0 '100'))) 0 0 () () 0 () () () 0 0)
-133 'title2' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+135 'title2' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0) (CHARACTER 1 0 0 0 CHARACTER ((CONSTANT (
 INTEGER 4 0 0 0 INTEGER ()) 0 '100'))) 0 0 () () 0 () () () 0 0)
-134 'title3' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+136 'title3' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0) (CHARACTER 1 0 0 0 CHARACTER ((CONSTANT (
 INTEGER 4 0 0 0 INTEGER ()) 0 '100'))) 0 0 () () 0 () () () 0 0)
-135 'tm32' 'vrbls_mc' '' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC
+137 'tm32' 'vrbls_mc' '' 1 ((PARAMETER UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0) (REAL 8 0 0 0 REAL ()) 0 0 () (CONSTANT (
 REAL 8 0 0 0 REAL ()) 0 '0.10000000000000@-7') () 0 () () () 0 0)
-136 'tval' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+138 'tval' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0 DIMENSION) (INTEGER 4 0 0 0 INTEGER ()) 0 0 ()
 (1 0 EXPLICIT (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '1') (CONSTANT (
 INTEGER 4 0 0 0 INTEGER ()) 0 '8')) 0 () () () 0 0)
-137 'typegam2w' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
->>>>>>> test/pr-2
+139 'typegam2w' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0 DIMENSION) (INTEGER 4 0 0 0 INTEGER ()) 0 0 ()
 (2 0 EXPLICIT (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '1') (CONSTANT (
 INTEGER 4 0 0 0 INTEGER ()) 0 '6') (CONSTANT (INTEGER 4 0 0 0 INTEGER ())
 0 '1') (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '6')) 0 () () () 0 0)
-<<<<<<< HEAD
-139 'typegw2gam' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
-=======
-138 'typegw2gam' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
->>>>>>> test/pr-2
+140 'typegw2gam' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0 DIMENSION) (INTEGER 4 0 0 0 INTEGER ()) 0 0 ()
 (4 0 EXPLICIT (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '1') (CONSTANT (
 INTEGER 4 0 0 0 INTEGER ()) 0 '2') (CONSTANT (INTEGER 4 0 0 0 INTEGER ())
@@ -612,117 +480,60 @@ INTEGER 4 0 0 0 INTEGER ()) 0 '2') (CONSTANT (INTEGER 4 0 0 0 INTEGER ())
 4 0 0 0 INTEGER ()) 0 '1') (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '2')
 (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '1') (CONSTANT (INTEGER 4 0 0 0
 INTEGER ()) 0 '2')) 0 () () () 0 0)
-<<<<<<< HEAD
-140 'typeln' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+141 'typeln' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0 DIMENSION) (INTEGER 4 0 0 0 INTEGER ()) 0 0 ()
 (1 0 EXPLICIT (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '1') (CONSTANT (
 INTEGER 4 0 0 0 INTEGER ()) 0 '33')) 0 () () () 0 0)
-141 'typevertex' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+142 'typevertex' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0 DIMENSION) (INTEGER 4 0 0 0 INTEGER ()) 0 0 ()
 (1 0 EXPLICIT (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '1') (CONSTANT (
 INTEGER 4 0 0 0 INTEGER ()) 0 '22')) 0 () () () 0 0)
-142 'typevertexin' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT
+143 'typevertexin' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT
 UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0 DIMENSION) (INTEGER 4 0 0 0
 INTEGER ()) 0 0 () (1 0 EXPLICIT (CONSTANT (INTEGER 4 0 0 0 INTEGER ())
 0 '1') (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '22')) 0 () () () 0 0)
-143 'typevertexout' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT
+144 'typevertexout' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT
 UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0 DIMENSION) (INTEGER 4 0 0 0
 INTEGER ()) 0 0 () (1 0 EXPLICIT (CONSTANT (INTEGER 4 0 0 0 INTEGER ())
 0 '1') (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '22')) 0 () () () 0 0)
-144 'vertex4gamlist' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT
+145 'vertex4gamlist' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT
 UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0 DIMENSION) (INTEGER 4 0 0 0
 INTEGER ()) 0 0 () (1 0 EXPLICIT (CONSTANT (INTEGER 4 0 0 0 INTEGER ())
 0 '1') (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '22')) 0 () () () 0 0)
-145 'vol' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
+146 'vol' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
 IMPLICIT-SAVE 0 0) (INTEGER 4 0 0 0 INTEGER ()) 0 0 () () 0 () () () 0 0)
-146 'vrbls_mc' 'vrbls_mc' '' 1 ((MODULE UNKNOWN-INTENT UNKNOWN-PROC
+147 'vrbls_mc' 'vrbls_mc' '' 1 ((MODULE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN UNKNOWN 0 0) (UNKNOWN 0 0 0 0 UNKNOWN ()) 0 0 () () 0 () () () 0
 0)
-147 'w' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
+148 'w' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
 IMPLICIT-SAVE 0 0 ALLOCATABLE DIMENSION) (COMPLEX 8 0 0 0 COMPLEX ()) 0
 0 () (4 0 DEFERRED () () () () () () () ()) 0 () () () 0 0)
-148 'w0pf' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+149 'w0pf' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0 ALLOCATABLE DIMENSION) (COMPLEX 8 0 0 0
 COMPLEX ()) 0 0 () (3 0 DEFERRED () () () () () ()) 0 () () () 0 0)
-149 'weightcurrent' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT
+150 'weightcurrent' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT
 UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0) (REAL 8 0 0 0 REAL ()) 0 0 () ()
 0 () () () 0 0)
-150 'weightln' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+151 'weightln' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0 DIMENSION) (REAL 8 0 0 0 REAL ()) 0 0 () (1 0
 EXPLICIT (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '1') (CONSTANT (
 INTEGER 4 0 0 0 INTEGER ()) 0 '33')) 0 () () () 0 0)
-151 'weightvertex' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT
+152 'weightvertex' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT
 UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0 DIMENSION) (REAL 8 0 0 0 REAL ())
 0 0 () (1 0 EXPLICIT (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '1') (
 CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '22')) 0 () () () 0 0)
-152 'weightworm' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+153 'weightworm' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0) (REAL 8 0 0 0 REAL ()) 0 0 () () 0 () () () 0
 0)
-153 'wxvertex' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+154 'wxvertex' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0 DIMENSION) (INTEGER 4 0 0 0 INTEGER ()) 0 0 ()
 (1 0 EXPLICIT (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '1') (CONSTANT (
 INTEGER 4 0 0 0 INTEGER ()) 0 '22')) 0 () () () 0 0)
-154 'wyvertex' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
+155 'wyvertex' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0 DIMENSION) (INTEGER 4 0 0 0 INTEGER ()) 0 0 ()
 (1 0 EXPLICIT (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '1') (CONSTANT (
 INTEGER 4 0 0 0 INTEGER ()) 0 '22')) 0 () () () 0 0)
-155 'zone' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
-=======
-139 'typeln' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
-UNKNOWN IMPLICIT-SAVE 0 0 DIMENSION) (INTEGER 4 0 0 0 INTEGER ()) 0 0 ()
-(1 0 EXPLICIT (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '1') (CONSTANT (
-INTEGER 4 0 0 0 INTEGER ()) 0 '33')) 0 () () () 0 0)
-140 'typevertex' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
-UNKNOWN IMPLICIT-SAVE 0 0 DIMENSION) (INTEGER 4 0 0 0 INTEGER ()) 0 0 ()
-(1 0 EXPLICIT (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '1') (CONSTANT (
-INTEGER 4 0 0 0 INTEGER ()) 0 '22')) 0 () () () 0 0)
-141 'typevertexin' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT
-UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0 DIMENSION) (INTEGER 4 0 0 0
-INTEGER ()) 0 0 () (1 0 EXPLICIT (CONSTANT (INTEGER 4 0 0 0 INTEGER ())
-0 '1') (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '22')) 0 () () () 0 0)
-142 'typevertexout' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT
-UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0 DIMENSION) (INTEGER 4 0 0 0
-INTEGER ()) 0 0 () (1 0 EXPLICIT (CONSTANT (INTEGER 4 0 0 0 INTEGER ())
-0 '1') (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '22')) 0 () () () 0 0)
-143 'vertex4gamlist' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT
-UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0 DIMENSION) (INTEGER 4 0 0 0
-INTEGER ()) 0 0 () (1 0 EXPLICIT (CONSTANT (INTEGER 4 0 0 0 INTEGER ())
-0 '1') (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '22')) 0 () () () 0 0)
-144 'vol' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
-IMPLICIT-SAVE 0 0) (INTEGER 4 0 0 0 INTEGER ()) 0 0 () () 0 () () () 0 0)
-145 'vrbls_mc' 'vrbls_mc' '' 1 ((MODULE UNKNOWN-INTENT UNKNOWN-PROC
-UNKNOWN UNKNOWN 0 0) (UNKNOWN 0 0 0 0 UNKNOWN ()) 0 0 () () 0 () () () 0
-0)
-146 'w' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC UNKNOWN
-IMPLICIT-SAVE 0 0 ALLOCATABLE DIMENSION) (COMPLEX 8 0 0 0 COMPLEX ()) 0
-0 () (4 0 DEFERRED () () () () () () () ()) 0 () () () 0 0)
-147 'w0pf' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
-UNKNOWN IMPLICIT-SAVE 0 0 ALLOCATABLE DIMENSION) (COMPLEX 8 0 0 0
-COMPLEX ()) 0 0 () (3 0 DEFERRED () () () () () ()) 0 () () () 0 0)
-148 'weightcurrent' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT
-UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0) (REAL 8 0 0 0 REAL ()) 0 0 () ()
-0 () () () 0 0)
-149 'weightln' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
-UNKNOWN IMPLICIT-SAVE 0 0 DIMENSION) (REAL 8 0 0 0 REAL ()) 0 0 () (1 0
-EXPLICIT (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '1') (CONSTANT (
-INTEGER 4 0 0 0 INTEGER ()) 0 '33')) 0 () () () 0 0)
-150 'weightvertex' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT
-UNKNOWN-PROC UNKNOWN IMPLICIT-SAVE 0 0 DIMENSION) (REAL 8 0 0 0 REAL ())
-0 0 () (1 0 EXPLICIT (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '1') (
-CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '22')) 0 () () () 0 0)
-151 'weightworm' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
-UNKNOWN IMPLICIT-SAVE 0 0) (REAL 8 0 0 0 REAL ()) 0 0 () () 0 () () () 0
-0)
-152 'wxvertex' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
-UNKNOWN IMPLICIT-SAVE 0 0 DIMENSION) (INTEGER 4 0 0 0 INTEGER ()) 0 0 ()
-(1 0 EXPLICIT (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '1') (CONSTANT (
-INTEGER 4 0 0 0 INTEGER ()) 0 '22')) 0 () () () 0 0)
-153 'wyvertex' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
-UNKNOWN IMPLICIT-SAVE 0 0 DIMENSION) (INTEGER 4 0 0 0 INTEGER ()) 0 0 ()
-(1 0 EXPLICIT (CONSTANT (INTEGER 4 0 0 0 INTEGER ()) 0 '1') (CONSTANT (
-INTEGER 4 0 0 0 INTEGER ()) 0 '22')) 0 () () () 0 0)
-154 'zone' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
->>>>>>> test/pr-2
+156 'zone' 'vrbls_mc' '' 1 ((VARIABLE UNKNOWN-INTENT UNKNOWN-PROC
 UNKNOWN IMPLICIT-SAVE 0 0) (CHARACTER 1 0 0 0 CHARACTER ((CONSTANT (
 INTEGER 4 0 0 0 INTEGER ()) 0 '5'))) 0 0 () () 0 () () () 0 0)
 )
@@ -731,36 +542,6 @@ INTEGER 4 0 0 0 INTEGER ()) 0 '5'))) 0 0 () () 0 () () () 0 0)
 'checkw' 0 7 'chi' 0 8 'coefofsymmetry' 0 9 'coefofweight' 0 10
 'coefofworm' 0 11 'cor' 0 12 'd' 0 13 'date' 0 14 'dev' 0 15 'direcvertex'
 0 16 'dlx' 0 17 'dly' 0 18 'file_version' 0 19 'fupdate' 0 20 'g' 0 21
-<<<<<<< HEAD
-'g0f' 0 22 'gam' 0 23 'gammc' 0 24 'gamnorm' 0 25 'gamnormweight' 0 26
-'gamorder' 0 27 'gamwormorder' 0 28 'gxvertex' 0 29 'gyvertex' 0 30
-'h_curr' 0 31 'h_prev' 0 32 'hash4g' 0 33 'hash4w' 0 34 'ifd1' 0 35 'ifd2'
-0 36 'imc' 0 37 'inxt1' 0 38 'inxt2' 0 39 'ipnf1' 0 40 'ipnf2' 0 41
-'ipnt1' 0 42 'ipnt2' 0 43 'ir1' 0 44 'ir2' 0 45 'ira' 0 46 'irn' 0 47
-'iswormpresent' 0 48 'iupdate' 0 49 'jcp' 0 50 'kindln' 0 51 'kln' 0 52
-'kmasha' 0 53 'len1' 0 54 'len2' 0 55 'list4ln' 0 56 'list4vertex' 0 57
-'ln4glist' 0 58 'ln4wlist' 0 59 'lx' 0 60 'ly' 0 61 'masha' 0 62 'mcorder'
-0 63 'measuregam' 0 64 'mnint' 0 65 'mod2' 0 66 'mu' 0 67 'mul2' 0 68
-'mult' 0 69 'mxerror' 0 70 'mxint' 0 71 'mxk' 0 72 'mxlx' 0 73 'mxly' 0
-74 'mxnblck' 0 75 'mxngln' 0 76 'mxnln' 0 77 'mxnvertex' 0 78 'mxnwln' 0
-79 'mxorder' 0 80 'mxrn' 0 81 'mxt' 0 82 'mxvol' 0 83 'nblck' 0 84
-'neighln' 0 85 'neighvertex' 0 86 'nextln' 0 87 'nextvertex' 0 88 'ngln'
-0 89 'nobs' 0 90 'nrannr' 0 91 'nsamp' 0 92 'ntoss' 0 93 'ntypechi' 0 94
-'ntypeg' 0 95 'ntypegam' 0 96 'ntypew' 0 97 'nupdate' 0 98 'nvertex' 0
-99 'nwln' 0 100 'obs' 0 101 'order' 0 102 'phase' 0 103 'pi' 0 104 'pi2'
-0 105 'pi4' 0 106 'polar' 0 107 'probacc' 0 108 'probprop' 0 109 'prt' 0
-110 'pupdate' 0 111 'quan' 0 112 'seed' 0 113 'sigma' 0 114
-'signfermiloop' 0 115 'spinmasha' 0 116 'statusln' 0 117 'statusvertex'
-0 118 't1vertex' 0 119 't2vertex' 0 120 't3vertex' 0 121 't_curr' 0 122
-'t_elap' 0 123 't_init' 0 124 't_meas' 0 125 't_prev' 0 126 't_simu' 0
-127 't_toss' 0 128 'tailgam' 0 129 'tailln' 0 130 'time' 0 131 'title' 0
-132 'title1' 0 133 'title2' 0 134 'title3' 0 135 'tm32' 0 136 'tval' 0
-137 'typegam2w' 0 138 'typegw2gam' 0 139 'typeln' 0 140 'typevertex' 0
-141 'typevertexin' 0 142 'typevertexout' 0 143 'vertex4gamlist' 0 144
-'vol' 0 145 'vrbls_mc' 0 146 'w' 0 147 'w0pf' 0 148 'weightcurrent' 0
-149 'weightln' 0 150 'weightvertex' 0 151 'weightworm' 0 152 'wxvertex'
-0 153 'wyvertex' 0 154 'zone' 0 155)
-=======
 'g0f' 0 22 'gam' 0 23 'gam0pf' 0 24 'gammc' 0 25 'gamnorm' 0 26
 'gamnormweight' 0 27 'gamorder' 0 28 'gamwormorder' 0 29 'gxvertex' 0 30
 'gyvertex' 0 31 'h_curr' 0 32 'h_prev' 0 33 'hash4g' 0 34 'hash4w' 0 35
@@ -776,17 +557,16 @@ INTEGER 4 0 0 0 INTEGER ()) 0 '5'))) 0 0 () () 0 () () () 0 0)
 'mxvol' 0 84 'nblck' 0 85 'neighln' 0 86 'neighvertex' 0 87 'nextln' 0
 88 'nextvertex' 0 89 'ngln' 0 90 'nobs' 0 91 'nrannr' 0 92 'nsamp' 0 93
 'ntoss' 0 94 'ntypechi' 0 95 'ntypeg' 0 96 'ntypegam' 0 97 'ntypew' 0 98
-'nupdate' 0 99 'nvertex' 0 100 'nwln' 0 101 'obs' 0 102 'omegaln' 0 103
-'order' 0 104 'phase' 0 105 'pi' 0 106 'pi2' 0 107 'pi4' 0 108 'polar' 0
-109 'probacc' 0 110 'probprop' 0 111 'prt' 0 112 'pupdate' 0 113 'quan'
-0 114 'seed' 0 115 'sigma' 0 116 'signfermiloop' 0 117 'spinmasha' 0 118
-'statusln' 0 119 'statusvertex' 0 120 't_curr' 0 121 't_elap' 0 122
-'t_init' 0 123 't_meas' 0 124 't_prev' 0 125 't_simu' 0 126 't_toss' 0
-127 'tailgam' 0 128 'tailln' 0 129 'time' 0 130 'title' 0 131 'title1' 0
-132 'title2' 0 133 'title3' 0 134 'tm32' 0 135 'tval' 0 136 'typegam2w'
-0 137 'typegw2gam' 0 138 'typeln' 0 139 'typevertex' 0 140 'typevertexin'
-0 141 'typevertexout' 0 142 'vertex4gamlist' 0 143 'vol' 0 144 'vrbls_mc'
-0 145 'w' 0 146 'w0pf' 0 147 'weightcurrent' 0 148 'weightln' 0 149
-'weightvertex' 0 150 'weightworm' 0 151 'wxvertex' 0 152 'wyvertex' 0
-153 'zone' 0 154)
->>>>>>> test/pr-2
+'nupdate' 0 99 'nvertex' 0 100 'nwln' 0 101 'obs' 0 102 'order' 0 103
+'phase' 0 104 'pi' 0 105 'pi2' 0 106 'pi4' 0 107 'polar' 0 108 'probacc'
+0 109 'probprop' 0 110 'prt' 0 111 'pupdate' 0 112 'quan' 0 113 'seed' 0
+114 'sigma' 0 115 'signfermiloop' 0 116 'spinmasha' 0 117 'statusln' 0
+118 'statusvertex' 0 119 't1vertex' 0 120 't2vertex' 0 121 't3vertex' 0
+122 't_curr' 0 123 't_elap' 0 124 't_init' 0 125 't_meas' 0 126 't_prev'
+0 127 't_simu' 0 128 't_toss' 0 129 'tailgam' 0 130 'tailln' 0 131 'time'
+0 132 'title' 0 133 'title1' 0 134 'title2' 0 135 'title3' 0 136 'tm32'
+0 137 'tval' 0 138 'typegam2w' 0 139 'typegw2gam' 0 140 'typeln' 0 141
+'typevertex' 0 142 'typevertexin' 0 143 'typevertexout' 0 144
+'vertex4gamlist' 0 145 'vol' 0 146 'vrbls_mc' 0 147 'w' 0 148 'w0pf' 0
+149 'weightcurrent' 0 150 'weightln' 0 151 'weightvertex' 0 152
+'weightworm' 0 153 'wxvertex' 0 154 'wyvertex' 0 155 'zone' 0 156)
