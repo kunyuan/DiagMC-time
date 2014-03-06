@@ -212,13 +212,14 @@ SUBROUTINE calculate_Chi
   !!-------- calculate Chi = Pi/(1 - W0 * Pi) ------------------
   !!--------- already sum over the spins -----------------------
   Chi(:,:,:) = 0.d0
+  ratio = -1.d0*(real(MxT)/Beta)**2.d0*0.75d0
 
-  Chi(:,:,:) = Polar(:,:,:)/((1.d0,0.d0)-W0PF(:,:,:)*Polar(:,:,:))
+  Chi(:,:,:) = Polar(:,:,:)/((1.d0,0.d0) -W0PF(:,:,:)*Polar(:,:,:))
 
   do omega = 0, MxT-1
     do py = 0, Ly-1
       do px = 0, Lx-1
-        Chi(px, py, omega) = d_times_cd(3.d0, Chi(px, py, omega))
+        Chi(px, py, omega) = d_times_cd(ratio, Chi(px, py, omega))
       enddo
     enddo
   enddo

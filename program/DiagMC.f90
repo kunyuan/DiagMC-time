@@ -92,8 +92,11 @@ SUBROUTINE self_consistent
 
     flag = self_consistent_GW(1.d-8)
 
-    !call transfer_Sigma_t(-1)
-    !call output_Quantities
+    call calculate_Chi
+    call transfer_Chi_r(-1)
+    call transfer_Chi_t(-1)
+
+    call output_Quantities
 
     !call write_GWGamma
 
