@@ -3,7 +3,7 @@ PROGRAM MAIN
   integer :: it, it1, it2
   integer :: iloop, i, j 
   integer :: ix, iy, ix1, iy1, dx, dy, dit
-  integer, parameter :: Nt = 128
+  integer, parameter :: Nt = 32 
   integer, parameter :: L = 4
   double precision :: Beta = 0.5d0
   double precision :: ratio
