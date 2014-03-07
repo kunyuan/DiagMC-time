@@ -126,6 +126,7 @@ MODULE vrbls_mc
   !------------- MC steps -----------------------------------
   integer          :: iupdate           ! the update number
   double precision :: imc               ! imc: the MC step
+  double precision :: imeasure
   integer          :: NSamp             ! # total MC steps
   integer          :: NBlck             ! # total blocks
   integer          :: NToss             ! # MC steps for toss
