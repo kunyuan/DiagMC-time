@@ -3,6 +3,7 @@
 
 SUBROUTINE initialize_markov
     implicit none
+    integer :: i
 
     Pupdate(:)  = 1.d0
     Pupdate(2)  = 5.d0
@@ -13,8 +14,10 @@ SUBROUTINE initialize_markov
     GLnKey2Value(:) = 0
     WLnKey2Value(:) = 0
     VertexKey2Value(:) = 0
+
     StatusLn(:) = -1
     StatusVertex(:)= -1
+
     WeightLn(:) = 1.d0
     WeightVertex(:) = 1.d0
 
@@ -66,7 +69,7 @@ SUBROUTINE markov
 
   call def_prob
   imeasure = 0
-  do while(imeasure < nw)
+  do while(imeasure < NStep)
     nr=rn()
     iupdate = 1
     do while(nr>Fupdate(iupdate))
