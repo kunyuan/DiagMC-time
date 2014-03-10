@@ -20,9 +20,9 @@ subroutine def_conf
   call def_prob
 
   !--------------- initialization for weight ---------------
-  Ln4GList(:) = 0
-  Ln4WList(:) = 0
-  Vertex4GamList(:) = 0
+  GLnKey2Value(:) = 0
+  WLnKey2Value(:) = 0
+  VertexKey2Value(:) = 0
   StatusLn(:) = -1
   StatusVertex(:)= -1
   WeightLn(:) = 1.d0
@@ -91,7 +91,7 @@ SUBROUTINE def_diagram
   ! the index of measuring gamma
   NGLn = 4;  NWLn = 2;  NGam = 4
   ! the number of glines, wlines, gamma
-  MeasGamma = 1
+  MeasureGam = 1
   ! number of fermi loops
   NFermiLoop = 0
   ! the phase of the diagram
@@ -108,12 +108,12 @@ SUBROUTINE def_diagram
   StatusLn(6) = 0
   TailLn = 7
 
-  Ln4GList(1)= 1;     Ln4GList(2)= 2;     Ln4GList(3)= 4
-  Ln4GList(4)= 5
-  Ln4WList(1)= 3;     Ln4WList(2)= 6
+  GLnKey2Value(1)= 1;     GLnKey2Value(2)= 2;     GLnKey2Value(3)= 4
+  GLnKey2Value(4)= 5
+  WLnKey2Value(1)= 3;     WLnKey2Value(2)= 6
 
-  List4Ln(1)  = 1;     List4Ln(2)  = 2;     List4Ln(3)  = 1
-  List4Ln(4)  = 3;     List4Ln(5)  = 4;     List4Ln(6)  = 2
+  LnValue2Key(1)  = 1;     LnValue2Key(2)  = 2;     LnValue2Key(3)  = 1
+  LnValue2Key(4)  = 3;     LnValue2Key(5)  = 4;     LnValue2Key(6)  = 2
 
 
   !kind of lines: 1: gline;  2: wline
@@ -174,10 +174,10 @@ SUBROUTINE def_diagram
   StatusVertex(3) = 0
   StatusVertex(4) = 0
   do i = 1, 4
-    Vertex4GamList(i) = i
-    List4Vertex(i)  = i
+    VertexKey2Value(i) = i
+    VertexValue2Key(i)  = i
   enddo
-  TailGam = 5
+  TailVertex = 5
 
   ! the site variables of Gamma 1 and 2
   GXVertex(1) = 0;            GYVertex(1) = 0
@@ -293,19 +293,19 @@ SUBROUTINE markov
 
       !if(Order==0) then
         !HistoOmegaW(OmegaMasha) = HistoOmegaW(OmegaMasha) + 1
-        !HistoOmegaW(OmegaLn(NeighVertex(1, MeasGamma))) = HistoOmegaW(OmegaLn(NeighVertex(1, &
-          !& MeasGamma))) + 1
-        !HistoOmegaW(OmegaLn(NeighVertex(2, MeasGamma))) = HistoOmegaW(OmegaLn(NeighVertex(2, &
-          !& MeasGamma))) + 1
-        !HistoOmegaW(OmegaLn(NeighVertex(3, MeasGamma))) = HistoOmegaW(OmegaLn(NeighVertex(3, &
-          !& MeasGamma))) + 1
+        !HistoOmegaW(OmegaLn(NeighVertex(1, MeasureGam))) = HistoOmegaW(OmegaLn(NeighVertex(1, &
+          !& MeasureGam))) + 1
+        !HistoOmegaW(OmegaLn(NeighVertex(2, MeasureGam))) = HistoOmegaW(OmegaLn(NeighVertex(2, &
+          !& MeasureGam))) + 1
+        !HistoOmegaW(OmegaLn(NeighVertex(3, MeasureGam))) = HistoOmegaW(OmegaLn(NeighVertex(3, &
+          !& MeasureGam))) + 1
         !if(NeighVertex(1, Ira)==NeighVertex(2, Ira) .or. NeighVertex(1, Masha) &
           !& ==NeighVertex(2, Masha)) then
           !Gam0Bubble = Gam0Bubble +1
-          !if(Ira==MeasGamma) then
+          !if(Ira==MeasureGam) then
             !HistoOmegaW(OmegaLn(NeighVertex(1, Masha))) = HistoOmegaW(OmegaLn(NeighVertex(1, &
               !& Masha))) + 1
-          !else if(Masha==MeasGamma) then
+          !else if(Masha==MeasureGam) then
             !HistoOmegaW(OmegaLn(NeighVertex(1, Ira))) = HistoOmegaW(OmegaLn(NeighVertex(1, &
               !& Ira))) + 1
           !endif
@@ -1500,7 +1500,7 @@ SUBROUTINE add_interaction
   integer :: sp, typGamA, typGamB, typAB, statIA, statAC, statMB, statBD
   double precision :: Pacc, Anew, Aold, sgn
   double precision :: WWorm, WA, WB, WGIA, WGAC, WGMB, WGBD, WIra, WMasha, WWAB
-  double precision :: WMeasGamma
+  double precision :: WMeasureGam
   double precision :: rand
   integer :: confold, confnew
   integer :: flag
@@ -1655,14 +1655,14 @@ SUBROUTINE add_interaction
   endif
 
   !------------ weight calculation ----------------------------
-  if(MeasGamma/=Ira .and. MeasGamma/=Masha) then
-    WMeasGamma = weight_vertex(Order+1, StatusVertex(MeasGamma), &
-      & diff_x(GXVertex(MeasGamma), WXVertex(MeasGamma)), diff_y(GYVertex(MeasGamma), &
-      & WYVertex(MeasGamma)), OmegaLn(NeighVertex(1, MeasGamma)), &
-      & OmegaLn(NeighVertex(2, MeasGamma)), TypeVertex(MeasGamma)) 
-    Anew = CoefOfWeight(Order+1)*WWorm *WMeasGamma *WA *WB *WWAB *WIra *WMasha *WGIA *WGAC &
+  if(MeasureGam/=Ira .and. MeasureGam/=Masha) then
+    WMeasureGam = weight_vertex(Order+1, StatusVertex(MeasureGam), &
+      & diff_x(GXVertex(MeasureGam), WXVertex(MeasureGam)), diff_y(GYVertex(MeasureGam), &
+      & WYVertex(MeasureGam)), OmegaLn(NeighVertex(1, MeasureGam)), &
+      & OmegaLn(NeighVertex(2, MeasureGam)), TypeVertex(MeasureGam)) 
+    Anew = CoefOfWeight(Order+1)*WWorm *WMeasureGam *WA *WB *WWAB *WIra *WMasha *WGIA *WGAC &
       & *WGMB *WGBD*(1.d0)/Beta
-    Aold = CoefOfWeight(Order)*WeightWorm *WeightVertex(MeasGamma) *WeightLn(GIC) *WeightLn(GMD)&
+    Aold = CoefOfWeight(Order)*WeightWorm *WeightVertex(MeasureGam) *WeightLn(GIC) *WeightLn(GMD)&
       & *WeightVertex(Ira) *WeightVertex(Masha)
   else
     Anew = CoefOfWeight(Order+1)*WWorm *WA *WB *WWAB *WIra *WMasha *WGIA *WGAC &
@@ -1704,7 +1704,7 @@ SUBROUTINE add_interaction
     WeightVertex(Masha) = WMasha
     WeightLn(GIC) = WGAC
     WeightLn(GMD) = WGBD
-    if(MeasGamma/=Ira .and. MeasGamma/=Masha)  WeightVertex(MeasGamma) = WMeasGamma
+    if(MeasureGam/=Ira .and. MeasureGam/=Masha)  WeightVertex(MeasureGam) = WMeasureGam
 
     call update_weight(Anew, Aold)
 
@@ -1768,7 +1768,7 @@ SUBROUTINE remove_interaction
   integer :: GamA, GamB, GamC, GamD
   integer :: statIC, statMD
   double precision :: WWorm, WGIC, WGMD, WIra, WMasha
-  double precision :: WMeasGamma
+  double precision :: WMeasureGam
   double precision :: Pacc, Anew, Aold, sgn
   double precision :: rand
   integer :: flag
@@ -1809,12 +1809,12 @@ SUBROUTINE remove_interaction
   OmegaM = OmegaMasha +(-1)**dirW *omega
   if(Is_omega_not_valid(OmegaM))      return
 
-  if(Ira==MeasGamma .or. GamC==MeasGamma) then
+  if(Ira==MeasureGam .or. GamC==MeasureGam) then
     statIC = 1
   else
     statIC = 0
   endif
-  if(Masha==MeasGamma .or. GamD==MeasGamma) then
+  if(Masha==MeasureGam .or. GamD==MeasureGam) then
     statMD = 1
   else
     statMD = 0
@@ -1879,14 +1879,14 @@ SUBROUTINE remove_interaction
   WWorm= weight_worm(diff_x(GXVertex(Ira),GXVertex(Masha)),diff_y(GYVertex(Ira),GYVertex(Masha)), &
     & diff_x(WXVertex(Ira),WXVertex(Masha)),diff_y(WYVertex(Ira),WYVertex(Masha)), omegaM)
 
-  if(MeasGamma/=Ira .and. MeasGamma/=Masha) then
-    WMeasGamma = weight_vertex(Order-1, StatusVertex(MeasGamma), &
-      & diff_x(GXVertex(MeasGamma), WXVertex(MeasGamma)), diff_y(GYVertex(MeasGamma), &
-      & WYVertex(MeasGamma)), OmegaLn(NeighVertex(1, MeasGamma)), &
-      & OmegaLn(NeighVertex(2, MeasGamma)), TypeVertex(MeasGamma)) 
+  if(MeasureGam/=Ira .and. MeasureGam/=Masha) then
+    WMeasureGam = weight_vertex(Order-1, StatusVertex(MeasureGam), &
+      & diff_x(GXVertex(MeasureGam), WXVertex(MeasureGam)), diff_y(GYVertex(MeasureGam), &
+      & WYVertex(MeasureGam)), OmegaLn(NeighVertex(1, MeasureGam)), &
+      & OmegaLn(NeighVertex(2, MeasureGam)), TypeVertex(MeasureGam)) 
 
-    Anew = CoefOfWeight(Order-1)*WWorm*WMeasGamma*WGIC *WGMD *WIra *WMasha
-    Aold = CoefOfWeight(Order)*WeightWorm *WeightVertex(MeasGamma) *WeightLn(GIA) &
+    Anew = CoefOfWeight(Order-1)*WWorm*WMeasureGam*WGIC *WGMD *WIra *WMasha
+    Aold = CoefOfWeight(Order)*WeightWorm *WeightVertex(MeasureGam) *WeightLn(GIA) &
       & *WeightLn(GAC)*WeightLn(GMB)* WeightLn(GBD)*WeightVertex(Ira)*WeightVertex(Masha) &
       & *WeightVertex(GamA)*WeightVertex(GamB)*WeightLn(WAB)*(1.d0/Beta)
   else
@@ -1927,7 +1927,7 @@ SUBROUTINE remove_interaction
     WeightWorm = WWorm
     WeightVertex(Ira) = WIra
     WeightVertex(Masha) = WMasha
-    if(MeasGamma/=Ira .and. MeasGamma/=Masha)  WeightVertex(MeasGamma)=WMeasGamma
+    if(MeasureGam/=Ira .and. MeasureGam/=Masha)  WeightVertex(MeasureGam)=WMeasureGam
     WeightLn(GAC) = WGIC
     WeightLn(GBD) = WGMD
 
@@ -1997,7 +1997,7 @@ SUBROUTINE add_interaction_cross
   integer :: sp, typGamA, typGamB, typAB, statIA, statAC, statMB, statBD
   double precision :: Pacc, Anew, Aold, sgn
   double precision :: WWorm, WA, WB, WGIA, WGAC, WGMB, WGBD, WIra, WMasha, WWAB
-  double precision :: WMeasGamma
+  double precision :: WMeasureGam
   double precision :: rand
   integer :: flag
 
@@ -2147,14 +2147,14 @@ SUBROUTINE add_interaction_cross
   endif
 
   !------------ weight calculation ----------------------------
-  if(MeasGamma/=Ira .and. MeasGamma/=Masha) then
-    WMeasGamma = weight_vertex(Order+1, StatusVertex(MeasGamma), &
-      & diff_x(GXVertex(MeasGamma), WXVertex(MeasGamma)), diff_y(GYVertex(MeasGamma), &
-      & WYVertex(MeasGamma)), OmegaLn(NeighVertex(1, MeasGamma)), &
-      & OmegaLn(NeighVertex(2, MeasGamma)), TypeVertex(MeasGamma)) 
-    Anew = CoefOfWeight(Order+1)*WWorm *WMeasGamma *WA *WB *WWAB *WIra *WMasha *WGIA *WGAC &
+  if(MeasureGam/=Ira .and. MeasureGam/=Masha) then
+    WMeasureGam = weight_vertex(Order+1, StatusVertex(MeasureGam), &
+      & diff_x(GXVertex(MeasureGam), WXVertex(MeasureGam)), diff_y(GYVertex(MeasureGam), &
+      & WYVertex(MeasureGam)), OmegaLn(NeighVertex(1, MeasureGam)), &
+      & OmegaLn(NeighVertex(2, MeasureGam)), TypeVertex(MeasureGam)) 
+    Anew = CoefOfWeight(Order+1)*WWorm *WMeasureGam *WA *WB *WWAB *WIra *WMasha *WGIA *WGAC &
       & *WGMB *WGBD*(1.d0)/Beta
-    Aold = CoefOfWeight(Order)*WeightWorm *WeightVertex(MeasGamma) *WeightLn(GIC) *WeightLn(GMD)&
+    Aold = CoefOfWeight(Order)*WeightWorm *WeightVertex(MeasureGam) *WeightLn(GIC) *WeightLn(GMD)&
       & *WeightVertex(Ira) *WeightVertex(Masha)
   else
     Anew = CoefOfWeight(Order+1)*WWorm *WA *WB *WWAB *WIra *WMasha *WGIA *WGAC &
@@ -2194,7 +2194,7 @@ SUBROUTINE add_interaction_cross
     WeightWorm = WWorm
     WeightVertex(Ira) = WIra
     WeightVertex(Masha) = WMasha
-    if(MeasGamma/=Ira .and. MeasGamma/=Masha)  WeightVertex(MeasGamma) = WMeasGamma
+    if(MeasureGam/=Ira .and. MeasureGam/=Masha)  WeightVertex(MeasureGam) = WMeasureGam
     WeightLn(GIC) = WGAC
     WeightLn(GMD) = WGBD
 
@@ -2262,7 +2262,7 @@ SUBROUTINE remove_interaction_cross
   integer :: GamA, GamB, GamC, GamD
   integer :: statIC, statMD
   double precision :: WWorm, WGIC, WGMD, WIra, WMasha
-  double precision :: WMeasGamma
+  double precision :: WMeasureGam
   double precision :: Pacc, Anew, Aold, sgn
   double precision :: rand
   integer :: flag
@@ -2303,12 +2303,12 @@ SUBROUTINE remove_interaction_cross
   OmegaM = OmegaMasha +(-1)**dirW *omega
   if(Is_omega_not_valid(OmegaM))   return
 
-  if(Ira==MeasGamma .or. GamC==MeasGamma) then
+  if(Ira==MeasureGam .or. GamC==MeasureGam) then
     statIC = 1
   else
     statIC = 0
   endif
-  if(Masha==MeasGamma .or. GamD==MeasGamma) then
+  if(Masha==MeasureGam .or. GamD==MeasureGam) then
     statMD = 1
   else
     statMD = 0
@@ -2373,14 +2373,14 @@ SUBROUTINE remove_interaction_cross
   WWorm= weight_worm(diff_x(GXVertex(Ira),GXVertex(Masha)),diff_y(GYVertex(Ira),GYVertex(Masha)), &
     & diff_x(WXVertex(Ira),WXVertex(Masha)),diff_y(WYVertex(Ira),WYVertex(Masha)), omegaM)
 
-  if(MeasGamma/=Ira .and. MeasGamma/=Masha) then
-    WMeasGamma = weight_vertex(Order-1, StatusVertex(MeasGamma), &
-      & diff_x(GXVertex(MeasGamma), WXVertex(MeasGamma)), diff_y(GYVertex(MeasGamma), &
-      & WYVertex(MeasGamma)), OmegaLn(NeighVertex(1, MeasGamma)), &
-      & OmegaLn(NeighVertex(2, MeasGamma)), TypeVertex(MeasGamma)) 
+  if(MeasureGam/=Ira .and. MeasureGam/=Masha) then
+    WMeasureGam = weight_vertex(Order-1, StatusVertex(MeasureGam), &
+      & diff_x(GXVertex(MeasureGam), WXVertex(MeasureGam)), diff_y(GYVertex(MeasureGam), &
+      & WYVertex(MeasureGam)), OmegaLn(NeighVertex(1, MeasureGam)), &
+      & OmegaLn(NeighVertex(2, MeasureGam)), TypeVertex(MeasureGam)) 
 
-    Anew = CoefOfWeight(Order-1)*WWorm*WMeasGamma*WGIC *WGMD *WIra *WMasha
-    Aold = CoefOfWeight(Order)*WeightWorm *WeightVertex(MeasGamma) *WeightLn(GIA) &
+    Anew = CoefOfWeight(Order-1)*WWorm*WMeasureGam*WGIC *WGMD *WIra *WMasha
+    Aold = CoefOfWeight(Order)*WeightWorm *WeightVertex(MeasureGam) *WeightLn(GIA) &
       & *WeightLn(GAC)*WeightLn(GMB)* WeightLn(GBD)*WeightVertex(Ira)*WeightVertex(Masha) &
       & *WeightVertex(GamA)*WeightVertex(GamB)*WeightLn(WAB)*(1.d0/Beta)
   else
@@ -2419,7 +2419,7 @@ SUBROUTINE remove_interaction_cross
     WeightWorm = WWorm
     WeightVertex(Ira) = WIra
     WeightVertex(Masha) = WMasha
-    if(MeasGamma/=Ira .and. MeasGamma/=Masha)  WeightVertex(MeasGamma)=WMeasGamma
+    if(MeasureGam/=Ira .and. MeasureGam/=Masha)  WeightVertex(MeasureGam)=WMeasureGam
     WeightLn(GAC) = WGIC
     WeightLn(GBD) = WGMD
 
@@ -2504,12 +2504,12 @@ SUBROUTINE reconnect
   NeighLn(3-dir, GIA) = Masha 
 
   !----- the status for the new config ------------------
-  if(GamA==MeasGamma .or. Masha==MeasGamma) then
+  if(GamA==MeasureGam .or. Masha==MeasureGam) then
     statIA = 1
   else
     statIA = 0
   endif
-  if(GamB==MeasGamma .or. Ira==MeasGamma) then
+  if(GamB==MeasureGam .or. Ira==MeasureGam) then
     statMB = 1
   else
     statMB = 0
@@ -2879,7 +2879,7 @@ SUBROUTINE move_measuring_index
   iGin  = NeighVertex(1, iGam);      iGout = NeighVertex(2, iGam)
   iW    = NeighVertex(3, iGam)
 
-  jGam  = MeasGamma
+  jGam  = MeasureGam
   jGin  = NeighVertex(1, jGam);      jGout = NeighVertex(2, jGam)
   jW    = NeighVertex(3, jGam)
   
@@ -2960,7 +2960,7 @@ SUBROUTINE move_measuring_index
 
     !-------- update the diagram info ---------------
     Phase = Phase *sgn
-    MeasGamma = iGam
+    MeasureGam = iGam
 
     !-------- update the status of elements ---------
     StatusVertex(iGam) = statiGam
@@ -3212,7 +3212,7 @@ LOGICAL FUNCTION Is_reducible_G_Gamma(GLn)
 
   if(CheckGamma) then
     do i = 1, NGLn
-      nG = Ln4GList(i)
+      nG = GLnKey2Value(i)
       kG = kLn(nG)
       if(nG==GLn)   cycle             !! rule out the line itself
       if(nG==NeighVertex(1, Gam1) .or. nG==NeighVertex(2, Gam2)) cycle
@@ -3292,7 +3292,7 @@ LOGICAL FUNCTION Is_reducible_W_Gamma(WLn)
 
   if(CheckGamma) then
     do i = 1, NGLn
-      nG = Ln4GList(i)
+      nG = GLnKey2Value(i)
       kG5 = kLn(NeighVertex(1, NeighLn(1,nG)))
       kG6 = kLn(NeighVertex(2, NeighLn(2,nG)))
       kG = kLn(nG)
@@ -3446,12 +3446,12 @@ SUBROUTINE insert_line(newline, omega, k, knd, typ, stat, weigh)
 
   if(knd==1) then
     NGLn = NGLn + 1
-    Ln4GList(NGLn) = newline
-    List4Ln(newline) = NGLn
+    GLnKey2Value(NGLn) = newline
+    LnValue2Key(newline) = NGLn
   else
     NWLn = NWLn + 1
-    Ln4WList(NWLn) = newline
-    List4Ln(newline) = NWLn
+    WLnKey2Value(NWLn) = newline
+    LnValue2Key(newline) = NWLn
   endif
 
   OmegaLn(newline) = omega
@@ -3481,17 +3481,17 @@ SUBROUTINE undo_insert_line(occline, knd)
 
   if(knd==1) then
 
-    tmp = Ln4GList(NGLn)
-    Ln4GList(NGLn) = 0
-    Ln4GList(List4Ln(occline)) = tmp
-    List4Ln(tmp) = List4Ln(occline)
+    tmp = GLnKey2Value(NGLn)
+    GLnKey2Value(NGLn) = 0
+    GLnKey2Value(LnValue2Key(occline)) = tmp
+    LnValue2Key(tmp) = LnValue2Key(occline)
     NGLn = NGLn -1
   else
 
-    tmp = Ln4WList(NWLn)
-    Ln4WList(NWLn) = 0
-    Ln4WList(List4Ln(occline)) = tmp
-    List4Ln(tmp) = List4Ln(occline)
+    tmp = WLnKey2Value(NWLn)
+    WLnKey2Value(NWLn) = 0
+    WLnKey2Value(LnValue2Key(occline)) = tmp
+    LnValue2Key(tmp) = LnValue2Key(occline)
     NWLn = NWLn -1
   endif
 
@@ -3510,22 +3510,22 @@ SUBROUTINE insert_gamma(newgamma, gx, gy, wx, wy, dir, typ, stat, weigh)
   integer, intent(in) :: gx, gy, wx, wy, dir, typ, stat
   double precision, intent(in) :: weigh
 
-  newgamma = TailGam
-  TailGam = NextVertex(TailGam)
-  if(StatusVertex(TailGam)>=0) then
+  newgamma = TailVertex
+  TailVertex = NextVertex(TailVertex)
+  if(StatusVertex(TailVertex)>=0) then
     write(*, *) IsWormPresent, iupdate, "insert_gamma error!!!"
     call print_config
     stop
   endif
 
-  if(TailGam == -1) then
+  if(TailVertex == -1) then
     write(*, *) "Tail=-1! Too many gammas!"
     stop
   endif
    
   NGam = NGam + 1
-  Vertex4GamList(NGam) = newgamma
-  List4Vertex(newgamma) = NGam
+  VertexKey2Value(NGam) = newgamma
+  VertexValue2Key(newgamma) = NGam
 
   GXVertex(newgamma) = gx
   GYVertex(newgamma) = gy
@@ -3565,17 +3565,17 @@ SUBROUTINE delete_line(occline, knd)
 
   if(knd==1) then
 
-    tmp = Ln4GList(NGLn)
-    Ln4GList(NGLn) = 0
-    Ln4GList(List4Ln(occline)) = tmp
-    List4Ln(tmp) = List4Ln(occline)
+    tmp = GLnKey2Value(NGLn)
+    GLnKey2Value(NGLn) = 0
+    GLnKey2Value(LnValue2Key(occline)) = tmp
+    LnValue2Key(tmp) = LnValue2Key(occline)
     NGLn = NGLn -1
   else
 
-    tmp = Ln4WList(NWLn)
-    Ln4WList(NWLn) = 0
-    Ln4WList(List4Ln(occline)) = tmp
-    List4Ln(tmp) = List4Ln(occline)
+    tmp = WLnKey2Value(NWLn)
+    WLnKey2Value(NWLn) = 0
+    WLnKey2Value(LnValue2Key(occline)) = tmp
+    LnValue2Key(tmp) = LnValue2Key(occline)
     NWLn = NWLn -1
   endif
 
@@ -3606,13 +3606,13 @@ SUBROUTINE undo_delete_line(newline, knd, stat)
 
   if(knd==1) then
     NGLn = NGLn + 1
-    Ln4GList(NGLn) = newline
-    List4Ln(newline) = NGLn
+    GLnKey2Value(NGLn) = newline
+    LnValue2Key(newline) = NGLn
     !call add_Hash4G(kLn(newline))
   else
     NWLn = NWLn + 1
-    Ln4WList(NWLn) = newline
-    List4Ln(newline) = NWLn
+    WLnKey2Value(NWLn) = newline
+    LnValue2Key(newline) = NWLn
     call add_Hash4W(kLn(newline))
   endif
   return
@@ -3630,17 +3630,17 @@ SUBROUTINE delete_gamma(occgamma)
     call print_config
     stop
   endif
-  NextVertex(occgamma) = TailGam
+  NextVertex(occgamma) = TailVertex
   StatusVertex(occgamma) = -1
-  TailGam = occgamma
+  TailVertex = occgamma
 
-  tmp = Vertex4GamList(NGam)
-  Vertex4GamList(NGam) = 0
-  Vertex4GamList(List4Vertex(occgamma)) = tmp
-  List4Vertex(tmp) = List4Vertex(occgamma)
+  tmp = VertexKey2Value(NGam)
+  VertexKey2Value(NGam) = 0
+  VertexKey2Value(VertexValue2Key(occgamma)) = tmp
+  VertexValue2Key(tmp) = VertexValue2Key(occgamma)
   NGam = NGam -1
 
-  if(TailGam == -1) then
+  if(TailVertex == -1) then
     write(*, *) "Tail=-1! Too many vertexes!"
     stop
   endif
@@ -3652,21 +3652,21 @@ SUBROUTINE undo_delete_gamma(newgamma)
   implicit none
   integer, intent(in) :: newgamma
 
-  if(TailGam/=newgamma)    then
+  if(TailVertex/=newgamma)    then
     write(*, *) "undo_delete_gamma error!"
     stop
   endif
   StatusVertex(newgamma) = 0
 
-  TailGam = NextVertex(newgamma)
-  if(TailGam == -1) then
+  TailVertex = NextVertex(newgamma)
+  if(TailVertex == -1) then
     write(*, *) "Tail=-1! Too many gammas!"
     stop
   endif
    
   NGam = NGam + 1
-  Vertex4GamList(NGam) = newgamma
-  List4Vertex(newgamma) = NGam
+  VertexKey2Value(NGam) = newgamma
+  VertexValue2Key(newgamma) = NGam
 
   return
 END SUBROUTINE undo_delete_gamma
@@ -3855,24 +3855,24 @@ SUBROUTINE print_config
   write(8, *) "Order", Order
   write(8, *) "NFermiLoop", NFermiLoop
 
-  write(8, *) "Measuring Gamma", MeasGamma
+  write(8, *) "Measuring Gamma", MeasureGam
   write(8, *) "Phase", Phase
   write(8, *) "Weight", WeightCurrent
 
   do i = 1, NGLn
-    iln = Ln4GList(i)
+    iln = GLnKey2Value(i)
     if(StatusLn(iln) <0) cycle
     write(8, 10) iln, KindLn(iln), TypeLn(iln), kLn(iln), OmegaLn(iln), StatusLn(iln), NeighLn(1:2,iln)
   enddo
 
   do i = 1, NWLn
-    iln = Ln4WList(i)
+    iln = WLnKey2Value(i)
     if(StatusLn(iln) <0) cycle
     write(8, 10) iln, KindLn(iln), TypeLn(iln), kLn(iln), OmegaLn(iln), StatusLn(iln), NeighLn(1:2,iln)
   enddo
 
   do i = 1, NGam
-    iv = Vertex4GamList(i)
+    iv = VertexKey2Value(i)
     if(StatusVertex(iv) <0) cycle
     write(8, 12) iv,TypeVertex(iv),TypeVertexIn(iv),TypeVertexOut(iv),GXVertex(iv),GYVertex(iv),&
       & WXVertex(iv),WYVertex(iv), DirecVertex(iv), StatusVertex(iv), NeighVertex(:,iv)
@@ -3899,7 +3899,7 @@ INTEGER FUNCTION find_config()
     endif
   else if(Order == 1) then
     if(IsWormPresent) then
-      if(Ira==MeasGamma) then
+      if(Ira==MeasureGam) then
         itopo = 0
       else 
         itopo = 1
@@ -3929,9 +3929,9 @@ LOGICAL FUNCTION is_topo_1()
   integer :: MeaGin, MeaGout, MeaW
   integer :: G1, G2, G3, G4, W1, W2, Gam1, Gam2, Gam3, Gam4
 
-  MeaGin = NeighVertex(2, MeasGamma)
-  MeaGout = NeighVertex(1, MeasGamma)
-  MeaW = NeighVertex(3, MeasGamma)
+  MeaGin = NeighVertex(2, MeasureGam)
+  MeaGout = NeighVertex(1, MeasureGam)
+  MeaW = NeighVertex(3, MeasureGam)
 
   if(Order/=2) then
     is_topo_1 = .false.
@@ -3952,7 +3952,7 @@ LOGICAL FUNCTION is_topo_1()
     return
   endif
 
-  G1 = NeighVertex(2, MeasGamma)
+  G1 = NeighVertex(2, MeasureGam)
   Gam1 = NeighLn(2, G1)
   G2 = NeighVertex(2, Gam1)
   Gam2 = NeighLn(2, G2)
@@ -3979,9 +3979,9 @@ LOGICAL FUNCTION is_topo_2()
   integer :: MeaGin, MeaGout, MeaW
   integer :: G1, G2, G3, G4, W1, W2, Gam1, Gam2, Gam3, Gam4
 
-  MeaGin = NeighVertex(2, MeasGamma)
-  MeaGout = NeighVertex(1, MeasGamma)
-  MeaW = NeighVertex(3, MeasGamma)
+  MeaGin = NeighVertex(2, MeasureGam)
+  MeaGout = NeighVertex(1, MeasureGam)
+  MeaW = NeighVertex(3, MeasureGam)
 
   if(Order/=2) then
     is_topo_2 = .false.
@@ -4002,12 +4002,12 @@ LOGICAL FUNCTION is_topo_2()
     return
   endif
 
-  G1 = NeighVertex(2, MeasGamma)
+  G1 = NeighVertex(2, MeasureGam)
   Gam1 = NeighLn(2, G1)
   G2 = NeighVertex(2, Gam1)
   Gam2 = NeighLn(2, G2)
   W1 = NeighVertex(3, Gam2)
-  if(W1==NeighVertex(3, MeasGamma)) then
+  if(W1==NeighVertex(3, MeasureGam)) then
     is_topo_2 = .true.
   else
     is_topo_2 = .false.
@@ -4039,11 +4039,11 @@ SUBROUTINE measure
 
 
   !-------- find out the variables for Gamma ----------------
-  MeaGin = NeighVertex(2, MeasGamma)
-  MeaGout = NeighVertex(1, MeasGamma)
-  MeaW = NeighVertex(3, MeasGamma)
+  MeaGin = NeighVertex(2, MeasureGam)
+  MeaGout = NeighVertex(1, MeasureGam)
+  MeaW = NeighVertex(3, MeasureGam)
 
-  dir = DirecVertex(MeasGamma)
+  dir = DirecVertex(MeasureGam)
 
   !----- find the type for Gamma ----------------------
   if(dir==1) then
@@ -4060,15 +4060,15 @@ SUBROUTINE measure
     endif
   endif
 
-  if(TypeVertex(MeasGamma)==5 .or. TypeVertex(MeasGamma)==6) then
-    typ = 11-TypeVertex(MeasGamma)
-  else if(TypeVertex(MeasGamma)==1 .or. TypeVertex(MeasGamma)==3) then
+  if(TypeVertex(MeasureGam)==5 .or. TypeVertex(MeasureGam)==6) then
+    typ = 11-TypeVertex(MeasureGam)
+  else if(TypeVertex(MeasureGam)==1 .or. TypeVertex(MeasureGam)==3) then
     typ = TypeGW2Gam(1,1,spw,spw)
-  else if(TypeVertex(MeasGamma)==2 .or. TypeVertex(MeasGamma)==4) then
+  else if(TypeVertex(MeasureGam)==2 .or. TypeVertex(MeasureGam)==4) then
     typ = TypeGW2Gam(2,2,spw,spw)
   endif
 
-  xg = GXVertex(MeasGamma);        yg = GYVertex(MeasGamma)
+  xg = GXVertex(MeasureGam);        yg = GYVertex(MeasureGam)
   xw = WXVertex(NeighLn(3-dir, MeaW))
   yw = WYVertex(NeighLn(3-dir, MeaW))
 
@@ -4076,31 +4076,31 @@ SUBROUTINE measure
   if(abs(OmegaLn(MeaGin))<=MxOmegaDiag .and. abs(OmegaLn(MeaGout))<=MxOmegaDiag) then
 
     factorM = CoefOfSymmetry(diff_x(xg,xw), diff_y(yg,yw))* &
-      & CoefOfWeight(Order)*WeightLn(MeaW)*WeightVertex(MeasGamma)* &
+      & CoefOfWeight(Order)*WeightLn(MeaW)*WeightVertex(MeasureGam)* &
       & WeightLn(MeaGin)*WeightLn(MeaGout)
 
-    ime = ime + 1
+    !ime = ime + 1
     !write(175, *) imc, ime, Order, WeightCurrent
   
-    nloop = Mod(NFermiloop, 2)
+    !nloop = Mod(NFermiloop, 2)
 
     GamMC(Order, nloop,(typ+1)/2, diff_x(xg,xw), diff_y(yg,yw), OmegaLn(MeaGin), OmegaLn(MeaGout)) = &
       & GamMC(Order, nloop,(typ+1)/2, diff_x(xg,xw),diff_y(yg,yw),OmegaLn(MeaGin), OmegaLn(MeaGout)) + &
       & Phase/factorM
 
-    GamSqMC(Order,nloop,(typ+1)/2, diff_x(xg,xw), diff_y(yg,yw), OmegaLn(MeaGin), OmegaLn(MeaGout)) = &
-      & GamSqMC(Order,nloop,(typ+1)/2,diff_x(xg,xw),diff_y(yg,yw), OmegaLn(MeaGin), OmegaLn(MeaGout)) + &
-      & (Phase/factorM)**2.d0
+    !GamSqMC(Order,nloop,(typ+1)/2, diff_x(xg,xw), diff_y(yg,yw), OmegaLn(MeaGin), OmegaLn(MeaGout)) = &
+      !& GamSqMC(Order,nloop,(typ+1)/2,diff_x(xg,xw),diff_y(yg,yw), OmegaLn(MeaGin), OmegaLn(MeaGout)) + &
+      !& (Phase/factorM)**2.d0
 
     if(Order==2 .and. typ==1) then
-      factorM = CoefOfWeight(Order)*WeightLn(MeaW)*WeightVertex(MeasGamma)* &
+      factorM = CoefOfWeight(Order)*WeightLn(MeaW)*WeightVertex(MeasureGam)* &
         & WeightLn(MeaGin)*WeightLn(MeaGout)
-      if(is_topo_1()) then
-        gam2topo(1, omegaln(meagin)) = gam2topo(1, omegaln(meagin)) + phase/factorm
-      endif
-      if(is_topo_2()) then
-        gam2topo(2, omegaln(meagin)) = gam2topo(2, omegaln(meagin)) + phase/factorm
-      endif
+      !if(is_topo_1()) then
+        !gam2topo(1, omegaln(meagin)) = gam2topo(1, omegaln(meagin)) + phase/factorm
+      !endif
+      !if(is_topo_2()) then
+        !gam2topo(2, omegaln(meagin)) = gam2topo(2, omegaln(meagin)) + phase/factorm
+      !endif
     endif
 
 
