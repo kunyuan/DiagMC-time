@@ -6,14 +6,13 @@ SUBROUTINE initialize_markov
 
     Pupdate(:)  = 1.d0
     Pupdate(2)  = 5.d0
-
     Pupdate(3)  = 0.d0
     Pupdate(4)  = 0.d0
 
     !--------------- initialize variables ---------------
-    Ln4GList(:) = 0
-    Ln4WList(:) = 0
-    Vertex4GamList(:) = 0
+    GLnKey2Value(:) = 0
+    WLnKey2Value(:) = 0
+    VertexKey2Value(:) = 0
     StatusLn(:) = -1
     StatusVertex(:)= -1
     WeightLn(:) = 1.d0
