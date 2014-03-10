@@ -130,6 +130,7 @@ MODULE vrbls_mc
   integer          :: NSamp             ! # total MC steps
   integer          :: NBlck             ! # total blocks
   integer          :: NToss             ! # MC steps for toss
+  integer          :: NStep             ! # MC steps for one measurement
 
   !------------ basic variables for a diagram --------------------------
   integer          :: Order             ! order of the simulating diagram 
