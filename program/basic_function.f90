@@ -260,21 +260,21 @@
 !END FUNCTION Is_omega_not_valid
 
 !!---------- int x y -------------------------
-!INTEGER FUNCTION generate_x()
-  !implicit none
-  !integer :: nr
-  !nr = Floor(rn()*3.d0)-1
-  !generate_x = nr
-  !return
-!END FUNCTION generate_x
+INTEGER FUNCTION generate_x()
+  implicit none
+  integer :: nr
+  nr = Floor(rn()*3.d0)-1
+  generate_x = nr
+  return
+END FUNCTION generate_x
 
-!INTEGER FUNCTION generate_y()
-  !implicit none
-  !integer :: nr
-  !nr = Floor(rn()*3.d0)-1
-  !generate_y = nr
-  !return
-!END FUNCTION generate_y
+INTEGER FUNCTION generate_y()
+  implicit none
+  integer :: nr
+  nr = Floor(rn()*3.d0)-1
+  generate_y = nr
+  return
+END FUNCTION generate_y
 
 !DOUBLE PRECISION FUNCTION prob_x(x)
   !implicit none 
@@ -290,27 +290,27 @@
   !return
 !END FUNCTION prob_y
 
-!INTEGER FUNCTION find_neigh_x(x, dx)
-  !implicit none
-  !integer, intent(in) :: x, dx
-  !find_neigh_x = x+dx
-  !if(find_neigh_x<0) then
-    !find_neigh_x = find_neigh_x + Lx
-  !else if(find_neigh_x>=Lx) then
-    !find_neigh_x = find_neigh_x - Lx
-  !endif
-!END FUNCTION find_neigh_x
+INTEGER FUNCTION find_neigh_x(x, dx)
+  implicit none
+  integer, intent(in) :: x, dx
+  find_neigh_x = x+dx
+  if(find_neigh_x<0) then
+    find_neigh_x = find_neigh_x + Lx
+  else if(find_neigh_x>=Lx) then
+    find_neigh_x = find_neigh_x - Lx
+  endif
+END FUNCTION find_neigh_x
 
-!INTEGER FUNCTION find_neigh_y(y, dy)
-  !implicit none
-  !integer, intent(in) :: y, dy
-  !find_neigh_y = y+dy
-  !if(find_neigh_y<0) then
-    !find_neigh_y = find_neigh_y + Ly
-  !else if(find_neigh_y>=Ly) then
-    !find_neigh_y = find_neigh_y - Ly
-  !endif
-!END FUNCTION find_neigh_y
+INTEGER FUNCTION find_neigh_y(y, dy)
+  implicit none
+  integer, intent(in) :: y, dy
+  find_neigh_y = y+dy
+  if(find_neigh_y<0) then
+    find_neigh_y = find_neigh_y + Ly
+  else if(find_neigh_y>=Ly) then
+    find_neigh_y = find_neigh_y - Ly
+  endif
+END FUNCTION find_neigh_y
 
 !INTEGER FUNCTION diff_x(x1, x2)
   !implicit none
