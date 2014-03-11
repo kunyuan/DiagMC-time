@@ -33,6 +33,18 @@ PROGRAM MAIN
 
   InpMC = 0
 
+  !================ irreducibility check ===============================
+  CheckG = .true.
+  CheckW = .true.
+  CheckGam = .false.
+  !================ updates frequency   ================================
+  Pupdate(:)  = 1.d0
+  Pupdate(2)  = 5.d0
+
+  Pupdate(3)  = 0.d0
+  Pupdate(4)  = 0.d0
+  !===================================================================
+
   write(title1, '(f4.2)') beta
 
   allocate(W(NTypeW, 0:Lx-1, 0:Ly-1, 0:MxT-1))
@@ -74,7 +86,7 @@ PROGRAM MAIN
 CONTAINS
 INCLUDE "basic_function.f90"
 INCLUDE "self_consistent.f90"
-!INCLUDE "monte_carlo.f90"
+INCLUDE "monte_carlo.f90"
 !INCLUDE "check_conf.f90"
 !INCLUDE "analytic_integration.f90"
 INCLUDE "read_write_data.f90"
@@ -240,14 +252,14 @@ SUBROUTINE transfer_t(Backforth)
   return
 END SUBROUTINE
 
-!SUBROUTINE monte_carlo
-  !implicit none
+SUBROUTINE monte_carlo
+  implicit none
   !integer :: istep, iblck, mc_version
   !double precision :: WR, GamR
 
   !call read_GWGamma
   !call calculate_GamNormWeight
-  !call def_conf
+  call initialize_markov
 
   !if(InpMC==0) then
 
@@ -330,8 +342,8 @@ END SUBROUTINE
   !write(*,51) t_simu
   !51 format(/'simulation time:',f16.7,2x,'s')
 
-  !return
-!END SUBROUTINE monte_carlo
+  return
+END SUBROUTINE monte_carlo
 
 !SUBROUTINE read_flag
   !implicit none
