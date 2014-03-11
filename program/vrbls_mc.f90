@@ -116,7 +116,7 @@ MODULE vrbls_mc
   double precision :: GamNorm, GamNormWeight           ! the weight of the normalization diagram
   double precision :: GamOrder(0:MxOrder)              ! the configuration number of different orders
   double precision :: GamWormOrder(0:MxOrder)          ! the configuration number in worm section
-  double precision, allocatable :: GamMC(:,:,:,:,:,:,:)! the measurement of Gamma in MC
+  double precision, allocatable :: GamMC(:,:,:,:,:,:,:)      ! the measurement of Gamma in MC
 
   double precision :: WeightCurrent            ! the current weight of the configuration
   double precision :: CoefOfWorm
@@ -134,7 +134,7 @@ MODULE vrbls_mc
 
   !------------ basic variables for a diagram --------------------------
   integer          :: Order             ! order of the simulating diagram 
-  double precision :: Phase             ! phase of the present diagram
+  COMPLEX*16       :: Phase             ! phase of the present diagram
   integer          :: NGLn, NWLn, NVertex ! number of glines, wlines, gamma
   integer          :: MeasureGam        ! measuring vertex
   integer          :: SignFermiLoop     ! the sign of Fermi loops(1: even; -1: odd)
@@ -153,7 +153,7 @@ MODULE vrbls_mc
   integer, dimension(2,MxNLn) :: NeighLn            ! 1: begin gamma; 2: end gamma 
   integer, dimension(MxNLn) :: StatusLn             ! 2:I&M; 0:normal; 1: measure; -1: empty
   integer, dimension(MxNLn) :: IsDeltaLn            ! 0: W, not delta; 1: W, delta; -1: G
-  double precision, dimension(MxNLn) :: WeightLn    ! weight of glines and wlines
+  COMPLEX*16, dimension(MxNLn) :: WeightLn          ! weight of glines and wlines
   integer, dimension(MxNLn)  :: NextLn, TailLn      ! for add or delete use
 
   integer, dimension(MxNGLn) :: GLnKey2Value        
@@ -164,13 +164,13 @@ MODULE vrbls_mc
   !----------- data structure for vertexes -------------------------------------
   integer, dimension(MxNVertex) :: GXVertex, GYVertex       ! gline sites for Gamma
   integer, dimension(MxNVertex) :: WXVertex, WYVertex       ! wline sites for Gamma
-  integer, dimension(MxNVertex) :: T1Vertex, T2Vertex, T3Vertex ! times for Gamma
+  double precision, dimension(MxNVertex) :: T1Vertex, T2Vertex, T3Vertex ! times for Gamma
   integer, dimension(MxNVertex) :: DirecVertex              ! Gamma is 1: left, 2: right
   integer, dimension(MxNVertex) :: TypeVertex               ! type of Gamma: 1-6
   integer, dimension(MxNVertex) :: TypeVertexIn, TypeVertexOut ! type of Gamma inside spin: 1-2
   integer, dimension(3,MxNVertex) :: NeighVertex            ! 1: in gline; 2: out gline; 3: wline
-  double precision, dimension(MxNVertex) :: WeightVertex    ! weight of  gamma
-  integer, dimension(MxNLn) :: IsDeltaVertex            ! 0: not delta; 1: delta
+  COMPLEX*16, dimension(MxNVertex) :: WeightVertex          ! weight of  gamma
+  integer, dimension(MxNLn) :: IsDeltaVertex                ! 0: not delta; 1: delta
   integer, dimension(MxNVertex):: StatusVertex              ! 2:I&M; 0:normal; 1: measure; -1: empty
   integer, dimension(MxNVertex):: NextVertex, TailVertex    ! for add or delete use
 
