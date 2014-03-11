@@ -20,18 +20,20 @@ Anti-Periodic : G, Gam, Sigma
 2. self-consistent integrals in k and omega representation
 
 Test example:
-Sigma(t) = (beta/N)**2.d0* \sum_{t1,t2} G(t1) W(t2) Gam(t2-t1, t-t2) direct integral compared with
+1) Sigma(t) = (beta/N)**2.d0* \sum_{t1,t2} G(t1) W(t2) Gam(t2-t1, t-t2) direct integral compared with
 FFT(Sigma(omega)) = FFT( beta**2.d0/N**3.d0 *\sum_{omega1} G(omega1) W(omega-omega1) Gam(omega1, omega))
 Sigma(t) and FFT(Sigma(omega)) are the same
 
-G(t) from old code and FFT(G(omega)) from the current code are the same with error 1% after several 
+2) G(t) from old code and FFT(G(omega)) from the current code are the same with error 1% after several 
 self-consistent loops
 
-W(t) from old code and FFT(W(omega)) from the current code are the same with error 5% after several 
+3) W(t) from old code and FFT(W(omega)) from the current code are the same with error 5% after several 
 self-consistent loops except for the tau=0 point
 
-After adding the correction term in Polar, W(t) from old code and FFT(W(omega)) from the current 
-code are the same with error 5% for r=(0,0) and r=(1,1); but r=(1,0) still need to be checked
+	After adding the correction term in Polar, W(t) from old code and FFT(W(omega)) from the current 
+	code are the same with error 5% for r=(0,0) and r=(1,1); but r=(1,0) still need to be checked
+
+4) Write a new code using tau integral and compare it with W(0,0), W(1, 0) and W(1,1), get the same answer
 
 Report:
 The self-consistent integrals can give the right answer when they are transferred back to t domain

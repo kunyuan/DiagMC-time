@@ -3,19 +3,17 @@
 !_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
 !_TAG_PROGRAM_NAME	Exuberant Ctags	//
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
-!_TAG_PROGRAM_VERSION	5.8	//
-10	monte_carlo.f90	/^  10 format(' Line:',i2,2x,'kind:',i2,2x,'type:',i2,2x,'k:',i8,2x,'omega:',i6,2x,'stat:',i2, 2x,&$/;"	l	subroutine:print_config	file:
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+10	monte_carlo_old.f90	/^  10 format(' Line:',i2,2x,'kind:',i2,2x,'type:',i2,2x,'k:',i8,2x,'omega:',i6,2x,'stat:',i2, 2x,&$/;"	l	subroutine:print_config	file:
 100	basic_function.f90	/^100 J = 1$/;"	l	subroutine:SFFTEU	file:
 100	data_process/collapse_data.f90	/^100 continue$/;"	l	program:main	file:
 100	data_process/collapse_statistics.f90	/^100 close(11)$/;"	l	program:MAIN	file:
 101	basic_function.f90	/^101    K = N \/ 2$/;"	l	subroutine:SFFTEU	file:
 102	basic_function.f90	/^102    if ( K .ge. J ) goto 103$/;"	l	subroutine:SFFTEU	file:
 103	basic_function.f90	/^103    J = J + K$/;"	l	subroutine:SFFTEU	file:
-12	monte_carlo.f90	/^  12 format('Gamma:',i2,2x,'type:',i2,2x,'typein:',i2,2x,'typeout:',i2,2x,'gr:(',i4,i4,'), wr:(',i4,i4,')',&$/;"	l	subroutine:print_config	file:
+12	monte_carlo_old.f90	/^  12 format('Gamma:',i2,2x,'type:',i2,2x,'typein:',i2,2x,'typeout:',i2,2x,'gr:(',i4,i4,'), wr:(',i4,i4,')',&$/;"	l	subroutine:print_config	file:
 40	basic_function.f90	/^40        do I0 = IS, N-1, ID$/;"	l	subroutine:SFFTEU	file:
 50	basic_function.f90	/^50  do I0 = IS, N, ID$/;"	l	subroutine:SFFTEU	file:
-51	DiagMC.f90	/^  51 format(\/'simulation time:',f16.7,2x,'s')$/;"	l	subroutine:monte_carlo	file:
-52	DiagMC.f90	/^    52 format(\/'thermalization time:',f16.7,2x,'s')$/;"	l	subroutine:monte_carlo	file:
 Ave	data_process/collapse_statistics.f90	/^    double precision :: Obs(1:Nobs_b, 12000), Ave(/;"	v	program:MAIN
 Ave	vrbls_mc.f90	/^  double precision , dimension(1:Nobs) :: Quan, Ave,/;"	v	module:vrbls_mc
 Beta	data_process/collapse_statistics.f90	/^    double precision :: Beta,/;"	v	program:MAIN
@@ -23,7 +21,7 @@ Beta	vrbls_mc.f90	/^  double precision ::  Beta /;"	v	module:vrbls_mc
 CheckG	vrbls_mc.f90	/^  logical          ::  CheckG,/;"	v	module:vrbls_mc
 CheckGam	vrbls_mc.f90	/^  logical          ::  CheckG, CheckW, CheckGam /;"	v	module:vrbls_mc
 CheckW	vrbls_mc.f90	/^  logical          ::  CheckG, CheckW,/;"	v	module:vrbls_mc
-Chi	vrbls_mc.f90	/^  complex(kind=8) :: Chi(/;"	v	module:vrbls_mc
+Chi	vrbls_mc.f90	/^  complex(kind=8), allocatable :: Chi(/;"	v	module:vrbls_mc
 CoefOfSymmetry	vrbls_mc.f90	/^  double precision :: CoefOfSymmetry(/;"	v	module:vrbls_mc
 CoefOfWeight	vrbls_mc.f90	/^  double precision :: CoefOfWeight(/;"	v	module:vrbls_mc
 CoefOfWorm	vrbls_mc.f90	/^  double precision :: CoefOfWorm$/;"	v	module:vrbls_mc
@@ -41,7 +39,8 @@ G	vrbls_mc.f90	/^  complex(kind=8) :: G(/;"	v	module:vrbls_mc
 G0F	vrbls_mc.f90	/^  complex(kind=8) :: G0F(/;"	v	module:vrbls_mc
 GXVertex	vrbls_mc.f90	/^  integer, dimension(MxNVertex) :: GXVertex,/;"	v	module:vrbls_mc
 GYVertex	vrbls_mc.f90	/^  integer, dimension(MxNVertex) :: GXVertex, GYVertex /;"	v	module:vrbls_mc
-Gam	vrbls_mc.f90	/^  complex(kind=8) :: Gam(/;"	v	module:vrbls_mc
+Gam	vrbls_mc.f90	/^  complex(kind=8), allocatable :: Gam(/;"	v	module:vrbls_mc
+Gam0PF	vrbls_mc.f90	/^  complex(kind=8), allocatable :: Gam0PF(/;"	v	module:vrbls_mc
 Gam1	data_process/collapse_data.f90	/^    double precision :: Gam1,/;"	v	program:main
 Gam1MR	data_process/collapse_data.f90	/^    double precision :: Gam1MR,/;"	v	program:main
 Gam2	data_process/collapse_data.f90	/^    double precision :: Gam1, Gam2,/;"	v	program:main
@@ -64,10 +63,10 @@ Hash4G	vrbls_mc.f90	/^  integer, dimension(-MxK:MxK) ::  Hash4G /;"	v	module:vrb
 Hash4W	vrbls_mc.f90	/^  integer, dimension(0:MxK) ::     Hash4W /;"	v	module:vrbls_mc
 Ira	vrbls_mc.f90	/^  integer          :: Ira,/;"	v	module:vrbls_mc
 IsWormPresent	vrbls_mc.f90	/^  logical          :: IsWormPresent /;"	v	module:vrbls_mc
-Is_reducible_G	monte_carlo.f90	/^LOGICAL FUNCTION Is_reducible_G(/;"	f
-Is_reducible_G_Gamma	monte_carlo.f90	/^LOGICAL FUNCTION Is_reducible_G_Gamma(/;"	f
-Is_reducible_W	monte_carlo.f90	/^LOGICAL FUNCTION Is_reducible_W(/;"	f
-Is_reducible_W_Gamma	monte_carlo.f90	/^LOGICAL FUNCTION Is_reducible_W_Gamma(/;"	f
+Is_reducible_G	monte_carlo_old.f90	/^LOGICAL FUNCTION Is_reducible_G(/;"	f
+Is_reducible_G_Gamma	monte_carlo_old.f90	/^LOGICAL FUNCTION Is_reducible_G_Gamma(/;"	f
+Is_reducible_W	monte_carlo_old.f90	/^LOGICAL FUNCTION Is_reducible_W(/;"	f
+Is_reducible_W_Gamma	monte_carlo_old.f90	/^LOGICAL FUNCTION Is_reducible_W_Gamma(/;"	f
 Jcp	vrbls_mc.f90	/^  double precision ::  Jcp /;"	v	module:vrbls_mc
 KindLn	vrbls_mc.f90	/^  integer, dimension(MxNLn) :: KindLn /;"	v	module:vrbls_mc
 List4Ln	vrbls_mc.f90	/^  integer, dimension(MxNLn) :: NextLn, List4Ln /;"	v	module:vrbls_mc
@@ -121,13 +120,12 @@ Nobs_b	data_process/collapse_statistics.f90	/^    integer, parameter :: Nobs_b /
 Nupdate	vrbls_mc.f90	/^  integer, parameter :: Nupdate /;"	v	module:vrbls_mc
 Obs	data_process/collapse_statistics.f90	/^    double precision :: Obs(/;"	v	program:MAIN
 Obs	vrbls_mc.f90	/^  double precision :: Obs(/;"	v	module:vrbls_mc
-OmegaLn	vrbls_mc.f90	/^  integer, dimension(MxNLn) :: OmegaLn /;"	v	module:vrbls_mc
 Order	vrbls_mc.f90	/^  integer          :: Order /;"	v	module:vrbls_mc
 Phase	vrbls_mc.f90	/^  double precision :: Phase /;"	v	module:vrbls_mc
 Pi	vrbls_mc.f90	/^  double precision, parameter :: Pi /;"	v	module:vrbls_mc
 Pi2	vrbls_mc.f90	/^  double precision, parameter :: Pi2 /;"	v	module:vrbls_mc
 Pi4	vrbls_mc.f90	/^  double precision, parameter :: Pi4 /;"	v	module:vrbls_mc
-Polar	vrbls_mc.f90	/^  complex(kind=8) :: Polar(/;"	v	module:vrbls_mc
+Polar	vrbls_mc.f90	/^  complex(kind=8), allocatable :: Polar(/;"	v	module:vrbls_mc
 ProbAcc	vrbls_mc.f90	/^  double precision :: ProbAcc(/;"	v	module:vrbls_mc
 ProbProp	vrbls_mc.f90	/^  double precision :: ProbProp(/;"	v	module:vrbls_mc
 Pupdate	vrbls_mc.f90	/^  double precision :: Pupdate(/;"	v	module:vrbls_mc
@@ -140,6 +138,9 @@ SignFermiLoop	vrbls_mc.f90	/^  integer          :: SignFermiLoop /;"	v	module:vr
 SpinMasha	vrbls_mc.f90	/^  integer          :: SpinMasha /;"	v	module:vrbls_mc
 StatusLn	vrbls_mc.f90	/^  integer, dimension(MxNLn) :: StatusLn /;"	v	module:vrbls_mc
 StatusVertex	vrbls_mc.f90	/^  integer, dimension(MxNVertex):: StatusVertex /;"	v	module:vrbls_mc
+T1Vertex	vrbls_mc.f90	/^  integer, dimension(MxNVertex) :: T1Vertex,/;"	v	module:vrbls_mc
+T2Vertex	vrbls_mc.f90	/^  integer, dimension(MxNVertex) :: T1Vertex, T2Vertex,/;"	v	module:vrbls_mc
+T3Vertex	vrbls_mc.f90	/^  integer, dimension(MxNVertex) :: T1Vertex, T2Vertex, T3Vertex /;"	v	module:vrbls_mc
 TailGam	vrbls_mc.f90	/^  integer                   :: TailGam /;"	v	module:vrbls_mc
 TailLn	vrbls_mc.f90	/^  integer                   :: TailLn /;"	v	module:vrbls_mc
 TypeGW2Gam	vrbls_mc.f90	/^  integer, dimension(2,2,2,2) :: TypeGW2Gam$/;"	v	module:vrbls_mc
@@ -150,20 +151,21 @@ TypeVertexIn	vrbls_mc.f90	/^  integer, dimension(MxNVertex) :: TypeVertexIn,/;"	
 TypeVertexOut	vrbls_mc.f90	/^  integer, dimension(MxNVertex) :: TypeVertexIn, TypeVertexOut /;"	v	module:vrbls_mc
 Vertex4GamList	vrbls_mc.f90	/^  integer, dimension(MxNVertex):: Vertex4GamList /;"	v	module:vrbls_mc
 Vol	vrbls_mc.f90	/^  integer          ::  Lx, Ly, Vol /;"	v	module:vrbls_mc
-W	vrbls_mc.f90	/^  complex(kind=8) :: W(/;"	v	module:vrbls_mc
-W0PF	vrbls_mc.f90	/^  complex(kind=8) :: W0PF(/;"	v	module:vrbls_mc
+W	vrbls_mc.f90	/^  complex(kind=8), allocatable :: W(/;"	v	module:vrbls_mc
+W0PF	vrbls_mc.f90	/^  complex(kind=8), allocatable :: W0PF(/;"	v	module:vrbls_mc
 WXVertex	vrbls_mc.f90	/^  integer, dimension(MxNVertex) :: WXVertex,/;"	v	module:vrbls_mc
 WYVertex	vrbls_mc.f90	/^  integer, dimension(MxNVertex) :: WXVertex, WYVertex /;"	v	module:vrbls_mc
 WeightCurrent	vrbls_mc.f90	/^  double precision :: WeightCurrent /;"	v	module:vrbls_mc
 WeightLn	vrbls_mc.f90	/^  double precision, dimension(MxNLn) :: WeightLn /;"	v	module:vrbls_mc
 WeightVertex	vrbls_mc.f90	/^  double precision, dimension(MxNVertex) :: WeightVertex /;"	v	module:vrbls_mc
 WeightWorm	vrbls_mc.f90	/^  double precision :: WeightWorm /;"	v	module:vrbls_mc
-add_Hash4G	monte_carlo.f90	/^SUBROUTINE add_Hash4G(/;"	s
-add_Hash4W	monte_carlo.f90	/^SUBROUTINE add_Hash4W(/;"	s
-add_interaction	monte_carlo.f90	/^SUBROUTINE add_interaction$/;"	s
-add_interaction_cross	monte_carlo.f90	/^SUBROUTINE add_interaction_cross$/;"	s
-add_ira_stat	monte_carlo.f90	/^INTEGER FUNCTION add_ira_stat(/;"	f
-add_mea_stat	monte_carlo.f90	/^INTEGER FUNCTION add_mea_stat(/;"	f
+add_Hash4G	monte_carlo_old.f90	/^SUBROUTINE add_Hash4G(/;"	s
+add_Hash4W	monte_carlo_old.f90	/^SUBROUTINE add_Hash4W(/;"	s
+add_interaction	monte_carlo_old.f90	/^SUBROUTINE add_interaction$/;"	s
+add_interaction_cross	monte_carlo_old.f90	/^SUBROUTINE add_interaction_cross$/;"	s
+add_ira_stat	monte_carlo_old.f90	/^INTEGER FUNCTION add_ira_stat(/;"	f
+add_mea_stat	monte_carlo_old.f90	/^INTEGER FUNCTION add_mea_stat(/;"	f
+calculate_Chi	self_consistent.f90	/^SUBROUTINE calculate_Chi$/;"	s
 calculate_G	self_consistent.f90	/^SUBROUTINE calculate_G$/;"	s
 calculate_Gamma1	analytic_integration.f90	/^SUBROUTINE calculate_Gamma1$/;"	s
 calculate_Gamma2	analytic_integration.f90	/^SUBROUTINE calculate_Gamma2$/;"	s
@@ -171,7 +173,7 @@ calculate_Polar	self_consistent.f90	/^SUBROUTINE calculate_Polar$/;"	s
 calculate_Sigma	self_consistent.f90	/^SUBROUTINE calculate_Sigma$/;"	s
 calculate_W	self_consistent.f90	/^SUBROUTINE calculate_W$/;"	s
 calculate_W1	analytic_integration.f90	/^SUBROUTINE calculate_W1$/;"	s
-change_Gamma_type	monte_carlo.f90	/^SUBROUTINE change_Gamma_type$/;"	s
+change_Gamma_type	monte_carlo_old.f90	/^SUBROUTINE change_Gamma_type$/;"	s
 check_config	check_conf.f90	/^SUBROUTINE check_config$/;"	s
 check_irreducibility	check_conf.f90	/^SUBROUTINE check_irreducibility$/;"	s
 check_omega	check_conf.f90	/^SUBROUTINE check_omega$/;"	s
@@ -181,28 +183,32 @@ check_topo	check_conf.f90	/^SUBROUTINE check_topo$/;"	s
 check_type	check_conf.f90	/^SUBROUTINE check_type$/;"	s
 check_weight	check_conf.f90	/^SUBROUTINE check_weight$/;"	s
 coll_data	statistics.f90	/^  SUBROUTINE coll_data(/;"	s
-create_worm_along_gline	monte_carlo.f90	/^SUBROUTINE create_worm_along_gline$/;"	s
-create_worm_along_wline	monte_carlo.f90	/^SUBROUTINE create_worm_along_wline$/;"	s
+create_worm_along_gline	monte_carlo_old.f90	/^SUBROUTINE create_worm_along_gline$/;"	s
+create_worm_along_wline	monte_carlo_old.f90	/^SUBROUTINE create_worm_along_wline$/;"	s
 dLx	vrbls_mc.f90	/^  integer          ::  dLx,/;"	v	module:vrbls_mc
 dLy	vrbls_mc.f90	/^  integer          ::  dLx, dLy$/;"	v	module:vrbls_mc
+d_times_cd	basic_function.f90	/^COMPLEX*16 FUNCTION d_times_cd(/;"	f
 date	vrbls_mc.f90	/^  character( 8)         :: date$/;"	v	module:vrbls_mc
 def_conf	monte_carlo.f90	/^subroutine def_conf$/;"	s
+def_conf	monte_carlo_old.f90	/^subroutine def_conf$/;"	s
 def_diagram	monte_carlo.f90	/^SUBROUTINE def_diagram$/;"	s
+def_diagram	monte_carlo_old.f90	/^SUBROUTINE def_diagram$/;"	s
 def_spin	monte_carlo.f90	/^SUBROUTINE def_spin$/;"	s
-delete_Hash4G	monte_carlo.f90	/^SUBROUTINE delete_Hash4G(/;"	s
-delete_Hash4W	monte_carlo.f90	/^SUBROUTINE delete_Hash4W(/;"	s
-delete_gamma	monte_carlo.f90	/^SUBROUTINE delete_gamma(/;"	s
-delete_ira_stat	monte_carlo.f90	/^INTEGER FUNCTION delete_ira_stat(/;"	f
-delete_line	monte_carlo.f90	/^SUBROUTINE delete_line(/;"	s
-delete_mea_stat	monte_carlo.f90	/^INTEGER FUNCTION delete_mea_stat(/;"	f
-delete_worm_along_gline	monte_carlo.f90	/^SUBROUTINE delete_worm_along_gline$/;"	s
-delete_worm_along_wline	monte_carlo.f90	/^SUBROUTINE delete_worm_along_wline$/;"	s
+def_spin	monte_carlo_old.f90	/^SUBROUTINE def_spin$/;"	s
+delete_Hash4G	monte_carlo_old.f90	/^SUBROUTINE delete_Hash4G(/;"	s
+delete_Hash4W	monte_carlo_old.f90	/^SUBROUTINE delete_Hash4W(/;"	s
+delete_gamma	monte_carlo_old.f90	/^SUBROUTINE delete_gamma(/;"	s
+delete_ira_stat	monte_carlo_old.f90	/^INTEGER FUNCTION delete_ira_stat(/;"	f
+delete_line	monte_carlo_old.f90	/^SUBROUTINE delete_line(/;"	s
+delete_mea_stat	monte_carlo_old.f90	/^INTEGER FUNCTION delete_mea_stat(/;"	f
+delete_worm_along_gline	monte_carlo_old.f90	/^SUBROUTINE delete_worm_along_gline$/;"	s
+delete_worm_along_wline	monte_carlo_old.f90	/^SUBROUTINE delete_worm_along_wline$/;"	s
 file1	data_process/collapse.py	/^file1 = title + "_Gamma_MC.dat"$/;"	v
 file2	data_process/collapse.py	/^file2 = title + "_-*_Gamma_MC.dat"$/;"	v
 file3	data_process/collapse.py	/^file3 = title + "_monte_carlo_data.dat"$/;"	v
 file4	data_process/collapse.py	/^file4 = title + "_-*_monte_carlo_data.dat"$/;"	v
 file_version	vrbls_mc.f90	/^  integer:: file_version$/;"	v	module:vrbls_mc
-find_config	monte_carlo.f90	/^INTEGER FUNCTION find_config(/;"	f
+find_config	monte_carlo_old.f90	/^INTEGER FUNCTION find_config(/;"	f
 h_curr	vrbls_mc.f90	/^  integer               :: h_prev, h_curr$/;"	v	module:vrbls_mc
 h_prev	vrbls_mc.f90	/^  integer               :: h_prev,/;"	v	module:vrbls_mc
 i	data_process/collapse_data.f90	/^    in/;"	v	program:main
@@ -217,11 +223,12 @@ ime	data_process/collapse_data.f90	/^    double precision :: ime(/;"	v	program:m
 initialize_G	self_consistent.f90	/^SUBROUTINE initialize_G$/;"	s
 initialize_G0F	self_consistent.f90	/^SUBROUTINE initialize_G0F$/;"	s
 initialize_Gam	self_consistent.f90	/^SUBROUTINE initialize_Gam$/;"	s
+initialize_Gam0PF	self_consistent.f90	/^SUBROUTINE initialize_Gam0PF$/;"	s
 initialize_W	self_consistent.f90	/^SUBROUTINE initialize_W$/;"	s
 initialize_W0PF	self_consistent.f90	/^SUBROUTINE initialize_W0PF$/;"	s
 initialize_self_consistent	self_consistent.f90	/^SUBROUTINE initialize_self_consistent$/;"	s
-insert_gamma	monte_carlo.f90	/^SUBROUTINE insert_gamma(/;"	s
-insert_line	monte_carlo.f90	/^SUBROUTINE insert_line(/;"	s
+insert_gamma	monte_carlo_old.f90	/^SUBROUTINE insert_gamma(/;"	s
+insert_line	monte_carlo_old.f90	/^SUBROUTINE insert_line(/;"	s
 inxt1	vrbls_mc.f90	/^  integer, dimension(1:len1)   :: inxt1$/;"	v	module:vrbls_mc
 inxt2	vrbls_mc.f90	/^  integer, dimension(1:len2)   :: inxt2$/;"	v	module:vrbls_mc
 iobs	data_process/collapse_statistics.f90	/^    integer :: iblck, omega, ityp, iobs,/;"	v	program:MAIN
@@ -235,8 +242,8 @@ ipnt2	vrbls_mc.f90	/^  integer                      :: ipnt2,/;"	v	module:vrbls_
 ir1	vrbls_mc.f90	/^  integer, dimension(1:len1)   :: ir1$/;"	v	module:vrbls_mc
 ir2	vrbls_mc.f90	/^  integer, dimension(1:len2)   :: ir2$/;"	v	module:vrbls_mc
 irn	vrbls_mc.f90	/^  integer, dimension(1:mxrn)   :: irn(/;"	v	module:vrbls_mc
-is_topo_1	monte_carlo.f90	/^LOGICAL FUNCTION is_topo_1(/;"	f
-is_topo_2	monte_carlo.f90	/^LOGICAL FUNCTION is_topo_2(/;"	f
+is_topo_1	monte_carlo_old.f90	/^LOGICAL FUNCTION is_topo_1(/;"	f
+is_topo_2	monte_carlo_old.f90	/^LOGICAL FUNCTION is_topo_2(/;"	f
 itopo	data_process/collapse_data.f90	/^    integer :: itopo,/;"	v	program:main
 itot	data_process/collapse_data.f90	/^    integer :: i, itot,/;"	v	program:main
 ityp	data_process/collapse_data.f90	/^    integer :: itopo, ix, iy, ityp,/;"	v	program:main
@@ -248,15 +255,15 @@ kLn	vrbls_mc.f90	/^  integer, dimension(MxNLn) :: kLn /;"	v	module:vrbls_mc
 kMasha	vrbls_mc.f90	/^  integer          :: kMasha /;"	v	module:vrbls_mc
 len1	vrbls_mc.f90	/^  integer, parameter           :: len1=/;"	v	module:vrbls_mc
 len2	vrbls_mc.f90	/^  integer, parameter           :: len2=/;"	v	module:vrbls_mc
-line_stat	monte_carlo.f90	/^INTEGER FUNCTION line_stat(/;"	f
+line_stat	monte_carlo_old.f90	/^INTEGER FUNCTION line_stat(/;"	f
 main	data_process/collapse_data.f90	/^  program main$/;"	p
 markov	monte_carlo.f90	/^SUBROUTINE markov$/;"	s
-measure	monte_carlo.f90	/^SUBROUTINE measure$/;"	s
+markov	monte_carlo_old.f90	/^SUBROUTINE markov$/;"	s
+measure	monte_carlo_old.f90	/^SUBROUTINE measure$/;"	s
 mod2	vrbls_mc.f90	/^  integer, parameter           :: mod2=/;"	v	module:vrbls_mc
-monte_carlo	DiagMC.f90	/^SUBROUTINE monte_carlo$/;"	s
-move_measuring_index	monte_carlo.f90	/^SUBROUTINE move_measuring_index$/;"	s
-move_worm_along_gline	monte_carlo.f90	/^SUBROUTINE move_worm_along_gline$/;"	s
-move_worm_along_wline	monte_carlo.f90	/^SUBROUTINE move_worm_along_wline$/;"	s
+move_measuring_index	monte_carlo_old.f90	/^SUBROUTINE move_measuring_index$/;"	s
+move_worm_along_gline	monte_carlo_old.f90	/^SUBROUTINE move_worm_along_gline$/;"	s
+move_worm_along_wline	monte_carlo_old.f90	/^SUBROUTINE move_worm_along_wline$/;"	s
 mul2	vrbls_mc.f90	/^  integer, parameter           :: mod2=2796203, mul2=/;"	v	module:vrbls_mc
 mult	vrbls_mc.f90	/^  integer, parameter           :: mult=/;"	v	module:vrbls_mc
 mxrn	vrbls_mc.f90	/^  integer, parameter           :: mxrn /;"	v	module:vrbls_mc
@@ -266,33 +273,30 @@ norm_data	statistics.f90	/^  SUBROUTINE norm_data$/;"	s
 nrannr	vrbls_mc.f90	/^  integer                      :: nrannr /;"	v	module:vrbls_mc
 omega	data_process/collapse_statistics.f90	/^    integer :: iblck, omega,/;"	v	program:MAIN
 order	data_process/collapse_data.f90	/^    character*1 :: order$/;"	v	program:main
-os	data_process/collapse.py	/^import os$/;"	i
 output_GamMC	data_process/collapse_statistics.f90	/^  SUBROUTINE output_GamMC$/;"	s	program:MAIN
-output_GamMC	read_write_data.f90	/^SUBROUTINE output_GamMC$/;"	s
 output_Quantities	read_write_data.f90	/^SUBROUTINE output_Quantities$/;"	s
-output_prob_MC	read_write_data.f90	/^SUBROUTINE output_prob_MC$/;"	s
-print_config	monte_carlo.f90	/^SUBROUTINE print_config$/;"	s
-print_updates	monte_carlo.f90	/^SUBROUTINE print_updates$/;"	s
+plus_minus_Gam0	self_consistent.f90	/^SUBROUTINE plus_minus_Gam0(/;"	s
+plus_minus_W0	self_consistent.f90	/^SUBROUTINE plus_minus_W0(/;"	s
+print_config	monte_carlo_old.f90	/^SUBROUTINE print_config$/;"	s
+print_updates	monte_carlo_old.f90	/^SUBROUTINE print_updates$/;"	s
 prt	data_process/collapse_statistics.f90	/^    logical :: prt$/;"	v	program:MAIN
 prt	vrbls_mc.f90	/^  logical :: prt$/;"	v	module:vrbls_mc
 read_GWGamma	read_write_data.f90	/^SUBROUTINE read_GWGamma$/;"	s
-read_flag	DiagMC.f90	/^SUBROUTINE read_flag$/;"	s
 read_monte_carlo_conf	read_write_data.f90	/^SUBROUTINE read_monte_carlo_conf$/;"	s
 read_monte_carlo_data	read_write_data.f90	/^SUBROUTINE read_monte_carlo_data$/;"	s
-reconnect	monte_carlo.f90	/^SUBROUTINE reconnect$/;"	s
-remove_interaction	monte_carlo.f90	/^SUBROUTINE remove_interaction$/;"	s
-remove_interaction_cross	monte_carlo.f90	/^SUBROUTINE remove_interaction_cross$/;"	s
+reconnect	monte_carlo_old.f90	/^SUBROUTINE reconnect$/;"	s
+remove_interaction	monte_carlo_old.f90	/^SUBROUTINE remove_interaction$/;"	s
+remove_interaction_cross	monte_carlo_old.f90	/^SUBROUTINE remove_interaction_cross$/;"	s
 rn	basic_function.f90	/^DOUBLE PRECISION FUNCTION rn(/;"	f
 self_consistent	DiagMC.f90	/^SUBROUTINE self_consistent$/;"	s
 self_consistent_GW	DiagMC.f90	/^LOGICAL FUNCTION self_consistent_GW(/;"	f
 set_RNG	basic_function.f90	/^SUBROUTINE set_RNG$/;"	s
 set_time_elapse	basic_function.f90	/^SUBROUTINE set_time_elapse$/;"	s
-shift_gline_in_space	monte_carlo.f90	/^SUBROUTINE shift_gline_in_space$/;"	s
-shift_wline_in_space	monte_carlo.f90	/^SUBROUTINE shift_wline_in_space$/;"	s
+shift_gline_in_space	monte_carlo_old.f90	/^SUBROUTINE shift_gline_in_space$/;"	s
+shift_wline_in_space	monte_carlo_old.f90	/^SUBROUTINE shift_wline_in_space$/;"	s
 stat_analy	data_process/collapse_statistics.f90	/^  SUBROUTINE stat_analy$/;"	s	program:MAIN
 stat_analy	statistics.f90	/^  SUBROUTINE stat_analy$/;"	s
 str	data_process/collapse_statistics.f90	/^    character*100 :: str,/;"	v	program:MAIN
-switch_ira_and_masha	basic_function.f90	/^SUBROUTINE switch_ira_and_masha$/;"	s
 t_curr	vrbls_mc.f90	/^  double precision      :: t_prev, t_curr,/;"	v	module:vrbls_mc
 t_elap	vrbls_mc.f90	/^  double precision      :: t_prev, t_curr, t_elap$/;"	v	module:vrbls_mc
 t_init	vrbls_mc.f90	/^  double precision      :: t_init,/;"	v	module:vrbls_mc
@@ -315,32 +319,32 @@ transfer_Chi_r	basic_function.f90	/^SUBROUTINE transfer_Chi_r(/;"	s
 transfer_Chi_t	basic_function.f90	/^SUBROUTINE transfer_Chi_t(/;"	s
 transfer_G0	basic_function.f90	/^SUBROUTINE transfer_G0(/;"	s
 transfer_G_t	basic_function.f90	/^SUBROUTINE transfer_G_t(/;"	s
+transfer_Gam0	basic_function.f90	/^SUBROUTINE transfer_Gam0(/;"	s
 transfer_Gam_r	basic_function.f90	/^SUBROUTINE transfer_Gam_r(/;"	s
 transfer_Gam_t	basic_function.f90	/^SUBROUTINE transfer_Gam_t(/;"	s
-transfer_Polar_r	basic_function.f90	/^SUBROUTINE transfer_Polar_r(/;"	s
-transfer_Polar_t	basic_function.f90	/^SUBROUTINE transfer_Polar_t(/;"	s
 transfer_Sigma_t	basic_function.f90	/^SUBROUTINE transfer_Sigma_t(/;"	s
 transfer_W0	basic_function.f90	/^SUBROUTINE transfer_W0(/;"	s
 transfer_W_r	basic_function.f90	/^SUBROUTINE transfer_W_r(/;"	s
 transfer_W_t	basic_function.f90	/^SUBROUTINE transfer_W_t(/;"	s
+transfer_r	DiagMC.f90	/^SUBROUTINE transfer_r(/;"	s
+transfer_t	DiagMC.f90	/^SUBROUTINE transfer_t(/;"	s
 tval	vrbls_mc.f90	/^  integer, dimension(8) :: tval$/;"	v	module:vrbls_mc
-undo_delete_gamma	monte_carlo.f90	/^SUBROUTINE undo_delete_gamma(/;"	s
-undo_delete_line	monte_carlo.f90	/^SUBROUTINE undo_delete_line(/;"	s
-undo_insert_line	monte_carlo.f90	/^SUBROUTINE undo_insert_line(/;"	s
-update_Hash4G	monte_carlo.f90	/^SUBROUTINE update_Hash4G(/;"	s
-update_Hash4W	monte_carlo.f90	/^SUBROUTINE update_Hash4W(/;"	s
-update_flag	DiagMC.f90	/^SUBROUTINE update_flag$/;"	s
-update_weight	monte_carlo.f90	/^SUBROUTINE update_weight(/;"	s
+undo_delete_gamma	monte_carlo_old.f90	/^SUBROUTINE undo_delete_gamma(/;"	s
+undo_delete_line	monte_carlo_old.f90	/^SUBROUTINE undo_delete_line(/;"	s
+undo_insert_line	monte_carlo_old.f90	/^SUBROUTINE undo_insert_line(/;"	s
+update_Hash4G	monte_carlo_old.f90	/^SUBROUTINE update_Hash4G(/;"	s
+update_Hash4W	monte_carlo_old.f90	/^SUBROUTINE update_Hash4W(/;"	s
+update_weight	monte_carlo_old.f90	/^SUBROUTINE update_weight(/;"	s
 vrbls_mc	vrbls_mc.f90	/^MODULE vrbls_mc$/;"	m
-weight_G	self_consistent.f90	/^COMPLEX FUNCTION weight_G(/;"	f
-weight_G0	self_consistent.f90	/^Complex FUNCTION weight_G0(/;"	f
-weight_Gam	self_consistent.f90	/^COMPLEX FUNCTION weight_Gam(/;"	f
-weight_Gam0	self_consistent.f90	/^COMPLEX FUNCTION weight_Gam0(/;"	f
-weight_W	self_consistent.f90	/^COMPLEX FUNCTION weight_W(/;"	f
-weight_W0	self_consistent.f90	/^Complex FUNCTION weight_W0(/;"	f
-weight_line	monte_carlo.f90	/^DOUBLE PRECISION FUNCTION weight_line(/;"	f
-weight_ratio	monte_carlo.f90	/^SUBROUTINE weight_ratio(/;"	s
-weight_vertex	monte_carlo.f90	/^DOUBLE PRECISION FUNCTION weight_vertex(/;"	f
+weight_G	self_consistent.f90	/^COMPLEX*16 FUNCTION weight_G(/;"	f
+weight_G0	self_consistent.f90	/^Complex*16 FUNCTION weight_G0(/;"	f
+weight_Gam	self_consistent.f90	/^COMPLEX*16 FUNCTION weight_Gam(/;"	f
+weight_Gam0	self_consistent.f90	/^COMPLEX*16 FUNCTION weight_Gam0(/;"	f
+weight_W	self_consistent.f90	/^COMPLEX*16 FUNCTION weight_W(/;"	f
+weight_W0	self_consistent.f90	/^Complex*16 FUNCTION weight_W0(/;"	f
+weight_line	monte_carlo_old.f90	/^DOUBLE PRECISION FUNCTION weight_line(/;"	f
+weight_ratio	monte_carlo_old.f90	/^SUBROUTINE weight_ratio(/;"	s
+weight_vertex	monte_carlo_old.f90	/^DOUBLE PRECISION FUNCTION weight_vertex(/;"	f
 write_GWGamma	read_write_data.f90	/^SUBROUTINE write_GWGamma$/;"	s
 write_monte_carlo_conf	read_write_data.f90	/^SUBROUTINE write_monte_carlo_conf$/;"	s
 write_monte_carlo_data	read_write_data.f90	/^SUBROUTINE write_monte_carlo_data$/;"	s
