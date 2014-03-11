@@ -243,7 +243,7 @@ Complex*16 FUNCTION weight_G0(typ, t)
   tau = (t+0.5d0)*Beta/MxT
   if(tau>=0) then
     weight_G0 = cdexp(muc*tau)/(1.d0, 1.d0) 
-  else if(tau>=-MxT) then
+  else
     weight_G0 = -cdexp(muc*(tau+Beta))/(1.d0, 1.d0) 
   endif
   return
@@ -360,7 +360,11 @@ COMPLEX*16 FUNCTION weight_G(typ1, t1)
   implicit none
   integer, intent(in)  :: t1, typ1
 
-  weight_G = G(typ1, t1)
+  if(t1>=0) then
+    weight_G = G(typ1, t1)
+  else
+    weight_G = -G(typ1, t1+MxT)
+  endif
 END FUNCTION weight_G
 
 !!--------- extract weight for W ---------
@@ -368,27 +372,12 @@ COMPLEX*16 FUNCTION weight_W(typ1, dx1, dy1, t1)
   implicit none
   integer, intent(in)  :: dx1, dy1, t1, typ1
 
-  weight_W = W(typ1, dx1, dy1, t1)
+  if(t1>=0) then
+    weight_W = W(typ1, dx1, dy1, t1)
+  else
+    weight_W = W(typ1, dx1, dy1, t1+MxT)
+  endif
 
-  !dx = dx1;      dy = dy1
-  !if(dx>=0 .and. dx<Lx .and. dy>=0 .and. dy<Ly) then
-    !if(dx>dLx)     dx = Lx-dx
-    !if(dy>dLy)     dy = Ly-dy
-
-    !if(abs(omega1)<=MxOmegaW1) then
-      !WWR = WR(typ1, dx, dy, abs(omega1))
-    !else if(abs(omega1)>MxOmegaW1) then
-      !WWR = WRTailC(typ1, dx, dy)
-      !do ib = 1, nbasis
-        !WWR = WWR +WRTailP(typ1,dx,dy,ib)*weight_basis(WCoefP(ib,:),abs(omega1))
-      !enddo
-      !!write(*, *) WWR
-    !endif
-  !else
-    !write(*, *) dx, dy, "dx, dy bigger than system size!"
-    !stop
-  !endif
-  !weight_W = WWR
 END FUNCTION weight_W
 
 !!--------- extract weight for Gamma ---------
@@ -398,101 +387,15 @@ COMPLEX*16 FUNCTION weight_Gam(typ1, dx1, dy1, t1, t2)
   double precision :: GaR
   integer :: ib, jb, dx, dy
   
-  weight_Gam = Gam(typ1, dx1, dy1, t1, t2)
-
-  
-  !dx = dx1;      dy = dy1
-  !if(dx>=0 .and. dx<Lx .and. dy>=0 .and. dy<Ly) then
-    !if(dx>dLx)     dx = Lx-dx
-    !if(dy>dLy)     dy = Ly-dy
-
-    !if(abs(omega1)<=MxOmegaGamG1 .and. abs(omega2)<=MxOmegaGamG1) then
-      !GaR = GamR(typ1, dx, dy, omega1, omega2)
-
-    !else if(omega1>MxOmegaGamG1 .and. abs(omega2)<=MxOmegaGamG1) then
-      !GaR = GamRTailC(typ1, dx, dy)
-      !do ib = 1, nbasis
-        !GaR = GaR + GamRTailPM(typ1, dx, dy, ib, omega2)*weight_basis(&
-          !& GamGCoefP(ib,:), omega1)
-      !enddo
-    !else if(omega1<-MxOmegaGamG1 .and. abs(omega2)<=MxOmegaGamG1) then
-      !GaR = GamRTailC(typ1, dx, dy)
-      !do ib = 1, nbasis
-        !GaR = GaR + GamRTailNM(typ1, dx, dy, ib, omega2)*weight_basis(&
-          !& GamGCoefN(ib,:), omega1)
-      !enddo
-    !else if(omega2>MxOmegaGamG1 .and. abs(omega1)<=MxOmegaGamG1) then
-      !GaR = GamRTailC(typ1, dx, dy)
-      !do ib = 1, nbasis
-        !GaR = GaR + GamRTailMP(typ1, dx, dy, omega1, ib)*weight_basis(&
-          !& GamGCoefP(ib,:), omega2)
-      !enddo
-    !else if(omega2<-MxOmegaGamG1 .and. abs(omega1)<=MxOmegaGamG1) then
-      !GaR = GamRTailC(typ1, dx, dy)
-      !do ib = 1, nbasis
-        !GaR = GaR + GamRTailMN(typ1, dx, dy, omega1, ib)*weight_basis(&
-          !& GamGCoefN(ib,:), omega2)
-      !enddo
-
-    !else if(omega1>MxOmegaGamG1 .and. omega2>MxOmegaGamG1) then
-      !if(omega1==omega2) then
-        !GaR = GamRTailC(typ1, dx, dy)
-        !do ib = 1, nbasis
-          !GaR = GaR + GamRTailDiagP(typ1, dx, dy, ib)*weight_basis(&
-            !& GamGCoefP(ib,:), omega1)
-        !enddo
-      !else if(omega1<omega2) then
-        !GaR = GamRTailC(typ1, dx, dy)
-        !do ib = 1, nbasisGamma
-          !GaR = GaR + GamRTailPPL(typ1, dx, dy, ib)*weight_basis_Gamma(&
-            !& GamCoefPPL(ib,:), omega1, omega2)
-        !enddo
-      !else if(omega1>omega2) then
-        !GaR = GamRTailC(typ1, dx, dy)
-        !do ib = 1, nbasisGamma
-          !GaR = GaR + GamRTailPPR(typ1, dx, dy, ib)*weight_basis_Gamma(&
-            !& GamCoefPPR(ib,:), omega1, omega2)
-        !enddo
-      !endif
-
-    !else if(omega1<-MxOmegaGamG1 .and. omega2>MxOmegaGamG1) then
-      !GaR = GamRTailC(typ1, dx, dy)
-      !do ib = 1, nbasisGamma
-        !GaR = GaR + GamRTailNP(typ1, dx, dy, ib)*weight_basis_Gamma(&
-          !& GamCoefNP(ib,:), omega1, omega2)
-      !enddo
-    !else if(omega1>MxOmegaGamG1 .and. omega2<-MxOmegaGamG1) then
-      !GaR = GamRTailC(typ1, dx, dy)
-      !do ib = 1, nbasisGamma
-        !GaR = GaR + GamRTailPN(typ1, dx, dy, ib)*weight_basis_Gamma(&
-          !& GamCoefPN(ib,:), omega1, omega2)
-      !enddo
-    !else if(omega1<-MxOmegaGamG1 .and. omega2<-MxOmegaGamG1) then
-      !if(omega1==omega2) then
-        !GaR = GamRTailC(typ1, dx, dy)
-        !do ib = 1, nbasis
-          !GaR = GaR + GamRTailDiagN(typ1, dx, dy, ib)*weight_basis(&
-            !& GamGCoefN(ib,:), omega1)
-        !enddo
-      !else if(omega1<omega2) then
-        !GaR = GamRTailC(typ1, dx, dy)
-        !do ib = 1, nbasisGamma
-          !GaR = GaR + GamRTailNNL(typ1, dx, dy, ib)*weight_basis_Gamma(&
-            !& GamCoefNNL(ib,:), omega1, omega2)
-        !enddo
-      !else if(omega1>omega2) then
-        !GaR = GamRTailC(typ1, dx, dy)
-        !do ib = 1, nbasisGamma
-          !GaR = GaR + GamRTailNNR(typ1, dx, dy, ib)*weight_basis_Gamma(&
-            !& GamCoefNNR(ib,:), omega1, omega2)
-        !enddo
-      !endif
-    !endif
-  !else
-    !write(*, *) dx, dy, "dx, dy bigger than system size!"
-    !stop
-  !endif
-  !weight_Gamma = GaR
+  if(t1>=0 .and. t2>=0) then
+    weight_Gam = Gam(typ1, dx1, dy1, t1, t2)
+  else if(t1<0 .and. t2>=0) then
+    weight_Gam = -Gam(typ1, dx1, dy1, t1+MxT, t2)
+  else if(t1>=0 .and. t2<0) then
+    weight_Gam = -Gam(typ1, dx1, dy1, t1, t2+MxT)
+  else
+    weight_Gam = -Gam(typ1, dx1, dy1, t1+MxT, t2+MxT)
+  endif
 END FUNCTION weight_Gam
 
 !!====================================================================
@@ -515,123 +418,6 @@ END FUNCTION weight_Gam
     !do dx = 0, dLx
       !do dy = 0, dLy
 
-        !do omega1 = -MxOmegaDiag, MxOmegaDiag
-          !do omega2 = -MxOmegaDiag, MxOmegaDiag
-            !tempGamMC(omega1,omega2) = 0.d0
-            !do iorder = 1, MCOrder
-              !gam1 = SUM(GamMC(iorder, :,(ityp+1)/2, dx, dy, omega1,omega2))/ime
-              !gam2 = SUM(GamSqMC(iorder, :,(ityp+1)/2, dx, dy, omega1, omega2))/ime
-              !if(abs(gam1)>1.d-30) then
-                !perr = sqrt(gam2-gam1**2.d0)/(sqrt(ime-1)*abs(gam1))
-                !if(perr<=MxError) then
-                  !tempGamMC(omega1, omega2) = tempGamMC(omega1, omega2) + gam1*norm
-                !endif
-              !endif
-            !enddo
-          !enddo
-        !enddo
-
-        !do omega1 = -MxOmegaGamG2, -MxOmegaGamG1-1
-          !do omega2 = -MxOmegaGamG2, -MxOmegaGamG1-1
-            !if(omega1==omega2) then
-              !do ib = 1, nbasis
-                !GamRTailDiagN(ityp,dx,dy,ib) = GamRTailDiagN(ityp,dx,dy,ib) &
-                  !& + weight_basis(GamGCoefN(ib, :), omega1)* &
-                  !& tempGamMC(omega1,omega2)
-              !enddo
-            !else if(omega1<omega2) then
-              !do ib = 1, nbasisGamma
-                !GamRTailNNL(ityp,dx,dy,ib) = GamRTailNNL(ityp,dx,dy,ib) &
-                  !& + weight_basis_Gamma(GamCoefNNL(ib, :), omega1, omega2)* &
-                  !& ReweightBasis(omega1, omega2) *tempGamMC(omega1,omega2)
-              !enddo
-            !else if(omega1>omega2) then
-              !do ib = 1, nbasisGamma
-                !GamRTailNNR(ityp,dx,dy,ib) = GamRTailNNR(ityp,dx,dy,ib) &
-                  !& + weight_basis_Gamma(GamCoefNNR(ib, :), omega1, omega2)* &
-                  !& ReweightBasis(omega1, omega2) *tempGamMC(omega1,omega2)
-              !enddo
-            !endif
-          !enddo
-
-          !do omega2 = -MxOmegaGamG1, MxOmegaGamG1
-            !do ib = 1, nbasis
-              !GamRTailNM(ityp,dx,dy,ib,omega2) = GamRTailNM(ityp,dx,dy,ib,omega2) &
-                !& + weight_basis(GamGCoefN(ib, :), omega1)* &
-                !& tempGamMC(omega1,omega2)
-            !enddo
-          !enddo
-
-          !do omega2 = MxOmegaGamG1+1, MxOmegaGamG2
-            !do ib = 1, nbasisGamma
-              !GamRTailNP(ityp,dx,dy,ib) = GamRTailNP(ityp,dx,dy,ib) &
-                !& + weight_basis_Gamma(GamCoefNP(ib, :), omega1, omega2)* &
-                !& ReweightBasis(omega1, omega2) *tempGamMC(omega1,omega2)
-            !enddo
-          !enddo
-        !enddo
-
-        !do omega1 = -MxOmegaGamG1, MxOmegaGamG1
-          !do omega2 = -MxOmegaGamG2, -MxOmegaGamG1-1
-            !do ib = 1, nbasis
-              !GamRTailMN(ityp,dx,dy,omega1,ib) = GamRTailMN(ityp,dx,dy,omega1,ib) &
-                !& + weight_basis(GamGCoefN(ib,:), omega2)* &
-                !& tempGamMC(omega1,omega2)
-            !enddo
-          !enddo
-
-          !do omega2 = -MxOmegaGamG1, MxOmegaGamG1
-            !GamR(ityp,dx, dy, omega1, omega2) = GamR(ityp,dx,dy,omega1,omega2)+tempGamMC(omega1, omega2)
-          !enddo
-
-          !do omega2 = MxOmegaGamG1+1, MxOmegaGamG2
-            !do ib = 1, nbasis
-              !GamRTailMP(ityp,dx,dy,omega1,ib) = GamRTailMP(ityp,dx,dy,omega1,ib) &
-                !& + weight_basis(GamGCoefP(ib,:), omega2)* &
-                !& tempGamMC(omega1,omega2)
-            !enddo
-          !enddo
-        !enddo
-
-        !do omega1 = MxOmegaGamG1+1, MxOmegaGamG2
-          !do omega2 = -MxOmegaGamG2, -MxOmegaGamG1-1
-            !do ib = 1, nbasisGamma
-              !GamRTailPN(ityp,dx,dy,ib) = GamRTailPN(ityp,dx,dy,ib) &
-                !& + weight_basis_Gamma(GamCoefPN(ib, :), omega1, omega2)* &
-                !& ReweightBasis(omega1, omega2)* tempGamMC(omega1,omega2)
-            !enddo
-          !enddo
-
-          !do omega2 = -MxOmegaGamG1, MxOmegaGamG1
-            !do ib = 1, nbasis
-              !GamRTailPM(ityp,dx,dy,ib,omega2) = GamRTailPM(ityp,dx,dy,ib,omega2) &
-                !& + weight_basis(GamGCoefP(ib,:), omega1)* &
-                !& tempGamMC(omega1,omega2)
-            !enddo
-          !enddo
-
-          !do omega2 = MxOmegaGamG1+1, MxOmegaGamG2
-            !if(omega1==omega2) then
-              !do ib = 1, nbasis
-                !GamRTailDiagP(ityp,dx,dy,ib) = GamRTailDiagP(ityp,dx,dy,ib) &
-                  !& + weight_basis(GamGCoefP(ib, :), omega1)* &
-                  !& tempGamMC(omega1,omega2)
-              !enddo
-            !else if(omega1<omega2) then
-              !do ib = 1, nbasisGamma
-                !GamRTailPPL(ityp,dx,dy,ib) = GamRTailPPL(ityp,dx,dy,ib) &
-                  !& + weight_basis_Gamma(GamCoefPPL(ib, :), omega1, omega2)* &
-                  !& ReweightBasis(omega1, omega2) *tempGamMC(omega1,omega2)
-              !enddo
-            !else if(omega1>omega2) then
-              !do ib = 1, nbasisGamma
-                !GamRTailPPR(ityp,dx,dy,ib) = GamRTailPPR(ityp,dx,dy,ib) &
-                  !& + weight_basis_Gamma(GamCoefPPR(ib, :), omega1, omega2)* &
-                  !& ReweightBasis(omega1, omega2) *tempGamMC(omega1,omega2)
-              !enddo
-            !endif
-          !enddo
-        !enddo
       !enddo
     !enddo
   !enddo
@@ -651,21 +437,6 @@ END FUNCTION weight_Gam
 
   !tempGamMC(:, :) = 0.d0
 
-  !GamR(:,:,:,:,:) = 0.d0
-  !GamRTailC(:,:,:) = 0.d0
-  !GamRTailNP(:,:,:,:) = 0.d0
-  !GamRTailPN(:,:,:,:) = 0.d0
-  !GamRTailPPR(:,:,:,:) = 0.d0
-  !GamRTailNNR(:,:,:,:) = 0.d0
-  !GamRTailPPL(:,:,:,:) = 0.d0
-  !GamRTailNNL(:,:,:,:) = 0.d0
-
-  !GamRTailPM(:,:,:,:,:) = 0.d0
-  !GamRTailNM(:,:,:,:,:) = 0.d0
-  !GamRTailMP(:,:,:,:,:) = 0.d0
-  !GamRTailMN(:,:,:,:,:) = 0.d0
-  !GamRTailDiagP(:,:,:,:) = 0.d0
-  !GamRTailDiagN(:,:,:,:) = 0.d0
 
   !if(norder==0) then
     !call initialize_Gamma
@@ -678,121 +449,6 @@ END FUNCTION weight_Gam
     !do dx = 0, dLx
       !do dy = 0, dLy
 
-        !do omega1 = -MxOmegaDiag, MxOmegaDiag
-          !do omega2 = -MxOmegaDiag, MxOmegaDiag
-            !tempGamMC(omega1,omega2) = 0.d0
-            !gam1 = SUM(GamMC(norder, :,(ityp+1)/2, dx, dy, omega1,omega2))/ime
-            !gam2 = SUM(GamSqMC(norder, :,(ityp+1)/2, dx, dy, omega1, omega2))/ime
-            !if(abs(gam1)>1.d-30) then
-              !perr = sqrt(gam2-gam1**2.d0)/(sqrt(ime-1)*abs(gam1))
-              !if(perr<=MxError) then
-                !tempGamMC(omega1, omega2) = tempGamMC(omega1, omega2) + gam1*norm
-              !endif
-            !endif
-          !enddo
-        !enddo
-
-        !do omega1 = -MxOmegaGamG2, -MxOmegaGamG1-1
-          !do omega2 = -MxOmegaGamG2, -MxOmegaGamG1-1
-            !if(omega1==omega2) then
-              !do ib = 1, nbasis
-                !GamRTailDiagN(ityp,dx,dy,ib) = GamRTailDiagN(ityp,dx,dy,ib) &
-                  !& + weight_basis(GamGCoefN(ib, :), omega1)* &
-                  !& tempGamMC(omega1,omega2)
-              !enddo
-            !else if(omega1<omega2) then
-              !do ib = 1, nbasisGamma
-                !GamRTailNNL(ityp,dx,dy,ib) = GamRTailNNL(ityp,dx,dy,ib) &
-                  !& + weight_basis_Gamma(GamCoefNNL(ib, :), omega1, omega2)* &
-                  !& ReweightBasis(omega1, omega2) *tempGamMC(omega1,omega2)
-              !enddo
-            !else if(omega1>omega2) then
-              !do ib = 1, nbasisGamma
-                !GamRTailNNR(ityp,dx,dy,ib) = GamRTailNNR(ityp,dx,dy,ib) &
-                  !& + weight_basis_Gamma(GamCoefNNR(ib, :), omega1, omega2)* &
-                  !& ReweightBasis(omega1, omega2) *tempGamMC(omega1,omega2)
-              !enddo
-            !endif
-          !enddo
-
-          !do omega2 = -MxOmegaGamG1, MxOmegaGamG1
-            !do ib = 1, nbasis
-              !GamRTailNM(ityp,dx,dy,ib,omega2) = GamRTailNM(ityp,dx,dy,ib,omega2) &
-                !& + weight_basis(GamGCoefN(ib, :), omega1)* &
-                !& tempGamMC(omega1,omega2)
-            !enddo
-          !enddo
-
-          !do omega2 = MxOmegaGamG1+1, MxOmegaGamG2
-            !do ib = 1, nbasisGamma
-              !GamRTailNP(ityp,dx,dy,ib) = GamRTailNP(ityp,dx,dy,ib) &
-                !& + weight_basis_Gamma(GamCoefNP(ib, :), omega1, omega2)* &
-                !& ReweightBasis(omega1, omega2) *tempGamMC(omega1,omega2)
-            !enddo
-          !enddo
-        !enddo
-
-        !do omega1 = -MxOmegaGamG1, MxOmegaGamG1
-          !do omega2 = -MxOmegaGamG2, -MxOmegaGamG1-1
-            !do ib = 1, nbasis
-              !GamRTailMN(ityp,dx,dy,omega1,ib) = GamRTailMN(ityp,dx,dy,omega1,ib) &
-                !& + weight_basis(GamGCoefN(ib,:), omega2)* &
-                !& tempGamMC(omega1,omega2)
-            !enddo
-          !enddo
-
-          !do omega2 = -MxOmegaGamG1, MxOmegaGamG1
-            !GamR(ityp,dx, dy, omega1, omega2) = GamR(ityp,dx,dy,omega1,omega2)+tempGamMC(omega1, omega2)
-          !enddo
-
-          !do omega2 = MxOmegaGamG1+1, MxOmegaGamG2
-            !do ib = 1, nbasis
-              !GamRTailMP(ityp,dx,dy,omega1,ib) = GamRTailMP(ityp,dx,dy,omega1,ib) &
-                !& + weight_basis(GamGCoefP(ib,:), omega2)* &
-                !& tempGamMC(omega1,omega2)
-            !enddo
-          !enddo
-        !enddo
-
-        !do omega1 = MxOmegaGamG1+1, MxOmegaGamG2
-          !do omega2 = -MxOmegaGamG2, -MxOmegaGamG1-1
-            !do ib = 1, nbasisGamma
-              !GamRTailPN(ityp,dx,dy,ib) = GamRTailPN(ityp,dx,dy,ib) &
-                !& + weight_basis_Gamma(GamCoefPN(ib, :), omega1, omega2)* &
-                !& ReweightBasis(omega1, omega2)* tempGamMC(omega1,omega2)
-            !enddo
-          !enddo
-
-          !do omega2 = -MxOmegaGamG1, MxOmegaGamG1
-            !do ib = 1, nbasis
-              !GamRTailPM(ityp,dx,dy,ib,omega2) = GamRTailPM(ityp,dx,dy,ib,omega2) &
-                !& + weight_basis(GamGCoefP(ib,:), omega1)* &
-                !& tempGamMC(omega1,omega2)
-            !enddo
-          !enddo
-
-          !do omega2 = MxOmegaGamG1+1, MxOmegaGamG2
-            !if(omega1==omega2) then
-              !do ib = 1, nbasis
-                !GamRTailDiagP(ityp,dx,dy,ib) = GamRTailDiagP(ityp,dx,dy,ib) &
-                  !& + weight_basis(GamGCoefP(ib, :), omega1)* &
-                  !& tempGamMC(omega1,omega2)
-              !enddo
-            !else if(omega1<omega2) then
-              !do ib = 1, nbasisGamma
-                !GamRTailPPL(ityp,dx,dy,ib) = GamRTailPPL(ityp,dx,dy,ib) &
-                  !& + weight_basis_Gamma(GamCoefPPL(ib, :), omega1, omega2)* &
-                  !& ReweightBasis(omega1, omega2) *tempGamMC(omega1,omega2)
-              !enddo
-            !else if(omega1>omega2) then
-              !do ib = 1, nbasisGamma
-                !GamRTailPPR(ityp,dx,dy,ib) = GamRTailPPR(ityp,dx,dy,ib) &
-                  !& + weight_basis_Gamma(GamCoefPPR(ib, :), omega1, omega2)* &
-                  !& ReweightBasis(omega1, omega2) *tempGamMC(omega1,omega2)
-              !enddo
-            !endif
-          !enddo
-        !enddo
 
       !enddo
     !enddo

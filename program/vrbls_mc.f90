@@ -152,6 +152,7 @@ MODULE vrbls_mc
   integer, dimension(MxNLn) :: TypeLn               ! type of a line: 1-2 Glines; 1-6 Wlines
   integer, dimension(2,MxNLn) :: NeighLn            ! 1: begin gamma; 2: end gamma 
   integer, dimension(MxNLn) :: StatusLn             ! 2:I&M; 0:normal; 1: measure; -1: empty
+  integer, dimension(MxNLn) :: IsDeltaLn            ! 0: W, not delta; 1: W, delta; -1: G
   double precision, dimension(MxNLn) :: WeightLn    ! weight of glines and wlines
   integer, dimension(MxNLn)  :: NextLn, TailLn      ! for add or delete use
 
@@ -169,6 +170,7 @@ MODULE vrbls_mc
   integer, dimension(MxNVertex) :: TypeVertexIn, TypeVertexOut ! type of Gamma inside spin: 1-2
   integer, dimension(3,MxNVertex) :: NeighVertex            ! 1: in gline; 2: out gline; 3: wline
   double precision, dimension(MxNVertex) :: WeightVertex    ! weight of  gamma
+  integer, dimension(MxNLn) :: IsDeltaVertex            ! 0: not delta; 1: delta
   integer, dimension(MxNVertex):: StatusVertex              ! 2:I&M; 0:normal; 1: measure; -1: empty
   integer, dimension(MxNVertex):: NextVertex, TailVertex    ! for add or delete use
 
