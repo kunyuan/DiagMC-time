@@ -130,6 +130,7 @@ MODULE vrbls_mc
   integer          :: NSamp             ! # total MC steps
   integer          :: NBlck             ! # total blocks
   integer          :: NToss             ! # MC steps for toss
+  integer          :: NStep             ! # MC steps for one measurement
 
   !------------ basic variables for a diagram --------------------------
   integer          :: Order             ! order of the simulating diagram 
@@ -151,13 +152,13 @@ MODULE vrbls_mc
   integer, dimension(MxNLn) :: TypeLn               ! type of a line: 1-2 Glines; 1-6 Wlines
   integer, dimension(2,MxNLn) :: NeighLn            ! 1: begin gamma; 2: end gamma 
   integer, dimension(MxNLn) :: StatusLn             ! 2:I&M; 0:normal; 1: measure; -1: empty
-  integer, dimension(MxNLn) :: NextLn, List4Ln      ! the next empty block;  the
-                                                    ! location in OccuGLn and OccuWLn
   double precision, dimension(MxNLn) :: WeightLn    ! weight of glines and wlines
+  integer, dimension(MxNLn)  :: NextLn, TailLn      ! for add or delete use
 
-  integer                   :: TailLn               ! the tail of the link
-  integer, dimension(MxNGLn) :: Ln4GList             ! the occupied lines
-  integer, dimension(MxNWLn) :: Ln4WList             ! the occupied lines
+  integer, dimension(MxNGLn) :: GLnKey2Value        
+  integer, dimension(MxNWLn) :: WLnKey2Value       
+  integer, dimension(MxNLn) ::  LnValue2Key       
+                                                   
 
   !----------- data structure for vertexes -------------------------------------
   integer, dimension(MxNVertex) :: GXVertex, GYVertex       ! gline sites for Gamma
@@ -169,10 +170,10 @@ MODULE vrbls_mc
   integer, dimension(3,MxNVertex) :: NeighVertex            ! 1: in gline; 2: out gline; 3: wline
   double precision, dimension(MxNVertex) :: WeightVertex    ! weight of  gamma
   integer, dimension(MxNVertex):: StatusVertex              ! 2:I&M; 0:normal; 1: measure; -1: empty
-  integer, dimension(MxNVertex) :: NextVertex, List4Vertex  ! NextVertex:  the next empty block
-                                                    ! List4Vertex: the location of gammas in List 
-  integer                   :: TailGam                ! the tail of the link
-  integer, dimension(MxNVertex):: Vertex4GamList         ! the occupied gammas
+  integer, dimension(MxNVertex):: NextVertex, TailVertex    ! for add or delete use
+
+  integer, dimension(MxNVertex):: VertexKey2Value        
+  integer, dimension(MxNVertex):: VertexValue2Key      
 
   !----------- spin for W and Gamma---------------------------------------------
   integer, dimension(6,6)   :: TypeGam2W

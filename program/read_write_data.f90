@@ -113,16 +113,16 @@ SUBROUTINE write_monte_carlo_conf
 
   write(103, *)  Order, NGLn, NWLn, NVertex, MeasureGam, SignFermiLoop, IsWormPresent 
   write(103, *)  Ira, Masha, SpinMasha, kMasha
-  write(103, *)  TailLn, TailGam
+  write(103, *)  TailLn, TailVertex
   write(103, *)  NextLn(:)
   write(103, *)  NextVertex(:)
   write(103, *)  WeightCurrent, Phase
   write(103, *)  StatusLn(:)
-  write(103, *)  Ln4GList(1:NGLn), Ln4WList(1:NWLn)
-  write(103, *)  List4Ln(:)
+  write(103, *)  GLnKey2Value(1:NGLn), WLnKey2Value(1:NWLn)
+  write(103, *)  LnValue2Key(:)
   write(103, *)  StatusVertex(:)
-  write(103, *)  Vertex4GamList(:)
-  write(103, *)  List4Vertex(:)
+  write(103, *)  VertexKey2Value(:)
+  write(103, *)  VertexValue2Key(:)
   write(103, *)  KindLn(:)
   write(103, *)  TypeLn(:)
   write(103, *)  TypeVertexIn(:)
@@ -187,16 +187,16 @@ SUBROUTINE read_monte_carlo_conf
 
   read(106, *)  Order, NGLn, NWLn, NVertex, MeasureGam, SignFermiLoop, IsWormPresent 
   read(106, *)  Ira, Masha, SpinMasha, kMasha
-  read(106, *)  TailLn, TailGam
+  read(106, *)  TailLn, TailVertex
   read(106, *)  NextLn(:)
   read(106, *)  NextVertex(:)
   read(106, *)  WeightCurrent, Phase
   read(106, *)  StatusLn(:)
-  read(106, *)  Ln4GList(1:NGLn), Ln4WList(1:NWLn)
-  read(106, *)  List4Ln(:)
+  read(106, *)  GLnKey2Value(1:NGLn), WLnKey2Value(1:NWLn)
+  read(106, *)  LnValue2Key(:)
   read(106, *)  StatusVertex(:)
-  read(106, *)  Vertex4GamList(:)
-  read(106, *)  List4Vertex(:)
+  read(106, *)  VertexKey2Value(:)
+  read(106, *)  VertexValue2Key(:)
   read(106, *)  KindLn(:)
   read(106, *)  TypeLn(:)
   read(106, *)  TypeVertexIn(:)
