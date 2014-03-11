@@ -62,13 +62,14 @@ PROGRAM MAIN
   call initialize_self_consistent
 
   call self_consistent
+  call monte_carlo
 
-  open(15, file="W_t.dat")
+  !open(15, file="W_t.dat")
   
-  do it = 0, MxT-1
-    write(15, *) (real(it)+0.5d0)*Beta/real(MxT), real(W(1,1,0,it)), dimag(W(1,1,0,it))
-  enddo
-  close(15)
+  !do it = 0, MxT-1
+    !write(15, *) (real(it)+0.5d0)*Beta/real(MxT), real(W(1,1,0,it)), dimag(W(1,1,0,it))
+  !enddo
+  !close(15)
 
 
   !call def_symmetry
@@ -257,9 +258,10 @@ SUBROUTINE monte_carlo
   !integer :: istep, iblck, mc_version
   !double precision :: WR, GamR
 
+  call initialize_markov
+
   !call read_GWGamma
   !call calculate_GamNormWeight
-  call initialize_markov
 
   !if(InpMC==0) then
 
