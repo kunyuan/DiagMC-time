@@ -407,13 +407,13 @@
 !END FUNCTION generate_wline
 
 !!----------- randomly pick a gamma -------------
-!INTEGER FUNCTION generate_gamma()
-  !implicit none
-  !integer :: rand
-  !rand = Floor(rn()*NGam)+1
-  !generate_gamma = VertexKey2Value(rand)
-  !return
-!END FUNCTION generate_gamma
+INTEGER FUNCTION generate_gamma()
+  implicit none
+  integer :: rand
+  rand = Floor(rn()*NGam)+1
+  generate_gamma = VertexKey2Value(rand)
+  return
+END FUNCTION generate_gamma
 !!!=======================================================================
 !!!=======================================================================
 !!!=======================================================================
