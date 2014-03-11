@@ -278,7 +278,7 @@ SUBROUTINE change_wline_time
 
     !------- step2 : propose a new config -----------------
     iGam = generate_gamma()
-    if
+    if(IsDeltaVertex(iGam)==1) return
     dir  = DirecVertex(iGam)
     iWLn = NeighVertex(3, iGam)
     jGam = NeighLn(3-dir, iWLn)
@@ -287,7 +287,7 @@ SUBROUTINE change_wline_time
     xw = find_neigh_x(WXVertex(iGam), dxw)
     yw = find_neigh_y(WYVertex(iGam), dyw)
 
-    xwj = WXVertex(jGam);          ywj = WYVertex(jGam)
+    xwj = WXVertex(jGam);       ywj = WYVertex(jGam)
     
     !------- step3 : configuration check ------------------
 
