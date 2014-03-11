@@ -293,18 +293,18 @@ SUBROUTINE markov
         !call remove_interaction_cross                  
       !case(11) 
         !call reconnect                      
-      !case(12) 
-        !call shift_gline_in_space          
-      !case(13)  
-        !call shift_wline_in_space         
+      case(12) 
+        call change_gline_space          
+      case(13)  
+        call change_wline_space         
       !case(14) 
         !call change_Gamma_type     
       !case(15) 
         !call move_measuring_index       
       case(16)  
         call change_gline_time        
-      !case(17)  
-        !call shift_wline_in_space         
+      case(17)  
+        call change_wline_time        
     end select
 
     imc = imc + 1
@@ -328,6 +328,89 @@ END SUBROUTINE markov
 SUBROUTINE change_gline_time
     implicit none
     
+end SUBROUTINE
+
+SUBROUTINE change_gline_space
+    implicit none
+    
+end SUBROUTINE
+
+SUBROUTINE change_wline_time
+    implicit none
+    
+end SUBROUTINE
+
+SUBROUTINE change_wline_space
+    implicit none
+    integer :: iGam, iWLn, jGam, dxw, dyw, xwi, ywi, xwj, ywj, dir
+    double precision :: Pacc,T1,T2,T3,T4,T5,T6
+    complex*16  ::  WiGam,WjGam, WW, Anew, Aold, sgn
+    !------- step1 : check if worm is present -------------
+    if(IsWormPresent .eqv. .true.)    return
+    !ProbProp(iupdate) = ProbProp(iupdate) + 1
+
+    !------- step2 : propose a new config -----------------
+    iWLn=generate_wline()
+    iGam = NeighLn(1, iWLn)
+    jGam = NeighLn(2, iWLn)
+
+    dxw = generate_x();         dyw = generate_y()
+    xwi = find_neigh_x(WXVertex(iGam), dxw)
+    ywi = find_neigh_y(WYVertex(iGam), dyw)
+
+    if(IsDeltaLn(iWLn)==0) then
+      dxw = generate_x();         dyw = generate_y()
+      xwj = find_neigh_x(WXVertex(jGam), dxw)
+      ywj = find_neigh_y(WYVertex(jGam), dyw)
+    else
+      xwj=xwi
+      ywj=ywi
+    endif
+
+    !------- step3 : configuration check ------------------
+
+    !------- step4 : weight calculation -------------------
+    T1=T1Vertex(iGam);
+    T2=T2Vertex(iGam);
+    T3=T3Vertex(iGam);
+    WiGam = weight_vertex(StatusVertex(iGam),IsDeltaVertex(iGam),GXVertex(iGam)-xwi,GYVertex(iGam)-ywi, &
+      & T3-T2, T1-T3, TypeVertex(iGam))
+    T4=T1Vertex(jGam);
+    T5=T2Vertex(jGam);
+    T6=T3Vertex(jGam);
+    WjGam = weight_vertex(StatusVertex(jGam),IsDeltaVertex(jGam),GXVertex(jGam)-xwj,GYVertex(jGam)-ywj, &
+      & T6-T5, T4-T6, TypeVertex(jGam))
+    WW = weight_line(StatusLn(iWLn),IsDeltaLn(iWLn),2, xwi-xwj, ywi-ywj,T3-T6,TypeLn(iWLn))
+
+
+    Anew = WiGam*WjGam*WW
+    Aold = WeightLn(iWLn)*WeightVertex(iGam)*WeightVertex(jGam)
+
+    call weight_ratio(Pacc, sgn, Anew, Aold)
+
+    !------- step5 : accept the update --------------------
+    ProbProp(Order, iupdate) = ProbProp(Order, iupdate) + 1
+    if(rn()<=Pacc) then
+
+      !------ update the diagram info -------------------
+      Phase = Phase *sgn
+
+      !------ update the site of elements --------------
+      WXVertex(iGam) = xwi
+      WYVertex(iGam) = ywi
+
+      WXVertex(jGam) = xwj
+      WYVertex(jGam) = ywj
+      !------ update the weight of elements ------------
+      WeightLn(iWLn) = WW
+      WeightVertex(iGam) = WiGam
+      WeightVertex(iGam) = WjGam
+
+      call update_weight(Anew, Aold)
+
+      ProbAcc(Order, 13) = ProbAcc(Order, 13) + 1
+    endif
+    return
 end SUBROUTINE
 
 !--------- exchange the location of Ira and Masha  -----
