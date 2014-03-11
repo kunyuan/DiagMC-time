@@ -297,43 +297,63 @@ SUBROUTINE change_gline_time
     
 end SUBROUTINE
 
+SUBROUTINE change_gline_space
+    implicit none
+    
+end SUBROUTINE
+
 SUBROUTINE change_wline_time
     implicit none
-    integer :: iGam, iWLn, jGam, dxw, dyw, xw, yw, xwj, ywj, dir
-    double precision :: WGam, WW, Anew, Aold, Pacc, sgn
+    
+end SUBROUTINE
+
+SUBROUTINE change_wline_space
+    implicit none
+    integer :: iGam, iWLn, jGam, dxw, dyw, xwi, ywi, xwj, ywj, dir
+    double precision :: WiGam,WjGam, WW, Anew, Aold, Pacc, sgn,T1,T2,T3,T4,T5,T6
 
     !------- step1 : check if worm is present -------------
     if(IsWormPresent .eqv. .true.)    return
     !ProbProp(iupdate) = ProbProp(iupdate) + 1
 
     !------- step2 : propose a new config -----------------
-    iGam = generate_gamma()
-    if(IsDeltaVertex(iGam)==1) return
-    dir  = DirecVertex(iGam)
-    iWLn = NeighVertex(3, iGam)
-    jGam = NeighLn(3-dir, iWLn)
+    iWLn=generate_wline()
+    iGam = NeighLn(1, iWLn)
+    jGam = NeighLn(2, iWLn)
 
     dxw = generate_x();         dyw = generate_y()
-    xw = find_neigh_x(WXVertex(iGam), dxw)
-    yw = find_neigh_y(WYVertex(iGam), dyw)
+    xwi = find_neigh_x(WXVertex(iGam), dxw)
+    ywi = find_neigh_y(WYVertex(iGam), dyw)
 
-    xwj = WXVertex(jGam);       ywj = WYVertex(jGam)
-    
+    if(IsDeltaLn(iWLn)==0) then
+      dxw = generate_x();         dyw = generate_y()
+      xwj = find_neigh_x(WXVertex(jGam), dxw)
+      ywj = find_neigh_y(WYVertex(jGam), dyw)
+    else
+      xwj=xwi
+      ywj=ywi
+    endif
+
     !------- step3 : configuration check ------------------
 
     !------- step4 : weight calculation -------------------
-    WGam = weight_vertex(Order, StatusVertex(iGam), diff_x(GXVertex(iGam),xw), diff_y(GYVertex(iGam),yw), &
-      & OmegaLn(NeighVertex(1, iGam)), OmegaLn(NeighVertex(2, iGam)), TypeVertex(iGam))
-    WW = weight_line(StatusLn(iWLn), 2, diff_x(xw,xwj), diff_y(yw,ywj), &
-      & OmegaLn(iWLn), TypeLn(iWLn)) 
+    T1=T1Vertex(iGam);
+    T2=T2Vertex(iGam);
+    T3=T3Vertex(iGam);
+    WiGam = weight_vertex(StatusVertex(iGam),IsDeltaVertex(iGam),GXVertex(iGam)-xwi,GYVertex(iGam)-ywi, &
+      & T3-T2, T1-T3, TypeVertex(iGam))
+    T4=T1Vertex(jGam);
+    T5=T2Vertex(jGam);
+    T6=T3Vertex(jGam);
+    WjGam = weight_vertex(StatusVertex(jGam),IsDeltaVertex(jGam),GXVertex(jGam)-xwj,GYVertex(jGam)-ywj, &
+      & T6-T5, T4-T6, TypeVertex(jGam))
+    WW = weight_line(StatusLn(iWLn),IsDeltaLn(iWLn),2, xwi-xwj, ywi-ywj,T3-T6,TypeLn(iWLn))
 
 
-    Anew = WGam *WW
-    Aold = WeightLn(iWLn)*WeightVertex(iGam)
+    Anew = WiGam*WjGam*WW
+    Aold = WeightLn(iWLn)*WeightVertex(iGam)*WeightVertex(jGam)
 
     call weight_ratio(Pacc, sgn, Anew, Aold)
-
-    !Pacc = Pacc*prob_x(WXVertex(iGam))*prob_y(WYVertex(iGam))/(prob_x(dxw)*prob_y(dyw))
 
     !------- step5 : accept the update --------------------
     ProbProp(Order, iupdate) = ProbProp(Order, iupdate) + 1
@@ -343,12 +363,15 @@ SUBROUTINE change_wline_time
       Phase = Phase *sgn
 
       !------ update the site of elements --------------
-      WXVertex(iGam) = xw
-      WYVertex(iGam) = yw
+      WXVertex(iGam) = xwi
+      WYVertex(iGam) = ywi
 
+      WXVertex(jGam) = xwj
+      WYVertex(jGam) = ywj
       !------ update the weight of elements ------------
       WeightLn(iWLn) = WW
-      WeightVertex(iGam) = WGam
+      WeightVertex(iGam) = WiGam
+      WeightVertex(iGam) = WjGam
 
       call update_weight(Anew, Aold)
 
