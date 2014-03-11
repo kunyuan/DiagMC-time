@@ -390,7 +390,7 @@
   !implicit none
   !integer :: rand
   !rand = Floor(rn()*NGLn)+1
-  !generate_gline = Ln4GList(rand)
+  !generate_gline = GLnKey2Value(rand)
   !return
 !END FUNCTION generate_gline
 
@@ -402,7 +402,7 @@
   !!if(NWLn/=Order+1) then
     !!write(*, *) Order, NWLn
   !!endif
-  !generate_wline = Ln4WList(rand)
+  !generate_wline = WLnKey2Value(rand)
   !return
 !END FUNCTION generate_wline
 
@@ -411,7 +411,7 @@
   !implicit none
   !integer :: rand
   !rand = Floor(rn()*NGam)+1
-  !generate_gamma = Vertex4GamList(rand)
+  !generate_gamma = VertexKey2Value(rand)
   !return
 !END FUNCTION generate_gamma
 !!!=======================================================================
