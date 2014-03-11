@@ -356,64 +356,64 @@
 
 
 !!---------- int k -------------------------
-!INTEGER FUNCTION generate_k()
-  !implicit none
-  !generate_k = Floor(rn()*(2*MxK))-MxK
-  !return
-!END FUNCTION generate_k
+INTEGER FUNCTION generate_k()
+  implicit none
+  generate_k = Floor(rn()*(2*MxK))-MxK
+  return
+END FUNCTION generate_k
 
-!INTEGER FUNCTION add_k(k1, k2)
-  !implicit none
-  !integer :: k1, k2
-  !add_k = k1 + k2
-  !if(add_k>=MxK) then
-    !add_k = add_k -2*MxK
-  !else if(add_k<-MxK) then
-    !add_k = add_k +2*MxK
+INTEGER FUNCTION add_k(k1, k2)
+  implicit none
+  integer :: k1, k2
+  add_k = k1 + k2
+  if(add_k>=MxK) then
+    add_k = add_k -2*MxK
+  else if(add_k<-MxK) then
+    add_k = add_k +2*MxK
+  endif
+  return
+END FUNCTION add_k
+
+LOGICAL FUNCTION Is_k_valid(k)
+  implicit none
+  integer,intent(in) :: k
+  if(k<MxK .and. k>=-MxK)  then
+    Is_k_valid = .true.
+  else
+    Is_k_valid = .false.
+  endif
+END FUNCTION Is_k_valid
+
+
+!----------- randomly pick a gline -------------
+INTEGER FUNCTION generate_gline()
+  implicit none
+  integer :: rand
+  rand = Floor(rn()*NGLn)+1
+  generate_gline = GLnKey2Value(rand)
+  return
+END FUNCTION generate_gline
+
+!----------- randomly pick a wline -------------
+INTEGER FUNCTION generate_wline()
+  implicit none
+  integer :: rand
+  rand = Floor(rn()*NWLn)+1
+  !if(NWLn/=Order+1) then
+    !write(*, *) Order, NWLn
   !endif
-  !return
-!END FUNCTION add_k
+  generate_wline = WLnKey2Value(rand)
+  return
+END FUNCTION generate_wline
 
-!LOGICAL FUNCTION Is_k_valid(k)
-  !implicit none
-  !integer,intent(in) :: k
-  !if(k<MxK .and. k>=-MxK)  then
-    !Is_k_valid = .true.
-  !else
-    !Is_k_valid = .false.
-  !endif
-!END FUNCTION Is_k_valid
-
-
-!!----------- randomly pick a gline -------------
-!INTEGER FUNCTION generate_gline()
-  !implicit none
-  !integer :: rand
-  !rand = Floor(rn()*NGLn)+1
-  !generate_gline = GLnKey2Value(rand)
-  !return
-!END FUNCTION generate_gline
-
-!!----------- randomly pick a wline -------------
-!INTEGER FUNCTION generate_wline()
-  !implicit none
-  !integer :: rand
-  !rand = Floor(rn()*NWLn)+1
-  !!if(NWLn/=Order+1) then
-    !!write(*, *) Order, NWLn
-  !!endif
-  !generate_wline = WLnKey2Value(rand)
-  !return
-!END FUNCTION generate_wline
-
-!!----------- randomly pick a gamma -------------
-!INTEGER FUNCTION generate_gamma()
-  !implicit none
-  !integer :: rand
-  !rand = Floor(rn()*NGam)+1
-  !generate_gamma = VertexKey2Value(rand)
-  !return
-!END FUNCTION generate_gamma
+!----------- randomly pick a gamma -------------
+INTEGER FUNCTION generate_gamma()
+  implicit none
+  integer :: rand
+  rand = Floor(rn()*NVertex)+1
+  generate_gamma = VertexKey2Value(rand)
+  return
+END FUNCTION generate_gamma
 !!!=======================================================================
 !!!=======================================================================
 !!!=======================================================================

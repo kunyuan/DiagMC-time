@@ -48,15 +48,16 @@ END SUBROUTINE def_spin
 
 SUBROUTINE def_diagram
   implicit none
+  integer :: i, deltat
 
   !-------------- 1-order diagram ------------------------
   Order = 1
   ! the index of measuring gamma
-  NGLn = 4;  NWLn = 2;  NGam = 4
+  NGLn = 4;  NWLn = 2;  NVertex = 4
   ! the number of glines, wlines, gamma
   MeasureGam = 1
   ! number of fermi loops
-  NFermiLoop = 0
+  SignFermiLoop = 1.d0
   ! the phase of the diagram
   Phase = 1.d0
   ! if Ira and Masha are present
@@ -100,14 +101,6 @@ SUBROUTINE def_diagram
   TypeLn(3) = TypeGam2W(TypeVertex(1), TypeVertex(2))
   TypeLn(6) = TypeGam2W(TypeVertex(3), TypeVertex(4))
 
-  ! the omega on lines
-  OmegaLn(1) = 0
-  OmegaLn(2) = 0
-  OmegaLn(3) = OmegaLn(2)-OmegaLn(1)
-  OmegaLn(4) = 0
-  OmegaLn(5) = OmegaLn(3)+OmegaLn(4)
-  OmegaLn(6) = OmegaLn(1)-OmegaLn(4)
-
 
   ! the momentum on line 1, 2, and 3
   kLn(1) = 100
@@ -136,21 +129,20 @@ SUBROUTINE def_diagram
   StatusVertex(2) = 0
   StatusVertex(3) = 0
   StatusVertex(4) = 0
+
   do i = 1, 4
     VertexKey2Value(i) = i
     VertexValue2Key(i)  = i
   enddo
   TailVertex = 5
 
-  ! the site variables of Gamma 1 and 2
-  GXVertex(1) = 0;            GYVertex(1) = 0
-  GXVertex(2) = GXVertex(1);     GYVertex(2) = GYVertex(1)
-  GXVertex(3) = GXVertex(1);     GYVertex(3) = GYVertex(1)
-  GXVertex(4) = GXVertex(1);     GYVertex(4) = GYVertex(1)
-  WXVertex(1) = 0;            WYVertex(1) = 0
-  WXVertex(2) = 0;            WYVertex(2) = 0
-  WXVertex(3) = 0;            WYVertex(3) = 0
-  WXVertex(4) = 0;            WYVertex(4) = 0
+  ! the site variables of Gamma 1, 2, 3 and 4
+  GXVertex(1:4) = 0;            GYVertex(1:4) = 0
+  WXVertex(1:4) = 0;            WYVertex(1:4) = 0
+
+  ! the time variables of Gamma 1, 2, 3 and 4
+  T1Vertex(1:4) = 0;            T2Vertex(1:4) = 0
+  T3Vertex(1:4) = 0           
 
   ! Direction of Gamma: 1: left of W;  2: right of W
   DirecVertex(1) = 1;                DirecVertex(2) = 2
@@ -163,22 +155,23 @@ SUBROUTINE def_diagram
   NeighVertex(1,4) = 5;        NeighVertex(2,4) = 2;        NeighVertex(3,4) = 6
 
   ! weights for lines and vertexes
-  WeightLn(1) = weight_line(StatusLn(1),1,0,0,OmegaLn(1),TypeLn(1))
-  WeightLn(2) = weight_line(StatusLn(2),1,0,0,OmegaLn(2),TypeLn(2))
-  WeightLn(3) = weight_line(StatusLn(3),2,0,0,OmegaLn(3),TypeLn(3))
-  WeightLn(4) = weight_line(StatusLn(4),1,0,0,OmegaLn(4),TypeLn(4))
-  WeightLn(5) = weight_line(StatusLn(5),1,0,0,OmegaLn(5),TypeLn(5))
-  WeightLn(6) = weight_line(StatusLn(6),2,0,0,OmegaLn(6),TypeLn(6))
+  !deltat = T2Vertex(NeighLn(2, 1))-T1Vertex(NeighLn(1, 1))
+  !WeightLn(1) = weight_line(StatusLn(1),1,0,0,deltat,TypeLn(1))
+  !WeightLn(2) = weight_line(StatusLn(2),1,0,0,deltat,TypeLn(2))
+  !WeightLn(3) = weight_line(StatusLn(3),2,0,0,deltat,TypeLn(3))
+  !WeightLn(4) = weight_line(StatusLn(4),1,0,0,deltat,TypeLn(4))
+  !WeightLn(5) = weight_line(StatusLn(5),1,0,0,deltat,TypeLn(5))
+  !WeightLn(6) = weight_line(StatusLn(6),2,0,0,deltat,TypeLn(6))
 
-  WeightVertex(1) = weight_vertex(1, StatusVertex(1), 0, 0, OmegaLn(2), OmegaLn(1), TypeVertex(1))
-  WeightVertex(2) = weight_vertex(1, StatusVertex(2), 0, 0, OmegaLn(4), OmegaLn(5), TypeVertex(2))
-  WeightVertex(3) = weight_vertex(1, StatusVertex(3), 0, 0, OmegaLn(1), OmegaLn(4), TypeVertex(3))
-  WeightVertex(4) = weight_vertex(1, StatusVertex(4), 0, 0, OmegaLn(5), OmegaLn(2), TypeVertex(4))
+  !WeightVertex(1) = weight_vertex(1, StatusVertex(1), 0, 0, OmegaLn(2), OmegaLn(1), TypeVertex(1))
+  !WeightVertex(2) = weight_vertex(1, StatusVertex(2), 0, 0, OmegaLn(4), OmegaLn(5), TypeVertex(2))
+  !WeightVertex(3) = weight_vertex(1, StatusVertex(3), 0, 0, OmegaLn(1), OmegaLn(4), TypeVertex(3))
+  !WeightVertex(4) = weight_vertex(1, StatusVertex(4), 0, 0, OmegaLn(5), OmegaLn(2), TypeVertex(4))
 
 
   WeightCurrent = CoefOfWeight(1)*WeightLn(1)*WeightLn(2)*WeightLn(3)*WeightLn(4)* &
     & WeightLn(5)*WeightLn(6)*WeightVertex(1)*WeightVertex(2)*WeightVertex(3)* &
-    & WeightVertex(4)*(1.d0/Beta)**Order *(-1.d0)**NFermiLoop
+    & WeightVertex(4)*(1.d0/Beta)**Order *SignFermiLoop
 
   Phase = Phase *WeightCurrent/abs(WeightCurrent)
 
