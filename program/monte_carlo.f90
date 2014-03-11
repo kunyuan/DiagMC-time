@@ -5,6 +5,8 @@ SUBROUTINE initialize_markov
     implicit none
     integer :: i
 
+    CoefOfWeight(:) = 1.d0
+
     Pupdate(:)  = 1.d0
     Pupdate(2)  = 5.d0
     Pupdate(3)  = 0.d0
@@ -38,7 +40,7 @@ SUBROUTINE initialize_markov
     call def_spin
     call def_diagram
     return
-end SUBROUTINE
+end SUBROUTINE initialize_markov
 
 !------------- definition of the probabilities ----------------
 SUBROUTINE def_prob
@@ -59,19 +61,49 @@ SUBROUTINE def_prob
     Pupdate(k) = Pupdate(k)/Cupdate
     Fupdate(k) = Fupdate(k)/Cupdate
   enddo
-
+  return
 END SUBROUTINE def_prob
 
 
 SUBROUTINE def_spin
   implicit none
 
+  TypeGam2W(:,:) = 0
+  TypeGW2Gam(:,:,:,:) = 0
+
+  !-- calculate the type of W according to the neighbor vertexes --
+  !---- TypeGam2W(Type(Gamleft), Type(Gamright)) = Type(W)
+  TypeGam2W(1,1) = 1;      TypeGam2W(1,4) = 1
+  TypeGam2W(4,1) = 1;      TypeGam2W(4,4) = 1
+
+  TypeGam2W(2,2) = 2;      TypeGam2W(2,3) = 2
+  TypeGam2W(3,2) = 2;      TypeGam2W(3,3) = 2
+
+  TypeGam2W(1,2) = 3;      TypeGam2W(1,3) = 3
+  TypeGam2W(4,2) = 3;      TypeGam2W(4,3) = 3
+
+  TypeGam2W(2,1) = 4;      TypeGam2W(2,4) = 4
+  TypeGam2W(3,1) = 4;      TypeGam2W(3,4) = 4
+
+  TypeGam2W(5,6) = 5;      TypeGam2W(6,5) = 6
+
+  !-- calculate the type of Gam according to the neighbor G, W --
+  !---- TypeGW2Gam(Type(Gin), Type(Gout), Type(Gamin), Type(Gamout)) = Type(Gam)
+  TypeGW2Gam(1,1,1,1) = 1
+  TypeGW2Gam(2,2,2,2) = 2
+  TypeGW2Gam(1,1,2,2) = 3
+  TypeGW2Gam(2,2,1,1) = 4
+  TypeGW2Gam(1,2,1,2) = 5
+  TypeGW2Gam(2,1,2,1) = 6
+
 END SUBROUTINE def_spin
 
 !------------- definition of the config of diagram ----------------
 SUBROUTINE def_diagram
   implicit none
-  integer :: i, deltat
+  integer :: i
+  double precision :: ratio
+  complex*16 :: Anew
 
   !-------------- 1-order diagram ------------------------
   Order = 1
@@ -82,7 +114,7 @@ SUBROUTINE def_diagram
   ! number of fermi loops
   SignFermiLoop = 1.d0
   ! the phase of the diagram
-  Phase = 1.d0
+  Phase = (1.d0, 0.d0)
   ! if Ira and Masha are present
   IsWormPresent = .false.
 
@@ -199,15 +231,17 @@ SUBROUTINE def_diagram
   WeightVertex(4) = weight_vertex(StatusVertex(4), 1, 0, 0, 0.d0, 0.d0, TypeVertex(4))
 
 
-  WeightCurrent = CoefOfWeight(1)*WeightLn(1)*WeightLn(2)*WeightLn(3)*WeightLn(4)* &
+  ratio = CoefOfWeight(1)*(1.d0/Beta)**Order *SignFermiLoop
+  Anew = d_times_cd(ratio, WeightLn(1)*WeightLn(2)*WeightLn(3)*WeightLn(4)* &
     & WeightLn(5)*WeightLn(6)*WeightVertex(1)*WeightVertex(2)*WeightVertex(3)* &
-    & WeightVertex(4)*(1.d0/Beta)**Order *SignFermiLoop
+    & WeightVertex(4))
 
-  Phase = Phase *WeightCurrent/abs(WeightCurrent)
+  WeightCurrent = abs(Anew)
+  Phase = Anew/WeightCurrent
 
   !-------------------------------------------------------
 
-  !call print_config
+  call print_config
 
   return
 END SUBROUTINE def_diagram
@@ -228,7 +262,6 @@ SUBROUTINE markov
   integer :: iflag, imeasure
   double precision :: nr
 
-  call def_prob
   imeasure = 0
   do while(imeasure < NStep)
     nr=rn()
@@ -400,21 +433,21 @@ END SUBROUTINE switch_ira_and_masha
 
 !-------- the weight of a line -------------------------
 ! dx = x2-x1;  dy = y2- y1; tau = tau2-tau1
-DOUBLE PRECISION FUNCTION weight_line(stat, isdelta, knd, dx, dy, tau, typ)
+COMPLEX*16 FUNCTION weight_line(stat, isdelta, knd, dx, dy, tau, typ)
   implicit none
   integer :: stat, isdelta, knd, dx, dy, typ
   double precision :: tau
   integer :: t
 
   t = Floor(tau*MxT/Beta)
-  if(knd==2 .and. isdelta==0) then
-    t = 0
-  endif
+
+  dx = diff_x(dx)
+  dy = diff_y(dy)
 
   !---------------------- for test --------------------------------------
   !if(stat >= 0 .and. stat<=3) then
-    !if(knd==1) weight_line = weight_meas_G(omega, 1)
-    !if(knd==2) weight_line = weight_meas_W(dx, dy, omega, 1)
+    !if(knd==1) weight_line = weight_meas_G(1, t)
+    !if(knd==2) weight_line = weight_meas_W(1, dx, dy, t)
   !else if(stat==-1) then
     !write(*, *) IsWormPresent, iupdate, "line status == -1! There is no weight!" 
     !stop
@@ -425,14 +458,14 @@ DOUBLE PRECISION FUNCTION weight_line(stat, isdelta, knd, dx, dy, tau, typ)
   !------------------------ end -----------------------------------------
 
   if(stat == 0) then
-    if(knd==1) weight_line = weight_G(t, typ)
-    if(knd==2 .and. isdelta==0) weight_line = weight_W(dx, dy, t, typ)
-    if(knd==2 .and. isdelta==1) weight_line = weight_W0(dx, dy, t, typ)
+    if(knd==1) weight_line = weight_G(typ, t)
+    if(knd==2 .and. isdelta==0) weight_line = weight_W(typ, dx, dy, t)
+    if(knd==2 .and. isdelta==1) weight_line = weight_W0(typ, dx, dy)
   else if(stat == 1 .or. stat==3) then
-    if(knd==1) weight_line = weight_meas_G(t, typ)
-    if(knd==2) weight_line = weight_meas_W(dx, dy, t, typ)
+    if(knd==1) weight_line = weight_meas_G(typ, t)
+    if(knd==2) weight_line = weight_meas_W(typ, dx, dy, t)
   else if(stat == 2) then
-    if(knd==2) weight_line = weight_worm_W(dx, dy, t, typ)
+    if(knd==2) weight_line = weight_worm_W(typ, dx, dy, t)
     if(knd==1) then
       write(*, *) IsWormPresent, iupdate, "gline status == 2 or 3! Error!" 
       call print_config
@@ -453,7 +486,7 @@ END FUNCTION weight_line
 
 !-------- the weight of a vertex -------------------------
 !dx = xg-xw;  dy = yg-yw; dtau1 = tau3-tau2; dtau2 = tau1-tau3
-DOUBLE PRECISION FUNCTION weight_vertex(stat, isdelta, dx, dy, dtau1, dtau2, typ)
+COMPLEX*16 FUNCTION weight_vertex(stat, isdelta, dx, dy, dtau1, dtau2, typ)
   implicit none
   integer :: stat, dx, dy, t1, t2, typ, isdelta
   double precision :: weight
@@ -462,14 +495,12 @@ DOUBLE PRECISION FUNCTION weight_vertex(stat, isdelta, dx, dy, dtau1, dtau2, typ
   t1 = Floor(dtau1*MxT/Beta)
   t2 = Floor(dtau2*MxT/Beta)
 
-  if(isdelta==1) then
-    t1 = 0
-    t2 = 0
-  endif
+  dx = diff_x(dx)
+  dy = diff_y(dy)
 
   !---------------------- for test --------------------------------------
   !if(stat>=0 .and. stat<=3) then
-    !weight_vertex = weight_meas_gam(dx, dy, t1, t2, 1)
+    !weight_vertex = weight_meas_gam(1, dx, dy, t1, t2)
   !else if(stat==-1) then
     !write(*, *) IsWormPresent, iupdate, "vertex status == -1! There is no weight!" 
     !stop
@@ -480,16 +511,16 @@ DOUBLE PRECISION FUNCTION weight_vertex(stat, isdelta, dx, dy, dtau1, dtau2, typ
   !------------------------ end -----------------------------------------
 
   if(stat==0) then
-      if(isdelta==0) weight_vertex = weight_Gam(dx, dy, t1, t2, typ)
-      if(isdelta==1) weight_vertex = weight_Gam0(dx, dy, t1, t2, typ)
+      !if(isdelta==0) weight_vertex = weight_Gam(typ, dx, dy, t1, t2)
+      !if(isdelta==1) weight_vertex = weight_Gam0(typ, dx, dy)
       !----------------- for bare Gamma ------------------------------
-      !if(isdelta==0) weight_vertex = 0.d0
-      !if(isdelta==1) weight_vertex = weight_Gam0(dx, dy, t1, t2, typ)
+      if(isdelta==0) weight_vertex = 0.d0
+      if(isdelta==1) weight_vertex = weight_Gam0(typ, dx, dy)
       !------------------------ end ----------------------------------
   else if(stat==2) then
-    weight_vertex = weight_worm_gam(dx, dy, t1, t2, typ)
+    weight_vertex = weight_worm_Gam(typ, dx, dy, t1, t2)
   else if(stat==1 .or. stat==3) then
-    weight_vertex = weight_meas_gam(dx, dy, t1, t2, typ)
+    weight_vertex = weight_meas_Gam(typ, dx, dy, t1, t2)
   else if(stat==-1) then 
     write(*, *) IsWormPresent, iupdate, "vertex status == -1! There is no weight!" 
     stop
@@ -500,31 +531,88 @@ DOUBLE PRECISION FUNCTION weight_vertex(stat, isdelta, dx, dy, dtau1, dtau2, typ
   return
 END FUNCTION weight_vertex
 
+
+
 !-------- the weight ratio of new/old config -------------------------
 SUBROUTINE weight_ratio(Pacc, sgn, Anew, Aold)
   implicit none
-  double precision,intent(in) ::Anew, Aold
-  double precision,intent(out) :: Pacc, sgn
-  Pacc = Anew/Aold
-  if(Pacc>1.d-20) then
-    sgn = 1.d0
-  else if(Pacc<-1.d-20) then
-    sgn = -1.d0
-    Pacc = -1.d0*Pacc
-  else 
-    sgn = 1.d0
-    Pacc = 0.d0
-  endif
+  complex*16,intent(in) ::Anew, Aold
+  double precision,intent(out) :: Pacc
+  complex*16, intent(out) :: sgn
+  Pacc = abs(Anew/Aold)
+  sgn = (Anew/Aold)/Pacc
   return
 END SUBROUTINE weight_ratio
 
 SUBROUTINE update_weight(Anew, Aold)
   implicit none 
-  double precision :: Anew, Aold
+  complex*16 :: Anew, Aold
 
-  WeightCurrent = WeightCurrent *Anew/Aold
+  WeightCurrent = WeightCurrent *abs(Anew/Aold)
   return
 END SUBROUTINE update_weight
+!====================================================================
+!====================================================================
+!====================================================================
+
+
+
+
+!====================================================================
+!===================== PRINT CONFIGURATION ==========================
+!====================================================================
+
+
+SUBROUTINE print_config
+  implicit none
+  integer :: i, iln, iv
+  
+  open(8, access='append', file=trim(title1)//"_mc.conf")
+  
+  write(8, *) "============================================================"
+  write(8, *) imc, IsWormPresent, iupdate
+
+  if(IsWormPresent .eqv. .true.) then
+    write(8, *) "Ira", Ira, "Masha", Masha, "SpinMasha", SpinMasha
+    write(8, *) "kMasha", kMasha
+  endif
+
+  write(8, *) "Order", Order
+  write(8, *) "SignFermiLoop", SignFermiLoop
+
+  write(8, *) "Measuring Gamma", MeasureGam
+  write(8, *) "Phase", Phase
+  write(8, *) "Weight", WeightCurrent
+
+  do i = 1, NGLn
+    iln = GLnKey2Value(i)
+    if(StatusLn(iln) <0) cycle
+    write(8, 10) iln, KindLn(iln), IsDeltaLn(iln), TypeLn(iln), kLn(iln), StatusLn(iln), NeighLn(1:2,iln)
+  enddo
+
+  do i = 1, NWLn
+    iln = WLnKey2Value(i)
+    if(StatusLn(iln) <0) cycle
+    write(8, 10) iln, KindLn(iln), IsDeltaLn(iln), TypeLn(iln), kLn(iln), StatusLn(iln), NeighLn(1:2,iln)
+  enddo
+
+  do i = 1, NVertex
+    iv = VertexKey2Value(i)
+    if(StatusVertex(iv) <0) cycle
+    write(8, 12) iv,IsDeltaVertex(iv), TypeVertex(iv),TypeVertexIn(iv),TypeVertexOut(iv), &
+      & GXVertex(iv),GYVertex(iv),WXVertex(iv),WYVertex(iv), T1Vertex(iv), T2Vertex(iv),  &
+      & T3Vertex(iv), DirecVertex(iv), StatusVertex(iv), NeighVertex(:,iv)
+  enddo
+  write(8, *) "============================================================"
+
+  10 format(' Line:',i2,2x,'kind:',i2,2x,'isdelta:',i2,2x,'type:',i2,2x,'k:',i8,2x,'stat:',i2, 2x,&
+    & 'neigh:',i6,i6)
+  12 format('Gamma:',i2,2x,'isdelta:',i2,2x,'type:',i2,2x,'typein:',i2,2x,'typeout:',i2,2x,&
+    & 'gr:(',i4,i4,'), wr:(',i4,i4,')', 't:(', f6.4, f6.4, f6.4, ')',2x, &
+    & 'direction:', i2,2x, 'stat:',i2, 2x,'neigh:', i6,i6,i6)
+
+  close(8)
+END SUBROUTINE print_config
 !====================================================================
 !====================================================================
 !====================================================================

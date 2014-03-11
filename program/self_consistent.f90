@@ -63,30 +63,27 @@ END SUBROUTINE initialize_G0F
 !!------- Initialization of W0 in monmentum and frequency ----------
 SUBROUTINE initialize_W0PF
   implicit none
-  integer :: typ, t, dx, dy
+  double precision :: ratio
 
   W0PF(:,:,:) = (0.d0, 0.d0)
-  do t = 0, MxT-1
-    do dy = 0, Ly-1
-      do dx = 0, Lx-1
-        W0PF(dx, dy, t) = weight_W0(1, dx, dy, t)
-      enddo
-    enddo
-  enddo
+  ratio = 0.25d0*Jcp*real(MxT)/Beta
+
+  W0PF(1,    0, 0) = dcmplx(ratio, 0.d0)
+  W0PF(Lx-1, 0, 0) = dcmplx(ratio, 0.d0)
+  W0PF(0,    1, 0) = dcmplx(ratio, 0.d0)
+  W0PF(0, Ly-1, 0) = dcmplx(ratio, 0.d0)
+
   call transfer_W0(1)
 END SUBROUTINE initialize_W0PF
 
 !!------- Initialization of Gam0 in monmentum and frequency ----------
 SUBROUTINE initialize_Gam0PF
   implicit none
-  integer :: ityp, it1, it2
+  double precision :: ratio
 
+  ratio = (real(MxT)/Beta)**2.d0
   Gam0PF(:,:,:,:) = (0.d0, 0.d0)
-  do it2 = 0, MxT-1
-    do it1 = 0, MxT-1
-      Gam0PF(0,0,it1,it2) = weight_Gam0(1, 0, 0, it1, it2)
-    enddo
-  enddo
+  Gam0PF(0,0,0,0) = dcmplx(ratio, 0.d0)
 
   call transfer_Gam0(1)
 END SUBROUTINE initialize_Gam0PF
@@ -229,61 +226,6 @@ END SUBROUTINE calculate_Chi
 
 !!====================================================================
 
-
-!!======================== WEIGHT EXTRACTING =========================
-
-!--------- weight for bare propagator ----------------
-Complex*16 FUNCTION weight_G0(typ, t)
-  implicit none
-  integer, intent(in)  :: typ, t  
-  double precision     :: tau
-  complex(kind=8)      :: muc  
-
-  muc = dcmplx(0.d0, Mu(1)*pi/(2.d0*Beta))
-  tau = (t+0.5d0)*Beta/MxT
-  if(tau>=0) then
-    weight_G0 = cdexp(muc*tau)/(1.d0, 1.d0) 
-  else
-    weight_G0 = -cdexp(muc*(tau+Beta))/(1.d0, 1.d0) 
-  endif
-  return
-END FUNCTION weight_G0
-
-
-!!--------- calculate weight for bare interaction ----
-Complex*16 FUNCTION weight_W0(typ, dx, dy, t)
-  implicit none
-  integer, intent(in) :: dx, dy, typ, t
-  integer :: dx1, dy1
-  double precision :: ratio
-
-  ratio = Jcp*real(MxT)/Beta
-  dx1 = dx;       dy1 = dy
-  if(dx1>=0  .and. dx1<Lx .and. dy1>=0 .and. dy1<Ly) then
-    if(dx1>dLx)     dx1 = Lx-dx1
-    if(dy1>dLy)     dy1 = Ly-dy1
-
-    weight_W0 = (0.d0, 0.d0)
-
-    if(t==0) then
-      if((dx1==1.and.dy1==0).or.(dx1==0.and.dy1==1)) then
-        if(typ ==1 .or. typ == 2) then
-          weight_W0 = dcmplx(0.25d0*ratio, 0.d0)
-        else if(typ == 3 .or. typ == 4) then
-          weight_W0 = dcmplx(-0.25d0*ratio, 0.d0)
-        else if(typ == 5 .or. typ == 6) then
-          weight_W0 = dcmplx(0.5d0*ratio, 0.d0)
-        endif
-      endif
-    endif
-  else
-    write(*, *) dx1, dy1, "dx, dy bigger than system size!"
-    stop
-  endif
-
-END FUNCTION weight_W0
-
-
 SUBROUTINE plus_minus_W0(Backforth)
   implicit none
   integer, intent(in) :: Backforth
@@ -331,18 +273,69 @@ SUBROUTINE plus_minus_Gam0(Backforth)
   return
 END SUBROUTINE
 
-!!--------- calculate weight for bare Gamma ---------
-COMPLEX*16 FUNCTION weight_Gam0(typ, dx, dy, t1, t2)
+
+!!======================== WEIGHT EXTRACTING =========================
+
+!--------- weight for bare propagator ----------------
+Complex*16 FUNCTION weight_G0(typ, t)
   implicit none
-  integer, intent(in)  :: dx, dy, t1, t2, typ
+  integer, intent(in)  :: typ, t  
+  double precision     :: tau
+  complex(kind=8)      :: muc  
+
+  muc = dcmplx(0.d0, Mu(1)*pi/(2.d0*Beta))
+  tau = (t+0.5d0)*Beta/MxT
+  if(tau>=0) then
+    weight_G0 = cdexp(muc*tau)/(1.d0, 1.d0) 
+  else
+    weight_G0 = -cdexp(muc*(tau+Beta))/(1.d0, 1.d0) 
+  endif
+  return
+END FUNCTION weight_G0
+
+
+!!--------- calculate weight for bare interaction ----
+Complex*16 FUNCTION weight_W0(typ, dx, dy)
+  implicit none
+  integer, intent(in) :: dx, dy, typ
+  integer :: dx1, dy1
   double precision :: ratio
 
-  ratio = (real(MxT)/Beta)**2.d0
+  ratio = Jcp
+
+  dx1 = dx;       dy1 = dy
+  if(dx1>=0  .and. dx1<Lx .and. dy1>=0 .and. dy1<Ly) then
+    if(dx1>dLx)     dx1 = Lx-dx1
+    if(dy1>dLy)     dy1 = Ly-dy1
+
+    weight_W0 = (0.d0, 0.d0)
+
+    if((dx1==1.and.dy1==0).or.(dx1==0.and.dy1==1)) then
+      if(typ ==1 .or. typ == 2) then
+        weight_W0 = dcmplx(0.25d0*ratio, 0.d0)
+      else if(typ == 3 .or. typ == 4) then
+        weight_W0 = dcmplx(-0.25d0*ratio, 0.d0)
+      else if(typ == 5 .or. typ == 6) then
+        weight_W0 = dcmplx(0.5d0*ratio, 0.d0)
+      endif
+    endif
+  else
+    write(*, *) dx1, dy1, "dx, dy bigger than system size!"
+    stop
+  endif
+END FUNCTION weight_W0
+
+
+!!--------- calculate weight for bare Gamma ---------
+COMPLEX*16 FUNCTION weight_Gam0(typ, dx, dy)
+  implicit none
+  integer, intent(in)  :: dx, dy, typ
+  double precision :: ratio
 
   if(dx>=0 .and. dx<Lx .and. dy>=0 .and. dy<Ly) then
-    if(t1==0 .and. t2==0 .and. dx==0.and.dy==0) then
+    if(dx==0.and.dy==0) then
       if(typ==1 .or. typ==2 .or. typ==5 .or. typ==6) then
-        weight_Gam0 = dcmplx(ratio, 0.d0)
+        weight_Gam0 = (1.d0, 0.d0)
       else
         weight_Gam0 = (0.d0, 0.d0)
       endif

@@ -42,32 +42,32 @@
 
 
 !--------- worm weight function for W ---------
-DOUBLE PRECISION FUNCTION weight_worm_W(dx, dy, t1, ityp)
+complex*16 FUNCTION weight_worm_W(ityp, dx, dy, t1)
   implicit none
   integer, intent(in)  :: dx, dy, t1, ityp
 
-  weight_worm_W = weight_W(dx, dy, t1, 1)
+  weight_worm_W = weight_W(1, dx, dy, t1)
   return
 END FUNCTION weight_worm_W
 
 !--------- worm weight function for Gamma ---------
-DOUBLE PRECISION FUNCTION weight_worm_Gam(dx, dy, t1, t2, ityp)
+complex*16 FUNCTION weight_worm_Gam(ityp, dx, dy, t1, t2)
   implicit none
   integer, intent(in)  :: dx, dy, t1, t2, ityp
 
-  weight_worm_Gam = weight_Gam0(dx, dy, t1, t2, 1)
+  weight_worm_Gam = weight_Gam0(1, dx, dy)
   return
 END FUNCTION weight_worm_Gam
 
 !--------- measure weight function for Gamma ---------
-DOUBLE PRECISION FUNCTION weight_meas_G(t1, ityp)
+complex*16 FUNCTION weight_meas_G(ityp, t1)
   implicit none
   integer, intent(in)  :: t1, ityp
   weight_meas_G = 1.d0
   return
 END FUNCTION weight_meas_G
 
-DOUBLE PRECISION FUNCTION weight_meas_W(dx, dy, t1, ityp)
+complex*16 FUNCTION weight_meas_W(ityp, dx, dy, t1)
   implicit none
   integer, intent(in)  :: dx, dy, t1, ityp
 
@@ -75,7 +75,7 @@ DOUBLE PRECISION FUNCTION weight_meas_W(dx, dy, t1, ityp)
   return
 END FUNCTION weight_meas_W
 
-DOUBLE PRECISION FUNCTION weight_meas_Gam(dx, dy, t1, t2, ityp)
+complex*16 FUNCTION weight_meas_Gam(ityp, dx, dy, t1, t2)
   implicit none
   integer, intent(in)  :: dx, dy, t1, t2, ityp
 
@@ -156,6 +156,21 @@ END FUNCTION weight_meas_Gam
 !!============== ELEMENTS GENERATORS =================================
 !!====================================================================
 
+!---------- double precision tau -------------------------
+DOUBLE PRECISION FUNCTION generate_tau()
+  implicit none
+  double precision :: tau
+  generate_tau = rn()*Beta
+  return
+END FUNCTION generate_tau
+
+DOUBLE PRECISION FUNCTION prob_tau(tau)
+  implicit none 
+  integer, intent(in) :: tau
+  prob_tau = 1.d0/Beta
+  return
+END FUNCTION prob_tau
+
 !---------- int x y -------------------------
 INTEGER FUNCTION generate_x()
   implicit none
@@ -209,17 +224,17 @@ INTEGER FUNCTION find_neigh_y(y, dy)
   endif
 END FUNCTION find_neigh_y
 
-INTEGER FUNCTION diff_x(x1, x2)
+INTEGER FUNCTION diff_x(dx)
   implicit none
-  integer, intent(in) :: x1, x2
-  diff_x = x1 - x2
+  integer, intent(in) :: dx
+  diff_x = dx
   if(diff_x<0)     diff_x = Lx+diff_x
 END FUNCTION diff_x
 
-INTEGER FUNCTION diff_y(y1, y2)
+INTEGER FUNCTION diff_y(dy)
   implicit none
-  integer, intent(in) :: y1, y2
-  diff_y = y1 - y2
+  integer, intent(in) :: dy
+  diff_y = dy
   if(diff_y<0)     diff_y = Ly+diff_y
 END FUNCTION diff_y
 
