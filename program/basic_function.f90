@@ -1,16 +1,5 @@
 !============== BASIC PROCEDURES IN UPDATE ==========================
 
-!--------- exchange the location of Ira and Masha  -----
-!SUBROUTINE switch_ira_and_masha
-  !implicit none
-  !integer  :: k
-  !if(IsWormPresent .eqv. .false.)  return
-  !k=Ira;   Ira=Masha; Masha=k
-  !kMasha=-kMasha;     SpinMasha=-SpinMasha
-!END SUBROUTINE switch_ira_and_masha
-
-!====================================================================
-
 
 !=====================================================================
 !==================FAKE WEIGHT FOR MEASURING AND WORM=================
@@ -52,62 +41,57 @@
 !END FUNCTION weight_worm
 
 
-!!--------- worm weight function for W ---------
-!DOUBLE PRECISION FUNCTION weight_worm_W(dx, dy, omega1, ityp)
-  !implicit none
-  !integer, intent(in)  :: dx, dy, omega1, ityp
+!--------- worm weight function for W ---------
+DOUBLE PRECISION FUNCTION weight_worm_W(dx, dy, t1, ityp)
+  implicit none
+  integer, intent(in)  :: dx, dy, t1, ityp
 
-  !weight_worm_W = weight_W(dx, dy, omega1, 1)
-  !return
-!END FUNCTION weight_worm_W
+  weight_worm_W = weight_W(dx, dy, t1, 1)
+  return
+END FUNCTION weight_worm_W
 
-!!--------- worm weight function for Gamma ---------
-!DOUBLE PRECISION FUNCTION weight_worm_Gamma(dx, dy, omega1, omega2, ityp)
-  !implicit none
-  !integer, intent(in)  :: dx, dy, omega1, omega2, ityp
+!--------- worm weight function for Gamma ---------
+DOUBLE PRECISION FUNCTION weight_worm_Gam(dx, dy, t1, t2, ityp)
+  implicit none
+  integer, intent(in)  :: dx, dy, t1, t2, ityp
 
-  !weight_worm_Gamma = weight_Gamma0(dx, dy, omega1, omega2, 1)
-  !return
-!END FUNCTION weight_worm_Gamma
+  weight_worm_Gam = weight_Gam0(dx, dy, t1, t2, 1)
+  return
+END FUNCTION weight_worm_Gam
 
-!!--------- measure weight function for Gamma ---------
-!DOUBLE PRECISION FUNCTION weight_meas_G(omega1, ityp)
-  !implicit none
-  !integer, intent(in)  :: omega1, ityp
-  !weight_meas_G = 1.d0
-  !return
-!END FUNCTION weight_meas_G
+!--------- measure weight function for Gamma ---------
+DOUBLE PRECISION FUNCTION weight_meas_G(t1, ityp)
+  implicit none
+  integer, intent(in)  :: t1, ityp
+  weight_meas_G = 1.d0
+  return
+END FUNCTION weight_meas_G
 
-!DOUBLE PRECISION FUNCTION weight_meas_W(dx, dy, omega1, ityp)
-  !implicit none
-  !integer, intent(in)  :: dx, dy, omega1, ityp
+DOUBLE PRECISION FUNCTION weight_meas_W(dx, dy, t1, ityp)
+  implicit none
+  integer, intent(in)  :: dx, dy, t1, ityp
 
-  !weight_meas_W = 1.d0
-  !return
-!END FUNCTION weight_meas_W
+  weight_meas_W = 1.d0
+  return
+END FUNCTION weight_meas_W
 
-!DOUBLE PRECISION FUNCTION weight_meas_Gamma(iorder, dx, dy, omega1, omega2, ityp)
-  !implicit none
-  !integer, intent(in)  :: iorder, dx, dy, omega1, omega2, ityp
+DOUBLE PRECISION FUNCTION weight_meas_Gam(dx, dy, t1, t2, ityp)
+  implicit none
+  integer, intent(in)  :: dx, dy, t1, t2, ityp
 
-  !weight_meas_Gamma = 0.d0
-  !if(dx==0 .and. dy==0) then
-    !if(ityp ==1 .or. ityp == 2) then
-      !weight_meas_Gamma = 1.d0
-    !else if(ityp == 3 .or. ityp == 4) then
-      !weight_meas_Gamma = 0.d0
-    !else if(ityp == 5 .or. ityp == 6) then
-      !weight_meas_Gamma = 1.d0
-    !endif
-  !endif
+  weight_meas_Gam = 0.d0
+  if(dx==0 .and. dy==0) then
+    if(ityp ==1 .or. ityp == 2) then
+      weight_meas_Gam = 1.d0
+    else if(ityp == 3 .or. ityp == 4) then
+      weight_meas_Gam = 0.d0
+    else if(ityp == 5 .or. ityp == 6) then
+      weight_meas_Gam = 1.d0
+    endif
+  endif
 
-  !if(iorder==0) then
-    !weight_meas_Gamma = weight_meas_Gamma *1.d0/((omega1**2.d0+1.d0)*(omega2**2.d0 +1.d0))
-  !else if(iorder>=1) then
-    !weight_meas_Gamma = weight_meas_Gamma *1.d0/((abs(omega1)+1.d0)*(abs(omega2)+1.d0))
-  !endif
-  !return
-!END FUNCTION weight_meas_Gamma
+  return
+END FUNCTION weight_meas_Gam
 
 
 
@@ -164,195 +148,108 @@
 
   !return
 !END SUBROUTINE update_WeightCurrent
+
+
+
+
 !!====================================================================
 !!============== ELEMENTS GENERATORS =================================
 !!====================================================================
 
-!!------------- definition of the probabilities ----------------
-!SUBROUTINE def_prob
-  !implicit none
-  !integer  :: j, k
-  !double precision :: Cupdate, CPresent, CAbsent
+!---------- int x y -------------------------
+INTEGER FUNCTION generate_x()
+  implicit none
+  integer :: nr
+  nr = Floor(rn()*3.d0)-1
+  generate_x = nr
+  return
+END FUNCTION generate_x
 
-  !!-------- probability for updates --------
-  !do k = 1, Nupdate
-    !Fupdate(k) = 0.d0
-    !do j = 1, k
-      !Fupdate(k)=Fupdate(k)+Pupdate(j)
-    !enddo
-  !enddo
+INTEGER FUNCTION generate_y()
+  implicit none
+  integer :: nr
+  nr = Floor(rn()*3.d0)-1
+  generate_y = nr
+  return
+END FUNCTION generate_y
 
-  !Cupdate = Fupdate(Nupdate)
-  !do k = 1, Nupdate
-    !Pupdate(k) = Pupdate(k)/Cupdate
-    !Fupdate(k) = Fupdate(k)/Cupdate
-  !enddo
+DOUBLE PRECISION FUNCTION prob_x(x)
+  implicit none 
+  integer, intent(in) :: x
+  prob_x = 1.d0/3.d0
+  return
+END FUNCTION prob_x
 
-  !!--------- probability for omega ----------------------
-  !do j = -4, 4
-    !!Pomega(j) = exp(-1.d0*abs(j))
-    !Pomega(j) = 1.d0/(abs(j)-0.1)**2.d0
+DOUBLE PRECISION FUNCTION prob_y(y)
+  implicit none 
+  integer, intent(in) :: y
+  prob_y = 1.d0/3.d0
+  return
+END FUNCTION prob_y
 
-    !Fomega(j) = 0.d0
-    !do k = -4, j
-      !Fomega(j) = Fomega(j) + Pomega(k)
-    !enddo
-  !enddo
+INTEGER FUNCTION find_neigh_x(x, dx)
+  implicit none
+  integer, intent(in) :: x, dx
+  find_neigh_x = x+dx
+  if(find_neigh_x<0) then
+    find_neigh_x = find_neigh_x + Lx
+  else if(find_neigh_x>=Lx) then
+    find_neigh_x = find_neigh_x - Lx
+  endif
+END FUNCTION find_neigh_x
 
-  !do j = -4, 4
-    !Pomega(j) = Pomega(j)/Fomega(4)
-    !Fomega(j) = Fomega(j)/Fomega(4)
-  !enddo
+INTEGER FUNCTION find_neigh_y(y, dy)
+  implicit none
+  integer, intent(in) :: y, dy
+  find_neigh_y = y+dy
+  if(find_neigh_y<0) then
+    find_neigh_y = find_neigh_y + Ly
+  else if(find_neigh_y>=Ly) then
+    find_neigh_y = find_neigh_y - Ly
+  endif
+END FUNCTION find_neigh_y
 
+INTEGER FUNCTION diff_x(x1, x2)
+  implicit none
+  integer, intent(in) :: x1, x2
+  diff_x = x1 - x2
+  if(diff_x<0)     diff_x = Lx+diff_x
+END FUNCTION diff_x
 
-  !!--------- probability for x ----------------------
-  !Px(-1) =1.d0/3.d0
-  !Px( 0) =1.d0/3.d0
-  !Px( 1) =1.d0/3.d0
+INTEGER FUNCTION diff_y(y1, y2)
+  implicit none
+  integer, intent(in) :: y1, y2
+  diff_y = y1 - y2
+  if(diff_y<0)     diff_y = Ly+diff_y
+END FUNCTION diff_y
 
-  !!--------- probability for y ----------------------
-  !Py(-1) =1.d0/3.d0
-  !Py( 0) =1.d0/3.d0
-  !Py( 1) =1.d0/3.d0
-!END SUBROUTINE def_prob
+LOGICAL FUNCTION Is_x_valid(x1, x2)
+  implicit none
+  integer, intent(in) :: x1, x2
+  integer :: dx
+  dx = x1 - x2
+  if(dx<0)     dx = Lx+dx
+  if(dx>dLx)   dx = Lx-dx
+  if(abs(dx)<=1) then
+    Is_x_valid = .true.
+  else
+    Is_x_valid = .false.
+  endif
+END FUNCTION Is_x_valid
 
-
-!!---------- int omega -------------------------
-!INTEGER FUNCTION generate_omega()
-  !implicit none
-  !integer :: nr
-  !double precision :: rand
-
-  !rand = rn()
-  !generate_omega = -4
-  !do while(rand>=Fomega(generate_omega))
-    !generate_omega=generate_omega+1
-  !enddo
-
-  !return
-!END FUNCTION generate_omega
-
-!DOUBLE PRECISION FUNCTION prob_omega(omega)
-  !implicit none 
-  !integer, intent(in) :: omega
-  !prob_omega = Pomega(omega)
-  !return
-!END FUNCTION prob_omega
-
-!LOGICAL FUNCTION Is_delta_omega_not_valid(omega)
-  !implicit none
-  !integer,intent(in) :: omega
-  !if(abs(omega)<=4)  then
-    !Is_delta_omega_not_valid = .false.
-  !else
-    !Is_delta_omega_not_Valid = .true.
-  !endif
-!END FUNCTION Is_delta_omega_not_valid
-
-!LOGICAL FUNCTION Is_omega_not_valid(omega)
-  !implicit none
-  !integer,intent(in) :: omega
-  !if(abs(omega)<=MxOmega)  then
-    !Is_omega_not_valid = .false.
-  !else
-    !Is_Omega_not_Valid = .true.
-  !endif
-!END FUNCTION Is_omega_not_valid
-
-!!---------- int x y -------------------------
-!INTEGER FUNCTION generate_x()
-  !implicit none
-  !integer :: nr
-  !nr = Floor(rn()*3.d0)-1
-  !generate_x = nr
-  !return
-!END FUNCTION generate_x
-
-!INTEGER FUNCTION generate_y()
-  !implicit none
-  !integer :: nr
-  !nr = Floor(rn()*3.d0)-1
-  !generate_y = nr
-  !return
-!END FUNCTION generate_y
-
-!DOUBLE PRECISION FUNCTION prob_x(x)
-  !implicit none 
-  !integer, intent(in) :: x
-  !prob_x = Px(x)
-  !return
-!END FUNCTION prob_x
-
-!DOUBLE PRECISION FUNCTION prob_y(y)
-  !implicit none 
-  !integer, intent(in) :: y
-  !prob_y = Py(y)
-  !return
-!END FUNCTION prob_y
-
-!INTEGER FUNCTION find_neigh_x(x, dx)
-  !implicit none
-  !integer, intent(in) :: x, dx
-  !find_neigh_x = x+dx
-  !if(find_neigh_x<0) then
-    !find_neigh_x = find_neigh_x + Lx
-  !else if(find_neigh_x>=Lx) then
-    !find_neigh_x = find_neigh_x - Lx
-  !endif
-!END FUNCTION find_neigh_x
-
-!INTEGER FUNCTION find_neigh_y(y, dy)
-  !implicit none
-  !integer, intent(in) :: y, dy
-  !find_neigh_y = y+dy
-  !if(find_neigh_y<0) then
-    !find_neigh_y = find_neigh_y + Ly
-  !else if(find_neigh_y>=Ly) then
-    !find_neigh_y = find_neigh_y - Ly
-  !endif
-!END FUNCTION find_neigh_y
-
-!INTEGER FUNCTION diff_x(x1, x2)
-  !implicit none
-  !integer, intent(in) :: x1, x2
-  !diff_x = x1 - x2
-  !if(diff_x<0)     diff_x = Lx+diff_x
-!END FUNCTION diff_x
-
-!INTEGER FUNCTION diff_y(y1, y2)
-  !implicit none
-  !integer, intent(in) :: y1, y2
-  !diff_y = y1 - y2
-  !if(diff_y<0)     diff_y = Ly+diff_y
-!END FUNCTION diff_y
-
-!LOGICAL FUNCTION Is_x_valid(x1, x2)
-  !implicit none
-  !integer, intent(in) :: x1, x2
-  !integer :: dx
-  !dx = x1 - x2
-  !if(dx<0)     dx = Lx+dx
-  !if(dx>dLx)   dx = Lx-dx
-  !if(abs(dx)<=1) then
-    !Is_x_valid = .true.
-  !else
-    !Is_x_valid = .false.
-  !endif
-!END FUNCTION Is_x_valid
-
-!LOGICAL FUNCTION Is_y_valid(y1, y2)
-  !implicit none
-  !integer, intent(in) :: y1, y2
-  !integer :: dy
-  !dy = y1 - y2
-  !if(dy<0)     dy = Ly+dy
-  !if(dy>dLy)   dy = Ly-dy
-  !if(abs(dy)<=1) then
-    !Is_y_valid = .true.
-  !else
-    !Is_y_valid = .false.
-  !endif
-!END FUNCTION Is_y_valid
+LOGICAL FUNCTION Is_y_valid(y1, y2)
+  implicit none
+  integer, intent(in) :: y1, y2
+  integer :: dy
+  dy = y1 - y2
+  if(dy<0)     dy = Ly+dy
+  if(dy>dLy)   dy = Ly-dy
+  if(abs(dy)<=1) then
+    Is_y_valid = .true.
+  else
+    Is_y_valid = .false.
+  endif
+END FUNCTION Is_y_valid
 
 
 !!---------- int k -------------------------
@@ -399,9 +296,6 @@ INTEGER FUNCTION generate_wline()
   implicit none
   integer :: rand
   rand = Floor(rn()*NWLn)+1
-  !if(NWLn/=Order+1) then
-    !write(*, *) Order, NWLn
-  !endif
   generate_wline = WLnKey2Value(rand)
   return
 END FUNCTION generate_wline

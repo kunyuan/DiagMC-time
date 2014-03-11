@@ -39,13 +39,36 @@ SUBROUTINE initialize_markov
     call def_diagram
     return
 end SUBROUTINE
-!------------- definition of the config of diagram ----------------
+
+!------------- definition of the probabilities ----------------
+SUBROUTINE def_prob
+  implicit none
+  integer  :: j, k
+  double precision :: Cupdate, CPresent, CAbsent
+
+  !-------- probability for updates --------
+  do k = 1, Nupdate
+    Fupdate(k) = 0.d0
+    do j = 1, k
+      Fupdate(k)=Fupdate(k)+Pupdate(j)
+    enddo
+  enddo
+
+  Cupdate = Fupdate(Nupdate)
+  do k = 1, Nupdate
+    Pupdate(k) = Pupdate(k)/Cupdate
+    Fupdate(k) = Fupdate(k)/Cupdate
+  enddo
+
+END SUBROUTINE def_prob
+
 
 SUBROUTINE def_spin
   implicit none
 
 END SUBROUTINE def_spin
 
+!------------- definition of the config of diagram ----------------
 SUBROUTINE def_diagram
   implicit none
   integer :: i, deltat
@@ -87,6 +110,11 @@ SUBROUTINE def_diagram
   !type of glines: 1: spin up; 2: spin down
   TypeLn(1) = 1;     TypeLn(2) = 1
   TypeLn(4) = 1;     TypeLn(5) = 1
+
+  !IsDelta: 1: delta function(W); 0: normal function(W); -1: G
+  IsDeltaLn(1:6) = -1
+  IsDeltaLn(3) = 0
+  IsDeltaLn(6) = 0
 
   !type of gamma inside spins: 1: spin up; 2: spin down
   TypeVertexIn(:) = 1;   TypeVertexOut(:) = 1
@@ -136,13 +164,16 @@ SUBROUTINE def_diagram
   enddo
   TailVertex = 5
 
+  !IsDeltaVertex: 1: delta function(Gam); 0: normal function(Gam)
+  IsDeltaVertex(1:4) = 1
+
   ! the site variables of Gamma 1, 2, 3 and 4
   GXVertex(1:4) = 0;            GYVertex(1:4) = 0
   WXVertex(1:4) = 0;            WYVertex(1:4) = 0
 
   ! the time variables of Gamma 1, 2, 3 and 4
-  T1Vertex(1:4) = 0;            T2Vertex(1:4) = 0
-  T3Vertex(1:4) = 0           
+  T1Vertex(1:4) = 0.d0;            T2Vertex(1:4) = 0.d0
+  T3Vertex(1:4) = 0.d0           
 
   ! Direction of Gamma: 1: left of W;  2: right of W
   DirecVertex(1) = 1;                DirecVertex(2) = 2
@@ -155,18 +186,17 @@ SUBROUTINE def_diagram
   NeighVertex(1,4) = 5;        NeighVertex(2,4) = 2;        NeighVertex(3,4) = 6
 
   ! weights for lines and vertexes
-  !deltat = T2Vertex(NeighLn(2, 1))-T1Vertex(NeighLn(1, 1))
-  !WeightLn(1) = weight_line(StatusLn(1),1,0,0,deltat,TypeLn(1))
-  !WeightLn(2) = weight_line(StatusLn(2),1,0,0,deltat,TypeLn(2))
-  !WeightLn(3) = weight_line(StatusLn(3),2,0,0,deltat,TypeLn(3))
-  !WeightLn(4) = weight_line(StatusLn(4),1,0,0,deltat,TypeLn(4))
-  !WeightLn(5) = weight_line(StatusLn(5),1,0,0,deltat,TypeLn(5))
-  !WeightLn(6) = weight_line(StatusLn(6),2,0,0,deltat,TypeLn(6))
+  WeightLn(1) = weight_line(StatusLn(1),-1, 1,0,0,0.d0,TypeLn(1))
+  WeightLn(2) = weight_line(StatusLn(2),-1, 1,0,0,0.d0,TypeLn(2))
+  WeightLn(3) = weight_line(StatusLn(3), 0, 2,0,0,0.d0,TypeLn(3))
+  WeightLn(4) = weight_line(StatusLn(4),-1, 1,0,0,0.d0,TypeLn(4))
+  WeightLn(5) = weight_line(StatusLn(5),-1, 1,0,0,0.d0,TypeLn(5))
+  WeightLn(6) = weight_line(StatusLn(6), 0, 2,0,0,0.d0,TypeLn(6))
 
-  !WeightVertex(1) = weight_vertex(1, StatusVertex(1), 0, 0, OmegaLn(2), OmegaLn(1), TypeVertex(1))
-  !WeightVertex(2) = weight_vertex(1, StatusVertex(2), 0, 0, OmegaLn(4), OmegaLn(5), TypeVertex(2))
-  !WeightVertex(3) = weight_vertex(1, StatusVertex(3), 0, 0, OmegaLn(1), OmegaLn(4), TypeVertex(3))
-  !WeightVertex(4) = weight_vertex(1, StatusVertex(4), 0, 0, OmegaLn(5), OmegaLn(2), TypeVertex(4))
+  WeightVertex(1) = weight_vertex(StatusVertex(1), 1, 0, 0, 0.d0, 0.d0, TypeVertex(1))
+  WeightVertex(2) = weight_vertex(StatusVertex(2), 1, 0, 0, 0.d0, 0.d0, TypeVertex(2))
+  WeightVertex(3) = weight_vertex(StatusVertex(3), 1, 0, 0, 0.d0, 0.d0, TypeVertex(3))
+  WeightVertex(4) = weight_vertex(StatusVertex(4), 1, 0, 0, 0.d0, 0.d0, TypeVertex(4))
 
 
   WeightCurrent = CoefOfWeight(1)*WeightLn(1)*WeightLn(2)*WeightLn(3)*WeightLn(4)* &
@@ -259,10 +289,159 @@ SUBROUTINE markov
 END SUBROUTINE markov
 
 
-!===============================================================
-!========================= updates =============================
-!===============================================================
+!====================================================================
+!============================== UPDATES =============================
+!====================================================================
 SUBROUTINE change_gline_time
     implicit none
     
 end SUBROUTINE
+
+!--------- exchange the location of Ira and Masha  -----
+SUBROUTINE switch_ira_and_masha
+  implicit none
+  integer  :: k
+  if(IsWormPresent .eqv. .false.)  return
+  k=Ira;   Ira=Masha; Masha=k
+  kMasha=-kMasha;     SpinMasha=-SpinMasha
+END SUBROUTINE switch_ira_and_masha
+
+!====================================================================
+!====================================================================
+!====================================================================
+
+
+!====================================================================
+!============================== WEIGHTS =============================
+!====================================================================
+
+!-------- the weight of a line -------------------------
+! dx = x2-x1;  dy = y2- y1; tau = tau2-tau1
+DOUBLE PRECISION FUNCTION weight_line(stat, isdelta, knd, dx, dy, tau, typ)
+  implicit none
+  integer :: stat, isdelta, knd, dx, dy, typ
+  double precision :: tau
+  integer :: t
+
+  t = Floor(tau*MxT/Beta)
+  if(knd==2 .and. isdelta==0) then
+    t = 0
+  endif
+
+  !---------------------- for test --------------------------------------
+  !if(stat >= 0 .and. stat<=3) then
+    !if(knd==1) weight_line = weight_meas_G(omega, 1)
+    !if(knd==2) weight_line = weight_meas_W(dx, dy, omega, 1)
+  !else if(stat==-1) then
+    !write(*, *) IsWormPresent, iupdate, "line status == -1! There is no weight!" 
+    !stop
+  !else
+    !write(*, *) IsWormPresent, iupdate, "line status error!", stat
+    !stop
+  !endif
+  !------------------------ end -----------------------------------------
+
+  if(stat == 0) then
+    if(knd==1) weight_line = weight_G(t, typ)
+    if(knd==2 .and. isdelta==0) weight_line = weight_W(dx, dy, t, typ)
+    if(knd==2 .and. isdelta==1) weight_line = weight_W0(dx, dy, t, typ)
+  else if(stat == 1 .or. stat==3) then
+    if(knd==1) weight_line = weight_meas_G(t, typ)
+    if(knd==2) weight_line = weight_meas_W(dx, dy, t, typ)
+  else if(stat == 2) then
+    if(knd==2) weight_line = weight_worm_W(dx, dy, t, typ)
+    if(knd==1) then
+      write(*, *) IsWormPresent, iupdate, "gline status == 2 or 3! Error!" 
+      call print_config
+      stop
+    endif
+  else if(stat==-1) then
+    write(*, *) IsWormPresent, iupdate, "line status == -1! There is no weight!" 
+    call print_config
+    stop
+  else
+    write(*, *) IsWormPresent, iupdate, "line status error!", stat
+    call print_config
+    stop
+  endif
+
+  return
+END FUNCTION weight_line
+
+!-------- the weight of a vertex -------------------------
+!dx = xg-xw;  dy = yg-yw; dtau1 = tau3-tau2; dtau2 = tau1-tau3
+DOUBLE PRECISION FUNCTION weight_vertex(stat, isdelta, dx, dy, dtau1, dtau2, typ)
+  implicit none
+  integer :: stat, dx, dy, t1, t2, typ, isdelta
+  double precision :: weight
+  double precision :: dtau1, dtau2
+
+  t1 = Floor(dtau1*MxT/Beta)
+  t2 = Floor(dtau2*MxT/Beta)
+
+  if(isdelta==1) then
+    t1 = 0
+    t2 = 0
+  endif
+
+  !---------------------- for test --------------------------------------
+  !if(stat>=0 .and. stat<=3) then
+    !weight_vertex = weight_meas_gam(dx, dy, t1, t2, 1)
+  !else if(stat==-1) then
+    !write(*, *) IsWormPresent, iupdate, "vertex status == -1! There is no weight!" 
+    !stop
+  !else
+    !write(*, *) IsWormPresent, iupdate, "vertex status error!", stat
+    !stop
+  !endif
+  !------------------------ end -----------------------------------------
+
+  if(stat==0) then
+      if(isdelta==0) weight_vertex = weight_Gam(dx, dy, t1, t2, typ)
+      if(isdelta==1) weight_vertex = weight_Gam0(dx, dy, t1, t2, typ)
+      !----------------- for bare Gamma ------------------------------
+      !if(isdelta==0) weight_vertex = 0.d0
+      !if(isdelta==1) weight_vertex = weight_Gam0(dx, dy, t1, t2, typ)
+      !------------------------ end ----------------------------------
+  else if(stat==2) then
+    weight_vertex = weight_worm_gam(dx, dy, t1, t2, typ)
+  else if(stat==1 .or. stat==3) then
+    weight_vertex = weight_meas_gam(dx, dy, t1, t2, typ)
+  else if(stat==-1) then 
+    write(*, *) IsWormPresent, iupdate, "vertex status == -1! There is no weight!" 
+    stop
+  else
+    write(*, *) IsWormPresent, iupdate, "vertex status error!", stat
+    stop
+  endif
+  return
+END FUNCTION weight_vertex
+
+!-------- the weight ratio of new/old config -------------------------
+SUBROUTINE weight_ratio(Pacc, sgn, Anew, Aold)
+  implicit none
+  double precision,intent(in) ::Anew, Aold
+  double precision,intent(out) :: Pacc, sgn
+  Pacc = Anew/Aold
+  if(Pacc>1.d-20) then
+    sgn = 1.d0
+  else if(Pacc<-1.d-20) then
+    sgn = -1.d0
+    Pacc = -1.d0*Pacc
+  else 
+    sgn = 1.d0
+    Pacc = 0.d0
+  endif
+  return
+END SUBROUTINE weight_ratio
+
+SUBROUTINE update_weight(Anew, Aold)
+  implicit none 
+  double precision :: Anew, Aold
+
+  WeightCurrent = WeightCurrent *Anew/Aold
+  return
+END SUBROUTINE update_weight
+!====================================================================
+!====================================================================
+!====================================================================
