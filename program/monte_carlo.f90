@@ -343,8 +343,8 @@ end SUBROUTINE
 SUBROUTINE change_wline_space
     implicit none
     integer :: iGam, iWLn, jGam, dxw, dyw, xwi, ywi, xwj, ywj, dir
-    double precision :: WiGam,WjGam, WW, Anew, Aold, Pacc, sgn,T1,T2,T3,T4,T5,T6
-
+    double precision :: Pacc,T1,T2,T3,T4,T5,T6
+    complex*16  ::  WiGam,WjGam, WW, Anew, Aold, sgn
     !------- step1 : check if worm is present -------------
     if(IsWormPresent .eqv. .true.)    return
     !ProbProp(iupdate) = ProbProp(iupdate) + 1
