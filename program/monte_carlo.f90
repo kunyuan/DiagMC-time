@@ -308,6 +308,7 @@ SUBROUTINE markov
     end select
 
     imc = imc + 1
+    call check_config
 
 
     if(IsWormPresent ) then
