@@ -1119,16 +1119,17 @@ END SUBROUTINE undo_delete_gamma
 
 !-------- the weight of a line -------------------------
 ! dx = x2-x1;  dy = y2- y1; tau = tau2-tau1
-COMPLEX*16 FUNCTION weight_line(stat, isdelta, knd, dx, dy, tau, typ)
+COMPLEX*16 FUNCTION weight_line(stat, isdelta, knd, dx0, dy0, tau, typ)
   implicit none
   integer :: stat, isdelta, knd, dx, dy, typ
+  integer :: dx0, dy0
   double precision :: tau
   integer :: t
 
   t = Floor(tau*MxT/Beta)
 
-  dx = diff_x(dx)
-  dy = diff_y(dy)
+  dx = diff_x(dx0)
+  dy = diff_y(dy0)
 
   !---------------------- for test --------------------------------------
   !if(stat >= 0 .and. stat<=3) then
@@ -1172,17 +1173,18 @@ END FUNCTION weight_line
 
 !-------- the weight of a vertex -------------------------
 !dx = xg-xw;  dy = yg-yw; dtau1 = tau3-tau2; dtau2 = tau1-tau3
-COMPLEX*16 FUNCTION weight_vertex(stat, isdelta, dx, dy, dtau1, dtau2, typ)
+COMPLEX*16 FUNCTION weight_vertex(stat, isdelta, dx0, dy0, dtau1, dtau2, typ)
   implicit none
   integer :: stat, dx, dy, t1, t2, typ, isdelta
+  integer :: dx0, dy0
   double precision :: weight
   double precision :: dtau1, dtau2
 
   t1 = Floor(dtau1*MxT/Beta)
   t2 = Floor(dtau2*MxT/Beta)
 
-  dx = diff_x(dx)
-  dy = diff_y(dy)
+  dx = diff_x(dx0)
+  dy = diff_y(dy0)
 
   !---------------------- for test --------------------------------------
   !if(stat>=0 .and. stat<=3) then
