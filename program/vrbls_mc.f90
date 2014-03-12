@@ -114,9 +114,11 @@ MODULE vrbls_mc
 
   !====================== MC Simulation ==================================
   double precision :: GamNorm, GamNormWeight           ! the weight of the normalization diagram
+  double precision, allocatable :: GamMC(:,:,:,:,:,:,:)      ! the measurement of Gamma in MC
+  double precision, allocatable :: GamSqMC(:,:,:,:,:,:,:)      ! the measurement of Gamma in MC
+
   double precision :: GamOrder(0:MxOrder)              ! the configuration number of different orders
   double precision :: GamWormOrder(0:MxOrder)          ! the configuration number in worm section
-  double precision, allocatable :: GamMC(:,:,:,:,:,:,:)      ! the measurement of Gamma in MC
 
   double precision :: WeightCurrent            ! the current weight of the configuration
   double precision :: CoefOfWorm
@@ -154,7 +156,8 @@ MODULE vrbls_mc
   integer, dimension(MxNLn) :: StatusLn             ! 2:I&M; 0:normal; 1: measure; -1: empty
   integer, dimension(MxNLn) :: IsDeltaLn            ! 0: W, not delta; 1: W, delta; -1: G
   COMPLEX*16, dimension(MxNLn) :: WeightLn          ! weight of glines and wlines
-  integer, dimension(MxNLn)  :: NextLn, TailLn      ! for add or delete use
+  integer, dimension(MxNLn)  :: NextLn
+  integer                    :: TailLn      ! for add or delete use
 
   integer, dimension(MxNGLn) :: GLnKey2Value        
   integer, dimension(MxNWLn) :: WLnKey2Value       
@@ -172,7 +175,8 @@ MODULE vrbls_mc
   COMPLEX*16, dimension(MxNVertex) :: WeightVertex          ! weight of  gamma
   integer, dimension(MxNLn) :: IsDeltaVertex                ! 0: not delta; 1: delta
   integer, dimension(MxNVertex):: StatusVertex              ! 2:I&M; 0:normal; 1: measure; -1: empty
-  integer, dimension(MxNVertex):: NextVertex, TailVertex    ! for add or delete use
+  integer, dimension(MxNVertex):: NextVertex
+  integer                      :: TailVertex    ! for add or delete use
 
   integer, dimension(MxNVertex):: VertexKey2Value        
   integer, dimension(MxNVertex):: VertexValue2Key      
