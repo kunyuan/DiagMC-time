@@ -140,6 +140,7 @@ SUBROUTINE write_monte_carlo_data
   implicit none
   integer :: iorder, itopo, ix, iy, ityp, it1, it2
 
+  !=========== write into files =========================================
   open(104, status="replace", file=trim(title3)//"_monte_carlo_data.dat")
 
   write(104, *) imc, GamNorm, GamNormWeight
@@ -159,6 +160,8 @@ SUBROUTINE write_monte_carlo_data
       enddo
     enddo
   enddo
+  !=========  write on the screen ========================================
+
   
   close(104)
 END SUBROUTINE write_monte_carlo_data
@@ -681,6 +684,7 @@ END SUBROUTINE output_Quantities
   !close(35)
   !close(36)
 !END SUBROUTINE output_GamMC
+
 
 !!================================================================
 !!================================================================
