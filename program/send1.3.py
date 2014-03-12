@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#/usr/bin/python
 import random
 import os
 import sys
@@ -10,7 +10,7 @@ IsCluster=False
 cpu=4
 #sourcedir="."
 #execute="./test"
-execute="./Gamma3.exe"
+execute="./gamma3.exe"
 homedir=os.getcwd()
 proclist=[]
 
