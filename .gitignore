@@ -2,4 +2,6 @@
 *.mod
 *.dat
 *.swp
+*.o
+*.dwarf
 DiagMC_time_brain/*
