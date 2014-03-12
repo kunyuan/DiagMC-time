@@ -4,8 +4,8 @@ PROGRAM MAIN
   implicit none
   integer :: InpMC, it
 
-  !print *, 'Lx, Ly, Ntoss, Nsamp, nw, Nblck, Jcp, beta, MCOrder, Seed, ISub, InpMC, title'
-  !read  *,  Lx, Ly, Ntoss, Nsamp, nw, Nblck, Jcp, beta, MCOrder, Seed, ISub, InpMC, title
+  !print *, 'Lx, Ly, Ntoss, Nsamp, Nblck, NStep, Jcp, beta, MCOrder, Seed, ISub, InpMC, title'
+  !read  *,  Lx, Ly, Ntoss, Nsamp, Nblck, NStep, Jcp, beta, MCOrder, Seed, ISub, InpMC, title
 
   !do i = 1, MCOrder
     !read *, CoefOfWeight(i)
@@ -23,29 +23,41 @@ PROGRAM MAIN
   Mu(1)  = 1.d0
   Mu(2)  = 1.d0
 
-  Jcp = 1.d0
-  Beta = 0.5d0
   Lx = 4
   Ly = 4
+
+  Ntoss = 100
+  NSamp = 10
+  Nblck = 1024
+  NStep = 1
+
+  Jcp = 1.d0
+  Beta = 0.5d0
+  MCOrder = 2
+  Seed = -100
+
+  InpMC = 0
+
+  CoefOfWeight(1:MCOrder) = 1.d0
+  CoefOfWorm = 1.d0
+
+  write(title1, '(f4.2)') beta
+
+  !================== space variables ==================================
   Vol = Lx*Ly
   dLx = Floor(Lx/2.d0)
   dLy = Floor(Ly/2.d0)
-
-  InpMC = 0
 
   !================ irreducibility check ===============================
   CheckG = .true.
   CheckW = .true.
   CheckGam = .false.
-  !================ updates frequency   ================================
-  Pupdate(:)  = 1.d0
-  Pupdate(2)  = 5.d0
 
-  Pupdate(3)  = 0.d0
-  Pupdate(4)  = 0.d0
+  !================ updates frequency   ================================
+  Pupdate(:)  = 0.d0
+  Pupdate(13)  = 1.d0
   !===================================================================
 
-  write(title1, '(f4.2)') beta
 
   allocate(W(NTypeW, 0:Lx-1, 0:Ly-1, 0:MxT-1))
   allocate(Gam(NTypeGam, 0:Lx-1, 0:Ly-1, 0:MxT-1, 0:MxT-1))
@@ -56,6 +68,7 @@ PROGRAM MAIN
   allocate(Chi(0:Lx-1, 0:Ly-1, 0:MxT-1))
 
   allocate(GamMC(0:MCOrder,0:1,1:NTypeGam/2, 0:Lx-1, 0:Ly-1, 0:MxT-1, 0:MxT-1))
+  allocate(GamSqMC(0:MCOrder,0:1,1:NTypeGam/2, 0:Lx-1, 0:Ly-1, 0:MxT-1, 0:MxT-1))
 
   call set_time_elapse
   call set_RNG
@@ -255,29 +268,29 @@ END SUBROUTINE
 
 SUBROUTINE monte_carlo
   implicit none
-  !integer :: istep, iblck, mc_version
-  !double precision :: WR, GamR
+  integer :: isamp, iblck, mc_version
+  double precision :: WR, GamR
 
   call initialize_markov
 
   !call read_GWGamma
   !call calculate_GamNormWeight
 
-  !if(InpMC==0) then
+  if(InpMC==0) then
 
-    !ProbProp(:,:) = 0.d0
-    !ProbAcc(:,:) = 0.d0
+    ProbProp(:,:) = 0.d0
+    ProbAcc(:,:) = 0.d0
 
-    !!-------- throw away some configurations to thermalize -----------
-    !do istep = 1, Ntoss
-      !call markov
-    !enddo
-    !!call print_config
+    !-------- throw away some configurations to thermalize -----------
+    do isamp = 1, Ntoss
+      call markov
+    enddo
+    !call print_config
 
-    !call time_elapse
-    !t_simu = t_elap
-    !write(*,52) t_simu
-    !52 format(/'thermalization time:',f16.7,2x,'s')
+    call time_elapse
+    t_simu = t_elap
+    write(*,52) t_simu
+    52 format(/'thermalization time:',f16.7,2x,'s')
 
   !else if(InpMC==1) then
 
@@ -286,37 +299,32 @@ SUBROUTINE monte_carlo
     !call print_config
     !call check_config
 
-  !endif
+  endif
 
-  !!!================ MC SIMULATION FOR GAMMA =============================
-  !imc = 0.d0
-  !ime = 0.d0
-  !ProbProp(:,:) = 0.d0
-  !ProbAcc(:,:) = 0.d0
+  !!================ MC SIMULATION FOR GAMMA =============================
+  imc = 0.d0
+  imeasure = 0.d0
 
-  !GamOrder(:) = 0.d0
-  !GamWormOrder(:) = 0.d0
+  ProbProp(:,:) = 0.d0
+  ProbAcc(:,:) = 0.d0
 
-  !GamMC(:,:,:,:,:,:,:) = 0.d0
-  !GamSqMC(:,:,:,:,:,:,:) = 0.d0
-  !GamNorm = 0.d0
+  GamOrder(:) = 0.d0
+  GamWormOrder(:) = 0.d0
 
-  !Gam2Topo(:,:) = 0.d0
+  GamMC(:,:,:,:,:,:,:) = 0.d0
+  GamSqMC(:,:,:,:,:,:,:) = 0.d0
+  GamNorm = 0.d0
 
-  !AveWeightRatio(:,:) = 0.d0
+  mc_version = 0
 
+  do iblck = 1, Nblck
+    do isamp = 1, Nsamp
+      call markov
+      call measure
 
-  !mc_version = 0
-
-
-  !do iblck = 1, Nblck
-    !do isamp = 1, Nsamp
-      !call markov
-      !call measure
-
-      !if(Mod(isamp,1000000)==0) then
-        !call check_config
-        !call print_config
+      if(Mod(isamp,1000000)==0) then
+        call check_config
+        call print_config
 
         !call output_GamMC
         !call output_prob_MC
@@ -327,22 +335,22 @@ SUBROUTINE monte_carlo
           !call update_WeightCurrent
           !mc_version = file_version
         !endif
-      !endif
+      endif
 
-      !if(Mod(isamp,5000000)==0) then
-        !call write_monte_carlo_conf
-        !call write_monte_carlo_data
-      !endif
-    !enddo
-  !enddo
+      if(Mod(isamp,5000000)==0) then
+        call write_monte_carlo_conf
+        call write_monte_carlo_data
+      endif
+    enddo
+  enddo
 
-  !call write_monte_carlo_conf
-  !call write_monte_carlo_data
+  call write_monte_carlo_conf
+  call write_monte_carlo_data
 
-  !call time_elapse
-  !t_simu = t_elap
-  !write(*,51) t_simu
-  !51 format(/'simulation time:',f16.7,2x,'s')
+  call time_elapse
+  t_simu = t_elap
+  write(*,51) t_simu
+  51 format(/'simulation time:',f16.7,2x,'s')
 
   return
 END SUBROUTINE monte_carlo

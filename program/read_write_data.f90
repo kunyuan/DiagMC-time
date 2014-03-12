@@ -83,7 +83,7 @@ SUBROUTINE write_monte_carlo_data
   implicit none
   integer :: iorder, itopo, ix, iy, ityp, it1, it2
 
-  open(104, status="replace", file=trim(title3)//"_monte_carlo_data.dat")
+  open(104, status="replace", file=trim(title1)//"_monte_carlo_data.dat")
 
   write(104, *) imc, GamNorm, GamNormWeight
   do iorder = 0, MCOrder
@@ -94,6 +94,7 @@ SUBROUTINE write_monte_carlo_data
             do it1 = 0, MxT-1
               do it2 = 0, MxT-1
                 write(104, *)  GamMC(iorder, itopo, ityp, ix, iy, it1, it2)
+                write(104, *)  GamSqMC(iorder, itopo, ityp, ix, iy, it1, it2)
               enddo
             enddo
           enddo
@@ -109,7 +110,7 @@ SUBROUTINE write_monte_carlo_conf
   implicit none
   integer :: i
 
-  open(103, status="replace", file=trim(title3)//"_monte_carlo_conf.dat")
+  open(103, status="replace", file=trim(title1)//"_monte_carlo_conf.dat")
 
   write(103, *)  Order, NGLn, NWLn, NVertex, MeasureGam, SignFermiLoop, IsWormPresent 
   write(103, *)  Ira, Masha, SpinMasha, kMasha
@@ -154,7 +155,7 @@ SUBROUTINE read_monte_carlo_data
   implicit none
   integer :: iorder, ix, iy, ityp, it1, it2, itopo
 
-  open(105, status="old", file=trim(title)//"_monte_carlo_data.dat")
+  open(105, status="old", file=trim(title1)//"_monte_carlo_data.dat")
 
   read(105, *) imc, GamNorm, GamNormWeight
   do iorder = 0, MCOrder
@@ -183,7 +184,7 @@ SUBROUTINE read_monte_carlo_conf
   implicit none
   integer :: i
 
-  open(106, status="old", file=trim(title)//"_monte_carlo_conf.dat")
+  open(106, status="old", file=trim(title1)//"_monte_carlo_conf.dat")
 
   read(106, *)  Order, NGLn, NWLn, NVertex, MeasureGam, SignFermiLoop, IsWormPresent 
   read(106, *)  Ira, Masha, SpinMasha, kMasha

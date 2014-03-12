@@ -5,13 +5,6 @@ SUBROUTINE initialize_markov
     implicit none
     integer :: i
 
-    CoefOfWeight(:) = 1.d0
-
-    Pupdate(:)  = 1.d0
-    Pupdate(2)  = 5.d0
-    Pupdate(3)  = 0.d0
-    Pupdate(4)  = 0.d0
-
     !--------------- initialize variables ---------------
     GLnKey2Value(:) = 0
     WLnKey2Value(:) = 0
@@ -293,18 +286,18 @@ SUBROUTINE markov
         !call remove_interaction_cross                  
       !case(11) 
         !call reconnect                      
-      case(12) 
-        call change_gline_space          
+      !case(12) 
+        !call change_gline_space          
       case(13)  
         call change_wline_space         
       !case(14) 
         !call change_Gamma_type     
       !case(15) 
         !call move_measuring_index       
-      case(16)  
-        call change_gline_time        
-      case(17)  
-        call change_wline_time        
+      !case(16)  
+        !call change_gline_time        
+      !case(17)  
+        !call change_wline_time        
     end select
 
     imc = imc + 1
@@ -1376,6 +1369,7 @@ SUBROUTINE measure
     dt1 = dt1 + MxT
     factorM = factorM * (-1.d0)
   endif
+
   dt2 = Floor((tau1-tau3)*MxT/Beta)
   if(dt2<0) then
     dt2 = dt2 + MxT
