@@ -2,46 +2,26 @@ INCLUDE "vrbls_mc.f90"
 PROGRAM MAIN
   USE vrbls_mc
   implicit none
-  integer :: InpMC, it
+  integer :: InpMC, it, i, ISub
 
-  !print *, 'Lx, Ly, Ntoss, Nsamp, Nblck, NStep, Jcp, beta, MCOrder, Seed, ISub, InpMC, title'
-  !read  *,  Lx, Ly, Ntoss, Nsamp, Nblck, NStep, Jcp, beta, MCOrder, Seed, ISub, InpMC, title
+  print *, 'Lx, Ly, Ntoss, Nsamp, Nblck, NStep, Jcp, beta, MCOrder, Seed, ISub, InpMC, title'
+  read  *,  Lx, Ly, Ntoss, Nsamp, Nblck, NStep, Jcp, beta, MCOrder, Seed, ISub, InpMC, title
 
-  !do i = 1, MCOrder
-    !read *, CoefOfWeight(i)
-  !enddo
-  !read *, CoefOfWorm
+  do i = 1, MCOrder
+    read *, CoefOfWeight(i)
+  enddo
+  read *, CoefOfWorm
 
-  !write(title1, '(f4.2)') beta
-  !write(title2, '(i2)')  MCOrder
-  !write(title3, '(i14)') Seed
+  write(title1, '(f4.2)') beta
+  write(title2, '(i2)')  MCOrder
+  write(title3, '(i14)') Seed
 
-  !title2 = trim(adjustl(title1))//'_'//trim(adjustl(title2))
-  !title3 = trim(adjustl(title2))//'_'//trim(adjustl(title3))
+  title2 = trim(adjustl(title1))//'_'//trim(adjustl(title2))
+  title3 = trim(adjustl(title2))//'_'//trim(adjustl(title3))
 
   !!================= INITIALIZATION =======================================
   Mu(1)  = 1.d0
   Mu(2)  = 1.d0
-
-  Lx = 4
-  Ly = 4
-
-  Ntoss = 100
-  NSamp = 10
-  Nblck = 1024
-  NStep = 1
-
-  Jcp = 1.d0
-  Beta = 0.5d0
-  MCOrder = 2
-  Seed = -100
-
-  InpMC = 0
-
-  CoefOfWeight(1:MCOrder) = 1.d0
-  CoefOfWorm = 1.d0
-
-  write(title1, '(f4.2)') beta
 
   !================== space variables ==================================
   Vol = Lx*Ly
@@ -73,29 +53,15 @@ PROGRAM MAIN
   call set_time_elapse
   call set_RNG
   call initialize_self_consistent
-
-  call self_consistent
-  call monte_carlo
-
-  !open(15, file="W_t.dat")
-  
-  !do it = 0, MxT-1
-    !write(15, *) (real(it)+0.5d0)*Beta/real(MxT), real(W(1,1,0,it)), dimag(W(1,1,0,it))
-  !enddo
-  !close(15)
-
-
-  !call def_symmetry
+  call def_symmetry
 
   !!=====================================================================
 
-  !if(ISub==1) then
-    !call monte_carlo
-  !else if(ISub==2) then
-    !call self_consistent
-  !endif
-
-
+  if(ISub==1) then
+    call self_consistent
+  else if(ISub==2) then
+    call monte_carlo
+  endif
 
 CONTAINS
 INCLUDE "basic_function.f90"
@@ -124,7 +90,7 @@ SUBROUTINE self_consistent
 
     call output_Quantities
 
-    !call write_GWGamma
+    call write_GWGamma
 
     !!===== G, W with 1-order Gamma =============================
     !call calculate_Gamma1   
@@ -206,7 +172,7 @@ LOGICAL FUNCTION self_consistent_GW(err)
   WNow = weight_W(1, 0, 0, 0)
   self_consistent_GW = .true.
 
-  !if(InpMC==0) then
+  if(InpMC==0) then
     iloop = 0
 
     call calculate_Polar
@@ -236,7 +202,7 @@ LOGICAL FUNCTION self_consistent_GW(err)
 
       !write(*, *) "G-W loop:", iloop, WOldR, WWR
     !enddo
-  !endif
+  endif
 
   !!-------------------------------------------------------
   call plus_minus_W0(-1)
@@ -271,10 +237,10 @@ SUBROUTINE monte_carlo
   integer :: isamp, iblck, mc_version
   double precision :: WR, GamR
 
+  call read_GWGamma
+  call calculate_GamNormWeight   ! need to be updated
+  
   call initialize_markov
-
-  !call read_GWGamma
-  !call calculate_GamNormWeight
 
   if(InpMC==0) then
 

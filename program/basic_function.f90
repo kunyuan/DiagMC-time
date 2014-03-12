@@ -6,12 +6,12 @@
 !=====================================================================
 
 
-!SUBROUTINE calculate_GamNormWeight
-  !implicit none
-  !integer :: omega1, omegaW, omega2, ityp
-  !double precision :: Gam0
+SUBROUTINE calculate_GamNormWeight
+  implicit none
+  integer :: omega1, omegaW, omega2, ityp
+  double precision :: Gam0
 
-  !GamNormWeight = 0.d0
+  GamNormWeight = 1.d0
   !do omega1 = -MxOmegaDiag, MxOmegaDiag
     !do omega2 = -MxOmegaDiag, MxOmegaDiag
       !omegaW = omega1-omega2
@@ -24,8 +24,8 @@
       !enddo
     !enddo
   !enddo
-  !return
-!END SUBROUTINE calculate_GamNormWeight
+  return
+END SUBROUTINE calculate_GamNormWeight
 
 !!--------- worm weight function  ---------
 !DOUBLE PRECISION FUNCTION weight_worm(dxg, dyg, dxw, dyw, domega)
@@ -96,22 +96,22 @@ END FUNCTION weight_meas_Gam
 
 
 !!------------- definition of the system symmetry ----------------
-!SUBROUTINE def_symmetry
-  !implicit none
-  !integer :: i, j, omega
+SUBROUTINE def_symmetry
+  implicit none
+  integer :: i, j, omega
 
-  !CoefOfSymmetry(:,:) = 2.d0
+  CoefOfSymmetry(:,:) = 2.d0
 
-  !!do i = 1, Lx-1
-    !!CoefOfSymmetry(i, :) = 2.d0* CoefOfSymmetry(i, :)
-  !!enddo
+  !do i = 1, Lx-1
+    !CoefOfSymmetry(i, :) = 2.d0* CoefOfSymmetry(i, :)
+  !enddo
 
-  !!do j = 1, Ly-1
-    !!CoefOfSymmetry(:, j) = 2.d0* CoefOfSymmetry(:, j)
-  !!enddo
+  !do j = 1, Ly-1
+    !CoefOfSymmetry(:, j) = 2.d0* CoefOfSymmetry(:, j)
+  !enddo
   
-  !return
-!END SUBROUTINE def_symmetry
+  return
+END SUBROUTINE def_symmetry
 
 !SUBROUTINE update_WeightCurrent
   !implicit none

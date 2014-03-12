@@ -231,7 +231,6 @@ SUBROUTINE def_diagram
 
   WeightCurrent = abs(Anew)
   Phase = Anew/WeightCurrent
-
   !-------------------------------------------------------
 
   call print_config
@@ -301,15 +300,13 @@ SUBROUTINE markov
     end select
 
     imc = imc + 1
-    call check_config
-
 
     if(IsWormPresent ) then
       GamWormOrder(Order) = GamWormOrder(Order) + 1
       if(rn()<=0.5d0) call switch_ira_and_masha
     else
-      GamOrder(Order) = GamOrder(Order) + 1
       istep = istep + 1
+      GamOrder(Order) = GamOrder(Order) + 1
     endif
   enddo
 

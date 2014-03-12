@@ -187,6 +187,7 @@ add_mea_stat	monte_carlo.f90	/^INTEGER FUNCTION add_mea_stat(/;"	f
 add_mea_stat	monte_carlo_old.f90	/^INTEGER FUNCTION add_mea_stat(/;"	f
 calculate_Chi	self_consistent.f90	/^SUBROUTINE calculate_Chi$/;"	s
 calculate_G	self_consistent.f90	/^SUBROUTINE calculate_G$/;"	s
+calculate_GamNormWeight	basic_function.f90	/^SUBROUTINE calculate_GamNormWeight$/;"	s
 calculate_Gamma1	analytic_integration.f90	/^SUBROUTINE calculate_Gamma1$/;"	s
 calculate_Gamma2	analytic_integration.f90	/^SUBROUTINE calculate_Gamma2$/;"	s
 calculate_Polar	self_consistent.f90	/^SUBROUTINE calculate_Polar$/;"	s
@@ -219,6 +220,7 @@ def_diagram	monte_carlo_old.f90	/^SUBROUTINE def_diagram$/;"	s
 def_prob	monte_carlo.f90	/^SUBROUTINE def_prob$/;"	s
 def_spin	monte_carlo.f90	/^SUBROUTINE def_spin$/;"	s
 def_spin	monte_carlo_old.f90	/^SUBROUTINE def_spin$/;"	s
+def_symmetry	basic_function.f90	/^SUBROUTINE def_symmetry$/;"	s
 delete_Hash4G	monte_carlo.f90	/^SUBROUTINE delete_Hash4G(/;"	s
 delete_Hash4G	monte_carlo_old.f90	/^SUBROUTINE delete_Hash4G(/;"	s
 delete_Hash4W	monte_carlo.f90	/^SUBROUTINE delete_Hash4W(/;"	s
