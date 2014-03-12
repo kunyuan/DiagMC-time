@@ -3,5 +3,8 @@
 *.dat
 *.swp
 *.o
+*.out
 *.dwarf
 DiagMC_time_brain/*
+infile
+outfile
