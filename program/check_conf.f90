@@ -8,7 +8,7 @@ SUBROUTINE check_config
   call check_topo
   call check_stat
   call check_irreducibility
-  call check_omega
+  call check_k_conserve
   call check_type
   call check_site
   call check_weight
@@ -22,26 +22,26 @@ SUBROUTINE check_topo
   integer :: i, j, k
   integer :: nextLn, nLn
   
-  if(NGLn/=2*(Order+1) .or. NWLn/=Order+1 .or. NGam/=2*(Order+1)) then
+  if(NGLn/=2*(Order+1) .or. NWLn/=Order+1 .or. NVertex/=2*(Order+1)) then
     write(*, *) "================================================="
     write(*, *) "Oops, check_topo found a bug!"
     write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
     write(*, *) "Diagram order", Order
     write(*, *) "number of glines", NGLn, "number of wlines", NWLn, &
-      & "number of gamma", NGam
+      & "number of gamma", NVertex
     write(*, *) "================================================="
     call print_config
     stop
   endif
 
   do i = 1, NGLn
-    if(List4Ln(Ln4GList(i))/=i) then
+    if(LnValue2Key(GLnKey2Value(i))/=i) then
       write(*, *) "================================================="
       write(*, *) "Oops, check_topo found a bug!"
       write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
       write(*, *) "gline's location is wrong!"
-      write(*, *) "real location", i, "gline's number", Ln4GList(i), "gline's &
-        & location", List4Ln(Ln4GList(i))
+      write(*, *) "real location", i, "gline's number", GLnKey2Value(i), "gline's &
+        & location", LnValue2Key(GLnKey2Value(i))
       write(*, *) "================================================="
       call print_config
       stop
@@ -50,8 +50,8 @@ SUBROUTINE check_topo
 
   if(IsWormPresent .eqv. .false.) then
     nLn = 1
-    nextLn = NeighVertex(2, NeighLn(2, Ln4GList(1)))
-    do while(nextLn/=Ln4GList(1))
+    nextLn = NeighVertex(2, NeighLn(2, GLnKey2Value(1)))
+    do while(nextLn/=GLnKey2Value(1))
       nextLn = NeighVertex(2, NeighLn(2, nextLn))
       nLn = nLn + 1
       if(nLn>NGLn) then
@@ -79,26 +79,26 @@ SUBROUTINE check_topo
   endif
 
   do i = 1, NWLn
-    if(List4Ln(Ln4WList(i))/=i) then
+    if(LnValue2Key(WLnKey2Value(i))/=i) then
       write(*, *) "================================================="
       write(*, *) "Oops, check_topo found a bug!"
       write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
       write(*, *) "wline's location is wrong!"
-      write(*, *) "real location", i, "wline's number", Ln4WList(i), "wline's &
-        & location", List4Ln(Ln4WList(i))
+      write(*, *) "real location", i, "wline's number", WLnKey2Value(i), "wline's &
+        & location", LnValue2Key(WLnKey2Value(i))
       write(*, *) "================================================="
       call print_config
       stop
     endif
 
     if(IsWormPresent .eqv. .false.) then
-      if(NeighLn(1, Ln4WList(i))==NeighLn(2, Ln4WList(i))) then
+      if(NeighLn(1, WLnKey2Value(i))==NeighLn(2, WLnKey2Value(i))) then
         write(*, *) "================================================="
         write(*, *) "Oops, check_topo found a bug!"
         write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
         write(*, *) "wline's topology is wrong!"
-        write(*, *) "wline's number", Ln4WList(i), "wline's left Gam", NeighLn(1, &
-          &  Ln4WList(i)), "right Gam", NeighLn(2, Ln4WList(i))
+        write(*, *) "wline's number", WLnKey2Value(i), "wline's left Gam", NeighLn(1, &
+          &  WLnKey2Value(i)), "right Gam", NeighLn(2, WLnKey2Value(i))
         write(*, *) "================================================="
         call print_config
         stop
@@ -106,14 +106,14 @@ SUBROUTINE check_topo
     endif
   enddo
 
-  do i = 1, NGam
-    if(List4Vertex(Vertex4GamList(i))/=i) then
+  do i = 1, NVertex
+    if(VertexValue2Key(VertexKey2Value(i))/=i) then
       write(*, *) "================================================="
       write(*, *) "Oops, check_topo found a bug!"
       write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
       write(*, *) "gamma's location is wrong!"
-      write(*, *) "real location", i, "gamma's number", Vertex4GamList(i), "gamma's &
-        & location", List4Ln(Vertex4GamList(i))
+      write(*, *) "real location", i, "gamma's number", VertexKey2Value(i), "gamma's &
+        & location", VertexValue2Key(VertexKey2Value(i))
       write(*, *) "================================================="
       call print_config
       stop
@@ -156,7 +156,7 @@ SUBROUTINE check_stat
   do i = 1, MxNVertex
     if(StatusVertex(i)==-1)  cycle
     stat = 0
-    if(MeasGamma==i)         stat = stat+1
+    if(MeasureGam==i)         stat = stat+1
     if(IsWormPresent) then
       if(Ira==i .or. Masha==i) stat = stat+2
     endif
@@ -177,7 +177,7 @@ SUBROUTINE check_stat
   do i = 1, MxNLn
     if(StatusLn(i)==-1)  cycle
     stat = 0
-    if(NeighLn(1,i)==MeasGamma .or. NeighLn(2,i)==MeasGamma) stat = stat+1
+    if(NeighLn(1,i)==MeasureGam .or. NeighLn(2,i)==MeasureGam) stat = stat+1
     if(KindLn(i)==2) then
       if(IsWormPresent) then
         if(NeighLn(1,i)==Ira .or. NeighLn(2,i)==Ira .or. NeighLn(1,i)==Masha &
@@ -251,36 +251,11 @@ END SUBROUTINE check_site
 
 
 
-SUBROUTINE check_omega
+SUBROUTINE check_k_conserve
   implicit none
   integer :: i, j, k
   integer :: omega
   
-  do i = 1, MxNVertex
-    if(StatusVertex(i)==-1) cycle
-    if(DirecVertex(i)==1) then
-      omega = OmegaLn(NeighVertex(1,i))-OmegaLn(NeighVertex(2,i)) &
-        & -OmegaLn(NeighVertex(3,i))
-    else
-      omega = OmegaLn(NeighVertex(1,i))-OmegaLn(NeighVertex(2,i)) &
-        & +OmegaLn(NeighVertex(3,i))
-    endif
-    if(IsWormPresent .eqv. .true.) then
-      if(i==Ira)   omega = omega + OmegaMasha
-      if(i==Masha) omega = omega - OmegaMasha
-    endif
-    if(omega/=0) then
-      write(*, *) "================================================="
-      write(*, *) "Oops, check_omega found a bug!"
-      write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-      write(*, *) "Omega on gamma is not conserved!"
-      write(*, *) "gamma's number", i, "omega", omega
-      write(*, *) "================================================="
-      call print_config
-      stop
-    endif
-  enddo
-
   do i = 1, MxNVertex
     if(StatusVertex(i)==-1) cycle
     if(DirecVertex(i)==1) then
@@ -294,7 +269,7 @@ SUBROUTINE check_omega
     endif
     if(k/=0) then
       write(*, *) "================================================="
-      write(*, *) "Oops, check_omega found a bug!"
+      write(*, *) "Oops, check_k_conserve found a bug!"
       write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
       write(*, *) "k on gamma is not conserved!"
       write(*, *) "gamma's number", i, "k", k
@@ -304,7 +279,7 @@ SUBROUTINE check_omega
     endif
   enddo
   return
-END SUBROUTINE check_omega
+END SUBROUTINE check_k_conserve
 
 
 SUBROUTINE check_type
@@ -313,43 +288,6 @@ SUBROUTINE check_type
   integer :: Gam1, Gam2, G1, G2, G3, G4
   integer :: flag
   integer :: sum1
-
-  !========== Only for the first round in self-consistent loop =============
-  !do i = 1, MxNVertex
-    !if(StatusVertex(i)==-1) cycle
-    !if(TypeVertex(i)==3 .or. TypeVertex(i)==4)  then
-      !write(*, *) "================================================="
-      !write(*, *) "Oops, check_type found a bug!"
-      !write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-      !write(*, *) "In the first round, the weight of Gamma with type 3 and 4 is not zero!"
-      !write(*, *) "Gamma's number", i, "type of Gamma", TypeVertex(i), "status", &
-        !& StatusVertex(i), "weight", WeightVertex(i)
-      !write(*, *) "================================================="
-      !call print_config
-      !stop
-    !endif
-    !if(TypeVertexIn(i)>2 .or. TypeVertexIn(i)<1) then
-      !write(*, *) "================================================="
-      !write(*, *) "Oops, check_type found a bug!"
-      !write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-      !write(*, *) "The type of Gamma inside spin is not up nor down!"
-      !write(*, *) "Gamma's number", i, "type of Gamma inside spin in", TypeVertexIn(i)
-      !write(*, *) "================================================="
-      !call print_config
-      !stop
-    !endif
-    !if(TypeVertexOut(i)>2 .or. TypeVertexOut(i)<1) then
-      !write(*, *) "================================================="
-      !write(*, *) "Oops, check_type found a bug!"
-      !write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-      !write(*, *) "The type of Gamma inside spin is not up nor down!"
-      !write(*, *) "Gamma's number", i, "type of Gamma inside spin out", TypeVertexOut(i)
-      !write(*, *) "================================================="
-      !call print_config
-      !stop
-    !endif
-  !enddo
-  !==========================================================================
 
   do i = 1, MxNLn
     if(StatusLn(i)==-1) cycle
@@ -442,9 +380,9 @@ SUBROUTINE check_irreducibility
   
   if(CheckG) then
     do i = 1, NGLn
-      Gi = Ln4GList(i)
+      Gi = GLnKey2Value(i)
       do j = i+1, NGLn
-        Gj = Ln4GList(j)
+        Gj = GLnKey2Value(j)
         if(kLn(Gj)==kLn(Gi)) then
           write(*, *) "================================================="
           write(*, *) "Oops, check_irreducibility found a bug!"
@@ -461,7 +399,7 @@ SUBROUTINE check_irreducibility
 
   if(CheckW) then
     do i = 1, NWLn
-      Wi = Ln4WList(i)
+      Wi = WLnKey2Value(i)
       if(kLn(Wi)==0) then
         write(*, *) "================================================="
         write(*, *) "Oops, check_irreducibility found a bug!"
@@ -474,7 +412,7 @@ SUBROUTINE check_irreducibility
       endif
 
       do j = i+1, NWLn
-        Wj = Ln4WList(j)
+        Wj = WLnKey2Value(j)
         if(abs(kLn(Wj))==abs(kLn(Wi))) then
           write(*, *) "================================================="
           write(*, *) "Oops, check_irreducibility found a bug!"
@@ -490,14 +428,14 @@ SUBROUTINE check_irreducibility
   endif
 
 
-  if(CheckGamma) then
+  if(CheckGam) then
     do i = 1, NGLn
-      Gi = Ln4GList(i)
+      Gi = GLnKey2Value(i)
       do j = i+1, NGLn
-        Gj = Ln4GList(j)
+        Gj = GLnKey2Value(j)
         if(NeighLn(1,Gi)==NeighLn(2,Gj) .or. NeighLn(2,Gi)==NeighLn(1,Gj)) cycle
         do k = 1, NWLn
-          Wk = Ln4WList(k)
+          Wk = WLnKey2Value(k)
           if(NeighLn(1,Wk)==NeighLn(1,Gi) .or. NeighLn(1,Wk)==NeighLn(1,Gj)) cycle
           if(NeighLn(1,Wk)==NeighLn(2,Gi) .or. NeighLn(1,Wk)==NeighLn(2,Gj)) cycle
           if(NeighLn(2,Wk)==NeighLn(1,Gi) .or. NeighLn(2,Wk)==NeighLn(1,Gj)) cycle
@@ -525,18 +463,21 @@ END SUBROUTINE check_irreducibility
 SUBROUTINE check_weight
   implicit none
   integer :: i, Gam1, Gam2, G, G1, G2, W
-  double precision :: weight
-  double precision :: wln(MxNLn), wgam(MxNVertex)
+  double precision :: tau1, tau2, tau
+  complex*16 :: weight
+  complex*16 :: wln(MxNLn), wgam(MxNVertex)
 
   weight = 1.d0
   do i = 1, MxNLn
     if(StatusLn(i)<0)  cycle
     if(KindLn(i)==1) then
-      wln(i) = weight_line(StatusLn(i),1,0,0,OmegaLn(i),TypeLn(i))
+      tau = T2Vertex(NeighLn(2, i))-T1Vertex(NeighLn(1, i))
+      wln(i) = weight_line(StatusLn(i),IsDeltaLn(i),1,0,0, tau, TypeLn(i))
     else
       Gam1 = NeighLn(1,i);       Gam2 = NeighLn(2,i)
-      wln(i) = weight_line(StatusLn(i),2,diff_x(WXVertex(Gam1),WXVertex(Gam2)), &
-        & diff_y(WYVertex(Gam1),WYVertex(Gam2)), OmegaLn(i), TypeLn(i))
+      tau = T3Vertex(NeighLn(2, i))-T3Vertex(NeighLn(1, i))
+      wln(i) = weight_line(StatusLn(i),IsDeltaLn(i),2,WXVertex(Gam1)-WXVertex(Gam2), &
+        & WYVertex(Gam1)-WYVertex(Gam2), tau, TypeLn(i))
     endif
     weight = weight *wln(i)
   enddo
@@ -545,20 +486,24 @@ SUBROUTINE check_weight
     if(StatusVertex(i)<0)  cycle
     G1 = NeighVertex(1, i);           G2 = NeighVertex(2, i)
     W = NeighVertex(3, i)
-    wgam(i) = weight_vertex(Order, StatusVertex(i), diff_x(GXVertex(i),WXVertex(i)), &
-      & diff_y(GYVertex(i),WYVertex(i)), OmegaLn(G1), OmegaLn(G2), TypeVertex(i))
+    tau1 = T3Vertex(i)-T2Vertex(i)
+    tau2 = T1Vertex(i)-T3Vertex(i)
+    wgam(i) = weight_vertex(StatusVertex(i), IsDeltaVertex(i), GXVertex(i)-WXVertex(i), &
+      & GYVertex(i)-WYVertex(i), tau1, tau2, TypeVertex(i))
     weight = weight *wgam(i)
   enddo
 
-  weight = weight*CoefOfWeight(Order)*(1.d0/Beta)**Order *(-1.d0)**NFermiLoop
+  weight = weight *CoefOfWeight(Order) *(1.d0/Beta)**Order *SignFermiLoop
+
   if(IsWormPresent) weight = weight*WeightWorm
 
-  if(abs(WeightCurrent-weight)>1.d-5) then
+  if(abs(Phase*WeightCurrent - weight)>1.d-5) then
     write(*, *) "================================================="
     write(*, *) "Oops, check_weight found a bug!"
     write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
 
-    write(*, *) "real weight", weight, "current weight", WeightCurrent
+    write(*, *) "real weight", weight
+    write(*, *) "current weight", Phase*WeightCurrent
     write(*, *) Order, Beta
 
     do i = 1, MxNLn
