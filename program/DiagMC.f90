@@ -36,6 +36,8 @@ PROGRAM MAIN
   !================ updates frequency   ================================
   Pupdate(:)  = 0.d0
   Pupdate(13)  = 1.d0
+  !===============  Test variables ==================================
+  TestData(:)=0.d0
   !===================================================================
 
 
@@ -248,6 +250,7 @@ SUBROUTINE monte_carlo
     ProbAcc(:,:) = 0.d0
 
     !-------- throw away some configurations to thermalize -----------
+    IsToss=1
     do isamp = 1, Ntoss
       call markov
     enddo
@@ -282,36 +285,26 @@ SUBROUTINE monte_carlo
   GamNorm = 0.d0
 
   mc_version = 0
+  IsToss=0
 
   do iblck = 1, Nblck
-    do isamp = 1, Nsamp
-      call markov
-      call measure
+    call markov
 
-      if(Mod(isamp,1000000)==0) then
-        call check_config
-        call print_config
+    !call output_GamMC
+    !call output_prob_MC
 
-        !call output_GamMC
-        !call output_prob_MC
+    !call read_flag
+    !if(mc_version/=file_version) then
+      !call read_GWGamma
+      !call update_WeightCurrent
+      !mc_version = file_version
+    !endif
 
-        !call read_flag
-        !if(mc_version/=file_version) then
-          !call read_GWGamma
-          !call update_WeightCurrent
-          !mc_version = file_version
-        !endif
-      endif
-
-      if(Mod(isamp,5000000)==0) then
-        call write_monte_carlo_conf
-        call write_monte_carlo_data
-      endif
-    enddo
+    call print_config
+    !call write_monte_carlo_conf
+    !call write_monte_carlo_data
+    !call write_monte_carlo_test
   enddo
-
-  call write_monte_carlo_conf
-  call write_monte_carlo_data
 
   call time_elapse
   t_simu = t_elap

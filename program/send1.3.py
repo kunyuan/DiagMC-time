@@ -1,4 +1,7 @@
+<<<<<<< HEAD
 #/usr/bin/python
+=======
+>>>>>>> master
 import random
 import os
 import sys
