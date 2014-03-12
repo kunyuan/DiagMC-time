@@ -299,8 +299,9 @@ SUBROUTINE monte_carlo
       !mc_version = file_version
     !endif
 
-    call write_monte_carlo_conf
-    call write_monte_carlo_data
+    call print_config
+    !call write_monte_carlo_conf
+    !call write_monte_carlo_data
     call write_monte_carlo_test
   enddo
 

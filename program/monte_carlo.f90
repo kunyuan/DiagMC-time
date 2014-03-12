@@ -1397,8 +1397,8 @@ SUBROUTINE measure
   endif
   !===============  test variables =================================
   iGam=NeighLn(3,1)
-  if(WXVertex(iGam)==0 .and. WYVertex(iGam)==0) TestData(1)=TestData(1)+1
-  TestData(0)=TestData(0)+1
+  if(WXVertex(iGam)==0 .and. WYVertex(iGam)==0) TestData(1)=TestData(1)+1.d0
+  TestData(0)=TestData(0)+1.d0
   !================================================================
   
         
