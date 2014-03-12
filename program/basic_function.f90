@@ -79,26 +79,26 @@ complex*16 FUNCTION weight_meas_Gam(ityp, dx, dy, t1, t2)
   implicit none
   integer, intent(in)  :: dx, dy, t1, t2, ityp
 
-  !weight_meas_Gam = 0.d0
-  !if(dx==0 .and. dy==0) then
-    !if(ityp ==1 .or. ityp == 2) then
-      !weight_meas_Gam = 1.d0
-    !else if(ityp == 3 .or. ityp == 4) then
-      !weight_meas_Gam = 0.d0
-    !else if(ityp == 5 .or. ityp == 6) then
-      !weight_meas_Gam = 1.d0
-    !endif
-  !endif
+  weight_meas_Gam = 0.d0
+  if(dx==0 .and. dy==0) then
+    if(ityp ==1 .or. ityp == 2) then
+      weight_meas_Gam = 1.d0
+    else if(ityp == 3 .or. ityp == 4) then
+      weight_meas_Gam = 0.d0
+    else if(ityp == 5 .or. ityp == 6) then
+      weight_meas_Gam = 1.d0
+    endif
+  endif
   !================   test ================
   !=======  r independent ================
-  weight_meas_Gam=0.d0
-  if(ityp ==1 .or. ityp == 2) then
-    weight_meas_Gam = 1.d0
-  else if(ityp == 3 .or. ityp == 4) then
-    weight_meas_Gam = 0.d0
-  else if(ityp == 5 .or. ityp == 6) then
-    weight_meas_Gam = 1.d0
-  endif
+  !weight_meas_Gam=0.d0
+  !if(ityp ==1 .or. ityp == 2) then
+    !weight_meas_Gam = 1.d0
+  !else if(ityp == 3 .or. ityp == 4) then
+    !weight_meas_Gam = 0.d0
+  !else if(ityp == 5 .or. ityp == 6) then
+    !weight_meas_Gam = 1.d0
+  !endif
   !======================================
 
   return
