@@ -4,4 +4,8 @@
 *.swp
 *.o
 *.dwarf
-DiagMC_time_brain/*
+_in_*
+out_*
+job_*
+all_input.txt
+
