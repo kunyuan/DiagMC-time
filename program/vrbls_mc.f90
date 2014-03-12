@@ -133,6 +133,7 @@ MODULE vrbls_mc
   integer          :: NBlck             ! # total blocks
   integer          :: NToss             ! # MC steps for toss
   integer          :: NStep             ! # MC steps for one measurement
+  integer          :: IsToss
 
   !------------ basic variables for a diagram --------------------------
   integer          :: Order             ! order of the simulating diagram 
@@ -230,6 +231,10 @@ MODULE vrbls_mc
   double precision      :: t_prev, t_curr, t_elap
   integer               :: h_prev, h_curr
   double precision      :: t_init, t_simu, t_meas, t_toss
+  !=======================================================================
+
+  !================ Test =================================================
+  double precision,dimension(10)  :: TestData
   !=======================================================================
 
 end module vrbls_mc

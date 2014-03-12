@@ -251,63 +251,71 @@ END SUBROUTINE def_diagram
 
 SUBROUTINE markov
   implicit none
-  integer :: iflag, istep
+  integer :: iflag, istep,isamp
   double precision :: nr
 
-  istep = 0
-  do while(istep < NStep)
-    nr=rn()
-    iupdate = 1
-    do while(nr>Fupdate(iupdate))
-      iupdate = iupdate + 1
+  do isamp = 1, Nsamp
+    istep = 0
+    do while(istep < NStep)
+      nr=rn()
+      iupdate = 1
+      do while(nr>Fupdate(iupdate))
+        iupdate = iupdate + 1
+      enddo
+
+      select case(iupdate)
+        !case( 1) 
+          !call create_worm_along_wline          
+        !case( 2)      
+          !call delete_worm_along_wline                       
+        !case( 3) 
+          !call create_worm_along_gline  
+        !case( 4) 
+          !call delete_worm_along_gline  
+        !case( 5) 
+          !call move_worm_along_wline             
+        !case( 6) 
+          !call move_worm_along_gline              
+        !case( 7) 
+          !call add_interaction                  
+        !case( 8) 
+          !call remove_interaction             
+        !case( 9) 
+          !call add_interaction_cross              
+        !case(10)
+          !call remove_interaction_cross                  
+        !case(11) 
+          !call reconnect                      
+        !case(12) 
+          !call change_gline_space          
+        case(13)  
+          call change_wline_space         
+        !case(14) 
+          !call change_Gamma_type     
+        !case(15) 
+          !call move_measuring_index       
+        !case(16)  
+          !call change_gline_time        
+        !case(17)  
+          !call change_wline_time        
+      end select
+
+      imc = imc + 1
+
+      !if(Mod(int(imc),100000)==0) then
+        !call check_config
+        !call print_config
+      !endif
+
+      if(IsWormPresent) then
+        GamWormOrder(Order) = GamWormOrder(Order) + 1
+        if(rn()<=0.5d0) call switch_ira_and_masha
+      else
+        istep = istep + 1
+        GamOrder(Order) = GamOrder(Order) + 1
+      endif
     enddo
-
-    select case(iupdate)
-      !case( 1) 
-        !call create_worm_along_wline          
-      !case( 2)      
-        !call delete_worm_along_wline                       
-      !case( 3) 
-        !call create_worm_along_gline  
-      !case( 4) 
-        !call delete_worm_along_gline  
-      !case( 5) 
-        !call move_worm_along_wline             
-      !case( 6) 
-        !call move_worm_along_gline              
-      !case( 7) 
-        !call add_interaction                  
-      !case( 8) 
-        !call remove_interaction             
-      !case( 9) 
-        !call add_interaction_cross              
-      !case(10)
-        !call remove_interaction_cross                  
-      !case(11) 
-        !call reconnect                      
-      !case(12) 
-        !call change_gline_space          
-      case(13)  
-        call change_wline_space         
-      !case(14) 
-        !call change_Gamma_type     
-      !case(15) 
-        !call move_measuring_index       
-      !case(16)  
-        !call change_gline_time        
-      !case(17)  
-        !call change_wline_time        
-    end select
-
-    imc = imc + 1
-
-    if(IsWormPresent ) then
-      GamWormOrder(Order) = GamWormOrder(Order) + 1
-      if(rn()<=0.5d0) call switch_ira_and_masha
-    else
-      istep = istep + 1
-      GamOrder(Order) = GamOrder(Order) + 1
-    endif
+    if(IsToss==0) call measure
   enddo
 
 END SUBROUTINE markov
@@ -1121,42 +1129,44 @@ COMPLEX*16 FUNCTION weight_line(stat, isdelta, knd, dx0, dy0, tau, typ)
   dx = diff_x(dx0)
   dy = diff_y(dy0)
 
-  !---------------------- for test --------------------------------------
-  !if(stat >= 0 .and. stat<=3) then
-    !if(knd==1) weight_line = weight_meas_G(1, t)
-    !if(knd==2) weight_line = weight_meas_W(1, dx, dy, t)
+  !if(stat == 0) then
+    !if(knd==1) weight_line = weight_G(typ, t)
+    !if(knd==2 .and. isdelta==0) weight_line = weight_W(typ, dx, dy, t)
+    !if(knd==2 .and. isdelta==1) weight_line = weight_W0(typ, dx, dy)
+  !else if(stat == 1 .or. stat==3) then
+    !!  Have measuring vertex around
+    !if(knd==1) weight_line = weight_meas_G(typ, t)
+    !if(knd==2) weight_line = weight_meas_W(typ, dx, dy, t)
+  !else if(stat == 2) then
+    !! Have Ira or Masha around (no influence on G)
+    !if(knd==2) weight_line = weight_worm_W(typ, dx, dy, t)
+    !if(knd==1) then
+      !write(*, *) IsWormPresent, iupdate, "gline status == 2 or 3! Error!" 
+      !call print_config
+      !stop
+    !endif
   !else if(stat==-1) then
     !write(*, *) IsWormPresent, iupdate, "line status == -1! There is no weight!" 
+    !call print_config
     !stop
   !else
     !write(*, *) IsWormPresent, iupdate, "line status error!", stat
+    !call print_config
     !stop
   !endif
-  !------------------------ end -----------------------------------------
 
-  if(stat == 0) then
-    if(knd==1) weight_line = weight_G(typ, t)
-    if(knd==2 .and. isdelta==0) weight_line = weight_W(typ, dx, dy, t)
-    if(knd==2 .and. isdelta==1) weight_line = weight_W0(typ, dx, dy)
-  else if(stat == 1 .or. stat==3) then
-    if(knd==1) weight_line = weight_meas_G(typ, t)
-    if(knd==2) weight_line = weight_meas_W(typ, dx, dy, t)
-  else if(stat == 2) then
-    if(knd==2) weight_line = weight_worm_W(typ, dx, dy, t)
-    if(knd==1) then
-      write(*, *) IsWormPresent, iupdate, "gline status == 2 or 3! Error!" 
-      call print_config
-      stop
-    endif
+  !---------------------- for test --------------------------------------
+  if(stat >= 0 .and. stat<=3) then
+    if(knd==1) weight_line = weight_meas_G(1, t)
+    if(knd==2) weight_line = weight_meas_W(1, dx, dy, t)
   else if(stat==-1) then
     write(*, *) IsWormPresent, iupdate, "line status == -1! There is no weight!" 
-    call print_config
     stop
   else
     write(*, *) IsWormPresent, iupdate, "line status error!", stat
-    call print_config
     stop
   endif
+  !------------------------ end -----------------------------------------
 
   return
 END FUNCTION weight_line
@@ -1176,36 +1186,36 @@ COMPLEX*16 FUNCTION weight_vertex(stat, isdelta, dx0, dy0, dtau1, dtau2, typ)
   dx = diff_x(dx0)
   dy = diff_y(dy0)
 
-  !---------------------- for test --------------------------------------
-  !if(stat>=0 .and. stat<=3) then
-    !weight_vertex = weight_meas_gam(1, dx, dy, t1, t2)
-  !else if(stat==-1) then
+  !if(stat==0) then
+      !!if(isdelta==0) weight_vertex = weight_Gam(typ, dx, dy, t1, t2)
+      !!if(isdelta==1) weight_vertex = weight_Gam0(typ, dx, dy)
+      !!----------------- for bare Gamma ------------------------------
+      !if(isdelta==0) weight_vertex = 0.d0
+      !if(isdelta==1) weight_vertex = weight_Gam0(typ, dx, dy)
+      !!------------------------ end ----------------------------------
+  !else if(stat==2) then
+    !weight_vertex = weight_worm_Gam(typ, dx, dy, t1, t2)
+  !else if(stat==1 .or. stat==3) then
+    !weight_vertex = weight_meas_Gam(typ, dx, dy, t1, t2)
+  !else if(stat==-1) then 
     !write(*, *) IsWormPresent, iupdate, "vertex status == -1! There is no weight!" 
     !stop
   !else
     !write(*, *) IsWormPresent, iupdate, "vertex status error!", stat
     !stop
   !endif
-  !------------------------ end -----------------------------------------
 
-  if(stat==0) then
-      !if(isdelta==0) weight_vertex = weight_Gam(typ, dx, dy, t1, t2)
-      !if(isdelta==1) weight_vertex = weight_Gam0(typ, dx, dy)
-      !----------------- for bare Gamma ------------------------------
-      if(isdelta==0) weight_vertex = 0.d0
-      if(isdelta==1) weight_vertex = weight_Gam0(typ, dx, dy)
-      !------------------------ end ----------------------------------
-  else if(stat==2) then
-    weight_vertex = weight_worm_Gam(typ, dx, dy, t1, t2)
-  else if(stat==1 .or. stat==3) then
-    weight_vertex = weight_meas_Gam(typ, dx, dy, t1, t2)
-  else if(stat==-1) then 
+  !---------------------- for test --------------------------------------
+  if(stat>=0 .and. stat<=3) then
+    weight_vertex = weight_meas_Gam(1, dx, dy, t1, t2)
+  else if(stat==-1) then
     write(*, *) IsWormPresent, iupdate, "vertex status == -1! There is no weight!" 
     stop
   else
     write(*, *) IsWormPresent, iupdate, "vertex status error!", stat
     stop
   endif
+  !------------------------ end -----------------------------------------
   return
 END FUNCTION weight_vertex
 
@@ -1302,7 +1312,7 @@ END SUBROUTINE print_config
 !!=======================================================================
 SUBROUTINE measure
   implicit none
-  integer :: i, iln
+  integer :: i, iln,iGam,jGam
   integer :: flag, it
   integer :: spg, spw
   integer :: ityp, nloop
@@ -1385,6 +1395,12 @@ SUBROUTINE measure
   if(Order==0) then
     GamNorm = GamNorm + Phase
   endif
+  !===============  test variables =================================
+  iGam=NeighLn(3,1)
+  if(WXVertex(iGam)==0 .and. WYVertex(iGam)==0) TestData(1)=TestData(1)+1
+  TestData(0)=TestData(0)+1
+  !================================================================
+  
         
 END SUBROUTINE measure
 !!=======================================================================
