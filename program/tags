@@ -16,6 +16,8 @@
 12	monte_carlo_old.f90	/^  12 format('Gamma:',i2,2x,'type:',i2,2x,'typein:',i2,2x,'typeout:',i2,2x,'gr:(',i4,i4,'), wr:(',i4,i4,')',&$/;"	l	subroutine:print_config	file:
 40	basic_function.f90	/^40        do I0 = IS, N-1, ID$/;"	l	subroutine:SFFTEU	file:
 50	basic_function.f90	/^50  do I0 = IS, N, ID$/;"	l	subroutine:SFFTEU	file:
+51	DiagMC.f90	/^  51 format(\/'simulation time:',f16.7,2x,'s')$/;"	l	subroutine:monte_carlo	file:
+52	DiagMC.f90	/^    52 format(\/'thermalization time:',f16.7,2x,'s')$/;"	l	subroutine:monte_carlo	file:
 Ave	data_process/collapse_statistics.f90	/^    double precision :: Obs(1:Nobs_b, 12000), Ave(/;"	v	program:MAIN
 Ave	vrbls_mc.f90	/^  double precision , dimension(1:Nobs) :: Quan, Ave,/;"	v	module:vrbls_mc
 Beta	data_process/collapse_statistics.f90	/^    double precision :: Beta,/;"	v	program:MAIN
