@@ -12,7 +12,7 @@ PROGRAM MAIN
   enddo
   read *, CoefOfWorm
 
-  write(title1, '(f4.2)') beta
+  write(title1, '(f5.2)') beta
   write(title2, '(i2)')  MCOrder
   write(title3, '(i14)') Seed
 
@@ -36,6 +36,8 @@ PROGRAM MAIN
   !================ updates frequency   ================================
   Pupdate(:)  = 0.d0
   Pupdate(13)  = 1.d0
+  Pupdate(14)  = 1.d0
+
   !===============  Test variables ==================================
   TestData(:)=0.d0
   !===================================================================
