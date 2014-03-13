@@ -1,6 +1,6 @@
 
 ====================================================
-======================== TEST ======================
+================ TEST  BY  YUAN ====================
 ====================================================
 
 1. FFT for complex quantities in tau representation
@@ -40,7 +40,45 @@ The self-consistent integrals can give the right answer when they are transferre
 
 ====================================================
 
-3. MC update: change_wline_space
+3. mc update: change_gamma_type
+
+Test example:
+1) Order1 diagram: 
+initial: 1 is the measureGam, IsDelta(1) =1;  IsDelta(2:4) = 0; Type(1:4) = 1
+weight: WeightGam(Type=1:6) = 1
+result:
+after updates, Conf(Type(1:4)==1)/Conf(total) = 0.125
+
+Report:
+The update change_gamma_type can change the gamma types with uniform distribution
+
+====================================================
+
+4. mc update: move_measuring_index
+
+Test example:
+1) Order1 diagram: 
+initial: 1 is the measureGam, IsDelta(1:4) =1;  IsDeltaLn(3) = IsDeltaLn(6)=0
+weight: WeightGam(Type=1:6) = 1
+result:
+after updates, Conf(measureGam==1)/Conf(total) = 0.25
+
+Report:
+The update move_measuring_index can move measureGam around with uniform distribution
+
+Notes:
+For the measuring part, only allow IsDeltaVertex(measureGam)=1 and IsDeltaLn(MeasureW)=0
+
+====================================================
+
+
+
+
+
+====================================================
+========== TEST  BY  KUN ===========================
+====================================================
+1. MC update: change_wline_space (mc1)
 
 Test example:
 1) G = 1; W(r) = 1; Gam(r) = 1  Lx=Ly=2
