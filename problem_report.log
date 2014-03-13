@@ -54,6 +54,27 @@ The update change_gamma_type can change the gamma types with uniform distributio
 
 ====================================================
 
+4. mc update: move_measuring_index
+
+Test example:
+1) Order1 diagram: 
+initial: 1 is the measureGam, IsDelta(1:4) =1;  IsDeltaLn(3) = IsDeltaLn(6)=0
+weight: WeightGam(Type=1:6) = 1
+result:
+after updates, Conf(measureGam==1)/Conf(total) = 0.25
+
+Report:
+The update move_measuring_index can move measureGam around with uniform distribution
+
+Notes:
+For the measuring part, only allow IsDeltaVertex(measureGam)=1 and IsDeltaLn(MeasureW)=0
+
+====================================================
+
+
+
+
+
 ====================================================
 ========== TEST  BY  KUN ===========================
 ====================================================
