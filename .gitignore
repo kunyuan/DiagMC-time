@@ -5,6 +5,10 @@
 *.o
 *.out
 *.dwarf
-DiagMC_time_brain/*
-infile
-outfile
+_in_*
+ou_*
+job_*
+all_input.txt
+logfile.txt
+
+
