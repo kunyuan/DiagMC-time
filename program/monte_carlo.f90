@@ -290,8 +290,8 @@ SUBROUTINE markov
           !call change_gline_space          
         case(13)  
           call change_wline_space         
-        !case(14) 
-          !call change_Gamma_type     
+        case(14) 
+          call change_Gamma_type     
         !case(15) 
           !call move_measuring_index       
         !case(16)  
@@ -324,6 +324,7 @@ END SUBROUTINE markov
 !====================================================================
 !============================== UPDATES =============================
 !====================================================================
+
 SUBROUTINE change_gline_time
     implicit none
     
@@ -411,6 +412,86 @@ SUBROUTINE change_wline_space
     endif
     return
 end SUBROUTINE
+
+SUBROUTINE change_Gamma_type
+  implicit none
+  
+  integer :: iGam, iWLn, jGam, dir, typGam, typW
+  double precision :: tau1, tau2, tau, Pacc
+  complex*16 :: WGam, WW, Anew, Aold, sgn
+
+  !------- step1 : check if worm is present -------------
+  if(IsWormPresent .eqv. .true.)    return
+  !ProbProp(iupdate) = ProbProp(iupdate) + 1
+
+  !------- step2 : propose a new config -----------------
+  iGam = generate_gamma()
+  if(IsDeltaVertex(iGam)==1)  return
+
+  dir  = DirecVertex(iGam)
+  iWLn = NeighVertex(3, iGam)
+  jGam = NeighLn(3-dir, iWLn)
+
+  if(TypeVertex(iGam)==1 .or. TypeVertex(iGam)==2) then
+    typGam = TypeVertex(iGam)+2
+  else if(TypeVertex(iGam)==3 .or. TypeVertex(iGam)==4) then
+    typGam = TypeVertex(iGam)-2
+  else 
+    return
+  endif
+
+  if(dir==1) then
+    typW = 5-TypeLn(iWLn)
+  else
+    if(TypeLn(iWLn)<=2) then
+      typW = TypeLn(iWLn)+2
+    else if(TypeLn(iWLn)<=4) then
+      typW = TypeLn(iWLn)-2
+    else
+      write(*, *) "change Gamma type error!"
+      stop
+    endif
+  endif
+
+  !------- step4 : weight calculation -------------------
+  tau1 = T3Vertex(iGam)-T2Vertex(iGam)
+  tau2 = T1Vertex(iGam)-T3Vertex(iGam)
+  WGam = weight_vertex(StatusVertex(iGam), IsDeltaVertex(iGam), GXVertex(iGam)-WXVertex(iGam), &
+    & GYVertex(iGam)-WYVertex(iGam), tau1, tau2, typGam)
+
+  tau = T3Vertex(NeighLn(2, iWLn))-T3Vertex(NeighLn(1, iWLn))
+  WW = weight_line(StatusLn(iWLn), IsDeltaLn(iWLn), 2, WXVertex(iGam)-WXVertex(jGam), &
+    & WYVertex(iGam)-WYVertex(jGam), tau, typW) 
+
+  Anew = WGam *WW
+  Aold = WeightLn(iWLn)*WeightVertex(iGam)
+
+  call weight_ratio(Pacc, sgn, Anew, Aold)
+
+  !------- step5 : accept the update --------------------
+  ProbProp(Order, iupdate) = ProbProp(Order, iupdate) + 1
+
+  if(rn()<=Pacc) then
+
+    !------ update the diagram info -------------------
+    Phase = Phase *sgn
+
+    !------ update the site of elements --------------
+    TypeVertex(iGam)    = typGam
+    TypeVertexIn(iGam)  = 3-TypeVertexIn(iGam)
+    TypeVertexOut(iGam) = 3-TypeVertexOut(iGam)
+    TypeLn(iWLn)     = typW
+
+    !------ update the weight of elements ------------
+    WeightLn(iWLn) = WW
+    WeightVertex(iGam) = WGam
+
+    call update_weight(Anew, Aold)
+
+    ProbAcc(Order, 14) = ProbAcc(Order, 14) + 1
+  endif
+  return
+END SUBROUTINE change_Gamma_type
 
 !--------- exchange the location of Ira and Masha  -----
 SUBROUTINE switch_ira_and_masha
@@ -1296,7 +1377,7 @@ SUBROUTINE print_config
   10 format(' Line:',i2,2x,'kind:',i2,2x,'isdelta:',i2,2x,'type:',i2,2x,'k:',i8,2x,'stat:',i2, 2x,&
     & 'neigh:',i6,i6)
   12 format('Gamma:',i2,2x,'isdelta:',i2,2x,'type:',i2,2x,'typein:',i2,2x,'typeout:',i2,2x,&
-    & 'gr:(',i4,i4,'), wr:(',i4,i4,')', 't:(', f6.4, f6.4, f6.4, ')',2x, &
+    & 'gr:(',i4,i4,'), wr:(',i4,i4,')', 't:(', f7.4, f7.4, f7.4, ')',2x, &
     & 'direction:', i2,2x, 'stat:',i2, 2x,'neigh:', i6,i6,i6)
 
   close(8)
