@@ -685,6 +685,10 @@ END SUBROUTINE output_Quantities
   !close(36)
 !END SUBROUTINE output_GamMC
 
+SUBROUTINE write_monte_carlo_test
+    implicit none
+    write(*, *) "weight of MeasureGam=1", TestData(0)/TestData(1)
+end SUBROUTINE
 
 !!================================================================
 !!================================================================
