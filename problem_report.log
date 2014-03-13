@@ -40,6 +40,18 @@ The self-consistent integrals can give the right answer when they are transferre
 
 ====================================================
 
+3. MC update: change_wline_space
+
+Test example:
+1) G = 1; W(r) = 1; Gam(r) = 1  Lx=Ly=2
+   result: Conf(total)/Conf(WX(1)=WY(1)=0) = 4.00 
+
+Report:
+
+====================================================
+
+
+
 
 ====================================================
 ======================== BUGS ======================
