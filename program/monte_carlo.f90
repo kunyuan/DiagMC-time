@@ -190,7 +190,8 @@ SUBROUTINE def_diagram
   TailVertex = 5
 
   !IsDeltaVertex: 1: delta function(Gam); 0: normal function(Gam)
-  IsDeltaVertex(1:4) = 1
+  IsDeltaVertex(1:4) = 0
+  IsDeltaVertex(MeasureGam) = 1
 
   ! the site variables of Gamma 1, 2, 3 and 4
   GXVertex(1:4) = 0;            GYVertex(1:4) = 0
@@ -1210,43 +1211,43 @@ COMPLEX*16 FUNCTION weight_line(stat, isdelta, knd, dx0, dy0, tau, typ)
   dx = diff_x(dx0)
   dy = diff_y(dy0)
 
-  if(stat == 0) then
-    if(knd==1) weight_line = weight_G(typ, t)
-    if(knd==2 .and. isdelta==0) weight_line = weight_W(typ, dx, dy, t)
-    if(knd==2 .and. isdelta==1) weight_line = weight_W0(typ, dx, dy)
-  else if(stat == 1 .or. stat==3) then
-    !  Have measuring vertex around
-    if(knd==1) weight_line = weight_meas_G(typ, t)
-    if(knd==2) weight_line = weight_meas_W(typ, dx, dy, t)
-  else if(stat == 2) then
-    ! Have Ira or Masha around (no influence on G)
-    if(knd==2) weight_line = weight_worm_W(typ, dx, dy, t)
-    if(knd==1) then
-      write(*, *) IsWormPresent, iupdate, "gline status == 2 or 3! Error!" 
-      call print_config
-      stop
-    endif
-  else if(stat==-1) then
-    write(*, *) IsWormPresent, iupdate, "line status == -1! There is no weight!" 
-    call print_config
-    stop
-  else
-    write(*, *) IsWormPresent, iupdate, "line status error!", stat
-    call print_config
-    stop
-  endif
-
-  !---------------------- for test --------------------------------------
-  !if(stat >= 0 .and. stat<=3) then
-    !if(knd==1) weight_line = weight_meas_G(1, t)
-    !if(knd==2) weight_line = weight_meas_W(1, dx, dy, t)
+  !if(stat == 0) then
+    !if(knd==1) weight_line = weight_G(typ, t)
+    !if(knd==2 .and. isdelta==0) weight_line = weight_W(typ, dx, dy, t)
+    !if(knd==2 .and. isdelta==1) weight_line = weight_W0(typ, dx, dy)
+  !else if(stat == 1 .or. stat==3) then
+    !!  Have measuring vertex around
+    !if(knd==1) weight_line = weight_meas_G(typ, t)
+    !if(knd==2) weight_line = weight_meas_W(typ, dx, dy, t)
+  !else if(stat == 2) then
+    !! Have Ira or Masha around (no influence on G)
+    !if(knd==2) weight_line = weight_worm_W(typ, dx, dy, t)
+    !if(knd==1) then
+      !write(*, *) IsWormPresent, iupdate, "gline status == 2 or 3! Error!" 
+      !call print_config
+      !stop
+    !endif
   !else if(stat==-1) then
     !write(*, *) IsWormPresent, iupdate, "line status == -1! There is no weight!" 
+    !call print_config
     !stop
   !else
     !write(*, *) IsWormPresent, iupdate, "line status error!", stat
+    !call print_config
     !stop
   !endif
+
+  !---------------------- for test --------------------------------------
+  if(stat >= 0 .and. stat<=3) then
+    if(knd==1) weight_line = weight_meas_G(1, t)
+    if(knd==2) weight_line = weight_meas_W(1, dx, dy, t)
+  else if(stat==-1) then
+    write(*, *) IsWormPresent, iupdate, "line status == -1! There is no weight!" 
+    stop
+  else
+    write(*, *) IsWormPresent, iupdate, "line status error!", stat
+    stop
+  endif
   !------------------------ end -----------------------------------------
 
   return
@@ -1267,35 +1268,35 @@ COMPLEX*16 FUNCTION weight_vertex(stat, isdelta, dx0, dy0, dtau1, dtau2, typ)
   dx = diff_x(dx0)
   dy = diff_y(dy0)
 
-  if(stat==0) then
-      !if(isdelta==0) weight_vertex = weight_Gam(typ, dx, dy, t1, t2)
+  !if(stat==0) then
+      !!if(isdelta==0) weight_vertex = weight_Gam(typ, dx, dy, t1, t2)
+      !!if(isdelta==1) weight_vertex = weight_Gam0(typ, dx, dy)
+      !!----------------- for bare Gamma ------------------------------
+      !if(isdelta==0) weight_vertex = 0.d0
       !if(isdelta==1) weight_vertex = weight_Gam0(typ, dx, dy)
-      !----------------- for bare Gamma ------------------------------
-      if(isdelta==0) weight_vertex = 0.d0
-      if(isdelta==1) weight_vertex = weight_Gam0(typ, dx, dy)
-      !------------------------ end ----------------------------------
-  else if(stat==2) then
-    weight_vertex = weight_worm_Gam(typ, dx, dy, t1, t2)
-  else if(stat==1 .or. stat==3) then
-    weight_vertex = weight_meas_Gam(typ, dx, dy, t1, t2)
-  else if(stat==-1) then 
-    write(*, *) IsWormPresent, iupdate, "vertex status == -1! There is no weight!" 
-    stop
-  else
-    write(*, *) IsWormPresent, iupdate, "vertex status error!", stat
-    stop
-  endif
-
-  !---------------------- for test --------------------------------------
-  !if(stat>=0 .and. stat<=3) then
-    !weight_vertex = weight_meas_Gam(1, dx, dy, t1, t2)
-  !else if(stat==-1) then
+      !!------------------------ end ----------------------------------
+  !else if(stat==2) then
+    !weight_vertex = weight_worm_Gam(typ, dx, dy, t1, t2)
+  !else if(stat==1 .or. stat==3) then
+    !weight_vertex = weight_meas_Gam(typ, dx, dy, t1, t2)
+  !else if(stat==-1) then 
     !write(*, *) IsWormPresent, iupdate, "vertex status == -1! There is no weight!" 
     !stop
   !else
     !write(*, *) IsWormPresent, iupdate, "vertex status error!", stat
     !stop
   !endif
+
+  !---------------------- for test --------------------------------------
+  if(stat>=0 .and. stat<=3) then
+    weight_vertex = weight_meas_Gam(1, dx, dy, t1, t2)
+  else if(stat==-1) then
+    write(*, *) IsWormPresent, iupdate, "vertex status == -1! There is no weight!" 
+    stop
+  else
+    write(*, *) IsWormPresent, iupdate, "vertex status error!", stat
+    stop
+  endif
   !------------------------ end -----------------------------------------
   return
 END FUNCTION weight_vertex
@@ -1476,10 +1477,13 @@ SUBROUTINE measure
   if(Order==0) then
     GamNorm = GamNorm + Phase
   endif
+
   !===============  test variables =================================
-  !iGam=NeighLn(3,1)
+  !iGam=NeighLn(1, 3)
   !if(WXVertex(iGam)==0 .and. WYVertex(iGam)==0) TestData(1)=TestData(1)+1.d0
   !TestData(0)=TestData(0)+1.d0
+  if(TypeVertex(2)==1 .and. TypeVertex(3)==1 ) TestData(1)=TestData(1)+1.d0
+  TestData(0)=TestData(0)+1.d0
   !================================================================
   
         
