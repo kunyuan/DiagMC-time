@@ -685,6 +685,11 @@ END SUBROUTINE output_Quantities
   !close(36)
 !END SUBROUTINE output_GamMC
 
+!SUBROUTINE write_monte_carlo_test
+  !implicit none
+  !write(*, *) "weight:", TestData(0)/TestData(1)
+  !return
+!END SUBROUTINE
 
 !!================================================================
 !!================================================================
