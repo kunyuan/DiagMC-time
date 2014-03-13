@@ -6,7 +6,7 @@
 *.out
 *.dwarf
 _in_*
-ou_*
+out_*
 job_*
+logfile.log
 all_input.txt
-logfile.txt
