@@ -287,6 +287,8 @@ SUBROUTINE monte_carlo
   GamSqMC(:,:,:,:,:,:,:) = 0.d0
   GamNorm = 0.d0
 
+  TestData(:) = 0.d0
+
   mc_version = 0
   IsToss=0
 
@@ -306,7 +308,7 @@ SUBROUTINE monte_carlo
     call print_config
     !call write_monte_carlo_conf
     !call write_monte_carlo_data
-    !call write_monte_carlo_test
+    call write_monte_carlo_test
   enddo
 
   call time_elapse
