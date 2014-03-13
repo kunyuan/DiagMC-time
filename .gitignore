@@ -3,10 +3,10 @@
 *.dat
 *.swp
 *.o
+*.out
 *.dwarf
 _in_*
-out_*
+ou_*
 job_*
 all_input.txt
 logfile.txt
-

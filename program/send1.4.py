@@ -39,7 +39,7 @@ def check_status():
         if elemp[0].poll()==0:
             print str(elemp[1])+" is done"
             proclist.remove(elemp)
-            log=open("./logfile.txt","a")
+            log=open("./logfile.log","a")
             log.write("#"+str(elemp[1])+" job is ended at "+time.strftime("%Y-%m-%d %A %X %Z",time.localtime())+"\n")
             log.close()
     return
