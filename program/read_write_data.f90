@@ -686,6 +686,12 @@ END SUBROUTINE output_Quantities
 !END SUBROUTINE output_GamMC
 
 
+SUBROUTINE write_monte_carlo_test
+    implicit none
+    integer :: i
+    write(*, *) "weight of Type==1", TestData(1)/TestData(0)
+    return
+END SUBROUTINE
 !!================================================================
 !!================================================================
 !!================================================================
