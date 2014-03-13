@@ -292,8 +292,8 @@ SUBROUTINE markov
           call change_wline_space         
         case(14) 
           call change_Gamma_type     
-        !case(15) 
-          !call move_measuring_index       
+        case(15) 
+          call move_measuring_index       
         !case(16)  
           !call change_gline_time        
         !case(17)  
@@ -413,9 +413,11 @@ SUBROUTINE change_wline_space
     return
 end SUBROUTINE
 
+
+
+!------------ change Gamma type: Pupdate(14) ------------
 SUBROUTINE change_Gamma_type
   implicit none
-  
   integer :: iGam, iWLn, jGam, dir, typGam, typW
   double precision :: tau1, tau2, tau, Pacc
   complex*16 :: WGam, WW, Anew, Aold, sgn
@@ -492,6 +494,155 @@ SUBROUTINE change_Gamma_type
   endif
   return
 END SUBROUTINE change_Gamma_type
+
+
+!------------ move measuring index: Pupdate(15) ------------
+SUBROUTINE move_measuring_index
+  implicit none
+  integer :: iW, iGin, iGout, iGam
+  integer :: jW, jGin, jGout, jGam
+  integer :: statiGam, statiGin, statiGout, statiW
+  integer :: statjGam, statjGin, statjGout, statjW
+  double precision :: tau, tau1, tau2, Pacc
+  complex*16 :: WiGam, WiGin, WiGout, WiW
+  complex*16 :: WjGam, WjGin, WjGout, WjW, Anew, Aold, sgn
+
+  !------- step1 : check if worm is present -------------
+  if(IsWormPresent .eqv. .true.)    return
+  !ProbProp(iupdate) = ProbProp(iupdate) + 1
+
+  !------- step2 : propose a new config -----------------
+  iGam = generate_gamma()
+  if(IsDeltaVertex(iGam)/=1)   return
+
+  iGin  = NeighVertex(1, iGam);      iGout = NeighVertex(2, iGam)
+  iW    = NeighVertex(3, iGam)
+  if(IsDeltaLn(iW)/=0)         return
+
+  jGam  = MeasureGam
+  jGin  = NeighVertex(1, jGam);      jGout = NeighVertex(2, jGam)
+  jW    = NeighVertex(3, jGam)
+  
+  if(iGam==jGam)            return
+
+  !----- the status for the new config ------------------
+  statiGam  = add_mea_stat(StatusVertex(iGam))
+  statjGam  = delete_mea_stat(StatusVertex(jGam))
+
+  if(jW/=iW) then
+    statiW    = line_stat(statiGam, StatusVertex(NeighLn(3-DirecVertex(iGam), iW)))
+    statjW    = line_stat(statjGam, StatusVertex(NeighLn(3-DirecVertex(jGam), jW)))
+  else
+    statiW    = line_stat(statiGam, statjGam)
+    statjW    = line_stat(statjGam, statiGam)
+  endif
+
+  statiGin    = 1
+  statiGout   = 1
+  if(jGout/=iGin) then
+    statjGout   = 0
+  else
+    statjGout   = 1
+  endif
+
+  if(iGout/=jGin) then
+    statjGin    = 0
+  else
+    statjGin    = 1
+  endif
+
+  !------- step4 : weight calculation -------------------
+  tau1 = T3Vertex(iGam)-T2Vertex(iGam)
+  tau2 = T1Vertex(iGam)-T3Vertex(iGam)
+  WiGam = weight_vertex(statiGam, IsDeltaVertex(iGam), GXVertex(iGam)-WXVertex(iGam), &
+    & GYVertex(iGam)-WYVertex(iGam), tau1, tau2, TypeVertex(iGam))
+
+  tau = T3Vertex(NeighLn(2, iW)) - T3Vertex(NeighLn(1, iW))
+  WiW = weight_line(statiW, IsDeltaLn(iW), 2, WXVertex(NeighLn(2, iW))-WXVertex(NeighLn(1,iW)),&
+    & WYVertex(NeighLn(2,iW))-WYVertex(NeighLn(1,iW)), tau, TypeLn(iW))
+
+  tau = T2Vertex(NeighLn(2, iGin)) - T1Vertex(NeighLn(1, iGin))
+  WiGin = weight_line(statiGin, IsDeltaLn(iGin), 1, 0, 0, tau, TypeLn(iGin))
+
+  tau = T2Vertex(NeighLn(2, iGout)) - T1Vertex(NeighLn(1, iGout))
+  WiGout = weight_line(statiGout, IsDeltaLn(iGout), 1, 0, 0, tau, TypeLn(iGout))
+
+  tau1 = T3Vertex(jGam)-T2Vertex(jGam)
+  tau2 = T1Vertex(jGam)-T3Vertex(jGam)
+  WjGam = weight_vertex(statjGam, 1, GXVertex(jGam)-WXVertex(jGam), GYVertex(jGam)-&
+    & WYVertex(jGam), tau1, tau2, TypeVertex(jGam))
+
+  tau = T3Vertex(NeighLn(2, jW)) - T3Vertex(NeighLn(1, jW))
+  WjW = weight_line(statjW, 0, 2, WXVertex(NeighLn(2, jW))-WXVertex(NeighLn(1,jW)),&
+    & WYVertex(NeighLn(2,jW))-WYVertex(NeighLn(1,jW)), tau, TypeLn(jW))
+
+  tau = T2Vertex(NeighLn(2, jGin)) - T1Vertex(NeighLn(1, jGin))
+  WjGin = weight_line(statjGin, IsDeltaLn(jGin), 1, 0, 0, tau, TypeLn(jGin))
+
+  tau = T2Vertex(NeighLn(2, jGout)) - T1Vertex(NeighLn(1, jGout))
+  WjGout = weight_line(statjGout, IsDeltaLn(jGout), 1, 0, 0, tau, TypeLn(jGout))
+
+  Anew = WjGam *WjW *WjGin *WjGout *WiGam *WiW *WiGin *WiGout
+  Aold = WeightVertex(iGam) *WeightLn(iW) *WeightLn(iGin) *WeightLn(iGout) &
+    & *WeightVertex(jGam) *WeightLn(jW) *WeightLn(jGin) *WeightLn(jGout)
+
+  if(abs(Anew)==0.d0)   return
+
+  if(iGin==jGout) then
+    Anew = Anew/WjGout
+    Aold = Aold/WeightLn(jGout)
+  endif
+
+  if(jGin==iGout) then
+    Anew = Anew/WjGin
+    Aold = Aold/WeightLn(jGin)
+  endif
+
+  if(iW==jW) then
+    Anew = Anew/WjW
+    Aold = Aold/WeightLn(jW)
+  endif
+
+  call weight_ratio(Pacc, sgn, Anew, Aold)
+
+  !------- step5 : accept the update --------------------
+  ProbProp(Order, iupdate) = ProbProp(Order, iupdate) + 1
+
+  if(rn()<=Pacc) then
+
+    !-------- update the diagram info ---------------
+    Phase = Phase *sgn
+    MeasureGam = iGam
+
+    !-------- update the status of elements ---------
+    StatusVertex(iGam) = statiGam
+    StatusLn(iW)    = statiW
+    StatusLn(iGin)  = statiGin
+    StatusLn(iGout) = statiGout
+
+    StatusVertex(jGam) = statjGam
+    StatusLn(jW)    = statjW
+    StatusLn(jGin)  = statjGin
+    StatusLn(jGout) = statjGout
+
+    !-------- update the weight of elements ---------
+    WeightVertex(iGam) = WiGam
+    WeightLn(iW) = WiW
+    WeightLn(iGin) = WiGin
+    WeightLn(iGout) = WiGout
+
+    WeightVertex(jGam) = WjGam
+    WeightLn(jW) = WjW
+    WeightLn(jGin) = WjGin
+    WeightLn(jGout) = WjGout
+
+    call update_weight(Anew, Aold)
+
+    ProbAcc(Order, 15) = ProbAcc(Order, 15) + 1
+
+  endif
+END SUBROUTINE move_measuring_index
+
 
 !--------- exchange the location of Ira and Masha  -----
 SUBROUTINE switch_ira_and_masha
