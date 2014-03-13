@@ -1,4 +1,4 @@
-#/usr/bin/python
+#!/usr/bin/python
 import random
 import os
 import sys
@@ -39,7 +39,7 @@ def check_status():
         if elemp[0].poll()==0:
             print str(elemp[1])+" is done"
             proclist.remove(elemp)
-            log=open("./logfile.txt","a")
+            log=open("./logfile.log","a")
             log.write("#"+str(elemp[1])+" job is ended at "+time.strftime("%Y-%m-%d %A %X %Z",time.localtime())+"\n")
             log.close()
     return
@@ -51,6 +51,13 @@ def submit_jobs(para,i,execute,homedir):
         os.system("mkdir "+infilepath)
     if(os.path.exists(outfilepath)!=True):
         os.system("mkdir "+outfilepath)
+    filelist=os.listdir(infilepath)
+    filelist.sort()
+    if(len(filelist)!=0):
+        lastfile=filelist[-1]
+        lastnum=int(lastfile.split('_')[-1])
+    else:
+        lastnum=0
 
     #if you want to iterate some parameter, add more "for" here
     for belem in para["Beta"]:
@@ -80,8 +87,8 @@ def submit_jobs(para,i,execute,homedir):
                 f.close()
 
             for j in range(0,int(para["Duplicate"][0])):
-                i+=1
-                pid=int(random.random()*2**30)  #the unique id and random number seed for job
+                lastnum+=1
+                pid=lastnum  #the unique id and random number seed for job
                 infile="_in_"+str(pid)
                 outfile="out_"+str(pid)+".txt"
                 jobfile="_job_"+str(pid)+".sh"
@@ -95,7 +102,7 @@ def submit_jobs(para,i,execute,homedir):
                 item.append(jelem)  #jcp
                 item.append(belem)  #beta
                 item.append(para["Order"][0])
-                item.append(str(-pid))   #Seed
+                item.append(str(-int(random.random()*2**30)))   #Seed
                 item.append(para["Type"][0])
                 item.append(para["IsLoad"][0])
                 item.append(para["ReadFile"][0])
@@ -158,11 +165,17 @@ def submit_jobs(para,i,execute,homedir):
 #os.system(compilerstr)
 
 inlist=open(homedir+"/inlist","r")
+last=inlist.readline()[-2:]
+if(last!="\r\n"):
+    last="\n"
+
+inlist.close()
+inlist=open(homedir+"/inlist","r")
 num=0
 #parse inlist file
 para=para_init()
 for eachline in inlist:
-    eachline=eachline.lstrip(' ').rstrip('\n')
+    eachline=eachline.lstrip(' ').rstrip(last)
     
     if eachline=="":
         continue
