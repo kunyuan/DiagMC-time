@@ -694,7 +694,7 @@ SUBROUTINE change_wline_isdelta
       call print_config
       stop
     endif
-    t3jGam = generate_tau()
+    t3jGam = generate_tau(T3Vertex(jGam))
   endif
 
   if(IsDeltaVertex(jGam)==1) then
@@ -728,9 +728,9 @@ SUBROUTINE change_wline_isdelta
 
   call weight_ratio(Pacc, sgn, Anew, Aold)
   if(backforth==0) then
-    Pacc = Pacc*prob_tau(T3Vertex(jGam))
+    Pacc = Pacc*prob_dtau(T3Vertex(jGam)-t3jGam)
   else 
-    Pacc = Pacc/prob_tau(t3jGam)
+    Pacc = Pacc/prob_dtau(t3jGam-T3Vertex(jGam))
   endif
 
   !------- step5 : accept the update --------------------
@@ -806,8 +806,8 @@ SUBROUTINE change_gamma_isdelta
       stop
     endif
 
-    t1iGam = generate_tau()
-    t2iGam = generate_tau()
+    t1iGam = generate_tau(T1Vertex(iGam))
+    t2iGam = generate_tau(T2Vertex(iGam))
   endif
 
   !------- step4 : weight calculation -------------------
@@ -828,9 +828,9 @@ SUBROUTINE change_gamma_isdelta
   call weight_ratio(Pacc, sgn, Anew, Aold)
 
   if(backforth==0) then
-    Pacc = Pacc*prob_tau(T1Vertex(iGam))*prob_tau(T2Vertex(iGam))
+    Pacc = Pacc*prob_dtau(T1Vertex(iGam)-t1iGam)*prob_dtau(T2Vertex(iGam)-t2iGam)
   else 
-    Pacc = Pacc/(prob_tau(t1iGam)*prob_tau(t2iGam))
+    Pacc = Pacc/(prob_dtau(t1iGam-T1Vertex(iGam))*prob_dtau(t2iGam-T2Vertex(iGam)))
   endif
 
   !------- step5 : accept the update --------------------
