@@ -34,7 +34,9 @@ PROGRAM MAIN
   CheckGam = .false.
 
   !================ updates frequency   ================================
-  Pupdate(:)  = 0.d0
+  Pupdate( :)  = 0.d0
+  Pupdate( 1)  = 1.d0
+  Pupdate( 2)  = 1.d0
   Pupdate(13)  = 1.d0
   Pupdate(14)  = 1.d0
   Pupdate(15)  = 1.d0

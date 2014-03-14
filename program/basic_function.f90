@@ -27,18 +27,19 @@ SUBROUTINE calculate_GamNormWeight
   return
 END SUBROUTINE calculate_GamNormWeight
 
-!!--------- worm weight function  ---------
-!DOUBLE PRECISION FUNCTION weight_worm(dxg, dyg, dxw, dyw, domega)
-  !implicit none
-  !integer, intent(in)  :: dxg, dyg, dxw, dyw, domega
+!--------- worm weight function  ---------
+DOUBLE PRECISION FUNCTION weight_worm(dxg, dyg, dxw, dyw, dtau)
+  implicit none
+  integer, intent(in)  :: dxg, dyg, dxw, dyw
+  double precision, intent(in) :: dtau
 
-  !!weight_worm = 1.d0
+  weight_worm = 1.d0
   !weight_worm = 1.d0/(1.d0+abs(domega)**2.d0)
   !weight_worm = weight_worm*exp(-0.5d0*(abs(dxg)+abs(dyg)))
   !weight_worm = weight_worm*exp(-0.5d0*(abs(dxw)+abs(dyw)))
 
-  !return
-!END FUNCTION weight_worm
+  return
+END FUNCTION weight_worm
 
 
 !--------- worm weight function for W ---------
