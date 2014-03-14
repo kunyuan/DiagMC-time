@@ -264,10 +264,10 @@ SUBROUTINE markov
       enddo
 
       select case(iupdate)
-        !case( 1) 
-          !call create_worm_along_wline          
-        !case( 2)      
-          !call delete_worm_along_wline                       
+        case( 1) 
+          call create_worm_along_wline          
+        case( 2)      
+          call delete_worm_along_wline                       
         !case( 3) 
           !call create_worm_along_gline  
         !case( 4) 
@@ -306,11 +306,6 @@ SUBROUTINE markov
 
       imc = imc + 1
 
-      !if(Mod(int(imc),100000)==0) then
-        !call check_config
-        !call print_config
-      !endif
-
       if(IsWormPresent) then
         GamWormOrder(Order) = GamWormOrder(Order) + 1
         if(rn()<=0.5d0) call switch_ira_and_masha
@@ -328,6 +323,327 @@ END SUBROUTINE markov
 !====================================================================
 !============================== UPDATES =============================
 !====================================================================
+
+
+!---------------- create worm on wline : Pupdate(1) ------------
+!------       \iGout    jGout/           \           /     -----
+!------   iGam ======>======= jGam  => Ira====>======Masha -----
+!------       /iGin      jGin\           /           \     -----
+!---------------------------------------------------------------
+SUBROUTINE create_worm_along_wline
+  implicit none
+  integer :: iWLn, iGam, jGam, iGin, jGin, iGout, jGout
+  integer :: statiGam, statjGam, statW
+  integer :: statiGin, statiGout, statjGin, statjGout
+  integer :: k, kiW
+  integer :: kiWold, flag
+  integer :: spin
+  integer :: tempGam
+  double precision :: tau, tau1, tau2, Pacc
+  double precision :: WWorm
+  complex*16 :: WiGin, WiGout, WjGin, WjGout
+  complex*16 :: WIra, WMasha, WWNew, Anew, Aold, sgn
+
+  !------------ step1 : check if worm is present ------------------
+  if(IsWormPresent .eqv. .true.)   return
+  !ProbProp(iupdate) = ProbProp(iupdate) + 1
+
+  !------------ step2 : propose the new config ------------------
+  iWLn = generate_wline()
+
+  iGam = NeighLn(1, iWLn);              jGam = NeighLn(2, iWLn)
+  iGin = NeighVertex(1, iGam);          jGin = NeighVertex(1, jGam)
+  iGout = NeighVertex(2, iGam);         jGout = NeighVertex(2, jGam)
+
+  spin = 4*(Floor(rn()*2.d0))-2         !spin = +/- 2
+  if(spin-2*(TypeLn(jGin)-TypeLn(jGout))==0)  return  !in this case, I/M cannot move
+
+  k = generate_k()
+  kiWold = kLn(iWLn)
+  kLn(iWLn) = add_k(kiWold, k)
+
+  !------------ step3 : configuration check -------------------
+  flag=0
+  if(flag==0) then
+    if(Is_reducible_W(iWLn))                 flag=1
+  endif
+  if(flag==0) then
+    if(Is_reducible_W_Gam(iWLn))           flag=1
+  endif
+
+  if(flag==1) then
+    kLn(iWLn) = kiWold
+    return
+  endif
+
+  statiGam = add_ira_stat(StatusVertex(iGam))
+  statjGam = add_ira_stat(StatusVertex(jGam))
+  statW    = line_stat(statiGam, statjGam)
+
+  !------------ step4 : weight calculation ----------------------
+  tau = T2Vertex(NeighLn(2, iGin))- T1Vertex(NeighLn(1, iGin))
+  WiGin  = weight_line(StatusLn(iGin),  IsDeltaLn(iGin), 1, 0, 0, tau, TypeLn(iGin))
+
+  tau = T2Vertex(NeighLn(2, iGout))- T1Vertex(NeighLn(1, iGout))
+  WiGout = weight_line(StatusLn(iGout), IsDeltaLn(iGin), 1, 0, 0, tau, TypeLn(iGout))
+
+  tau = T2Vertex(NeighLn(2, jGin))- T1Vertex(NeighLn(1, jGin))
+  WjGin  = weight_line(StatusLn(jGin),  IsDeltaLn(iGin), 1, 0, 0, tau, TypeLn(jGin))
+
+  tau = T2Vertex(NeighLn(2, jGout))- T1Vertex(NeighLn(1, jGout))
+  WjGout = weight_line(StatusLn(jGout), IsDeltaLn(iGin), 1, 0, 0, tau, TypeLn(jGout))
+
+  tau1 = T3Vertex(iGam)- T2Vertex(iGam)
+  tau2 = T1Vertex(iGam)- T3Vertex(iGam)
+  WIra = weight_vertex(statiGam, IsDeltaVertex(iGam), GXVertex(iGam)-WXVertex(iGam),  &
+    & GYVertex(iGam)-WYVertex(iGam), tau1, tau2, TypeVertex(iGam))
+
+  tau1 = T3Vertex(jGam)- T2Vertex(jGam)
+  tau2 = T1Vertex(jGam)- T3Vertex(jGam)
+  WMasha = weight_vertex(statjGam, IsDeltaVertex(jGam), GXVertex(jGam)-WXVertex(jGam),  &
+    & GYVertex(jGam)-WYVertex(jGam), tau1, tau2, TypeVertex(jGam))
+
+  tau = T3Vertex(jGam) - T3Vertex(iGam)
+  WWNew = weight_line(statW, IsDeltaLn(iWLn), 2, WXVertex(jGam)-WXVertex(iGam), &
+    & WYVertex(jGam)-WYVertex(iGam), tau, TypeLn(iWLn))
+
+  tau = T3Vertex(jGam) - T3Vertex(iGam)
+  WWorm = weight_worm(GXVertex(iGam)-GXVertex(jGam), GYVertex(iGam)-GYVertex(jGam),&
+    & WXVertex(iGam)-WXVertex(jGam), WYVertex(iGam)-WYVertex(jGam), tau) 
+
+  Anew = WIra *WMasha *WWNew *WiGin *WiGout *WjGin *WjGout
+  Aold = WeightLn(iWLn) *WeightVertex(iGam) *WeightVertex(jGam) *WeightLn(iGin) &
+  & *WeightLn(iGout) *WeightLn(jGin) *WeightLn(jGout)
+
+  if(abs(Anew)==0.d0)   return
+
+  if(iGin==jGout)  then
+    Anew = Anew/WjGout
+    Aold = Aold/WeightLn(jGout)
+  endif
+  if(jGin==iGout)  then
+    Anew = Anew/WjGin
+    Aold = Aold/WeightLn(jGin)
+  endif
+  if(iGin==iGout) then
+    Anew = Anew/WiGout
+    Aold = Aold/WeightLn(iGout)
+  endif
+  if(jGin==jGout) then
+    Anew = Anew/WjGout
+    Aold = Aold/WeightLn(jGout)
+  endif
+
+  call weight_ratio(Pacc, sgn, Anew, Aold)
+  Pacc = Pacc *Wworm *(Order+1.d0)/(CoefOfWorm*0.5d0) 
+  Pacc = Pacc *Pupdate(2)/Pupdate(1)
+
+  !------------ step5 : accept the update -----------------------
+  ProbProp(Order, iupdate) = ProbProp(Order, iupdate) + 1
+
+  if(rn()<=Pacc) then
+
+    !-------------- update the diagram info --------------------
+    Phase = Phase*sgn
+    IsWormPresent = .true.
+
+    !---------- update Ira and Masha -------------------
+    Ira = iGam
+    Masha = jGam
+    kMasha = k
+    SpinMasha = spin
+
+    !----------- update k and omega of elements --------
+    call update_Hash4W(kiWold, kLn(iWLn))
+
+    !----------- update status of elements -------------
+    StatusVertex(Ira)  = statiGam
+    StatusVertex(Masha)= statjGam
+    StatusLn(iWLn)  = statW
+
+    !----------- update weight of elements -------------
+    WeightWorm = WWorm
+    WeightVertex(Ira) = WIra
+    WeightVertex(Masha) = WMasha
+    WeightLn(iWLn) = WWNew
+
+    WeightLn(iGin)  = WiGin
+    WeightLn(iGout) = WiGout
+    WeightLn(jGin)  = WjGin
+    WeightLn(jGout) = WjGout
+
+    call update_weight(Anew, Aold)
+
+    ProbAcc(Order, iupdate) = ProbAcc(Order, iupdate) + 1
+  else
+    kLn(iWLn) = kiWold
+  endif
+  return
+END SUBROUTINE create_worm_along_wline
+
+
+
+!!--------------- delete worm along wline: Pupdate(2) ----------------
+!------       \iGout    jGout/           \           /     -----
+!------   Ira  ======>======= Masha =>iGam====>======jGam  -----
+!------       /iGin      jGin\           /           \     -----
+!---------------------------------------------------------------
+SUBROUTINE delete_worm_along_wline
+  implicit none
+  integer :: dir
+  integer :: iWLn, iGam, jGam, iGin, jGin, iGout, jGout
+  integer :: typIra, typMasha, typW
+  integer :: statIra, statMasha, statW
+  integer :: statiGin, statiGout, statjGin, statjGout
+  integer :: k, kiW, kiWold, flag
+  double precision :: Pacc, tau, tau1, tau2
+  complex*16 :: WiGin, WiGout, WjGin, WjGout
+  complex*16 :: Wi, Wj, WWNew, Anew, Aold, sgn
+
+  !------------ step1 : check if worm is present ------------------
+  if(IsWormPresent .eqv. .false.)  return
+  !ProbProp(iupdate) = ProbProp(iupdate) + 1
+
+  if(NeighVertex(3, Ira)/= NeighVertex(3, Masha))   return
+
+  !------------ step2 : propose the new config ------------------
+  iWLn = NeighVertex(3, Ira)
+  dir = DirecVertex(Ira)
+
+  iGin  = NeighVertex(1, Ira);          jGin  = NeighVertex(1, Masha)
+  iGout = NeighVertex(2, Ira);          jGout = NeighVertex(2, Masha)
+
+  k = kMasha
+  kiWold = kLn(iWLn)
+  kLn(iWLn) = add_k(kiWold, (-1)**dir*k)
+
+  !------------ step3 : configuration check ---------------------
+  flag=0
+  if(flag==0) then
+    if(Is_reducible_W(iWLn))   flag=1
+  endif
+  if(flag==0) then
+    if(Is_reducible_W_Gam(iWLn))  flag=1
+  endif
+
+  if(flag==1) then
+    kLn(iWLn) = kiWold
+    return
+  endif
+
+  !------------ status, type for the new configuration ------------
+  statIra   = delete_ira_stat(StatusVertex(Ira))
+  statMasha = delete_ira_stat(StatusVertex(Masha))
+  statW     = line_stat(statIra, statMasha)
+
+  typIra = TypeGW2Gam(TypeLn(iGin),TypeLn(iGout),TypeVertexIn(Ira), TypeVertexOut(Ira))
+  typMasha = TypeGW2Gam(TypeLn(jGin),TypeLn(jGout),TypeVertexIn(Masha),TypeVertexOut(Masha))
+  if(dir==1) then
+    typW = TypeGam2W(typIra, typMasha)
+  else
+    typW = TypeGam2W(typMasha, typIra)
+  endif
+
+
+  !------------ step4 : weight calculation ---------------------
+  tau = T2Vertex(NeighLn(2, iGin))- T1Vertex(NeighLn(1, iGin))
+  WiGin  = weight_line(StatusLn(iGin),  IsDeltaLn(iGin), 1, 0, 0, tau, TypeLn(iGin))
+
+  tau = T2Vertex(NeighLn(2, iGout))- T1Vertex(NeighLn(1, iGout))
+  WiGout = weight_line(StatusLn(iGout), IsDeltaLn(iGin), 1, 0, 0, tau, TypeLn(iGout))
+
+  tau = T2Vertex(NeighLn(2, jGin))- T1Vertex(NeighLn(1, jGin))
+  WjGin  = weight_line(StatusLn(jGin),  IsDeltaLn(iGin), 1, 0, 0, tau, TypeLn(jGin))
+
+  tau = T2Vertex(NeighLn(2, jGout))- T1Vertex(NeighLn(1, jGout))
+  WjGout = weight_line(StatusLn(jGout), IsDeltaLn(iGin), 1, 0, 0, tau, TypeLn(jGout))
+
+  tau1 = T3Vertex(Ira)- T2Vertex(Ira)
+  tau2 = T1Vertex(Ira)- T3Vertex(Ira)
+  Wi = weight_vertex(statIra, IsDeltaVertex(Ira), GXVertex(Ira)-WXVertex(Ira),  &
+    & GYVertex(Ira)-WYVertex(Ira), tau1, tau2, typIra)
+
+  tau1 = T3Vertex(Masha)- T2Vertex(Masha)
+  tau2 = T1Vertex(Masha)- T3Vertex(Masha)
+  Wj = weight_vertex(statMasha, IsDeltaVertex(Masha), GXVertex(Masha)-WXVertex(Masha),  &
+    & GYVertex(Masha)-WYVertex(Masha), tau1, tau2, typMasha)
+
+  tau = T3Vertex(Masha) - T3Vertex(Ira)
+  WWNew = weight_line(statW, IsDeltaLn(iWLn), 2, WXVertex(Masha)-WXVertex(Ira), WYVertex(Masha)- &
+    & WYVertex(Ira), tau, typW)
+
+  Anew = Wi *Wj *WWNew *WiGin *WiGout *WjGin *WjGout
+  Aold = WeightLn(iWLn) *WeightVertex(Ira) *WeightVertex(Masha) *WeightLn(iGin) &
+  & *WeightLn(iGout) *WeightLn(jGin) *WeightLn(jGout)
+
+  if(abs(Anew)==0.d0)   return
+
+  if(iGin==jGout)  then
+    Anew = Anew/WjGout
+    Aold = Aold/WeightLn(jGout)
+  endif
+
+  if(jGin==iGout)  then
+    Anew = Anew/WjGin
+    Aold = Aold/WeightLn(jGin)
+  endif
+
+  if(iGin==iGout) then
+    Anew = Anew/WiGout
+    Aold = Aold/WeightLn(iGout)
+  endif
+
+  if(jGin==jGout) then
+    Anew = Anew/WjGout
+    Aold = Aold/WeightLn(jGout)
+  endif
+
+  call weight_ratio(Pacc, sgn, Anew, Aold)
+  Pacc = Pacc *(CoefOfWorm*0.5d0)/WeightWorm/(Order+1.d0) 
+  Pacc = Pacc *Pupdate(1)/Pupdate(2)
+
+  ProbProp(Order, iupdate) = ProbProp(Order, iupdate) + 1
+  !------------ step5 : accept the update -----------------------
+  if(rn()<=Pacc) then
+
+    !---------- update the diagram info ----------------
+    Phase = Phase*sgn
+    IsWormPresent = .false.
+
+    !----------- update k and omega of elements --------
+    call update_Hash4W(kiWold, kLn(iWLn))
+
+    !----------- update type ---------------------------
+    TypeVertex(Ira) = typIra
+    TypeVertex(Masha) = typMasha
+    TypeLn(iWLn) = typW
+
+    !----------- update status of elements -------------
+    StatusVertex(Ira)  = statIra
+    StatusVertex(Masha)= statMasha
+    StatusLn(iWLn)  = statW
+
+    !----------- update weight of elements -------------
+    WeightVertex(Ira) = Wi
+    WeightVertex(Masha) = Wj
+
+    WeightLn(iWLn) = WWNew
+    WeightLn(iGin)  = WiGin
+    WeightLn(iGout) = WiGout
+    WeightLn(jGin)  = WjGin
+    WeightLn(jGout) = WjGout
+
+    call update_weight(Anew, Aold)
+
+    ProbAcc(Order, 2) = ProbAcc(Order, 2) + 1
+  else
+    kLn(iWLn) = kiWold
+  endif
+  return
+END SUBROUTINE delete_worm_along_wline
+
+
+
 
 SUBROUTINE change_gline_time
     implicit none
@@ -466,10 +782,10 @@ SUBROUTINE change_Gamma_type
     & GYVertex(iGam)-WYVertex(iGam), tau1, tau2, typGam)
 
   tau = T3Vertex(NeighLn(2, iWLn))-T3Vertex(NeighLn(1, iWLn))
-  WW = weight_line(StatusLn(iWLn), IsDeltaLn(iWLn), 2, WXVertex(iGam)-WXVertex(jGam), &
+  WW  = weight_line(StatusLn(iWLn), IsDeltaLn(iWLn), 2, WXVertex(iGam)-WXVertex(jGam), &
     & WYVertex(iGam)-WYVertex(jGam), tau, typW) 
 
-  Anew = WGam *WW
+  Anew = WW *WGam
   Aold = WeightLn(iWLn)*WeightVertex(iGam)
 
   call weight_ratio(Pacc, sgn, Anew, Aold)
@@ -1573,43 +1889,43 @@ COMPLEX*16 FUNCTION weight_line(stat, isdelta, knd, dx0, dy0, tau, typ)
   dx = diff_x(dx0)
   dy = diff_y(dy0)
 
-  !if(stat == 0) then
-    !if(knd==1) weight_line = weight_G(typ, t)
-    !if(knd==2 .and. isdelta==0) weight_line = weight_W(typ, dx, dy, t)
-    !if(knd==2 .and. isdelta==1) weight_line = weight_W0(typ, dx, dy)
-  !else if(stat == 1 .or. stat==3) then
-    !!  Have measuring vertex around
-    !if(knd==1) weight_line = weight_meas_G(typ, t)
-    !if(knd==2) weight_line = weight_meas_W(typ, dx, dy, t)
-  !else if(stat == 2) then
-    !! Have Ira or Masha around (no influence on G)
-    !if(knd==2) weight_line = weight_worm_W(typ, dx, dy, t)
-    !if(knd==1) then
-      !write(*, *) IsWormPresent, iupdate, "gline status == 2 or 3! Error!" 
-      !call print_config
-      !stop
-    !endif
-  !else if(stat==-1) then
-    !write(*, *) IsWormPresent, iupdate, "line status == -1! There is no weight!" 
-    !call print_config
-    !stop
-  !else
-    !write(*, *) IsWormPresent, iupdate, "line status error!", stat
-    !call print_config
-    !stop
-  !endif
-
-  !---------------------- for test --------------------------------------
-  if(stat >= 0 .and. stat<=3) then
-    if(knd==1) weight_line = weight_meas_G(1, t)
-    if(knd==2) weight_line = weight_meas_W(1, dx, dy, t)
+  if(stat == 0) then
+    if(knd==1) weight_line = weight_G(typ, t)
+    if(knd==2 .and. isdelta==0) weight_line = weight_W(typ, dx, dy, t)
+    if(knd==2 .and. isdelta==1) weight_line = weight_W0(typ, dx, dy)
+  else if(stat == 1 .or. stat==3) then
+    !  Have measuring vertex around
+    if(knd==1) weight_line = weight_meas_G(typ, t)
+    if(knd==2) weight_line = weight_meas_W(typ, dx, dy, t)
+  else if(stat == 2) then
+    ! Have Ira or Masha around (no influence on G)
+    if(knd==2) weight_line = weight_worm_W(typ, dx, dy, t)
+    if(knd==1) then
+      write(*, *) IsWormPresent, iupdate, "gline status == 2 or 3! Error!" 
+      call print_config
+      stop
+    endif
   else if(stat==-1) then
     write(*, *) IsWormPresent, iupdate, "line status == -1! There is no weight!" 
+    call print_config
     stop
   else
     write(*, *) IsWormPresent, iupdate, "line status error!", stat
+    call print_config
     stop
   endif
+
+  !---------------------- for test --------------------------------------
+  !if(stat >= 0 .and. stat<=3) then
+    !if(knd==1) weight_line = weight_meas_G(1, t)
+    !if(knd==2) weight_line = weight_meas_W(1, dx, dy, t)
+  !else if(stat==-1) then
+    !write(*, *) IsWormPresent, iupdate, "line status == -1! There is no weight!" 
+    !stop
+  !else
+    !write(*, *) IsWormPresent, iupdate, "line status error!", stat
+    !stop
+  !endif
   !------------------------ end -----------------------------------------
 
   return
@@ -1630,35 +1946,35 @@ COMPLEX*16 FUNCTION weight_vertex(stat, isdelta, dx0, dy0, dtau1, dtau2, typ)
   dx = diff_x(dx0)
   dy = diff_y(dy0)
 
-  !if(stat==0) then
-      !!if(isdelta==0) weight_vertex = weight_Gam(typ, dx, dy, t1, t2)
-      !!if(isdelta==1) weight_vertex = weight_Gam0(typ, dx, dy)
-      !!----------------- for bare Gamma ------------------------------
-      !if(isdelta==0) weight_vertex = 0.d0
+  if(stat==0) then
+      !if(isdelta==0) weight_vertex = weight_Gam(typ, dx, dy, t1, t2)
       !if(isdelta==1) weight_vertex = weight_Gam0(typ, dx, dy)
-      !!------------------------ end ----------------------------------
-  !else if(stat==2) then
-    !weight_vertex = weight_worm_Gam(typ, dx, dy, t1, t2)
-  !else if(stat==1 .or. stat==3) then
-    !weight_vertex = weight_meas_Gam(typ, dx, dy, t1, t2)
-  !else if(stat==-1) then 
-    !write(*, *) IsWormPresent, iupdate, "vertex status == -1! There is no weight!" 
-    !stop
-  !else
-    !write(*, *) IsWormPresent, iupdate, "vertex status error!", stat
-    !stop
-  !endif
-
-  !---------------------- for test --------------------------------------
-  if(stat>=0 .and. stat<=3) then
-    weight_vertex = weight_meas_Gam(1, dx, dy, t1, t2)
-  else if(stat==-1) then
+      !----------------- for bare Gamma ------------------------------
+      if(isdelta==0) weight_vertex = 0.d0
+      if(isdelta==1) weight_vertex = weight_Gam0(typ, dx, dy)
+      !------------------------ end ----------------------------------
+  else if(stat==2) then
+    weight_vertex = weight_worm_Gam(typ, dx, dy, t1, t2)
+  else if(stat==1 .or. stat==3) then
+    weight_vertex = weight_meas_Gam(typ, dx, dy, t1, t2)
+  else if(stat==-1) then 
     write(*, *) IsWormPresent, iupdate, "vertex status == -1! There is no weight!" 
     stop
   else
     write(*, *) IsWormPresent, iupdate, "vertex status error!", stat
     stop
   endif
+
+  !---------------------- for test --------------------------------------
+  !if(stat>=0 .and. stat<=3) then
+    !weight_vertex = weight_meas_Gam(1, dx, dy, t1, t2)
+  !else if(stat==-1) then
+    !write(*, *) IsWormPresent, iupdate, "vertex status == -1! There is no weight!" 
+    !stop
+  !else
+    !write(*, *) IsWormPresent, iupdate, "vertex status error!", stat
+    !stop
+  !endif
   !------------------------ end -----------------------------------------
   return
 END FUNCTION weight_vertex
@@ -1839,6 +2155,7 @@ SUBROUTINE measure
   if(Order==0) then
     GamNorm = GamNorm + Phase
   endif
+
   !===============  test variables =================================
   !iGam=NeighLn(3,1)
   !if(IsDeltaLn(3)==0 .and. StatusLn(3)==0) TestData(1) = TestData(1) +1.d0
