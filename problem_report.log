@@ -110,6 +110,21 @@ change the time variables for Gin and Gout when change_gamma_isdelta
 
 ====================================================
 
+7. mc update: create_worm_along_wline/delete_worm_along_wline
+
+Test example:
+1) Order1 diagram: 
+initial: 1 is the measureGam, IsDelta(1:4) =1;  IsDeltaLn(3) = IsDeltaLn(6)=0
+weight: WeightGam(Type=1:6) = 1, WeightLn(:) = 1
+
+result:
+Conf(with worm)/conf(total) = 0.80
+
+Report:
+The updates can add and delete worm with uniform weights
+
+====================================================
+
 
 
 
