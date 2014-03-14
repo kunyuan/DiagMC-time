@@ -268,6 +268,8 @@ SUBROUTINE monte_carlo
 
     !------- read the configuration and MC data from previous simulation --
     call read_monte_carlo_conf
+    call read_monte_carlo_data
+
     call print_config
     call check_config
 
