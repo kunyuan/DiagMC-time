@@ -1,4 +1,5 @@
-rm *.dat
+rm *.bin.dat
+rm *.conf
 rm infile/*
 rm outfile/*
 rm logfile.log

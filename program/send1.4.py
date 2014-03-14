@@ -114,7 +114,8 @@ def submit_jobs(para,i,execute,homedir):
                     f=open(infilepath+"/"+infile,"w")
                     f.write(stri)
                     f.close()
-                    f=open(homedir+"/all_input.txt","a")
+                    f=open(homedir+"/all_input.log","a")
+                    f.write("Job ID:"+str(pid))
                     f.write(stri)
                     f.close()
                     f=open(jobfile,"w")
@@ -136,7 +137,7 @@ def submit_jobs(para,i,execute,homedir):
                             f=open(infilepath+"/"+infile,"w")
                             f.write(stri)
                             f.close()
-                            f=open(homedir+"/all_input.txt","a")
+                            f=open(homedir+"/all_input.log","a")
                             f.write(stri)
                             f.close()
                             f=open(infilepath+"/"+infile,"r")
@@ -147,7 +148,7 @@ def submit_jobs(para,i,execute,homedir):
                             proclist.append((p,pid))
                             #print i,j
                             print str(pid)+" is started"
-                            log=open("./logfile.txt","a")
+                            log=open("./logfile.log","a")
                             log.write("#"+str(pid)+" job is started at "+time.strftime("%Y-%m-%d %A %X %Z",time.localtime())+"\n")
                             log.close()
 

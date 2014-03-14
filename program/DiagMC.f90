@@ -291,6 +291,7 @@ SUBROUTINE monte_carlo
   IsToss=0
 
   do iblck = 1, Nblck
+    write(*,*) "Block",iblck," Started!"
     call markov
 
     !call output_GamMC
@@ -303,10 +304,14 @@ SUBROUTINE monte_carlo
       !mc_version = file_version
     !endif
 
+    write(*,*) "Block",iblck," is printing config!"
     call print_config
+    write(*,*) "Block",iblck," is writing config!"
     call write_monte_carlo_conf
+    write(*,*) "Block",iblck," is writing data!"
     call write_monte_carlo_data
     !call write_monte_carlo_test
+    write(*,*) "Block",iblck," is done!"
   enddo
 
   call time_elapse
