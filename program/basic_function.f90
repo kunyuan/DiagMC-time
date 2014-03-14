@@ -183,19 +183,29 @@ DOUBLE PRECISION FUNCTION prob_tau(tau)
 END FUNCTION prob_tau
 
 !---------- int x y -------------------------
-INTEGER FUNCTION generate_x()
+INTEGER FUNCTION generate_x(CurrentX)
   implicit none
-  integer :: nr
-  nr = Floor(rn()*3.d0)-1
-  generate_x = nr
+  integer :: NewX,CurrentX
+  NewX = CurrentX + Floor(rn()*3.d0)-1
+  if(NewX<0) then
+    NewX = NewX + Lx
+  else if(NewX>=Lx) then
+    NewX = NewX - Lx
+  endif
+  generate_x = NewX
   return
 END FUNCTION generate_x
 
-INTEGER FUNCTION generate_y()
+INTEGER FUNCTION generate_y(CurrentY)
   implicit none
-  integer :: nr
-  nr = Floor(rn()*3.d0)-1
-  generate_y = nr
+  integer :: NewY,CurrentY
+  NewY = CurrentY + Floor(rn()*3.d0)-1
+  if(NewY<0) then
+    NewY = NewY + Ly
+  else if(NewY>=Ly) then
+    NewY = NewY - Ly
+  endif
+  generate_y = NewY
   return
 END FUNCTION generate_y
 
@@ -212,28 +222,6 @@ DOUBLE PRECISION FUNCTION prob_y(y)
   prob_y = 1.d0/3.d0
   return
 END FUNCTION prob_y
-
-INTEGER FUNCTION find_neigh_x(x, dx)
-  implicit none
-  integer, intent(in) :: x, dx
-  find_neigh_x = x+dx
-  if(find_neigh_x<0) then
-    find_neigh_x = find_neigh_x + Lx
-  else if(find_neigh_x>=Lx) then
-    find_neigh_x = find_neigh_x - Lx
-  endif
-END FUNCTION find_neigh_x
-
-INTEGER FUNCTION find_neigh_y(y, dy)
-  implicit none
-  integer, intent(in) :: y, dy
-  find_neigh_y = y+dy
-  if(find_neigh_y<0) then
-    find_neigh_y = find_neigh_y + Ly
-  else if(find_neigh_y>=Ly) then
-    find_neigh_y = find_neigh_y - Ly
-  endif
-END FUNCTION find_neigh_y
 
 INTEGER FUNCTION diff_x(dx)
   implicit none

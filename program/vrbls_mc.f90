@@ -169,6 +169,7 @@ MODULE vrbls_mc
   integer, dimension(MxNVertex) :: GXVertex, GYVertex       ! gline sites for Gamma
   integer, dimension(MxNVertex) :: WXVertex, WYVertex       ! wline sites for Gamma
   double precision, dimension(MxNVertex) :: T1Vertex, T2Vertex, T3Vertex ! times for Gamma
+  !  T1: outgoing G, T2: ingoing G, T3: W attached
   integer, dimension(MxNVertex) :: DirecVertex              ! Gamma is 1: left, 2: right
   integer, dimension(MxNVertex) :: TypeVertex               ! type of Gamma: 1-6
   integer, dimension(MxNVertex) :: TypeVertexIn, TypeVertexOut ! type of Gamma inside spin: 1-2
