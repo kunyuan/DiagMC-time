@@ -7,6 +7,10 @@ PROGRAM MAIN
   print *, 'Lx, Ly, Ntoss, Nsamp, Nblck, NStep, Jcp, beta, MCOrder, Seed, ISub, InpMC, title'
   read  *,  Lx, Ly, Ntoss, Nsamp, Nblck, NStep, Jcp, beta, MCOrder, Seed, ISub, InpMC, title
 
+  logLx=dlog(Lx*1.d0)
+  logLy=dlog(Ly*1.d0)
+  SpatialWeight(:,:)=0.d0
+
   do i = 1, MCOrder
     read *, CoefOfWeight(i)
   enddo

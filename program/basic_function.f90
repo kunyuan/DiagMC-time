@@ -183,45 +183,63 @@ DOUBLE PRECISION FUNCTION prob_tau(tau)
 END FUNCTION prob_tau
 
 !---------- int x y -------------------------
-INTEGER FUNCTION generate_x(CurrentX)
+INTEGER FUNCTION generate_x(CurrentX,Weight)
   implicit none
-  integer :: NewX,CurrentX
-  NewX = CurrentX + Floor(rn()*3.d0)-1
-  if(NewX<0) then
-    NewX = NewX + Lx
-  else if(NewX>=Lx) then
+  integer :: NewX,CurrentX,dX
+  double precision :: Weight,rand
+  rand=rn()
+  dX=0.5d0*dexp(rand*logLx)
+  Weight=SpatialWeight(1,dX)
+  IF(rn()>0.5d0) dX=Lx-1-dX
+
+  NewX = CurrentX + dX
+  if(NewX>=Lx) then
     NewX = NewX - Lx
   endif
   generate_x = NewX
   return
 END FUNCTION generate_x
 
-INTEGER FUNCTION generate_y(CurrentY)
+INTEGER FUNCTION generate_y(CurrentY,Weight)
   implicit none
-  integer :: NewY,CurrentY
-  NewY = CurrentY + Floor(rn()*3.d0)-1
-  if(NewY<0) then
-    NewY = NewY + Ly
-  else if(NewY>=Ly) then
+  integer :: NewY,CurrentY,dY
+  double precision :: Weight,rand
+  rand=rn()
+  dY=0.5d0*dexp(rand*logLy)
+  Weight=SpatialWeight(2,dY)
+  IF(rn()>0.5d0) dY=Ly-1-dY
+
+  NewY = CurrentY + dY
+  if(NewY>=Ly) then
     NewY = NewY - Ly
   endif
   generate_y = NewY
   return
 END FUNCTION generate_y
 
-DOUBLE PRECISION FUNCTION prob_x(x)
+DOUBLE PRECISION FUNCTION prob_dx(x)
   implicit none 
-  integer, intent(in) :: x
-  prob_x = 1.d0/3.d0
+  integer :: dx,x
+  if(dx<0)then 
+    dx=x+Lx
+  else 
+    dx=x
+  endif
+  prob_dx = SpatialWeight(1,dx)
   return
-END FUNCTION prob_x
+END FUNCTION prob_dx
 
-DOUBLE PRECISION FUNCTION prob_y(y)
+DOUBLE PRECISION FUNCTION prob_dy(y)
   implicit none 
-  integer, intent(in) :: y
-  prob_y = 1.d0/3.d0
+  integer :: dy,y
+  if(dy<0)then
+    dy=y+Ly;
+  else
+    dy=y
+  endif
+  prob_dy = SpatialWeight(2,dy)
   return
-END FUNCTION prob_y
+END FUNCTION prob_dy
 
 INTEGER FUNCTION diff_x(dx)
   implicit none
