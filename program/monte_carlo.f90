@@ -1841,9 +1841,8 @@ SUBROUTINE measure
   endif
   !===============  test variables =================================
   !iGam=NeighLn(3,1)
-  !if(IsDeltaLn(3)==0 .and. StatusLn(3)==0) TestData(1) = TestData(1) +1.d0
-  !if(StatusLn(3)==1)  TestData(2) = TestData(2) +1.d0
-  !TestData(0)=TestData(0)+1.d0
+  if(IsDeltaVertex(1)==1 .and. StatusVertex(1)==0) TestData(1) = TestData(1) +1.d0
+  TestData(0)=TestData(0)+1.d0
   !================================================================
   
         
