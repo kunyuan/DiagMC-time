@@ -694,7 +694,7 @@ END SUBROUTINE output_Quantities
 
 SUBROUTINE write_monte_carlo_test
   implicit none
-  !write(*, *) "conf(IsDelta(3)=1):", TestData(1)/TestData(0)
+  write(*, *) "weight in worm:", TestData(1)/TestData(0)
   !write(*, *) "conf(Status(3)=measure):", TestData(2)/TestData(0)
   return
 END SUBROUTINE
