@@ -11,7 +11,8 @@ MODULE vrbls_mc
   integer, parameter          :: Mnint =-2147483647
 
   integer, parameter :: D = 2                       ! 2-dimensional system
-  integer, parameter :: MxLx  = 16, MxLy = 16       ! the largest system size
+  integer, parameter :: MxLx  = 16, MxLy = 16       ! the largest system
+  !                                                   size,MxLx>MxLy
   integer, parameter :: MxVol = MxLx**D             ! the maximum system volume
   integer, parameter :: MxT   = 128                  ! the maximum number of time segments
   integer, parameter :: MxK   = 1000000             ! the maximum momentum
@@ -37,6 +38,7 @@ MODULE vrbls_mc
 
   !======================== Input parameter ==============================
   integer          ::  Lx, Ly, Vol                ! System size
+  double precision  ::  logLx,logLy
   integer          ::  dLx, dLy
   double precision ::  Jcp                        ! interaction
   double precision ::  Mu(2)                      ! Chem. potential for spin down & up
@@ -124,6 +126,7 @@ MODULE vrbls_mc
   double precision :: CoefOfWorm
   double precision :: CoefOfWeight(0:MxOrder)  ! the coeffecients for different orders and worm section
   double precision :: CoefOfSymmetry(MxLx, MxLy)
+  double precision :: SpatialWeight(1:2,0:MxLx-1)  ! 1, fox x direction 2, for y direction;
 
   !------------- MC steps -----------------------------------
   integer          :: iupdate           ! the update number
