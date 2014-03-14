@@ -141,16 +141,17 @@ SUBROUTINE write_monte_carlo_data
   integer :: iorder, itopo, ix, iy, ityp, it1, it2
 
   !=========== write into files =========================================
-  open(104, status="replace", file=trim(title3)//"_monte_carlo_data.dat")
+  open(104, status="replace", &
+    & file=trim(title3)//"_monte_carlo_data.bin.dat",form="binary")
 
   write(104, *) imc, GamNorm, GamNormWeight
-  do iorder = 0, MCOrder
-    do itopo = 0, 1
-      do ityp = 1, NtypeGam/2
+  do it2 = 0, MxT-1
+    do it1 = 0, MxT-1
+      do iy = 0, Ly-1
         do ix = 0, Lx-1
-          do iy = 0, Ly-1
-            do it1 = 0, MxT-1
-              do it2 = 0, MxT-1
+          do ityp = 1, NtypeGam/2
+            do itopo = 0, 1
+              do iorder = 0, MCOrder
                 write(104, *)  GamMC(iorder, itopo, ityp, ix, iy, it1, it2)
                 write(104, *)  GamSqMC(iorder, itopo, ityp, ix, iy, it1, it2)
               enddo
@@ -170,7 +171,8 @@ SUBROUTINE write_monte_carlo_conf
   implicit none
   integer :: i
 
-  open(103, status="replace", file=trim(title3)//"_monte_carlo_conf.dat")
+  open(103, status="replace", &
+   & file=trim(title3)//"_monte_carlo_conf.bin.dat",form="binary")
 
   write(103, *)  Order, NGLn, NWLn, NVertex, MeasureGam, SignFermiLoop, IsWormPresent 
   write(103, *)  Ira, Masha, SpinMasha, kMasha
@@ -215,16 +217,16 @@ SUBROUTINE read_monte_carlo_data
   implicit none
   integer :: iorder, ix, iy, ityp, it1, it2, itopo
 
-  open(105, status="old", file=trim(title)//"_monte_carlo_data.dat")
+  open(105, status="old", file=trim(title)//"_monte_carlo_data.bin.dat",form="binary")
 
   read(105, *) imc, GamNorm, GamNormWeight
-  do iorder = 0, MCOrder
-    do itopo = 0, 1
-      do ityp = 1, NtypeGam/2
+  do it2 = 0, MxT-1
+    do it1 = 0, MxT-1
+      do iy = 0, Ly-1
         do ix = 0, Lx-1
-          do iy = 0, Ly-1
-            do it1 = 0, MxT-1
-              do it2 = 0, MxT-1
+          do ityp = 1, NtypeGam/2
+            do itopo = 0, 1
+              do iorder = 0, MCOrder
                 read(105, *)  GamMC(iorder, itopo, ityp, ix, iy, it1, it2)
               enddo
             enddo
@@ -244,7 +246,7 @@ SUBROUTINE read_monte_carlo_conf
   implicit none
   integer :: i
 
-  open(106, status="old", file=trim(title)//"_monte_carlo_conf.dat")
+  open(106, status="old", file=trim(title)//"_monte_carlo_conf.bin.dat",form="binary")
 
   read(106, *)  Order, NGLn, NWLn, NVertex, MeasureGam, SignFermiLoop, IsWormPresent 
   read(106, *)  Ira, Masha, SpinMasha, kMasha

@@ -264,12 +264,12 @@ SUBROUTINE monte_carlo
     write(*,52) t_simu
     52 format(/'thermalization time:',f16.7,2x,'s')
 
-  !else if(InpMC==1) then
+  else if(InpMC==1) then
 
-    !!------- read the configuration and MC data from previous simulation --
-    !call read_monte_carlo_conf
-    !call print_config
-    !call check_config
+    !------- read the configuration and MC data from previous simulation --
+    call read_monte_carlo_conf
+    call print_config
+    call check_config
 
   endif
 
@@ -304,8 +304,8 @@ SUBROUTINE monte_carlo
     !endif
 
     call print_config
-    !call write_monte_carlo_conf
-    !call write_monte_carlo_data
+    call write_monte_carlo_conf
+    call write_monte_carlo_data
     !call write_monte_carlo_test
   enddo
 
