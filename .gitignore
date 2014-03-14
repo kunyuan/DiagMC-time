@@ -4,10 +4,11 @@
 *.swp
 *.o
 *.out
+*.log
 *.dwarf
 _in_*
 out_*
 job_*
-logfile.*
-program/all_input.*
+program/infile
+program/outfile
 
