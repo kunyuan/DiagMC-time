@@ -177,7 +177,7 @@ END FUNCTION generate_tau
 
 DOUBLE PRECISION FUNCTION prob_tau(tau)
   implicit none 
-  integer, intent(in) :: tau
+  double precision, intent(in) :: tau
   prob_tau = 1.d0/Beta
   return
 END FUNCTION prob_tau

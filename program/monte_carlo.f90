@@ -298,6 +298,10 @@ SUBROUTINE markov
           !call change_gline_time        
         !case(17)  
           !call change_wline_time        
+        case(18)  
+          call change_wline_isdelta       
+        !case(19)  
+          !call change_Gamma_isdelta       
       end select
 
       imc = imc + 1
@@ -642,6 +646,103 @@ SUBROUTINE move_measuring_index
 
   endif
 END SUBROUTINE move_measuring_index
+
+
+!------------ change wline isdelta: Pupdate(18) ------------
+SUBROUTINE change_wline_isdelta
+  implicit none
+  integer :: iWLn, iGam, jGam, backforth
+  !backforth = 1: delta -> normal; backforth = 0: normal -> delta
+  double precision :: t3iGam, t3jGam, tau1, tau2, dtau, Pacc
+  complex*16 :: WW, WiGam, WjGam, Anew, Aold, sgn
+
+  !------- step1 : check if worm is present -------------
+  if(IsWormPresent .eqv. .true.)    return
+  !ProbProp(iupdate) = ProbProp(iupdate) + 1
+
+  !------- step2 : propose a new config -----------------
+  iWLn = generate_wline()
+  if(StatusLn(iWLn)==1 .or. StatusLn(iWLn)==3)  return
+
+  iGam = NeighLn(1, iWLn)
+  jGam = NeighLn(2, iWLn)
+  t3iGam = T3Vertex(iGam)
+  t3jGam = T3Vertex(jGam)
+
+  if(IsDeltaVertex(jGam)==1)  return
+
+  backforth = IsDeltaLn(iWLn)
+  if(backforth==0) then
+    t3jGam = t3iGam
+  else 
+    if(t3jGam/=t3iGam) then
+      write(*, *) "There is a bug in delta-W!"
+      call print_config
+      stop
+    endif
+    t3jGam = generate_tau()
+  endif
+  
+  !------- step4 : weight calculation -------------------
+  if(backforth==0) then
+    WW = weight_line(StatusLn(iWLn), 1, 2, WXVertex(jGam)-WXVertex(iGam), &
+      & WYVertex(jGam)-WYVertex(iGam), 0.d0, TypeLn(iWLn)) 
+  else
+    dtau = t3jGam - t3iGam
+    WW = weight_line(StatusLn(iWLn), 0, 2, WXVertex(jGam)-WXVertex(iGam), &
+      & WYVertex(jGam)-WYVertex(iGam), dtau, TypeLn(iWLn)) 
+  endif
+
+  tau1 = t3iGam-T2Vertex(iGam)
+  tau2 = T1Vertex(iGam)-t3iGam
+  WiGam = weight_vertex(StatusVertex(iGam), IsDeltaVertex(iGam), GXVertex(iGam)-WXVertex(iGam), &
+    & GYVertex(iGam)-WYVertex(iGam), tau1, tau2, TypeVertex(iGam))
+
+  tau1 = t3jGam-T2Vertex(jGam)
+  tau2 = T1Vertex(jGam)-t3jGam
+  WjGam = weight_vertex(StatusVertex(jGam), IsDeltaVertex(jGam), GXVertex(jGam)-WXVertex(jGam), &
+    & GYVertex(jGam)-WYVertex(jGam), tau1, tau2, TypeVertex(jGam))
+
+  Anew = WiGam * WjGam *WW
+  Aold = WeightLn(iWLn)*WeightVertex(iGam) *WeightVertex(jGam)
+
+  call weight_ratio(Pacc, sgn, Anew, Aold)
+  if(backforth==0) then
+    Pacc = Pacc*prob_tau(T3Vertex(jGam))
+  else 
+    Pacc = Pacc/prob_tau(t3jGam)
+  endif
+
+  !------- step5 : accept the update --------------------
+  ProbProp(Order, iupdate) = ProbProp(Order, iupdate) + 1
+
+  if(rn()<=Pacc) then
+
+    !------ update the diagram info -------------------
+    Phase = Phase *sgn
+
+    !------- update the weight type of elements -------
+    IsDeltaLn(iWLn) = 1-backforth
+
+    !------ update the time of elements ---------------
+    T3Vertex(iGam) = t3iGam
+    T3Vertex(jGam) = t3jGam
+
+    !------ update the weight of elements -------------
+    WeightLn(iWLn) = WW
+    WeightVertex(iGam) = WiGam
+    WeightVertex(jGam) = WjGam
+
+    call update_weight(Anew, Aold)
+
+    ProbAcc(Order, 18) = ProbAcc(Order, 18) + 1
+  endif
+  return
+END SUBROUTINE change_wline_isdelta
+  
+
+
+
 
 
 !--------- exchange the location of Ira and Masha  -----
