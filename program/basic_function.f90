@@ -168,19 +168,24 @@ END SUBROUTINE def_symmetry
 !!====================================================================
 
 !---------- double precision tau -------------------------
-DOUBLE PRECISION FUNCTION generate_tau()
+DOUBLE PRECISION FUNCTION generate_tau(Currenttau)
   implicit none
-  double precision :: tau
-  generate_tau = rn()*Beta
+  double precision :: Currenttau, Newtau
+  Newtau = Currenttau + rn()*Beta
+  if(Newtau>Beta) Newtau = Newtau - Beta
+  generate_tau = Newtau
   return
 END FUNCTION generate_tau
 
-DOUBLE PRECISION FUNCTION prob_tau(tau)
+DOUBLE PRECISION FUNCTION prob_dtau(dtau0)
   implicit none 
-  double precision, intent(in) :: tau
-  prob_tau = 1.d0/Beta
+  double precision, intent(in) :: dtau0
+  double precision :: dtau
+  if(dtau0<0) dtau = dtau0 + Beta
+
+  prob_dtau = 1.d0/Beta
   return
-END FUNCTION prob_tau
+END FUNCTION prob_dtau
 
 !---------- int x y -------------------------
 INTEGER FUNCTION generate_x(CurrentX)
@@ -209,19 +214,19 @@ INTEGER FUNCTION generate_y(CurrentY)
   return
 END FUNCTION generate_y
 
-DOUBLE PRECISION FUNCTION prob_x(x)
+DOUBLE PRECISION FUNCTION prob_dx(dx)
   implicit none 
-  integer, intent(in) :: x
-  prob_x = 1.d0/3.d0
+  integer, intent(in) :: dx
+  prob_dx = 1.d0/3.d0
   return
-END FUNCTION prob_x
+END FUNCTION prob_dx
 
-DOUBLE PRECISION FUNCTION prob_y(y)
+DOUBLE PRECISION FUNCTION prob_dy(dy)
   implicit none 
-  integer, intent(in) :: y
-  prob_y = 1.d0/3.d0
+  integer, intent(in) :: dy
+  prob_dy = 1.d0/3.d0
   return
-END FUNCTION prob_y
+END FUNCTION prob_dy
 
 INTEGER FUNCTION diff_x(dx)
   implicit none
