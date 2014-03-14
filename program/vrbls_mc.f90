@@ -187,7 +187,7 @@ MODULE vrbls_mc
   integer, dimension(2,2,2,2) :: TypeGW2Gam
 
   !------------ probabilities functions for updates -----------------------------
-  integer, parameter :: Nupdate = 15
+  integer, parameter :: Nupdate = 19
   double precision :: Pupdate(Nupdate)  ! the probabilities to call different subroutines       
   double precision :: Fupdate(Nupdate)  ! a function of the summation of Pcall
 
