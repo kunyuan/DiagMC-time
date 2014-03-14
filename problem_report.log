@@ -91,6 +91,25 @@ If a normal Gamma in connected with W, change only T3 in Gamma.
 
 ====================================================
 
+6. mc update: change_gamma_isdelta
+
+Test example:
+1) Order1 diagram: 
+initial: 1 is the measureGam, IsDelta(1:4) =1;  IsDeltaLn(3) = IsDeltaLn(6)=0
+weight: WeightGam(Type=1:6) = 1, WeightLn(:) = 1
+
+result:
+after updates, Conf(StatusVertex(1)==0 .and. IsDelta(1)==1)/Conf(total) = 0.60
+Conf(Status(1)==0 .and. IsDelta(1)==0)/Conf(total) = 0.15 
+
+Report:
+The update can change gamma between delta and normal functions
+
+Notes:
+change the time variables for Gin and Gout when change_gamma_isdelta
+
+====================================================
+
 
 
 
