@@ -300,8 +300,8 @@ SUBROUTINE markov
           !call change_wline_time        
         case(18)  
           call change_wline_isdelta       
-        !case(19)  
-          !call change_Gamma_isdelta       
+        case(19)  
+          call change_Gamma_isdelta       
       end select
 
       imc = imc + 1
@@ -752,6 +752,104 @@ SUBROUTINE change_wline_isdelta
   endif
   return
 END SUBROUTINE change_wline_isdelta
+  
+
+
+!------------ change gamma isdelta: Pupdate(19) ------------
+SUBROUTINE change_gamma_isdelta
+  implicit none
+  integer :: iGam, iGin, iGout, iW, backforth
+  !backforth = 1: delta -> normal; backforth = 0: normal -> delta
+  double precision :: t1iGam, t2iGam, t3iGam, tau1, tau2, dtau, Pacc
+  complex*16 :: WiGin, WiGout, WiGam, Anew, Aold, sgn
+
+  !------- step1 : check if worm is present -------------
+  if(IsWormPresent .eqv. .true.)    return
+  !ProbProp(iupdate) = ProbProp(iupdate) + 1
+
+  !------- step2 : propose a new config -----------------
+  iGam = generate_gamma()
+  if(iGam==MeasureGam)  return
+
+  iGin = NeighVertex(1, iGam)
+  iGout = NeighVertex(2, iGam)
+
+  t1iGam = T1Vertex(iGam)
+  t2iGam = T2Vertex(iGam)
+  t3iGam = T3Vertex(iGam)
+
+  backforth = IsDeltaVertex(iGam)
+
+  if(backforth==0) then
+    t1iGam = t3iGam
+    t2iGam = t3iGam
+  else 
+    if(t1iGam/=t3iGam) then
+      write(*, *) "There is a bug in delta-Gam!"
+      call print_config
+      stop
+    endif
+
+    if(t2iGam/=t3iGam) then
+      write(*, *) "There is a bug in delta-Gam!"
+      call print_config
+      stop
+    endif
+
+    t1iGam = generate_tau()
+    t2iGam = generate_tau()
+  endif
+
+  !------- step4 : weight calculation -------------------
+  tau1 = t3iGam-t2iGam
+  tau2 = t1iGam-t3iGam
+  WiGam = weight_vertex(StatusVertex(iGam), 1-backforth, GXVertex(iGam)-WXVertex(iGam), &
+    & GYVertex(iGam)-WYVertex(iGam), tau1, tau2, TypeVertex(iGam))
+
+  dtau = t2iGam-T1Vertex(NeighLn(1, iGin))
+  WiGin = weight_line(StatusLn(iGin), IsDeltaLn(iGin), 1, 0, 0, dtau, TypeLn(iGin)) 
+
+  dtau = T2Vertex(NeighLn(2, iGout))-t1iGam
+  WiGout = weight_line(StatusLn(iGout), IsDeltaLn(iGout), 1, 0, 0, dtau, TypeLn(iGout)) 
+
+  Anew = WiGam *WiGin *WiGout
+  Aold = WeightVertex(iGam) *WeightLn(iGin) *WeightLn(iGout)
+
+  call weight_ratio(Pacc, sgn, Anew, Aold)
+
+  if(backforth==0) then
+    Pacc = Pacc*prob_tau(T1Vertex(iGam))*prob_tau(T2Vertex(iGam))
+  else 
+    Pacc = Pacc/(prob_tau(t1iGam)*prob_tau(t2iGam))
+  endif
+
+  !------- step5 : accept the update --------------------
+  ProbProp(Order, iupdate) = ProbProp(Order, iupdate) + 1
+
+  if(rn()<=Pacc) then
+
+    !------ update the diagram info -------------------
+    Phase = Phase *sgn
+
+    !------- update the weight type of elements -------
+    IsDeltaVertex(iGam) = 1-backforth
+
+    !------ update the time of elements ---------------
+    T1Vertex(iGam) = t1iGam
+    T2Vertex(iGam) = t2iGam
+    T3Vertex(iGam) = t3iGam
+
+    !------ update the weight of elements -------------
+    WeightVertex(iGam) = WiGam
+    WeightLn(iGin) = WiGin
+    WeightLn(iGout) = WiGout
+
+    call update_weight(Anew, Aold)
+
+    ProbAcc(Order, 19) = ProbAcc(Order, 19) + 1
+  endif
+  return
+END SUBROUTINE change_Gamma_isdelta
   
 
 
