@@ -1,9 +1,9 @@
-Block:  1024
-Sample: 10000
+Block:  10
+Sample: 1000
 Sweep:  1
 Toss:  1000
 IsLoad: 0
-Type: 1
+Type: 2
 #1: self consist loop; 2: monte carlo
 
 Lx:   2 
