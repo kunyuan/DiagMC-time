@@ -351,7 +351,7 @@ SUBROUTINE change_wline_time
     !------- step2 : propose a new config -----------------
     iGam=generate_gamma()
     if(IsDeltaVertex(iGam))return
-    WNewTau=generate_tau(T3Vertex(iGam))
+    WNewTau=generate_tau()
 
     
 end SUBROUTINE
