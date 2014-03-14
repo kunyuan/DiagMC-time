@@ -47,11 +47,16 @@
 
 SUBROUTINE read_GWGamma
   implicit none
-  integer :: ix, iy, ityp, it1, it2
+  integer :: ix, iy, ityp, it1, it2, ios
 
-  open(100, status="old", file=trim(title1)//"_G_file.dat")
-  open(101, status="old", file=trim(title1)//"_W_file.dat")
-  open(102, status="old", file=trim(title1)//"_Gamma_file.dat")
+  open(100, status="old", file=trim(title1)//"_G_file.dat",iostat=ios)
+  open(101, status="old", file=trim(title1)//"_W_file.dat",iostat=ios)
+  open(102, status="old", file=trim(title1)//"_Gamma_file.dat",iostat=ios)
+
+  if(.not. (ios==0)) then
+    write(*,*) "You have to run self consistent loop first!"
+    stop
+  endif
 
   do it1 = 0, MxT-1
     do ityp = 1, NTypeG
@@ -144,7 +149,7 @@ SUBROUTINE write_monte_carlo_data
   open(104, status="replace", &
     & file=trim(title3)//"_monte_carlo_data.bin.dat",form="binary")
 
-  write(104, *) imc, GamNorm, GamNormWeight
+  write(104) imc, GamNorm, GamNormWeight
   do it2 = 0, MxT-1
     do it1 = 0, MxT-1
       do iy = 0, Ly-1
@@ -152,8 +157,8 @@ SUBROUTINE write_monte_carlo_data
           do ityp = 1, NtypeGam/2
             do itopo = 0, 1
               do iorder = 0, MCOrder
-                write(104, *)  GamMC(iorder, itopo, ityp, ix, iy, it1, it2)
-                write(104, *)  GamSqMC(iorder, itopo, ityp, ix, iy, it1, it2)
+                write(104)  GamMC(iorder, itopo, ityp, ix, iy, it1, it2)
+                write(104)  GamSqMC(iorder, itopo, ityp, ix, iy, it1, it2)
               enddo
             enddo
           enddo
@@ -174,39 +179,39 @@ SUBROUTINE write_monte_carlo_conf
   open(103, status="replace", &
    & file=trim(title3)//"_monte_carlo_conf.bin.dat",form="binary")
 
-  write(103, *)  Order, NGLn, NWLn, NVertex, MeasureGam, SignFermiLoop, IsWormPresent 
-  write(103, *)  Ira, Masha, SpinMasha, kMasha
-  write(103, *)  TailLn, TailVertex
-  write(103, *)  NextLn(:)
-  write(103, *)  NextVertex(:)
-  write(103, *)  WeightCurrent, Phase
-  write(103, *)  StatusLn(:)
-  write(103, *)  GLnKey2Value(1:NGLn), WLnKey2Value(1:NWLn)
-  write(103, *)  LnValue2Key(:)
-  write(103, *)  StatusVertex(:)
-  write(103, *)  VertexKey2Value(:)
-  write(103, *)  VertexValue2Key(:)
-  write(103, *)  KindLn(:)
-  write(103, *)  TypeLn(:)
-  write(103, *)  TypeVertexIn(:)
-  write(103, *)  TypeVertexOut(:)
-  write(103, *)  TypeVertex(:)
-  write(103, *)  kLn(:)
-  write(103, *)  Hash4G(:) 
-  write(103, *)  Hash4W(:)
-  write(103, *)  GXVertex(:), GYVertex(:)
-  write(103, *)  WXVertex(:), WYVertex(:)
-  write(103, *)  T1Vertex(:), T2Vertex(:), T3Vertex(:)
-  write(103, *)  DirecVertex(:)             
-  write(103, *)  WeightLn(:) 
-  write(103, *)  WeightVertex(:) 
+  write(103)  Order, NGLn, NWLn, NVertex, MeasureGam, SignFermiLoop, IsWormPresent 
+  write(103)  Ira, Masha, SpinMasha, kMasha
+  write(103)  TailLn, TailVertex
+  write(103)  NextLn(:)
+  write(103)  NextVertex(:)
+  write(103)  WeightCurrent, Phase
+  write(103)  StatusLn(:)
+  write(103)  GLnKey2Value(1:NGLn), WLnKey2Value(1:NWLn)
+  write(103)  LnValue2Key(:)
+  write(103)  StatusVertex(:)
+  write(103)  VertexKey2Value(:)
+  write(103)  VertexValue2Key(:)
+  write(103)  KindLn(:)
+  write(103)  TypeLn(:)
+  write(103)  TypeVertexIn(:)
+  write(103)  TypeVertexOut(:)
+  write(103)  TypeVertex(:)
+  write(103)  kLn(:)
+  write(103)  Hash4G(:) 
+  write(103)  Hash4W(:)
+  write(103)  GXVertex(:), GYVertex(:)
+  write(103)  WXVertex(:), WYVertex(:)
+  write(103)  T1Vertex(:), T2Vertex(:), T3Vertex(:)
+  write(103)  DirecVertex(:)             
+  write(103)  WeightLn(:) 
+  write(103)  WeightVertex(:) 
 
   do i = 1, 2
-    write(103, *)  NeighLn(i,:)
+    write(103)  NeighLn(i,:)
   enddo
 
   do i = 1, 3
-    write(103, *)  NeighVertex(i,:) 
+    write(103)  NeighVertex(i,:) 
   enddo
 
   close(103)
@@ -219,7 +224,7 @@ SUBROUTINE read_monte_carlo_data
 
   open(105, status="old", file=trim(title)//"_monte_carlo_data.bin.dat",form="binary")
 
-  read(105, *) imc, GamNorm, GamNormWeight
+  read(105) imc, GamNorm, GamNormWeight
   do it2 = 0, MxT-1
     do it1 = 0, MxT-1
       do iy = 0, Ly-1
@@ -227,7 +232,7 @@ SUBROUTINE read_monte_carlo_data
           do ityp = 1, NtypeGam/2
             do itopo = 0, 1
               do iorder = 0, MCOrder
-                read(105, *)  GamMC(iorder, itopo, ityp, ix, iy, it1, it2)
+                read(105)  GamMC(iorder, itopo, ityp, ix, iy, it1, it2)
               enddo
             enddo
           enddo
@@ -248,39 +253,39 @@ SUBROUTINE read_monte_carlo_conf
 
   open(106, status="old", file=trim(title)//"_monte_carlo_conf.bin.dat",form="binary")
 
-  read(106, *)  Order, NGLn, NWLn, NVertex, MeasureGam, SignFermiLoop, IsWormPresent 
-  read(106, *)  Ira, Masha, SpinMasha, kMasha
-  read(106, *)  TailLn, TailVertex
-  read(106, *)  NextLn(:)
-  read(106, *)  NextVertex(:)
-  read(106, *)  WeightCurrent, Phase
-  read(106, *)  StatusLn(:)
-  read(106, *)  GLnKey2Value(1:NGLn), WLnKey2Value(1:NWLn)
-  read(106, *)  LnValue2Key(:)
-  read(106, *)  StatusVertex(:)
-  read(106, *)  VertexKey2Value(:)
-  read(106, *)  VertexValue2Key(:)
-  read(106, *)  KindLn(:)
-  read(106, *)  TypeLn(:)
-  read(106, *)  TypeVertexIn(:)
-  read(106, *)  TypeVertexOut(:)
-  read(106, *)  TypeVertex(:)
-  read(106, *)  kLn(:)
-  read(106, *)  Hash4G(:) 
-  read(106, *)  Hash4W(:)
-  read(106, *)  GXVertex(:), GYVertex(:)
-  read(106, *)  WXVertex(:), WYVertex(:)
-  read(106, *)  T1Vertex(:), T2Vertex(:), T3Vertex(:)
-  read(106, *)  DirecVertex(:)             
-  read(106, *)  WeightLn(:) 
-  read(106, *)  WeightVertex(:) 
+  read(106)  Order, NGLn, NWLn, NVertex, MeasureGam, SignFermiLoop, IsWormPresent 
+  read(106)  Ira, Masha, SpinMasha, kMasha
+  read(106)  TailLn, TailVertex
+  read(106)  NextLn(:)
+  read(106)  NextVertex(:)
+  read(106)  WeightCurrent, Phase
+  read(106)  StatusLn(:)
+  read(106)  GLnKey2Value(1:NGLn), WLnKey2Value(1:NWLn)
+  read(106)  LnValue2Key(:)
+  read(106)  StatusVertex(:)
+  read(106)  VertexKey2Value(:)
+  read(106)  VertexValue2Key(:)
+  read(106)  KindLn(:)
+  read(106)  TypeLn(:)
+  read(106)  TypeVertexIn(:)
+  read(106)  TypeVertexOut(:)
+  read(106)  TypeVertex(:)
+  read(106)  kLn(:)
+  read(106)  Hash4G(:) 
+  read(106)  Hash4W(:)
+  read(106)  GXVertex(:), GYVertex(:)
+  read(106)  WXVertex(:), WYVertex(:)
+  read(106)  T1Vertex(:), T2Vertex(:), T3Vertex(:)
+  read(106)  DirecVertex(:)             
+  read(106)  WeightLn(:) 
+  read(106)  WeightVertex(:) 
 
   do i = 1, 2
-    write(106, *)  NeighLn(i,:)
+    read(106)  NeighLn(i,:)
   enddo
 
   do i = 1, 3
-    write(106, *)  NeighVertex(i,:) 
+    read(106)  NeighVertex(i,:) 
   enddo
 
   close(106)
