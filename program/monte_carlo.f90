@@ -341,6 +341,18 @@ end SUBROUTINE
 
 SUBROUTINE change_wline_time
     implicit none
+    integer :: iWLn,iGam
+    double precision :: Pacc,WNewTau
+    complex*16 :: WOldWeight,WNewWeight,GamOldWeight,GamNewWeight,Anew,Aold,sgn
+    !------- step1 : check if worm is present -------------
+    if(IsWormPresent .eqv. .true.)    return
+    !ProbProp(iupdate) = ProbProp(iupdate) + 1
+
+    !------- step2 : propose a new config -----------------
+    iGam=generate_gamma()
+    if(IsDeltaVertex(iGam))return
+    WNewTau=generate_tau(T3Vertex(iGam))
+
     
 end SUBROUTINE
 
@@ -358,14 +370,12 @@ SUBROUTINE change_wline_space
     iGam = NeighLn(1, iWLn)
     jGam = NeighLn(2, iWLn)
 
-    dxw = generate_x();         dyw = generate_y()
-    xwi = find_neigh_x(WXVertex(iGam), dxw)
-    ywi = find_neigh_y(WYVertex(iGam), dyw)
+    xwi = generate_x(WXVertex(iGam));
+    ywi = generate_y(WYVertex(iGam))
 
     if(IsDeltaLn(iWLn)==0) then
-      dxw = generate_x();         dyw = generate_y()
-      xwj = find_neigh_x(WXVertex(jGam), dxw)
-      ywj = find_neigh_y(WYVertex(jGam), dyw)
+      xwj = generate_x(WXVertex(jGam));
+      ywj = generate_y(WYVertex(jGam))
     else
       xwj=xwi
       ywj=ywi
