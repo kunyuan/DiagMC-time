@@ -44,7 +44,7 @@ The self-consistent integrals can give the right answer when they are transferre
 
 Test example:
 1) Order1 diagram: 
-initial: 1 is the measureGam, IsDelta(1) =1;  IsDelta(2:4) = 0; Type(1:4) = 1
+initial: 1 is the measureGam, IsDeltaVertex(1) =1;  IsDeltaVertex(2:4) = 0; Type(1:4) = 1
 weight: WeightGam(Type=1:6) = 1
 result:
 after updates, Conf(Type(1:4)==1)/Conf(total) = 0.125
@@ -58,7 +58,7 @@ The update change_gamma_type can change the gamma types with uniform distributio
 
 Test example:
 1) Order1 diagram: 
-initial: 1 is the measureGam, IsDelta(1:4) =1;  IsDeltaLn(3) = IsDeltaLn(6)=0
+initial: 1 is the measureGam, IsDeltaVertex(1:4) =1;  IsDeltaLn(3)=IsDeltaLn(6)=0
 weight: WeightGam(Type=1:6) = 1
 result:
 after updates, Conf(measureGam==1)/Conf(total) = 0.25
@@ -71,6 +71,25 @@ For the measuring part, only allow IsDeltaVertex(measureGam)=1 and IsDeltaLn(Mea
 
 ====================================================
 
+5. mc update: change_wline_isdelta
+
+Test example:
+1) Order1 diagram: 
+initial: 1 is the measureGam, IsDelta(1:4) =1;  IsDeltaLn(3) = IsDeltaLn(6)=0
+weight: WeightGam(Type=1:6) = 1, WeightLn(:) = 1
+
+result:
+after updates, Conf(Status(3)==0 .and. IsDelta(3)==1)/Conf(total) = 0.33
+Conf(Status(3)==0 .and. IsDelta(3)==0)/Conf(total) = 0.167
+
+Report:
+The update can change wline between delta and normal functions
+
+Notes:
+If a delta Gamma is connected with W, change all the 3 times in Gamma;
+If a normal Gamma in connected with W, change only T3 in Gamma.
+
+====================================================
 
 
 
