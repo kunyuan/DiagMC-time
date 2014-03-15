@@ -4,10 +4,10 @@ Sweep:  1
 Toss:  10
 IsLoad: 0
 Type: 2
-#1: self consist loop; 2: monte carlo
+#1: self consist loop; 2: monte carlo; 3: test
 
-Lx:   2 
-Ly:   2 
+Lx:   2
+Ly:   2
 Jcp:   1.0
 Beta:  0.5
 Order:  1
