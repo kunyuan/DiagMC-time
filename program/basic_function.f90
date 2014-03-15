@@ -183,7 +183,7 @@ DOUBLE PRECISION FUNCTION prob_tau(tau)
 END FUNCTION prob_tau
 
 !---------- int x y -------------------------
-INTEGER FUNCTION generate_x(CurrentX,Weight)
+SUBROUTINE generate_x(CurrentX,NewX,Weight)
   implicit none
   integer :: NewX,CurrentX,dX
   double precision :: Weight,rand
@@ -196,11 +196,10 @@ INTEGER FUNCTION generate_x(CurrentX,Weight)
   if(NewX>=Lx) then
     NewX = NewX - Lx
   endif
-  generate_x = NewX
   return
-END FUNCTION generate_x
+END SUBROUTINE generate_x
 
-INTEGER FUNCTION generate_y(CurrentY,Weight)
+SUBROUTINE generate_y(CurrentY,NewY,Weight)
   implicit none
   integer :: NewY,CurrentY,dY
   double precision :: Weight,rand
@@ -213,9 +212,8 @@ INTEGER FUNCTION generate_y(CurrentY,Weight)
   if(NewY>=Ly) then
     NewY = NewY - Ly
   endif
-  generate_y = NewY
   return
-END FUNCTION generate_y
+END SUBROUTINE generate_y
 
 DOUBLE PRECISION FUNCTION prob_dx(x)
   implicit none 
