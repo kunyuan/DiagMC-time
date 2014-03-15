@@ -184,57 +184,61 @@ DOUBLE PRECISION FUNCTION prob_tau(tau)
 END FUNCTION prob_tau
 
 !---------- int x y -------------------------
-INTEGER FUNCTION generate_x()
+SUBROUTINE generate_x(CurrentX,NewX,Weight)
   implicit none
-  integer :: nr
-  nr = Floor(rn()*3.d0)-1
-  generate_x = nr
-  return
-END FUNCTION generate_x
+  integer :: NewX,CurrentX,dX
+  double precision :: Weight,rand
+  rand=rn()
+  dX=0.5d0*dexp(rand*logLx)
+  Weight=SpatialWeight(1,dX)
+  IF(rn()>0.5d0) dX=Lx-1-dX
 
-INTEGER FUNCTION generate_y()
-  implicit none
-  integer :: nr
-  nr = Floor(rn()*3.d0)-1
-  generate_y = nr
-  return
-END FUNCTION generate_y
-
-DOUBLE PRECISION FUNCTION prob_x(x)
-  implicit none 
-  integer, intent(in) :: x
-  prob_x = 1.d0/3.d0
-  return
-END FUNCTION prob_x
-
-DOUBLE PRECISION FUNCTION prob_y(y)
-  implicit none 
-  integer, intent(in) :: y
-  prob_y = 1.d0/3.d0
-  return
-END FUNCTION prob_y
-
-INTEGER FUNCTION find_neigh_x(x, dx)
-  implicit none
-  integer, intent(in) :: x, dx
-  find_neigh_x = x+dx
-  if(find_neigh_x<0) then
-    find_neigh_x = find_neigh_x + Lx
-  else if(find_neigh_x>=Lx) then
-    find_neigh_x = find_neigh_x - Lx
+  NewX = CurrentX + dX
+  if(NewX>=Lx) then
+    NewX = NewX - Lx
   endif
-END FUNCTION find_neigh_x
+  return
+END SUBROUTINE generate_x
 
-INTEGER FUNCTION find_neigh_y(y, dy)
+SUBROUTINE generate_y(CurrentY,NewY,Weight)
   implicit none
-  integer, intent(in) :: y, dy
-  find_neigh_y = y+dy
-  if(find_neigh_y<0) then
-    find_neigh_y = find_neigh_y + Ly
-  else if(find_neigh_y>=Ly) then
-    find_neigh_y = find_neigh_y - Ly
+  integer :: NewY,CurrentY,dY
+  double precision :: Weight,rand
+  rand=rn()
+  dY=0.5d0*dexp(rand*logLy)
+  Weight=SpatialWeight(2,dY)
+  IF(rn()>0.5d0) dY=Ly-1-dY
+
+  NewY = CurrentY + dY
+  if(NewY>=Ly) then
+    NewY = NewY - Ly
   endif
-END FUNCTION find_neigh_y
+  return
+END SUBROUTINE generate_y
+
+DOUBLE PRECISION FUNCTION prob_dx(x)
+  implicit none 
+  integer :: dx,x
+  if(dx<0)then 
+    dx=x+Lx
+  else 
+    dx=x
+  endif
+  prob_dx = SpatialWeight(1,dx)
+  return
+END FUNCTION prob_dx
+
+DOUBLE PRECISION FUNCTION prob_dy(y)
+  implicit none 
+  integer :: dy,y
+  if(dy<0)then
+    dy=y+Ly;
+  else
+    dy=y
+  endif
+  prob_dy = SpatialWeight(2,dy)
+  return
+END FUNCTION prob_dy
 
 INTEGER FUNCTION diff_x(dx)
   implicit none

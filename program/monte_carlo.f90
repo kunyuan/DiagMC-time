@@ -30,6 +30,7 @@ SUBROUTINE initialize_markov
     enddo
 
     call def_prob
+    call def_spatial_weight
     call def_spin
     call def_diagram
     return
@@ -56,6 +57,42 @@ SUBROUTINE def_prob
   enddo
   return
 END SUBROUTINE def_prob
+
+SUBROUTINE def_spatial_weight
+  implicit none
+  double precision :: tt,logL(2)
+  integer :: ix,iy,i
+  integer,dimension(2) :: L
+! initializing logscale sampling of space
+! for seeding rx coordinate displacement do this
+!     x=rndm(); rx=0.5d0*dexp(x*logL); ix=rx
+!     IF(rndm()>0.5d0) ix=L(1)-1-ix
+! this gives you displacement ix in the affine basis called with probability
+! SpatialWeight(i,ix)
+  L(1)=Lx
+  L(2)=Ly
+  logL(1)=logLx
+  logL(2)=logLy
+
+  do i=1,2
+    ix=0;
+    SpatialWeight(i,ix)=dlog(2.d0)/(2.d0*logL(i))
+    SpatialWeight(i,L(i)-1-ix)=SpatialWeight(i,ix)
+    do ix=1,L(i)/2-1
+      tt=ix*1.d0;
+      SpatialWeight(i,ix)=dlog((tt+1.d0)/tt)/(2.d0*logL(i)) 
+      SpatialWeight(i,L(i)-1-ix)=SpatialWeight(i,ix)
+    enddo
+    tt=0.0
+    do ix=0,L(i)-1
+      tt=tt+SpatialWeight(i,ix)
+    enddo 
+    do ix=0,L(i)-1
+      SpatialWeight(i,ix)=SpatialWeight(i,ix)/tt
+    enddo 
+  enddo
+
+END SUBROUTINE def_spatial_weight
 
 
 SUBROUTINE def_spin
@@ -657,13 +694,25 @@ end SUBROUTINE
 
 SUBROUTINE change_wline_time
     implicit none
+    integer :: iWLn,iGam
+    double precision :: Pacc,WNewTau
+    complex*16 :: WOldWeight,WNewWeight,GamOldWeight,GamNewWeight,Anew,Aold,sgn
+    !------- step1 : check if worm is present -------------
+    if(IsWormPresent .eqv. .true.)    return
+    !ProbProp(iupdate) = ProbProp(iupdate) + 1
+
+    !------- step2 : propose a new config -----------------
+    iGam=generate_gamma()
+    if(IsDeltaVertex(iGam))return
+    WNewTau=generate_tau()
+
     
 end SUBROUTINE
 
 SUBROUTINE change_wline_space
     implicit none
     integer :: iGam, iWLn, jGam, dxw, dyw, xwi, ywi, xwj, ywj, dir
-    double precision :: Pacc,T1,T2,T3,T4,T5,T6
+    double precision :: Pacc,T1,T2,T3,T4,T5,T6,WeightIX,WeightIY,WeightJX,WeightJY
     complex*16  ::  WiGam,WjGam, WW, Anew, Aold, sgn
     !------- step1 : check if worm is present -------------
     if(IsWormPresent .eqv. .true.)    return
@@ -674,14 +723,12 @@ SUBROUTINE change_wline_space
     iGam = NeighLn(1, iWLn)
     jGam = NeighLn(2, iWLn)
 
-    dxw = generate_x();         dyw = generate_y()
-    xwi = find_neigh_x(WXVertex(iGam), dxw)
-    ywi = find_neigh_y(WYVertex(iGam), dyw)
+    call generate_x(WXVertex(iGam),xwi,WeightIX);
+    call generate_y(WYVertex(iGam),ywi,WeightIY)
 
     if(IsDeltaLn(iWLn)==0) then
-      dxw = generate_x();         dyw = generate_y()
-      xwj = find_neigh_x(WXVertex(jGam), dxw)
-      ywj = find_neigh_y(WYVertex(jGam), dyw)
+      call generate_x(WXVertex(jGam),xwj,WeightJX);
+      call generate_y(WYVertex(jGam),ywj,WeightJY)
     else
       xwj=xwi
       ywj=ywi

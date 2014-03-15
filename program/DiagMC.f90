@@ -7,6 +7,10 @@ PROGRAM MAIN
   print *, 'Lx, Ly, Ntoss, Nsamp, Nblck, NStep, Jcp, beta, MCOrder, Seed, ISub, InpMC, title'
   read  *,  Lx, Ly, Ntoss, Nsamp, Nblck, NStep, Jcp, beta, MCOrder, Seed, ISub, InpMC, title
 
+  logLx=dlog(Lx*1.d0)
+  logLy=dlog(Ly*1.d0)
+  SpatialWeight(:,:)=0.d0
+
   do i = 1, MCOrder
     read *, CoefOfWeight(i)
   enddo
@@ -70,6 +74,8 @@ PROGRAM MAIN
     call self_consistent
   else if(ISub==2) then
     call monte_carlo
+  else if(ISub==3) then
+    call test_subroutine
   endif
 
 CONTAINS
@@ -344,6 +350,37 @@ END SUBROUTINE monte_carlo
   !close(12)
   !return
 !END SUBROUTINE update_flag
+
+SUBROUTINE test_subroutine
+    implicit none
+    integer :: i,x,y,N
+    double precision :: histx(0:MxLx-1),xweight
+    double precision :: histy(0:MxLy-1),yweight
+    call initialize_markov
+    histx(:)=0.d0
+    histy(:)=0.d0
+    N=10000000
+    xweight=0.0
+    yweight=0.0
+    do i=1,N
+      call generate_x(0,x,xweight)
+      histx(x)=histx(x)+1
+      call generate_y(0,x,yweight)
+      histy(y)=histy(y)+1
+    enddo
+    open(11,file="testx.dat")
+    write(11,*) "X:",Lx,logLx
+    do x=0,Lx-1
+      write(11,*) x, histx(x)/N, SpatialWeight(1,x)
+    enddo
+    close(11)
+    open(11,file="testy.dat")
+    write(11,*) "Y:",Ly,logLy
+    do y=0,Ly-1
+      write(11,*) y, histy(y)/N, SpatialWeight(2,y)
+    enddo
+    close(11)
+END SUBROUTINE
 
 
 END PROGRAM MAIN
