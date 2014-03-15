@@ -694,17 +694,17 @@ end SUBROUTINE
 
 SUBROUTINE change_wline_time
     implicit none
-    integer :: iWLn,iGam
-    double precision :: Pacc,WNewTau
-    complex*16 :: WOldWeight,WNewWeight,GamOldWeight,GamNewWeight,Anew,Aold,sgn
-    !------- step1 : check if worm is present -------------
-    if(IsWormPresent .eqv. .true.)    return
-    !ProbProp(iupdate) = ProbProp(iupdate) + 1
+    !integer :: iWLn,iGam
+    !double precision :: Pacc,WNewTau
+    !complex*16 :: WOldWeight,WNewWeight,GamOldWeight,GamNewWeight,Anew,Aold,sgn
+    !!------- step1 : check if worm is present -------------
+    !if(IsWormPresent .eqv. .true.)    return
+    !!ProbProp(iupdate) = ProbProp(iupdate) + 1
 
-    !------- step2 : propose a new config -----------------
-    iGam=generate_gamma()
-    if(IsDeltaVertex(iGam))return
-    WNewTau=generate_tau()
+    !!------- step2 : propose a new config -----------------
+    !iGam=generate_gamma()
+    !if(IsDeltaVertex(iGam))return
+    !WNewTau=generate_tau()
 
     
 end SUBROUTINE
