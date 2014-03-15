@@ -60,9 +60,9 @@ END SUBROUTINE def_prob
 
 SUBROUTINE def_spatial_weight
   implicit none
-  double precision :: tt
+  double precision :: tt,logL(2)
   integer :: ix,iy,i
-  integer,dimension(2) :: L,logL
+  integer,dimension(2) :: L
 ! initializing logscale sampling of space
 ! for seeding rx coordinate displacement do this
 !     x=rndm(); rx=0.5d0*dexp(x*logL); ix=rx
@@ -85,7 +85,7 @@ SUBROUTINE def_spatial_weight
     enddo
     tt=0.0
     do ix=0,L(i)-1
-      tt=tt+SpatialWeight(1,ix)
+      tt=tt+SpatialWeight(i,ix)
     enddo 
     do ix=0,L(i)-1
       SpatialWeight(i,ix)=SpatialWeight(i,ix)/tt
@@ -407,12 +407,12 @@ SUBROUTINE change_wline_space
     iGam = NeighLn(1, iWLn)
     jGam = NeighLn(2, iWLn)
 
-    xwi = generate_x(WXVertex(iGam),WeightIX);
-    ywi = generate_y(WYVertex(iGam),WeightIY)
+    call generate_x(WXVertex(iGam),xwi,WeightIX);
+    call generate_y(WYVertex(iGam),ywi,WeightIY)
 
     if(IsDeltaLn(iWLn)==0) then
-      xwj = generate_x(WXVertex(jGam),WeightJX);
-      ywj = generate_y(WYVertex(jGam),WeightJY)
+      call generate_x(WXVertex(jGam),xwj,WeightJX);
+      call generate_y(WYVertex(jGam),ywj,WeightJY)
     else
       xwj=xwi
       ywj=ywi
