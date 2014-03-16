@@ -353,6 +353,7 @@ END SUBROUTINE monte_carlo
 
 SUBROUTINE test_subroutine
     implicit none
+    integer :: isamp
     !======== test x,y distribution =========================
     !integer :: i,x,y,N
     !double precision :: histx(0:MxLx-1),xweight
@@ -383,7 +384,11 @@ SUBROUTINE test_subroutine
     !close(11)
     !========  test drawing subroutine =====================
     call initialize_markov
-    call DRAW
+    do isamp = 1, Ntoss
+      call create_worm_along_wline
+      if(IsWormPresent) call DRAW
+    enddo
+    !call DRAW
 END SUBROUTINE
 
 
