@@ -234,8 +234,10 @@ SUBROUTINE def_diagram
   WXVertex(1:4) = 0;            WYVertex(1:4) = 0
 
   ! the time variables of Gamma 1, 2, 3 and 4
-  T1Vertex(1:4) = 0.d0;            T2Vertex(1:4) = 0.d0
-  T3Vertex(1:4) = 0.d0           
+  T1Vertex(1)=0.d0; T2Vertex(1)=0.d0; T3Vertex(1)=0.d0
+  T1Vertex(2)=0.1; T2Vertex(2)=0.1; T3Vertex(2)=0.1
+  T1Vertex(3)=0.2; T2Vertex(3)=0.2; T3Vertex(3)=0.2
+  T1Vertex(4)=0.3; T2Vertex(4)=0.3; T3Vertex(4)=0.3
 
   ! Direction of Gamma: 1: left of W;  2: right of W
   DirecVertex(1) = 1;                DirecVertex(2) = 2
