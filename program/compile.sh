@@ -1,9 +1,7 @@
-#!/bin/bash
 echo "Compling..."
 compilor="ifort"
 sourcecode="DiagMC.f90"
 target="gamma3.exe"
-
 if [ -n "$1" ]
 then
   if [ $1 = "-g" ] || [$1 = "g" ]; then

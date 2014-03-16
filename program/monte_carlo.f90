@@ -136,13 +136,150 @@ SUBROUTINE def_diagram
   complex*16 :: Anew
 
   !-------------- 1-order diagram ------------------------
+  !Order = 1
+  !! the index of measuring gamma
+  !NGLn = 4;  NWLn = 2;  NVertex = 4
+  !! the number of glines, wlines, gamma
+  !MeasureGam = 1
+  !! number of fermi loops
+  !SignFermiLoop = 1.d0
+  !! the phase of the diagram
+  !Phase = (1.d0, 0.d0)
+  !! if Ira and Masha are present
+  !IsWormPresent = .false.
+
+  !!status for lines: 0: normal; 1: with measuring Gamma
+  !StatusLn(1) = 1
+  !StatusLn(2) = 1
+  !StatusLn(3) = 1
+  !StatusLn(4) = 0
+  !StatusLn(5) = 0
+  !StatusLn(6) = 0
+  !TailLn = 7
+
+  !GLnKey2Value(1)= 1;     GLnKey2Value(2)= 2;     GLnKey2Value(3)= 4
+  !GLnKey2Value(4)= 5
+  !WLnKey2Value(1)= 3;     WLnKey2Value(2)= 6
+
+  !LnValue2Key(1)  = 1;     LnValue2Key(2)  = 2;     LnValue2Key(3)  = 1
+  !LnValue2Key(4)  = 3;     LnValue2Key(5)  = 4;     LnValue2Key(6)  = 2
+
+
+  !!kind of lines: 1: gline;  2: wline
+  !KindLn(1) = 1;     KindLn(2) = 1;     KindLn(3) = 2
+  !KindLn(4) = 1;     KindLn(5) = 1;     KindLn(6) = 2
+
+  !!type of glines: 1: spin up; 2: spin down
+  !TypeLn(1) = 1;     TypeLn(2) = 1
+  !TypeLn(4) = 1;     TypeLn(5) = 1
+
+  !!IsDelta: 1: delta function(W); 0: normal function(W); -1: G
+  !IsDeltaLn(1:6) = -1
+  !IsDeltaLn(3) = 0
+  !IsDeltaLn(6) = 0
+
+  !!type of gamma inside spins: 1: spin up; 2: spin down
+  !TypeVertexIn(:) = 1;   TypeVertexOut(:) = 1
+
+  !!type of Gamma: 1: gin, 2: gout, 3: win, 4: wout
+  !TypeVertex(1) = 1
+  !TypeVertex(2) = 1
+  !TypeVertex(3) = 1
+  !TypeVertex(4) = 1
+
+  !!type of wlines
+  !TypeLn(3) = TypeGam2W(TypeVertex(1), TypeVertex(2))
+  !TypeLn(6) = TypeGam2W(TypeVertex(3), TypeVertex(4))
+
+
+  !! the momentum on line 1, 2, and 3
+  !kLn(1) = 100
+  !Hash4G(kLn(1)) = 1
+  !kLn(2) = 32
+  !Hash4G(kLn(2)) = 1
+  !kLn(3) = add_k(kLn(2), -kLn(1))
+  !Hash4W(abs(kLn(3))) = 1
+  !kLn(4) = 23
+  !Hash4G(kLn(4)) = 1
+  !kLn(5) = add_k(kLn(3), kLn(4))
+  !Hash4G(kLn(5)) = 1
+  !kLn(6) = add_k(kLn(1), -kLn(4))
+  !Hash4W(abs(kLn(6))) = 1
+
+
+  !! NeighLn(i, j): the ith neighbor gamma of line j
+  !NeighLn(1,1) = 1;                NeighLn(2,1) = 3
+  !NeighLn(1,2) = 4;                NeighLn(2,2) = 1
+  !NeighLn(1,3) = 1;                NeighLn(2,3) = 2
+  !NeighLn(1,4) = 3;                NeighLn(2,4) = 2
+  !NeighLn(1,5) = 2;                NeighLn(2,5) = 4
+  !NeighLn(1,6) = 3;                NeighLn(2,6) = 4
+
+  !StatusVertex(1) = 1
+  !StatusVertex(2) = 0
+  !StatusVertex(3) = 0
+  !StatusVertex(4) = 0
+
+  !do i = 1, 4
+    !VertexKey2Value(i) = i
+    !VertexValue2Key(i)  = i
+  !enddo
+  !TailVertex = 5
+
+  !!IsDeltaVertex: 1: delta function(Gam); 0: normal function(Gam)
+  !IsDeltaVertex(1:4) = 1
+
+  !! the site variables of Gamma 1, 2, 3 and 4
+  !GXVertex(1:4) = 0;            GYVertex(1:4) = 0
+  !WXVertex(1:4) = 0;            WYVertex(1:4) = 0
+
+  !! the time variables of Gamma 1, 2, 3 and 4
+  !T1Vertex(1)=0.d0; T2Vertex(1)=0.d0; T3Vertex(1)=0.d0
+  !T1Vertex(2)=0.1; T2Vertex(2)=0.1; T3Vertex(2)=0.1
+  !T1Vertex(3)=0.2; T2Vertex(3)=0.2; T3Vertex(3)=0.2
+  !T1Vertex(4)=0.3; T2Vertex(4)=0.3; T3Vertex(4)=0.3
+
+  !! Direction of Gamma: 1: left of W;  2: right of W
+  !DirecVertex(1) = 1;                DirecVertex(2) = 2
+  !DirecVertex(3) = 1;                DirecVertex(4) = 2
+
+  !! NeighVertex(i, j): the ith neighbor line of gamma j
+  !NeighVertex(1,1) = 2;        NeighVertex(2,1) = 1;        NeighVertex(3,1) = 3
+  !NeighVertex(1,2) = 4;        NeighVertex(2,2) = 5;        NeighVertex(3,2) = 3
+  !NeighVertex(1,3) = 1;        NeighVertex(2,3) = 4;        NeighVertex(3,3) = 6
+  !NeighVertex(1,4) = 5;        NeighVertex(2,4) = 2;        NeighVertex(3,4) = 6
+
+  !! weights for lines and vertexes
+  !WeightLn(1) = weight_line(StatusLn(1),-1, 1,0,0,0.d0,TypeLn(1))
+  !WeightLn(2) = weight_line(StatusLn(2),-1, 1,0,0,0.d0,TypeLn(2))
+  !WeightLn(3) = weight_line(StatusLn(3), 0, 2,0,0,0.d0,TypeLn(3))
+  !WeightLn(4) = weight_line(StatusLn(4),-1, 1,0,0,0.d0,TypeLn(4))
+  !WeightLn(5) = weight_line(StatusLn(5),-1, 1,0,0,0.d0,TypeLn(5))
+  !WeightLn(6) = weight_line(StatusLn(6), 0, 2,0,0,0.d0,TypeLn(6))
+
+  !WeightVertex(1) = weight_vertex(StatusVertex(1), 1, 0, 0, 0.d0, 0.d0, TypeVertex(1))
+  !WeightVertex(2) = weight_vertex(StatusVertex(2), 1, 0, 0, 0.d0, 0.d0, TypeVertex(2))
+  !WeightVertex(3) = weight_vertex(StatusVertex(3), 1, 0, 0, 0.d0, 0.d0, TypeVertex(3))
+  !WeightVertex(4) = weight_vertex(StatusVertex(4), 1, 0, 0, 0.d0, 0.d0, TypeVertex(4))
+
+
+  !ratio = CoefOfWeight(1)*(1.d0/Beta)**Order *SignFermiLoop
+  !Anew = d_times_cd(ratio, WeightLn(1)*WeightLn(2)*WeightLn(3)*WeightLn(4)* &
+    !& WeightLn(5)*WeightLn(6)*WeightVertex(1)*WeightVertex(2)*WeightVertex(3)* &
+    !& WeightVertex(4))
+
+  !WeightCurrent = abs(Anew)
+  !Phase = Anew/WeightCurrent
+  !-------------------------------------------------------
+
+  !-------------- 1-order diagram with bubble ------------
   Order = 1
   ! the index of measuring gamma
   NGLn = 4;  NWLn = 2;  NVertex = 4
   ! the number of glines, wlines, gamma
   MeasureGam = 1
   ! number of fermi loops
-  SignFermiLoop = 1.d0
+  SignFermiLoop = -1.d0
   ! the phase of the diagram
   Phase = (1.d0, 0.d0)
   ! if Ira and Masha are present
@@ -197,22 +334,22 @@ SUBROUTINE def_diagram
   Hash4G(kLn(1)) = 1
   kLn(2) = 32
   Hash4G(kLn(2)) = 1
-  kLn(3) = add_k(kLn(2), -kLn(1))
+  kLn(3) = add_k(kLn(1), -kLn(1))
   Hash4W(abs(kLn(3))) = 1
   kLn(4) = 23
   Hash4G(kLn(4)) = 1
-  kLn(5) = add_k(kLn(3), kLn(4))
+  kLn(5) = add_k(kLn(4), kLn(3))
   Hash4G(kLn(5)) = 1
-  kLn(6) = add_k(kLn(1), -kLn(4))
+  kLn(6) = add_k(kLn(4), -kLn(2))
   Hash4W(abs(kLn(6))) = 1
 
 
   ! NeighLn(i, j): the ith neighbor gamma of line j
-  NeighLn(1,1) = 1;                NeighLn(2,1) = 3
-  NeighLn(1,2) = 4;                NeighLn(2,2) = 1
+  NeighLn(1,1) = 1;                NeighLn(2,1) = 1
+  NeighLn(1,2) = 3;                NeighLn(2,2) = 4
   NeighLn(1,3) = 1;                NeighLn(2,3) = 2
-  NeighLn(1,4) = 3;                NeighLn(2,4) = 2
-  NeighLn(1,5) = 2;                NeighLn(2,5) = 4
+  NeighLn(1,4) = 2;                NeighLn(2,4) = 3
+  NeighLn(1,5) = 4;                NeighLn(2,5) = 2
   NeighLn(1,6) = 3;                NeighLn(2,6) = 4
 
   StatusVertex(1) = 1
@@ -244,10 +381,10 @@ SUBROUTINE def_diagram
   DirecVertex(3) = 1;                DirecVertex(4) = 2
 
   ! NeighVertex(i, j): the ith neighbor line of gamma j
-  NeighVertex(1,1) = 2;        NeighVertex(2,1) = 1;        NeighVertex(3,1) = 3
-  NeighVertex(1,2) = 4;        NeighVertex(2,2) = 5;        NeighVertex(3,2) = 3
-  NeighVertex(1,3) = 1;        NeighVertex(2,3) = 4;        NeighVertex(3,3) = 6
-  NeighVertex(1,4) = 5;        NeighVertex(2,4) = 2;        NeighVertex(3,4) = 6
+  NeighVertex(1,1) = 1;        NeighVertex(2,1) = 1;        NeighVertex(3,1) = 3
+  NeighVertex(1,2) = 5;        NeighVertex(2,2) = 4;        NeighVertex(3,2) = 3
+  NeighVertex(1,3) = 4;        NeighVertex(2,3) = 2;        NeighVertex(3,3) = 6
+  NeighVertex(1,4) = 2;        NeighVertex(2,4) = 5;        NeighVertex(3,4) = 6
 
   ! weights for lines and vertexes
   WeightLn(1) = weight_line(StatusLn(1),-1, 1,0,0,0.d0,TypeLn(1))
@@ -272,7 +409,165 @@ SUBROUTINE def_diagram
   Phase = Anew/WeightCurrent
   !-------------------------------------------------------
 
-  call print_config
+  !-------------- 2-order diagram ------------------------
+  !Order = 2
+  !! the index of measuring gamma
+  !NGLn = 6;  NWLn = 3;  NVertex = 6
+  !! the number of glines, wlines, gamma
+  !MeasureGam = 1
+  !! sign of fermi loops
+  !SignFermiLoop = -1.d0
+  !! the phase of the diagram
+  !Phase = (1.d0, 0.d0)
+  !! if Ira and Masha are present
+  !IsWormPresent = .false.
+
+  !!status for lines: 0: normal; 1: with measuring Gamma
+  !StatusLn(1) = 1
+  !StatusLn(2) = 1
+  !StatusLn(3) = 1
+  !StatusLn(4) = 0
+  !StatusLn(5) = 0
+  !StatusLn(6) = 0
+  !StatusLn(7) = 0
+  !StatusLn(8) = 0
+  !StatusLn(9) = 0
+  !TailLn = 10
+
+  !GLnKey2Value(1)= 1;     GLnKey2Value(2)= 2;     GLnKey2Value(3)= 4
+  !GLnKey2Value(4)= 5;     GLnKey2Value(5)= 7;     GLnKey2Value(6)= 8
+  !WLnKey2Value(1)= 3;     WLnKey2Value(2)= 6;     WLnKey2Value(3)= 9
+
+  !LnValue2Key(1)  = 1;     LnValue2Key(2)  = 2;     LnValue2Key(3)  = 1
+  !LnValue2Key(4)  = 3;     LnValue2Key(5)  = 4;     LnValue2Key(6)  = 2
+  !LnValue2Key(7)  = 5;     LnValue2Key(8)  = 6;     LnValue2Key(9)  = 3
+
+
+  !!kind of lines: 1: gline;  2: wline
+  !KindLn(1) = 1;     KindLn(2) = 1;     KindLn(3) = 2
+  !KindLn(4) = 1;     KindLn(5) = 1;     KindLn(6) = 2
+  !KindLn(7) = 1;     KindLn(8) = 1;     KindLn(9) = 2
+
+  !!type of glines: 1: spin up; 2: spin down
+  !TypeLn(1) = 1;     TypeLn(2) = 1
+  !TypeLn(4) = 1;     TypeLn(5) = 1
+  !TypeLn(7) = 1;     TypeLn(8) = 1
+
+  !!IsDelta: 1: delta function(W); 0: normal function(W); -1: G
+  !IsDeltaLn(1:9) = -1
+  !IsDeltaLn(3) = 0
+  !IsDeltaLn(6) = 0
+  !IsDeltaLn(9) = 0
+
+  !!type of gamma inside spins: 1: spin up; 2: spin down
+  !TypeVertexIn(:) = 1;   TypeVertexOut(:) = 1
+
+  !!type of Gamma: 1: gin, 2: gout, 3: win, 4: wout
+  !TypeVertex(:) = 1
+
+  !!type of wlines
+  !TypeLn(3) = TypeGam2W(TypeVertex(1), TypeVertex(2))
+  !TypeLn(6) = TypeGam2W(TypeVertex(3), TypeVertex(4))
+  !TypeLn(9) = TypeGam2W(TypeVertex(5), TypeVertex(6))
+
+
+  !! the momentum on line 1, 2, and 3
+  !kLn(1) = 10
+  !Hash4G(kLn(1)) = 1
+  !kLn(2) = 21
+  !Hash4G(kLn(2)) = 1
+  !kLn(3) = add_k(kLn(1), -kLn(2))
+  !Hash4W(abs(kLn(3))) = 1
+  !kLn(4) = 33
+  !Hash4G(kLn(4)) = 1
+  !kLn(5) = add_k(kLn(4), -kLn(3))
+  !Hash4G(kLn(5)) = 1
+  !kLn(6) = 46
+  !Hash4W(abs(kLn(6))) = 1
+  !kLn(7) = add_k(kLn(4), -kLn(6))
+  !Hash4G(kLn(7)) = 1
+  !kLn(8) = add_k(kLn(2), kLn(6))
+  !Hash4G(kLn(8)) = 1
+  !kLn(9) = add_k(kLn(1), -kLn(8))
+  !Hash4W(abs(kLn(9))) = 1
+
+
+  !! NeighLn(i, j): the ith neighbor gamma of line j
+  !NeighLn(1,1) = 6;                NeighLn(2,1) = 1
+  !NeighLn(1,2) = 1;                NeighLn(2,2) = 4
+  !NeighLn(1,4) = 2;                NeighLn(2,4) = 3
+  !NeighLn(1,5) = 5;                NeighLn(2,5) = 2
+  !NeighLn(1,7) = 3;                NeighLn(2,7) = 5
+  !NeighLn(1,8) = 4;                NeighLn(2,8) = 6
+
+  !NeighLn(1,3) = 1;                NeighLn(2,3) = 2
+  !NeighLn(1,6) = 3;                NeighLn(2,6) = 4
+  !NeighLn(1,9) = 5;                NeighLn(2,9) = 6
+
+  !StatusVertex(1) = 1
+  !StatusVertex(2:6) = 0
+
+  !do i = 1, 6
+    !VertexKey2Value(i) = i
+    !VertexValue2Key(i)  = i
+  !enddo
+  !TailVertex = 7
+
+  !!IsDeltaVertex: 1: delta function(Gam); 0: normal function(Gam)
+  !IsDeltaVertex(1:6) = 1
+
+  !! the site variables of Gamma 1, 2, 3 and 4
+  !GXVertex(1:6) = 0;            GYVertex(1:6) = 0
+  !WXVertex(1:6) = 0;            WYVertex(1:6) = 0
+
+  !! the time variables of Gamma 1, 2, 3 and 4
+  !T1Vertex(1)=0.d0;  T2Vertex(1)=0.d0;  T3Vertex(1)=0.d0
+  !T1Vertex(2)=0.1d0; T2Vertex(2)=0.1d0; T3Vertex(2)=0.1d0
+  !T1Vertex(3)=0.2d0; T2Vertex(3)=0.2d0; T3Vertex(3)=0.2d0
+  !T1Vertex(4)=0.3d0; T2Vertex(4)=0.3d0; T3Vertex(4)=0.3d0
+  !T1Vertex(5)=0.4d0; T2Vertex(5)=0.4d0; T3Vertex(5)=0.4d0
+  !T1Vertex(6)=0.5d0; T2Vertex(6)=0.5d0; T3Vertex(6)=0.5d0
+
+  !! Direction of Gamma: 1: left of W;  2: right of W
+  !DirecVertex(1) = 1;                DirecVertex(2) = 2
+  !DirecVertex(3) = 1;                DirecVertex(4) = 2
+  !DirecVertex(5) = 1;                DirecVertex(6) = 2
+
+  !! NeighVertex(i, j): the ith neighbor line of gamma j
+  !NeighVertex(1,1) = 1;        NeighVertex(2,1) = 2;        NeighVertex(3,1) = 3
+  !NeighVertex(1,2) = 5;        NeighVertex(2,2) = 4;        NeighVertex(3,2) = 3
+  !NeighVertex(1,3) = 4;        NeighVertex(2,3) = 7;        NeighVertex(3,3) = 6
+  !NeighVertex(1,4) = 2;        NeighVertex(2,4) = 8;        NeighVertex(3,4) = 6
+  !NeighVertex(1,5) = 7;        NeighVertex(2,5) = 5;        NeighVertex(3,5) = 9
+  !NeighVertex(1,6) = 8;        NeighVertex(2,6) = 1;        NeighVertex(3,6) = 9
+
+  !! weights for lines and vertexes
+  !WeightLn(1) = weight_line(StatusLn(1),-1, 1,0,0,0.d0,TypeLn(1))
+  !WeightLn(2) = weight_line(StatusLn(2),-1, 1,0,0,0.d0,TypeLn(2))
+  !WeightLn(3) = weight_line(StatusLn(3), 0, 2,0,0,0.d0,TypeLn(3))
+  !WeightLn(4) = weight_line(StatusLn(4),-1, 1,0,0,0.d0,TypeLn(4))
+  !WeightLn(5) = weight_line(StatusLn(5),-1, 1,0,0,0.d0,TypeLn(5))
+  !WeightLn(6) = weight_line(StatusLn(6), 0, 2,0,0,0.d0,TypeLn(6))
+  !WeightLn(7) = weight_line(StatusLn(7),-1, 1,0,0,0.d0,TypeLn(7))
+  !WeightLn(8) = weight_line(StatusLn(8),-1, 1,0,0,0.d0,TypeLn(8))
+  !WeightLn(9) = weight_line(StatusLn(9), 0, 2,0,0,0.d0,TypeLn(9))
+
+  !WeightVertex(1) = weight_vertex(StatusVertex(1), 1, 0, 0, 0.d0, 0.d0, TypeVertex(1))
+  !WeightVertex(2) = weight_vertex(StatusVertex(2), 1, 0, 0, 0.d0, 0.d0, TypeVertex(2))
+  !WeightVertex(3) = weight_vertex(StatusVertex(3), 1, 0, 0, 0.d0, 0.d0, TypeVertex(3))
+  !WeightVertex(4) = weight_vertex(StatusVertex(4), 1, 0, 0, 0.d0, 0.d0, TypeVertex(4))
+  !WeightVertex(5) = weight_vertex(StatusVertex(5), 1, 0, 0, 0.d0, 0.d0, TypeVertex(5))
+  !WeightVertex(6) = weight_vertex(StatusVertex(6), 1, 0, 0, 0.d0, 0.d0, TypeVertex(6))
+
+
+  !ratio = CoefOfWeight(2)*(1.d0/Beta)**Order *SignFermiLoop
+  !Anew = d_times_cd(ratio, WeightLn(1)*WeightLn(2)*WeightLn(3)*WeightLn(4)* &
+    !& WeightLn(5)*WeightLn(6)*WeightLn(7) *WeightLn(8) *WeightLn(9) *WeightVertex(1) &
+    !& *WeightVertex(2)*WeightVertex(3)*WeightVertex(4)*WeightVertex(5)*WeightVertex(6))
+
+  !WeightCurrent = abs(Anew)
+  !Phase = Anew/WeightCurrent
+  !!-------------------------------------------------------
 
   return
 END SUBROUTINE def_diagram
