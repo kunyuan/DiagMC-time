@@ -384,11 +384,7 @@ SUBROUTINE test_subroutine
     !close(11)
     !========  test drawing subroutine =====================
     call initialize_markov
-    do isamp = 1, Ntoss
-      call create_worm_along_wline
-      if(IsWormPresent) call DRAW
-    enddo
-    !call DRAW
+    call DRAW
 END SUBROUTINE
 
 
