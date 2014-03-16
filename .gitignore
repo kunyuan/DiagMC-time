@@ -1,6 +1,7 @@
 *.exe
 *.mod
 *.dat
+*.conf
 *.swp
 *.o
 *.out
