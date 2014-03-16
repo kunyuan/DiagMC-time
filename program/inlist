@@ -3,7 +3,7 @@ Sample: 1000
 Sweep:  1
 Toss:  10
 IsLoad: 0
-Type: 2
+Type: 3
 #1: self consist loop; 2: monte carlo; 3: test
 
 Lx:   2
