@@ -353,6 +353,7 @@ END SUBROUTINE monte_carlo
 
 SUBROUTINE test_subroutine
     implicit none
+    integer :: isamp
     !======== test x,y distribution =========================
     !integer :: i,x,y,N
     !double precision :: histx(0:MxLx-1),xweight
