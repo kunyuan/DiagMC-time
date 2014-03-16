@@ -1466,16 +1466,22 @@ SUBROUTINE DRAW
       Vertex1=VertexKey2Value(i)
       x1=scx*T3Vertex(Vertex1)
       y1=scy*site_num(GXVertex(Vertex1),GYVertex(Vertex1))
-      if(Vertex1==Ira) then
-        write(11,*) '1 0 0 setrgbcolor'
-      elseif(Vertex1==Masha) then
-        write(11,*) '0 0 1 setrgbcolor'
-      elseif(Vertex1==MeasureGam) then
+      if(Vertex1==MeasureGam) then
         write(11,*) '0 1 0 setrgbcolor'
+        write(11,777) x1, y1, scy/15.
+        if(Vertex1==Ira .or. Vertex1==Masha) then
+          write(11,*) '1 0 0 setrgbcolor'
+          write(11,777) x1, y1, scy/20.
+        endif
       else
-        write(11,*) '0 0 0 setrgbcolor'
+        if(Vertex1==Ira .or. Vertex1==Masha) then
+          write(11,*) '1 0 0 setrgbcolor'
+          write(11,777) x1, y1, scy/20.
+        else
+          write(11,*) '0 0 0 setrgbcolor'
+          write(11,777) x1, y1, scy/20.
+        endif
       endif
-      write(11,777) x1, y1, scy/20.
       write(11,801) x1-5., y1+7., i
       write(11,802) 500.0,650.0-i*10,i,T3Vertex(Vertex1), &
          & GXVertex(Vertex1),GYVertex(Vertex2)
@@ -1486,7 +1492,7 @@ SUBROUTINE DRAW
     write(11,*) '%%Trailer'
 
     close (11)
-	return
+  return
 !******************************************************************
  777  format ('Nsolid ',f6.1,x,f6.1,x,f9.3,' Y')
  778  format ('N ',f6.1,x,f6.1,x,' M')
