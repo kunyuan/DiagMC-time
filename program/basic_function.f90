@@ -1308,119 +1308,128 @@ SUBROUTINE time_elapse
 END SUBROUTINE time_elapse
 
 !=================== VISUALIZATION  ==================================
-      SUBROUTINE DRAW
-      IMPLICIT NONE
-      DOUBLE PRECISION :: x1,y1, x2,y2, y3, scx, scy, sgn   
-      DOUBLE PRECISION :: scydash, ca1,ca2,ra,a1,a2, radian
-      DOUBLE PRECISION :: phi1, phi2, pi2, pi4
-      INTEGER :: i, value1,value2, name3
-      !LOGICAL :: up(N_max)
-      integer :: iWLn,iGLn,Vertex1,Vertex2
-      
-      pi2=dasin(1.d0)
-      pi4=pi2/2.d0
-      radian=90.d0/pi2
-      scx=500/beta
-      scy=400./Lx/Ly
-      x1=scx*beta
-      y1=scy*Vol
-      scydash=scy/40.
-
-      open(11, file='graph.eps')
-      write(11,*) '%!'
-      write(11,*) '%BoundingBox: 0 0 ', x1, y1
-      write(11,*) '%%EndComments'
-      write(11,*) '%%BeginProlog'
-      write(11,*) '/L { lineto stroke} def'
-      write(11,*) '/M { moveto } def'
-      write(11,*) '/N {newpath } def'
-      write(11,*) '/Ndashed {[5 5] 0 setdash newpath } def'
-      write(11,*) '/Nsolid {[] 0 setdash newpath } def'
-      write(11,*) '/Y { 0 360 arc closepath gsave fill'
-      write(11,*) '     grestore stroke } def'
-      write(11,*) '/YL { 0 360 arc stroke} def' 
-      write(11,*) '/Y45 { arc stroke} def'
-      write(11,*) '% Put an arrowhead at point x2 y2,'
-      write(11,*) '% pointing away from x1 y1'
-      write(11,*) '% Replace x2 y2 with coordinates of arrowbase:'
-      write(11,*) '% the point to connect lines to'
-      write(11,*) '% ArrowHeadSize gives the size of the arrow'
-      write(11,*) '/ArrowHeadSize 20 def'
-      write(11,*) '/ahead {'
-      write(11,*) '    1 index 4 index sub'
-      write(11,*) '    1 index 4 index sub'
-      write(11,*) '    exch atan'
-      write(11,*) '    ArrowHeadSize -.8 mul'
-      write(11,*) '    dup'
-      write(11,*) '    2 index cos mul 4 index add'
-      write(11,*) '    exch'
-      write(11,*) '    2 index sin mul 3 index add'
-      write(11,*) '    5 2 roll'
-      write(11,*) '    gsave'
-      write(11,*) '        3 1 roll'
-      write(11,*) '        translate'
-      write(11,*) '        rotate'
-      write(11,*) '        newpath'
-      write(11,*) '        0 0 moveto'
-      write(11,*) '        ArrowHeadSize dup neg exch .25 mul'
-      write(11,*) '        2 copy lineto'
-      write(11,*) '        ArrowHeadSize -.8 mul 0'
-      write(11,*) '        2 copy'
-      write(11,*) '        6 4 roll'
-      write(11,*) '        neg curveto'
-      write(11,*) '        closepath fill'
-      write(11,*) '    grestore'
-      write(11,*) '} bind def'
-      write(11,*) ''
-      write(11,*) '%%EndProlog'
-      write(11,*) '%%BeginSetup'
-      write(11,*) '2 setlinewidth'
-      write(11,*) '5 140 translate'
-      write(11,*) '1 1 scale'
-      write(11,*) '%%EndSetup'
-
-      do i=1,NWLn;
-        iWLn=WLnKey2Value(i)
-        Vertex1=NeighLn(1,iWLn)
-        x1=scx*T3Vertex(Vertex1)
-        y1=scy*site_num(GXVertex(Vertex1),GYVertex(Vertex1))
-        !write(*,*) "W"
-        !write(*,*) T3Vertex(Vertex1),Vertex1
-        Vertex2=NeighLn(2,iWLn)
-        !write(*,*) T3Vertex(Vertex2),Vertex2
-        x2=scx*T3Vertex(Vertex2)
-        y2=scy*site_num(GXVertex(Vertex2),GYVertex(Vertex2))
-
-        if(Vertex1 .ne. Ira .and. Vertex2 .ne. Masha &
-            & .and. Vertex1 .ne. Masha .and. Vertex2 .ne. Ira) then
-          if(TypeLn(iWLn)<=4) then
-            write(11,*) '0 0 0 setrgbcolor'
-          else
-            write(11,*) '0 1 0 setrgbcolor'
-          endif
-        else
-          if(Vertex1==Ira .or. Vertex2==Ira) write(11,*)'0 1 1 setrgbcolor'
-          if(Vertex1==Masha .or. Vertex2==Masha) write(11,*)'0 1 1 setrgbcolor'
-        endif
-        write(11,791) x1,y1,x2,y2 
-      enddo
+SUBROUTINE DRAW
+    IMPLICIT NONE
+    DOUBLE PRECISION :: x1,y1, x2,y2, y3, scx, scy, sgn   
+    DOUBLE PRECISION :: scydash, ca1,ca2,ra,a1,a2, radian
+    DOUBLE PRECISION :: phi1, phi2, pi2, pi4
+    INTEGER :: i
+    integer :: iWLn,iGLn,Vertex1,Vertex2,Vertex3
     
-      do i=1,NGLn;
-        iGLn=GLnKey2Value(i)
-        Vertex1=NeighLn(1,iGLn)
-        x1=scx*T3Vertex(Vertex1)
-        y1=scy*site_num(GXVertex(Vertex1),GYVertex(Vertex1))
-        write(*,*) "G"
-        write(*,*) "V1",Vertex1
-        write(*,*) T3Vertex(Vertex1),GXVertex(Vertex1),GYVertex(Vertex1)
-        Vertex2=NeighLn(2,iGLn)
-        write(*,*) "V2",Vertex2
-        x2=scx*T3Vertex(Vertex2)
-        y2=scy*site_num(GXVertex(Vertex2),GYVertex(Vertex2))
-        write(*,*) T3Vertex(Vertex2),GXVertex(Vertex2),GYVertex(Vertex2)
+    pi2=dasin(1.d0)
+    pi4=pi2/2.d0
+    radian=90.d0/pi2
+    scx=500/beta
+    scy=400./Lx/Ly
+    x1=scx*beta
+    y1=scy*Vol
+    scydash=scy/40.
+
+    open(11, file='graph.eps')
+    write(11,*) '%!'
+    write(11,*) '%BoundingBox: 0 0 ', x1, y1
+    write(11,*) '%%EndComments'
+    write(11,*) '%%BeginProlog'
+    write(11,*) '/L { lineto stroke} def'
+    write(11,*) '/M { moveto } def'
+    write(11,*) '/N {newpath } def'
+    write(11,*) '/Ndashed {[5 5] 0 setdash newpath } def'
+    write(11,*) '/Nsolid {[] 0 setdash newpath } def'
+    write(11,*) '/Y { 0 360 arc closepath gsave fill'
+    write(11,*) '     grestore stroke } def'
+    write(11,*) '/YL { 0 360 arc stroke} def' 
+    write(11,*) '/Y45 { arc stroke} def'
+    write(11,*) '/C12 {/Times-Roman findfont 12 scalefont setfont show} def'
+    write(11,*) '% Put an arrowhead at point x2 y2,'
+    write(11,*) '% pointing away from x1 y1'
+    write(11,*) '% Replace x2 y2 with coordinates of arrowbase:'
+    write(11,*) '% the point to connect lines to'
+    write(11,*) '% ArrowHeadSize gives the size of the arrow'
+    write(11,*) '/ArrowHeadSize 20 def'
+    write(11,*) '/ahead {'
+    write(11,*) '    1 index 4 index sub'
+    write(11,*) '    1 index 4 index sub'
+    write(11,*) '    exch atan'
+    write(11,*) '    ArrowHeadSize -.8 mul'
+    write(11,*) '    dup'
+    write(11,*) '    2 index cos mul 4 index add'
+    write(11,*) '    exch'
+    write(11,*) '    2 index sin mul 3 index add'
+    write(11,*) '    5 2 roll'
+    write(11,*) '    gsave'
+    write(11,*) '        3 1 roll'
+    write(11,*) '        translate'
+    write(11,*) '        rotate'
+    write(11,*) '        newpath'
+    write(11,*) '        0 0 moveto'
+    write(11,*) '        ArrowHeadSize dup neg exch .25 mul'
+    write(11,*) '        2 copy lineto'
+    write(11,*) '        ArrowHeadSize -.8 mul 0'
+    write(11,*) '        2 copy'
+    write(11,*) '        6 4 roll'
+    write(11,*) '        neg curveto'
+    write(11,*) '        closepath fill'
+    write(11,*) '    grestore'
+    write(11,*) '} bind def'
+    write(11,*) ''
+    write(11,*) '%%EndProlog'
+    write(11,*) '%%BeginSetup'
+    write(11,*) '2 setlinewidth'
+    write(11,*) '5 140 translate'
+    write(11,*) '1 1 scale'
+    write(11,*) '%%EndSetup'
+
+    do i=1,NWLn;
+      iWLn=WLnKey2Value(i)
+      Vertex1=NeighLn(1,iWLn)
+      x1=scx*T3Vertex(Vertex1)
+      y1=scy*site_num(GXVertex(Vertex1),GYVertex(Vertex1))
+      !write(*,*) "W"
+      !write(*,*) T3Vertex(Vertex1),Vertex1
+      Vertex2=NeighLn(2,iWLn)
+      !write(*,*) T3Vertex(Vertex2),Vertex2
+      x2=scx*T3Vertex(Vertex2)
+      y2=scy*site_num(GXVertex(Vertex2),GYVertex(Vertex2))
+
+      if(Vertex1 .ne. Ira .and. Vertex2 .ne. Masha &
+          & .and. Vertex1 .ne. Masha .and. Vertex2 .ne. Ira) then
+        if(TypeLn(iWLn)<=4) then
+          write(11,*) '0 0 0 setrgbcolor'
+        else
+          write(11,*) '0 1 0 setrgbcolor'
+        endif
+      else
+        if(Vertex1==Ira .or. Vertex2==Ira) write(11,*)'0 1 1 setrgbcolor'
+        if(Vertex1==Masha .or. Vertex2==Masha) write(11,*)'0 1 1 setrgbcolor'
+      endif
+      write(11,791) x1,y1,x2,y2 
+    enddo
+  
+    do i=1,NGLn;
+      iGLn=GLnKey2Value(i)
+      Vertex1=NeighLn(1,iGLn)
+      x1=scx*T3Vertex(Vertex1)
+      y1=scy*site_num(GXVertex(Vertex1),GYVertex(Vertex1))
+      !write(*,*) "G"
+      !write(*,*) "V1",Vertex1
+      !write(*,*) T3Vertex(Vertex1),GXVertex(Vertex1),GYVertex(Vertex1)
+      Vertex2=NeighLn(2,iGLn)
+      !write(*,*) "V2",Vertex2
+      x2=scx*T3Vertex(Vertex2)
+      y2=scy*site_num(GXVertex(Vertex2),GYVertex(Vertex2))
+      !write(*,*) T3Vertex(Vertex2),GXVertex(Vertex2),GYVertex(Vertex2)
+
+      if(TypeLn(iGLn)==1) then
+        write(11,*) '1 0 0 setrgbcolor'
+      else
+        write(11,*) '0 0 1 setrgbcolor'
+      endif
+
+
+      if(Vertex1/=Vertex2) then
+        if(x1==x2) x2=500 !unphysical situation
 
         ra=dsqrt((x2-x1)**2+(y2-y1)**2)/2.d0
-        write(*,*) ra
         phi1=(y2-y1)/(2.d0*ra)
         phi2=(x2-x1)/(2.d0*ra)
         ca1=(x1+x2)/2.d0
@@ -1442,90 +1451,40 @@ END SUBROUTINE time_elapse
         ca2=y1+(phi2+phi1)*scy/2. 
 
         write(11,790) ca1, ca2, x1, y1       ! arrows
-      enddo
+      else
+        iWLn=NeighVertex(3,Vertex1)
+        Vertex3=NeighLn(3-DirecVertex(Vertex1),iWLn)
+        y3=scy*site_num(GXVertex(Vertex3),GYVertex(Vertex3))
+        sgn=1.d0
+        IF(y3>y1) sgn=-1.d0   
+        write(11,780) x1, y1+sgn*scy/5. , scy/5. 
+      endif
+    enddo
 
-      !up=.true.
-      !do i=1,nmnm; value1=nlist(i) ; 
-    
-      !x1=scx*tau(value1)
-      !y1=scy*site(value1)
-      !value2=link(value1,1); name3=link(value1,3); y3=scy*site(name3)
-      !x2=scx*tau(value2)
-      !y2=scy*site(value2)
-      !IF(type(value1,1)==1) then     
-            !write(11,*) '1 0 0 setrgbcolor'    ! propagator lnes
-      !ELSE; write(11,*) '0 0 1 setrgbcolor'  ; ENDIF
+    do i=1,NVertex
+      Vertex1=VertexKey2Value(i)
+      x1=scx*T3Vertex(Vertex1)
+      y1=scy*site_num(GXVertex(Vertex1),GYVertex(Vertex1))
+      if(Vertex1==Ira) then
+        write(11,*) '1 0 0 setrgbcolor'
+      elseif(Vertex1==Masha) then
+        write(11,*) '0 0 1 setrgbcolor'
+      elseif(Vertex1==MeasureGam) then
+        write(11,*) '0 1 0 setrgbcolor'
+      else
+        write(11,*) '0 0 0 setrgbcolor'
+      endif
+      write(11,777) x1, y1, scy/20.
+      write(11,801) x1-5., y1+7., i
+      write(11,802) 500.0,650.0-i*10,i,T3Vertex(Vertex1), &
+         & GXVertex(Vertex1),GYVertex(Vertex2)
+    enddo
 
-      !IF(value2.ne. value1) then
- 
-        !ra=dsqrt((x2-x1)**2+(y2-y1)**2)/2.d0
-        !phi1=(y2-y1)/(2.d0*ra); phi2=(x2-x1)/(2.d0*ra)
-        !ca1=(x1+x2)/2.d0; ca2=(y1+y2)/2.d0;
-        !ca1=ca1+phi1*ra; ca2=ca2-phi2*ra; 
-        !ra=ra*dsqrt(2.d0)
-        
-        !a1=pi4+dasin(phi1); a2=a1+pi2
-        !IF(phi2.lt.0) then; a2=4*pi2-pi4-dasin(phi1); a1=a2-pi2; endif
-        !a1=a1*radian; a2=a2*radian 
-        
-        !IF(.not.measV) then
-          !IF(value1.ne.vert2)  then
-            !write(11,781)  ca1, ca2, ra, a1, a2  ! propagator lines - arcs 
-          !ENDIF
-        !ELSE
-           !write(11,781)  ca1, ca2, ra, a1, a2  ! propagator lines - arcs 
-        !endif
-          
-        !ca1=x1+(phi2-phi1)*scy/2.;     
-        !ca2=y1+(phi2+phi1)*scy/2. 
-        !write(11,790) ca1, ca2, x1, y1       ! arrows
-      !ELSE
-        !sgn=1.d0; IF(y3>y1) sgn=-1.d0 ;  
-        !write(11,780) x1, y1+sgn*scy/5. , scy/5. 
-      !ENDIF
- 
-      !end do 
+    write(11,*) ''
+    write(11,*) 'stroke showpage'
+    write(11,*) '%%Trailer'
 
-
-      !do i=1,nmnm; value1=nlist(i)          ! vertexes 
-
-      !x1=scx*tau(value1)
-      !y1=scy*site(value1)
-      !value2=link(value1,3)
-      !IF(    value1.ne.sveta .AND. value1.ne.tonya
-     !* .AND. value2.ne.sveta .AND. value2.ne.tonya) then
-       !IF(type(value1,3)==1) then
-       !write(11,*) '0 0 0 setrgbcolor'
-       !write(11,777) x1, y1, scy/20.
-       !else  
-       !write(11,*) '0 1 0 setrgbcolor'
-       !write(11,777) x1, y1, scy/20.
-       !endif
-      !ELSE
-      !IF(value1==sveta .OR. value2==sveta) then
-       !write(11,*) '0 1 1 setrgbcolor'
-       !write(11,777) x1, y1, scy/20. ; 
-	 !IF(value1==sveta) then
-       !write(11,*) '0 0 0 setrgbcolor'
-       !write(11,777) x1, y1, scy/50. ;	 
-	 !endif; endif
-      !IF(value1==tonya .OR. value2==tonya) then
-       !write(11,*) '1 0 1 setrgbcolor'
-       !write(11,777) x1, y1, scy/20. ; 
-	 !IF(value1==tonya) then
-       !write(11,*) '0 0 0 setrgbcolor'
-       !write(11,777) x1, y1, scy/50. ;
-	 !endif; endif
-      !ENDIF
-     
-      !enddo
- 
-
-      write(11,*) ''
-      write(11,*) 'stroke showpage'
-      write(11,*) '%%Trailer'
-
-      close (11)
+    close (11)
 	return
 !******************************************************************
  777  format ('Nsolid ',f6.1,x,f6.1,x,f9.3,' Y')
@@ -1535,8 +1494,10 @@ END SUBROUTINE time_elapse
  781  format ('Nsolid ',f6.1,x,f6.1,x,f6.1,x,f6.1,x,f6.1,' Y45')
  790  format ('Nsolid ',f6.1,x,f6.1,x,f6.1,x,f6.1,x,' ahead')
  791  format ('Ndashed ',f6.1,x,f6.1,' M',f6.1,x,f6.1,' L')
+ 801  format (f6.1,x,f6.1,x,' M (',i2,') C12')
+ 802  format (f6.1,x,f6.1,x,' M (',i2,':',f6.3,'; (',i3,',',i3,')) C12')
  
-      END SUBROUTINE DRAW
+END SUBROUTINE DRAW
 
 !__________________________________________ 
 !   	'0 0 0 setrgbcolor'    black
