@@ -51,11 +51,10 @@ def submit_jobs(para,i,execute,homedir):
         os.system("mkdir "+infilepath)
     if(os.path.exists(outfilepath)!=True):
         os.system("mkdir "+outfilepath)
-    filelist=os.listdir(infilepath)
+    filelist=[int(elem.split('_')[-1]) for elem in os.listdir(infilepath)]
     filelist.sort()
     if(len(filelist)!=0):
-        lastfile=filelist[-1]
-        lastnum=int(lastfile.split('_')[-1])
+        lastnum=filelist[-1]
     else:
         lastnum=0
 
