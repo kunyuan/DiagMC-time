@@ -1,3 +1,321 @@
+!================================================================
+!================= print/draw configuratoins ====================
+!================================================================
+
+
+!====================================================================
+!===================== PRINT CONFIGURATION ==========================
+!====================================================================
+
+
+SUBROUTINE print_config
+  implicit none
+  integer :: i, iln, iv
+  
+  open(8, access='append', file=trim(title1)//"_mc.conf")
+  
+  write(8, *) "============================================================"
+  write(8, *) imc, IsWormPresent, iupdate
+
+  if(IsWormPresent .eqv. .true.) then
+    write(8, *) "Ira", Ira, "Masha", Masha, "SpinMasha", SpinMasha
+    write(8, *) "kMasha", kMasha
+  endif
+
+  write(8, *) "Order", Order
+  write(8, *) "SignFermiLoop", SignFermiLoop
+
+  write(8, *) "Measuring Gamma", MeasureGam
+  write(8, *) "Phase", Phase
+  write(8, *) "Weight", WeightCurrent
+
+  do i = 1, NGLn
+    iln = GLnKey2Value(i)
+    if(StatusLn(iln) <0) cycle
+    write(8, 10) iln, KindLn(iln), IsDeltaLn(iln), TypeLn(iln), kLn(iln), StatusLn(iln), NeighLn(1:2,iln)
+  enddo
+
+  do i = 1, NWLn
+    iln = WLnKey2Value(i)
+    if(StatusLn(iln) <0) cycle
+    write(8, 10) iln, KindLn(iln), IsDeltaLn(iln), TypeLn(iln), kLn(iln), StatusLn(iln), NeighLn(1:2,iln)
+  enddo
+
+  do i = 1, NVertex
+    iv = VertexKey2Value(i)
+    if(StatusVertex(iv) <0) cycle
+    write(8, 12) iv,IsDeltaVertex(iv), TypeVertex(iv),TypeVertexIn(iv),TypeVertexOut(iv), &
+      & GXVertex(iv),GYVertex(iv),WXVertex(iv),WYVertex(iv), T1Vertex(iv), T2Vertex(iv),  &
+      & T3Vertex(iv), DirecVertex(iv), StatusVertex(iv), NeighVertex(:,iv)
+  enddo
+  write(8, *) "============================================================"
+
+  10 format(' Line:',i2,2x,'kind:',i2,2x,'isdelta:',i2,2x,'type:',i2,2x,'k:',i8,2x,'stat:',i2, 2x,&
+    & 'neigh:',i6,i6)
+  12 format('Gamma:',i2,2x,'isdelta:',i2,2x,'type:',i2,2x,'typein:',i2,2x,'typeout:',i2,2x,&
+    & 'gr:(',i4,i4,'), wr:(',i4,i4,')', 't:(', f7.4, f7.4, f7.4, ')',2x, &
+    & 'direction:', i2,2x, 'stat:',i2, 2x,'neigh:', i6,i6,i6)
+
+  close(8)
+  call DRAW()
+END SUBROUTINE print_config
+
+!=================== VISUALIZATION  ==================================
+SUBROUTINE DRAW()
+    IMPLICIT NONE
+    DOUBLE PRECISION :: x1,y1, x2,y2, y3, scx, scy, sgn   
+    DOUBLE PRECISION :: scydash, ca1,ca2,ra,a1,a2, radian
+    DOUBLE PRECISION :: phi1, phi2, pi2, pi4,ini,seg
+    INTEGER :: i
+    INTEGER :: FEXIST, RES
+    integer :: iWLn,iGLn,Vertex1,Vertex2,Vertex3
+    character(10) :: imcstr
+    character(100) :: tempstr
+    
+    pi2=dasin(1.d0)
+    pi4=pi2/2.d0
+    radian=90.d0/pi2
+    scx=500/beta
+    scy=400./Lx/Ly
+    x1=scx*beta
+    y1=scy*Vol
+    scydash=scy/40.
+
+    INQUIRE(DIRECTORY="graph",EXIST=FEXIST)
+    IF(.not.FEXIST) THEN
+      call system("mkdir graph")
+    ENDIF
+
+    write(imcstr,'(i10)') int(imc)
+    open(11, file='graph/graph_'//trim(adjustl(imcstr))//'.eps')
+    write(11,*) '%!'
+    write(11,*) '%BoundingBox: 0 0 ', x1, y1
+    write(11,*) '%%EndComments'
+    write(11,*) '%%BeginProlog'
+    write(11,*) '/L { lineto stroke} def'
+    write(11,*) '/M { moveto } def'
+    write(11,*) '/N {newpath } def'
+    write(11,*) '/Ndashed {[5 5] 0 setdash newpath } def'
+    write(11,*) '/Nsolid {[] 0 setdash newpath } def'
+    write(11,*) '/Y { 0 360 arc closepath gsave fill'
+    write(11,*) '     grestore stroke } def'
+    write(11,*) '/YL { 0 360 arc stroke} def' 
+    write(11,*) '/Y45 { arc stroke} def'
+    write(11,*) '/C {/Times-Roman findfont 15 scalefont setfont show} def'
+    write(11,*) '% Put an arrowhead at point x2 y2,'
+    write(11,*) '% pointing away from x1 y1'
+    write(11,*) '% Replace x2 y2 with coordinates of arrowbase:'
+    write(11,*) '% the point to connect lines to'
+    write(11,*) '% ArrowHeadSize gives the size of the arrow'
+    write(11,*) '/ArrowHeadSize 20 def'
+    write(11,*) '/ahead {'
+    write(11,*) '    1 index 4 index sub'
+    write(11,*) '    1 index 4 index sub'
+    write(11,*) '    exch atan'
+    write(11,*) '    ArrowHeadSize -.8 mul'
+    write(11,*) '    dup'
+    write(11,*) '    2 index cos mul 4 index add'
+    write(11,*) '    exch'
+    write(11,*) '    2 index sin mul 3 index add'
+    write(11,*) '    5 2 roll'
+    write(11,*) '    gsave'
+    write(11,*) '        3 1 roll'
+    write(11,*) '        translate'
+    write(11,*) '        rotate'
+    write(11,*) '        newpath'
+    write(11,*) '        0 0 moveto'
+    write(11,*) '        ArrowHeadSize dup neg exch .25 mul'
+    write(11,*) '        2 copy lineto'
+    write(11,*) '        ArrowHeadSize -.8 mul 0'
+    write(11,*) '        2 copy'
+    write(11,*) '        6 4 roll'
+    write(11,*) '        neg curveto'
+    write(11,*) '        closepath fill'
+    write(11,*) '    grestore'
+    write(11,*) '} bind def'
+    write(11,*) ''
+    write(11,*) '%%EndProlog'
+    write(11,*) '%%BeginSetup'
+    write(11,*) '2 setlinewidth'
+    write(11,*) '5 140 translate'
+    write(11,*) '1 1 scale'
+    write(11,*) '%%EndSetup'
+
+    ini=640.0
+    seg=15.0
+    write(11,*) '0 0 0 setrgbcolor'
+    write(tempstr, *) "Beta: ",beta,"    Lx: ",Lx,"       Ly: ",Ly
+    write(11,803) 0.,ini,tempstr
+    write(tempstr,*)  "Jcp: ",Jcp," Seed: ",Seed
+    ini=ini-seg
+    write(11,803) 0.,ini,tempstr
+    write(tempstr, *) "imc: ",imc," Is Worm Here:", IsWormPresent
+    ini=ini-seg
+    write(11,803) 0.,ini,tempstr
+    if(IsWormPresent .eqv. .true.) then
+      write(tempstr, *) "Ira: ", Ira, "Masha: ", Masha
+      ini=ini-seg
+      write(11,803) 0.,ini,tempstr
+      write(tempstr, *) "Spin of Masha: ", SpinMasha, "k of Masha: ", kMasha
+      ini=ini-seg
+      write(11,803) 0.,ini,tempstr
+    endif
+
+    write(tempstr, *) "Order: ", Order
+    ini=ini-seg
+    write(11,803) 0.,ini,tempstr
+    write(tempstr, *) "Fermi Loop Sign: ", SignFermiLoop
+    ini=ini-seg
+    write(11,803) 0.,ini,tempstr
+
+    write(tempstr, *) "Measuring Gamma: ", MeasureGam
+    ini=ini-seg
+    write(11,803) 0.,ini,tempstr
+    write(tempstr, *) "Phase: ", Phase
+    ini=ini-seg
+    write(11,803) 0.,ini,tempstr
+    write(tempstr, *) "Weight: ", WeightCurrent
+    ini=ini-seg
+    write(11,803) 0.,ini,tempstr
+
+    do i=1,NWLn;
+      iWLn=WLnKey2Value(i)
+      Vertex1=NeighLn(1,iWLn)
+      x1=scx*T3Vertex(Vertex1)
+      y1=scy*site_num(GXVertex(Vertex1),GYVertex(Vertex1))
+      !write(*,*) "W"
+      !write(*,*) T3Vertex(Vertex1),Vertex1
+      Vertex2=NeighLn(2,iWLn)
+      !write(*,*) T3Vertex(Vertex2),Vertex2
+      x2=scx*T3Vertex(Vertex2)
+      y2=scy*site_num(GXVertex(Vertex2),GYVertex(Vertex2))
+
+      if(Vertex1 .ne. Ira .and. Vertex2 .ne. Masha &
+          & .and. Vertex1 .ne. Masha .and. Vertex2 .ne. Ira) then
+        if(TypeLn(iWLn)<=4) then
+          write(11,*) '0 0 0 setrgbcolor'
+        else
+          write(11,*) '0 1 0 setrgbcolor'
+        endif
+      else
+        if(Vertex1==Ira .or. Vertex2==Ira) write(11,*)'0 1 1 setrgbcolor'
+        if(Vertex1==Masha .or. Vertex2==Masha) write(11,*)'0 1 1 setrgbcolor'
+      endif
+      write(11,791) x1,y1,x2,y2 
+    enddo
+  
+    do i=1,NGLn;
+      iGLn=GLnKey2Value(i)
+      Vertex1=NeighLn(1,iGLn)
+      x1=scx*T3Vertex(Vertex1)
+      y1=scy*site_num(GXVertex(Vertex1),GYVertex(Vertex1))
+      !write(*,*) "G"
+      !write(*,*) "V1",Vertex1
+      !write(*,*) T3Vertex(Vertex1),GXVertex(Vertex1),GYVertex(Vertex1)
+      Vertex2=NeighLn(2,iGLn)
+      !write(*,*) "V2",Vertex2
+      x2=scx*T3Vertex(Vertex2)
+      y2=scy*site_num(GXVertex(Vertex2),GYVertex(Vertex2))
+      !write(*,*) T3Vertex(Vertex2),GXVertex(Vertex2),GYVertex(Vertex2)
+
+      if(TypeLn(iGLn)==1) then
+        write(11,*) '1 0 0 setrgbcolor'
+      else
+        write(11,*) '0 0 1 setrgbcolor'
+      endif
+
+
+      if(Vertex1/=Vertex2) then
+        if(x1==x2) x2=500 !unphysical situation
+
+        ra=dsqrt((x2-x1)**2+(y2-y1)**2)/2.d0
+        phi1=(y2-y1)/(2.d0*ra)
+        phi2=(x2-x1)/(2.d0*ra)
+        ca1=(x1+x2)/2.d0
+        ca2=(y1+y2)/2.d0;
+        ca1=ca1+phi1*ra
+        ca2=ca2-phi2*ra; 
+        ra=ra*dsqrt(2.d0)
+        a1=pi4+dasin(phi1)
+        a2=a1+pi2
+        IF(phi2.lt.0) then
+          a2=4*pi2-pi4-dasin(phi1)
+          a1=a2-pi2
+        endif
+        a1=a1*radian
+        a2=a2*radian 
+
+        write(11,781)  ca1, ca2, ra, a1, a2  ! propagator lines - arcs 
+        ca1=x1+(phi2-phi1)*scy/2.;     
+        ca2=y1+(phi2+phi1)*scy/2. 
+
+        write(11,790) ca1, ca2, x1, y1       ! arrows
+      else
+        iWLn=NeighVertex(3,Vertex1)
+        Vertex3=NeighLn(3-DirecVertex(Vertex1),iWLn)
+        y3=scy*site_num(GXVertex(Vertex3),GYVertex(Vertex3))
+        sgn=1.d0
+        IF(y3>y1) sgn=-1.d0   
+        write(11,780) x1, y1+sgn*scy/5. , scy/5. 
+      endif
+    enddo
+
+    write(11,*) '0 0 0 setrgbcolor'
+    write(11,"(f6.1,x,f6.1,x,' M (Gamma info) C')") 520.0,350.0
+    do i=1,NVertex
+      Vertex1=VertexKey2Value(i)
+      x1=scx*T3Vertex(Vertex1)
+      y1=scy*site_num(GXVertex(Vertex1),GYVertex(Vertex1))
+      if(Vertex1==Ira) then
+        write(11,*) '1 0 0 setrgbcolor'
+      elseif(Vertex1==Masha) then
+        write(11,*) '0 0 1 setrgbcolor'
+      elseif(Vertex1==MeasureGam) then
+        write(11,*) '0 1 0 setrgbcolor'
+      else
+        write(11,*) '0 0 0 setrgbcolor'
+      endif
+      write(11,777) x1, y1, scy/20.
+      write(11,801) x1-5., y1+7., i
+      write(11,802) 500.0,350.0-i*15,i,T3Vertex(Vertex1), &
+         & GXVertex(Vertex1),GYVertex(Vertex2)
+    enddo
+
+    write(11,*) ''
+    write(11,*) 'stroke showpage'
+    write(11,*) '%%Trailer'
+
+    close (11)
+	return
+!******************************************************************
+ 777  format ('Nsolid ',f6.1,x,f6.1,x,f9.3,' Y')
+ 778  format ('N ',f6.1,x,f6.1,x,' M')
+ 779  format (     f6.1,x,f6.1,x,' L')
+ 780  format ('Nsolid ',f6.1,x,f6.1,x,f9.3,' YL')
+ 781  format ('Nsolid ',f6.1,x,f6.1,x,f6.1,x,f6.1,x,f6.1,' Y45')
+ 790  format ('Nsolid ',f6.1,x,f6.1,x,f6.1,x,f6.1,x,' ahead')
+ 791  format ('Ndashed ',f6.1,x,f6.1,' M',f6.1,x,f6.1,' L')
+ 801  format (f6.1,x,f6.1,x,' M (',i2,') C')
+ 802  format (f6.1,x,f6.1,x,' M (',i2,':',f6.3,'; (',i3,',',i3,')) C')
+ 803  format (f6.1,x,f6.1,x,' M (',A,') C')
+ 
+END SUBROUTINE DRAW
+
+!__________________________________________ 
+!   	'0 0 0 setrgbcolor'    black
+!     '0 0 1 setrgbcolor'    blue
+!     '1 0 0 setrgbcolor'    red
+!     '0 1 0 setrgbcolor'    green
+
+INTEGER FUNCTION site_num(X,Y)
+  implicit none
+  integer :: x,y
+  site_num=y*Ly+x+1
+  return
+END FUNCTION site_num
+!====================================================================
+!====================================================================
+
 !!================================================================
 !!================= READ/WRITE CONFIGURATIONS ====================
 !!================================================================
