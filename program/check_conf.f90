@@ -5,6 +5,8 @@
 SUBROUTINE check_config
   implicit none
 
+  open(36, access="append", file=trim(title3)//".log")
+
   call check_topo
   call check_stat
   call check_irreducibility
@@ -13,6 +15,8 @@ SUBROUTINE check_config
   call check_time
   call check_site
   call check_weight
+
+  close(36)
   return
 END SUBROUTINE check_config
 
@@ -24,26 +28,26 @@ SUBROUTINE check_topo
   integer :: nextLn, nLn
   
   if(NGLn/=2*(Order+1) .or. NWLn/=Order+1 .or. NVertex/=2*(Order+1)) then
-    write(*, *) "================================================="
-    write(*, *) "Oops, check_topo found a bug!"
-    write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-    write(*, *) "Diagram order", Order
-    write(*, *) "number of glines", NGLn, "number of wlines", NWLn, &
+    write(36, *) "================================================="
+    write(36, *) "Oops, check_topo found a bug!"
+    write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
+    write(36, *) "Diagram order", Order
+    write(36, *) "number of glines", NGLn, "number of wlines", NWLn, &
       & "number of gamma", NVertex
-    write(*, *) "================================================="
+    write(36, *) "================================================="
     call print_config
     stop
   endif
 
   do i = 1, NGLn
     if(LnValue2Key(GLnKey2Value(i))/=i) then
-      write(*, *) "================================================="
-      write(*, *) "Oops, check_topo found a bug!"
-      write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-      write(*, *) "gline's location is wrong!"
-      write(*, *) "real location", i, "gline's number", GLnKey2Value(i), "gline's &
+      write(36, *) "================================================="
+      write(36, *) "Oops, check_topo found a bug!"
+      write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
+      write(36, *) "gline's location is wrong!"
+      write(36, *) "real location", i, "gline's number", GLnKey2Value(i), "gline's &
         & location", LnValue2Key(GLnKey2Value(i))
-      write(*, *) "================================================="
+      write(36, *) "================================================="
       call print_config
       stop
     endif
@@ -56,24 +60,24 @@ SUBROUTINE check_topo
       nextLn = NeighVertex(2, NeighLn(2, nextLn))
       nLn = nLn + 1
       if(nLn>NGLn) then
-        write(*, *) "================================================="
-        write(*, *) "Oops, check_topo found a bug!"
-        write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-        write(*, *) "The Fermi loop is wrong!"
-        write(*, *) "The gline number in a loop:", nLn
-        write(*, *) "================================================="
+        write(36, *) "================================================="
+        write(36, *) "Oops, check_topo found a bug!"
+        write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
+        write(36, *) "The Fermi loop is wrong!"
+        write(36, *) "The gline number in a loop:", nLn
+        write(36, *) "================================================="
         call print_config
         stop
       endif
     enddo
 
     !if(nLn/=NGLn) then
-      !write(*, *) "================================================="
-      !write(*, *) "Oops, check_topo found a bug!"
-      !write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-      !write(*, *) "The Fermi loop is wrong!"
-      !write(*, *) "The gline number in a loop:", nLn
-      !write(*, *) "================================================="
+      !write(36, *) "================================================="
+      !write(36, *) "Oops, check_topo found a bug!"
+      !write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
+      !write(36, *) "The Fermi loop is wrong!"
+      !write(36, *) "The gline number in a loop:", nLn
+      !write(36, *) "================================================="
       !call print_config
       !stop
     !endif
@@ -81,26 +85,26 @@ SUBROUTINE check_topo
 
   do i = 1, NWLn
     if(LnValue2Key(WLnKey2Value(i))/=i) then
-      write(*, *) "================================================="
-      write(*, *) "Oops, check_topo found a bug!"
-      write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-      write(*, *) "wline's location is wrong!"
-      write(*, *) "real location", i, "wline's number", WLnKey2Value(i), "wline's &
+      write(36, *) "================================================="
+      write(36, *) "Oops, check_topo found a bug!"
+      write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
+      write(36, *) "wline's location is wrong!"
+      write(36, *) "real location", i, "wline's number", WLnKey2Value(i), "wline's &
         & location", LnValue2Key(WLnKey2Value(i))
-      write(*, *) "================================================="
+      write(36, *) "================================================="
       call print_config
       stop
     endif
 
     if(IsWormPresent .eqv. .false.) then
       if(NeighLn(1, WLnKey2Value(i))==NeighLn(2, WLnKey2Value(i))) then
-        write(*, *) "================================================="
-        write(*, *) "Oops, check_topo found a bug!"
-        write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-        write(*, *) "wline's topology is wrong!"
-        write(*, *) "wline's number", WLnKey2Value(i), "wline's left Gam", NeighLn(1, &
+        write(36, *) "================================================="
+        write(36, *) "Oops, check_topo found a bug!"
+        write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
+        write(36, *) "wline's topology is wrong!"
+        write(36, *) "wline's number", WLnKey2Value(i), "wline's left Gam", NeighLn(1, &
           &  WLnKey2Value(i)), "right Gam", NeighLn(2, WLnKey2Value(i))
-        write(*, *) "================================================="
+        write(36, *) "================================================="
         call print_config
         stop
       endif
@@ -109,13 +113,13 @@ SUBROUTINE check_topo
 
   do i = 1, NVertex
     if(VertexValue2Key(VertexKey2Value(i))/=i) then
-      write(*, *) "================================================="
-      write(*, *) "Oops, check_topo found a bug!"
-      write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-      write(*, *) "gamma's location is wrong!"
-      write(*, *) "real location", i, "gamma's number", VertexKey2Value(i), "gamma's &
+      write(36, *) "================================================="
+      write(36, *) "Oops, check_topo found a bug!"
+      write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
+      write(36, *) "gamma's location is wrong!"
+      write(36, *) "real location", i, "gamma's number", VertexKey2Value(i), "gamma's &
         & location", VertexValue2Key(VertexKey2Value(i))
-      write(*, *) "================================================="
+      write(36, *) "================================================="
       call print_config
       stop
     endif
@@ -132,23 +136,23 @@ SUBROUTINE check_stat
 
   if(IsWormPresent) then
     if(StatusVertex(Ira)<=1)  then
-      write(*, *) "================================================="
-      write(*, *) "Oops, check_stat found a bug!"
-      write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-      write(*, *) "Ira's status is wrong!"
-      write(*, *) "Ira's number", Ira, "Ira's status",StatusVertex(Ira)
-      write(*, *) "================================================="
+      write(36, *) "================================================="
+      write(36, *) "Oops, check_stat found a bug!"
+      write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
+      write(36, *) "Ira's status is wrong!"
+      write(36, *) "Ira's number", Ira, "Ira's status",StatusVertex(Ira)
+      write(36, *) "================================================="
       call print_config
       stop
     endif
 
     if(StatusVertex(Masha)<=1)  then
-      write(*, *) "================================================="
-      write(*, *) "Oops, check_stat found a bug!"
-      write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-      write(*, *) "Masha's status is wrong!"
-      write(*, *) "Masha's number", Masha, "Masha's status",StatusVertex(Masha)
-      write(*, *) "================================================="
+      write(36, *) "================================================="
+      write(36, *) "Oops, check_stat found a bug!"
+      write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
+      write(36, *) "Masha's status is wrong!"
+      write(36, *) "Masha's number", Masha, "Masha's status",StatusVertex(Masha)
+      write(36, *) "================================================="
       call print_config
       stop
     endif
@@ -164,12 +168,12 @@ SUBROUTINE check_stat
     endif
     if(StatusVertex(i)/=stat) then
 
-      write(*, *) "================================================="
-      write(*, *) "Oops, check_stat found a bug!"
-      write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-      write(*, *) "Gamma's status is wrong!"
-      write(*, *) "Gamma's number", i, "real status", stat, "Gamma's status",StatusVertex(i)
-      write(*, *) "================================================="
+      write(36, *) "================================================="
+      write(36, *) "Oops, check_stat found a bug!"
+      write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
+      write(36, *) "Gamma's status is wrong!"
+      write(36, *) "Gamma's number", i, "real status", stat, "Gamma's status",StatusVertex(i)
+      write(36, *) "================================================="
 
       call print_config
       stop
@@ -181,12 +185,12 @@ SUBROUTINE check_stat
     stat = 0
     if(NeighLn(1,i)==MeasureGam .or. NeighLn(2,i)==MeasureGam) stat = stat+1
     if(StatusLn(i)/=stat) then
-      write(*, *) "================================================="
-      write(*, *) "Oops, check_stat found a bug!"
-      write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-      write(*, *) "line's status is wrong!"
-      write(*, *) "line's number", i, "real status", stat, "line's status",StatusLn(i)
-      write(*, *) "================================================="
+      write(36, *) "================================================="
+      write(36, *) "Oops, check_stat found a bug!"
+      write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
+      write(36, *) "line's status is wrong!"
+      write(36, *) "line's number", i, "real status", stat, "line's status",StatusLn(i)
+      write(36, *) "================================================="
 
       call print_config
       stop
@@ -202,12 +206,12 @@ SUBROUTINE check_stat
         & .or. NeighLn(2,i)==Masha)                            stat = stat+2
     endif
     if(StatusLn(i)/=stat) then
-      write(*, *) "================================================="
-      write(*, *) "Oops, check_stat found a bug!"
-      write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-      write(*, *) "line's status is wrong!"
-      write(*, *) "line's number", i, "real status", stat, "line's status",StatusLn(i)
-      write(*, *) "================================================="
+      write(36, *) "================================================="
+      write(36, *) "Oops, check_stat found a bug!"
+      write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
+      write(36, *) "line's status is wrong!"
+      write(36, *) "line's number", i, "real status", stat, "line's status",StatusLn(i)
+      write(36, *) "================================================="
 
       call print_config
       stop
@@ -224,12 +228,12 @@ SUBROUTINE check_time
     if(IsDeltaVertex(i)==1) then
       if(T1Vertex(i)/=T2Vertex(i) .or. T1Vertex(i)/=T3Vertex(i) .or. T2Vertex(i) &
         & /=T3Vertex(i)) then
-        write(*, *) "================================================="
-        write(*, *) "Oops, check_time found a bug!"
-        write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-        write(*, *) "delta Gamma is wrong!"
-        write(*, *) "gamma's number", i, "time", T1Vertex(i), T2Vertex(i), T3Vertex(i)
-        write(*, *) "================================================="
+        write(36, *) "================================================="
+        write(36, *) "Oops, check_time found a bug!"
+        write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
+        write(36, *) "delta Gamma is wrong!"
+        write(36, *) "gamma's number", i, "time", T1Vertex(i), T2Vertex(i), T3Vertex(i)
+        write(36, *) "================================================="
         call print_config
         stop
       endif
@@ -240,12 +244,12 @@ SUBROUTINE check_time
     i = WLnKey2Value(ikey)
     if(IsDeltaLn(i)==1) then
       if(T3Vertex(NeighLn(1, i))/=T3Vertex(NeighLn(2, i))) then
-        write(*, *) "================================================="
-        write(*, *) "Oops, check_time found a bug!"
-        write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-        write(*, *) "delta W is wrong!"
-        write(*, *) "W's number", i, "time", T3Vertex(NeighLn(1,i)),T3Vertex(NeighLn(2,i))
-        write(*, *) "================================================="
+        write(36, *) "================================================="
+        write(36, *) "Oops, check_time found a bug!"
+        write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
+        write(36, *) "delta W is wrong!"
+        write(36, *) "W's number", i, "time", T3Vertex(NeighLn(1,i)),T3Vertex(NeighLn(2,i))
+        write(36, *) "================================================="
         call print_config
         stop
       endif
@@ -261,42 +265,42 @@ SUBROUTINE check_site
   do ikey = 1, NVertex
     i = VertexKey2Value(ikey)
     if(GXVertex(i)<0 .or. GXVertex(i)>Lx-1) then
-      write(*, *) "================================================="
-      write(*, *) "Oops, check_site found a bug!"
-      write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-      write(*, *) "GX is wrong!"
-      write(*, *) "gamma's number", i, "GX", GXVertex(i)
-      write(*, *) "================================================="
+      write(36, *) "================================================="
+      write(36, *) "Oops, check_site found a bug!"
+      write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
+      write(36, *) "GX is wrong!"
+      write(36, *) "gamma's number", i, "GX", GXVertex(i)
+      write(36, *) "================================================="
       call print_config
       stop
     endif
     if(GYVertex(i)<0 .or. GYVertex(i)>Ly-1) then
-      write(*, *) "================================================="
-      write(*, *) "Oops, check_site found a bug!"
-      write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-      write(*, *) "GY is wrong!"
-      write(*, *) "gamma's number", i, "GY", GYVertex(i)
-      write(*, *) "================================================="
+      write(36, *) "================================================="
+      write(36, *) "Oops, check_site found a bug!"
+      write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
+      write(36, *) "GY is wrong!"
+      write(36, *) "gamma's number", i, "GY", GYVertex(i)
+      write(36, *) "================================================="
       call print_config
       stop
     endif
     if(WXVertex(i)<0 .or. WXVertex(i)>Lx-1) then
-      write(*, *) "================================================="
-      write(*, *) "Oops, check_site found a bug!"
-      write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-      write(*, *) "WX is wrong!"
-      write(*, *) "gamma's number", i, "WX", WXVertex(i)
-      write(*, *) "================================================="
+      write(36, *) "================================================="
+      write(36, *) "Oops, check_site found a bug!"
+      write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
+      write(36, *) "WX is wrong!"
+      write(36, *) "gamma's number", i, "WX", WXVertex(i)
+      write(36, *) "================================================="
       call print_config
       stop
     endif
     if(WYVertex(i)<0 .or. WYVertex(i)>Ly-1) then
-      write(*, *) "================================================="
-      write(*, *) "Oops, check_site found a bug!"
-      write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-      write(*, *) "WY is wrong!"
-      write(*, *) "gamma's number", i, "WY", WYVertex(i)
-      write(*, *) "================================================="
+      write(36, *) "================================================="
+      write(36, *) "Oops, check_site found a bug!"
+      write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
+      write(36, *) "WY is wrong!"
+      write(36, *) "gamma's number", i, "WY", WYVertex(i)
+      write(36, *) "================================================="
       call print_config
       stop
     endif
@@ -324,12 +328,12 @@ SUBROUTINE check_k_conserve
       if(i==Masha) k = k - kMasha
     endif
     if(k/=0) then
-      write(*, *) "================================================="
-      write(*, *) "Oops, check_k_conserve found a bug!"
-      write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-      write(*, *) "k on gamma is not conserved!"
-      write(*, *) "gamma's number", i, "k", k
-      write(*, *) "================================================="
+      write(36, *) "================================================="
+      write(36, *) "Oops, check_k_conserve found a bug!"
+      write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
+      write(36, *) "k on gamma is not conserved!"
+      write(36, *) "gamma's number", i, "k", k
+      write(36, *) "================================================="
       call print_config
       stop
     endif
@@ -380,42 +384,42 @@ SUBROUTINE check_type
     if(sum1+2*(SpInVertex(1, Gam1)+SpInVertex(1, Gam2)-SpInVertex(2, Gam1)-SpInVertex(2, Gam2))/=0) flag=5
 
     if(flag==1 .or. flag==2) then
-      write(*, *) "================================================="
-      write(*, *) "Oops, check_type found a bug!"
-      write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-      write(*, *) "The type of Gamma is wrong!"
-      write(*, *) "wline's number", i, "Gamma", Gam1, Gam2
-      write(*, *) "================================================="
+      write(36, *) "================================================="
+      write(36, *) "Oops, check_type found a bug!"
+      write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
+      write(36, *) "The type of Gamma is wrong!"
+      write(36, *) "wline's number", i, "Gamma", Gam1, Gam2
+      write(36, *) "================================================="
       call print_config
       stop
     else if(flag==3) then
-      write(*, *) "================================================="
-      write(*, *) "Oops, check_type found a bug!"
-      write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-      write(*, *) "The type of wline is wrong!"
-      write(*, *) "wline's number", i, "Gamma", Gam1, Gam2
-      write(*, *) TypeLn(i), TypeVertex(Gam1), TypeVertex(Gam2)
-      write(*, *) "================================================="
+      write(36, *) "================================================="
+      write(36, *) "Oops, check_type found a bug!"
+      write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
+      write(36, *) "The type of wline is wrong!"
+      write(36, *) "wline's number", i, "Gamma", Gam1, Gam2
+      write(36, *) TypeLn(i), TypeVertex(Gam1), TypeVertex(Gam2)
+      write(36, *) "================================================="
       call print_config
       stop
     else if(flag==4) then
-      write(*, *) "================================================="
-      write(*, *) "Oops, check_type found a bug!"
-      write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-      write(*, *) "The type of glines are wrong!"
-      write(*, *) "wline's number", i, "Gamma", Gam1, Gam2
-      write(*, *) sum1, TypeLn(G1), TypeLn(G3), TypeLn(G2), TypeLn(G4)
-      write(*, *) "================================================="
+      write(36, *) "================================================="
+      write(36, *) "Oops, check_type found a bug!"
+      write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
+      write(36, *) "The type of glines are wrong!"
+      write(36, *) "wline's number", i, "Gamma", Gam1, Gam2
+      write(36, *) sum1, TypeLn(G1), TypeLn(G3), TypeLn(G2), TypeLn(G4)
+      write(36, *) "================================================="
       call print_config
       stop
     else if(flag==5) then
-      write(*, *) "================================================="
-      write(*, *) "Oops, check_type found a bug!"
-      write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-      write(*, *) "The type of gamma inside lines are wrong!"
-      write(*, *) "wline's number", i, "Gamma", Gam1, Gam2
-      write(*, *) sum1, SpInVertex(:, Gam1), SpInVertex(:, Gam2)
-      write(*, *) "================================================="
+      write(36, *) "================================================="
+      write(36, *) "Oops, check_type found a bug!"
+      write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
+      write(36, *) "The type of gamma inside lines are wrong!"
+      write(36, *) "wline's number", i, "Gamma", Gam1, Gam2
+      write(36, *) sum1, SpInVertex(:, Gam1), SpInVertex(:, Gam2)
+      write(36, *) "================================================="
       call print_config
       stop
     endif
@@ -438,12 +442,12 @@ SUBROUTINE check_irreducibility
       do j = i+1, NGLn
         Gj = GLnKey2Value(j)
         if(kLn(Gj)==kLn(Gi)) then
-          write(*, *) "================================================="
-          write(*, *) "Oops, check_irreducibility found a bug!"
-          write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-          write(*, *) "Gline is not irreducible!"
-          write(*, *) "Gline's number", Gi, "k", kLn(Gi)
-          write(*, *) "================================================="
+          write(36, *) "================================================="
+          write(36, *) "Oops, check_irreducibility found a bug!"
+          write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
+          write(36, *) "Gline is not irreducible!"
+          write(36, *) "Gline's number", Gi, "k", kLn(Gi)
+          write(36, *) "================================================="
           call print_config
           stop
         endif
@@ -455,12 +459,12 @@ SUBROUTINE check_irreducibility
     do i = 1, NWLn
       Wi = WLnKey2Value(i)
       if(kLn(Wi)==0) then
-        write(*, *) "================================================="
-        write(*, *) "Oops, check_irreducibility found a bug!"
-        write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-        write(*, *) "Wline is not irreducible!"
-        write(*, *) "Wline's number", Wi, "k", kLn(Wi)
-        write(*, *) "================================================="
+        write(36, *) "================================================="
+        write(36, *) "Oops, check_irreducibility found a bug!"
+        write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
+        write(36, *) "Wline is not irreducible!"
+        write(36, *) "Wline's number", Wi, "k", kLn(Wi)
+        write(36, *) "================================================="
         call print_config
         stop
       endif
@@ -468,12 +472,12 @@ SUBROUTINE check_irreducibility
       do j = i+1, NWLn
         Wj = WLnKey2Value(j)
         if(abs(kLn(Wj))==abs(kLn(Wi))) then
-          write(*, *) "================================================="
-          write(*, *) "Oops, check_irreducibility found a bug!"
-          write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-          write(*, *) "Wline is not irreducible!"
-          write(*, *) "Wline's number", Wi, "k", kLn(Wi)
-          write(*, *) "================================================="
+          write(36, *) "================================================="
+          write(36, *) "Oops, check_irreducibility found a bug!"
+          write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
+          write(36, *) "Wline is not irreducible!"
+          write(36, *) "Wline's number", Wi, "k", kLn(Wi)
+          write(36, *) "================================================="
           call print_config
           stop
         endif
@@ -495,12 +499,12 @@ SUBROUTINE check_irreducibility
           if(NeighLn(2,Wk)==NeighLn(1,Gi) .or. NeighLn(2,Wk)==NeighLn(1,Gj)) cycle
           if(NeighLn(2,Wk)==NeighLn(2,Gi) .or. NeighLn(2,Wk)==NeighLn(2,Gj)) cycle
           if(abs(add_k(kLn(Gi), -kLn(Gj)))==abs(kLn(Wk))) then
-            write(*, *) "================================================="
-            write(*, *) "Oops, check_irreducibility found a bug!"
-            write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-            write(*, *) "Gamma is not irreducible!"
-            write(*, *) "Gline's number", Gi, Gj, "Wline", Wk, "k", kLn(Gi), kLn(Gj), kLn(Wk)
-            write(*, *) "================================================="
+            write(36, *) "================================================="
+            write(36, *) "Oops, check_irreducibility found a bug!"
+            write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
+            write(36, *) "Gamma is not irreducible!"
+            write(36, *) "Gline's number", Gi, Gj, "Wline", Wk, "k", kLn(Gi), kLn(Gj), kLn(Wk)
+            write(36, *) "================================================="
             call print_config
             stop
           endif
@@ -547,29 +551,27 @@ SUBROUTINE check_weight
     weight = weight *wgam(i)
   enddo
 
-  weight = weight *CoefOfWeight(Order) *(1.d0/Beta)**Order *SignFermiLoop
-
-  if(IsWormPresent) weight = weight*WeightWorm
+  weight = weight *(1.d0/Beta)**Order *SignFermiLoop
 
   if(abs(Phase*WeightCurrent - weight)>1.d-5) then
-    write(*, *) "================================================="
-    write(*, *) "Oops, check_weight found a bug!"
-    write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
+    write(36, *) "================================================="
+    write(36, *) "Oops, check_weight found a bug!"
+    write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
 
-    write(*, *) "real weight", weight
-    write(*, *) "current weight", Phase*WeightCurrent
-    write(*, *) Order, Beta
+    write(36, *) "real weight", weight
+    write(36, *) "current weight", Phase*WeightCurrent
+    write(36, *) Order, Beta
 
     do i = 1, MxNLn
       if(StatusLn(i)<0)  cycle
-      write(*, *) i, wln(i), WeightLn(i)
+      write(36, *) i, wln(i), WeightLn(i)
     enddo
 
     do i = 1, MxNVertex
       if(StatusVertex(i)<0)  cycle
-      write(*, *) i, wgam(i), WeightVertex(i)
+      write(36, *) i, wgam(i), WeightVertex(i)
     enddo
-    write(*, *) "================================================="
+    write(36, *) "================================================="
 
     call print_config
     stop

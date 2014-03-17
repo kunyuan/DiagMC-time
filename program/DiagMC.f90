@@ -325,6 +325,7 @@ SUBROUTINE monte_carlo
 
     !call write_monte_carlo_conf
     !call write_monte_carlo_data
+    !call write_monte_carlo_test
 
     write(logstr,*) "Block",iblck," is done!"
     call write_log
