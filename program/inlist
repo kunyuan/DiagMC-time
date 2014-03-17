@@ -1,6 +1,6 @@
-Block:  10
+Block:  100
 Sample: 1000
-Sweep:  1
+Sweep:  5 
 Toss:  10
 IsLoad: 0
 Type: 2

@@ -701,8 +701,8 @@ INTEGER FUNCTION delete_ira_stat(stat)
     stop
   endif
   delete_ira_stat = stat - 2
-  if(delete_ira_stat == -2) delete_ira_stat = 0
-  if(delete_ira_stat == -1) delete_ira_stat = 1
+  !if(delete_ira_stat == -2) delete_ira_stat = 0
+  !if(delete_ira_stat == -1) delete_ira_stat = 1
   if(delete_ira_stat<0) then
     write(*, *)  IsWormPresent, iupdate, "del_ira_stat, stat < 0", delete_ira_stat
     call print_config

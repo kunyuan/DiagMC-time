@@ -321,7 +321,7 @@ SUBROUTINE monte_carlo
     call print_config
     !call write_monte_carlo_conf
     !call write_monte_carlo_data
-    !call write_monte_carlo_test
+    call write_monte_carlo_test
   enddo
 
   call time_elapse
