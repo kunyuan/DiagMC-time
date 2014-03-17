@@ -234,6 +234,7 @@ SUBROUTINE markov
         istep = istep + 1
         GamOrder(Order) = GamOrder(Order) + 1
       endif
+      if(Mod(Floor(imc), 100)==0) call check_config
     enddo
     if(IsToss==0) call measure
   enddo

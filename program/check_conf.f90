@@ -10,6 +10,7 @@ SUBROUTINE check_config
   call check_irreducibility
   call check_k_conserve
   call check_type
+  call check_time
   call check_site
   call check_weight
   return
@@ -126,7 +127,7 @@ END SUBROUTINE check_topo
 
 SUBROUTINE check_stat
   implicit none
-  integer :: i, j, k
+  integer :: i, ikey, j, k
   integer :: stat
 
   if(IsWormPresent) then
@@ -153,8 +154,9 @@ SUBROUTINE check_stat
     endif
   endif
 
-  do i = 1, MxNVertex
-    if(StatusVertex(i)==-1)  cycle
+  do ikey = 1, NVertex
+    i = VertexKey2Value(ikey)
+
     stat = 0
     if(MeasureGam==i)         stat = stat+1
     if(IsWormPresent) then
@@ -174,15 +176,30 @@ SUBROUTINE check_stat
     endif
   enddo
 
-  do i = 1, MxNLn
-    if(StatusLn(i)==-1)  cycle
+  do ikey = 1, NGLn
+    i = GLnKey2Value(ikey)
     stat = 0
     if(NeighLn(1,i)==MeasureGam .or. NeighLn(2,i)==MeasureGam) stat = stat+1
-    if(KindLn(i)==2) then
-      if(IsWormPresent) then
-        if(NeighLn(1,i)==Ira .or. NeighLn(2,i)==Ira .or. NeighLn(1,i)==Masha &
-          & .or. NeighLn(2,i)==Masha)                            stat = stat+2
-      endif
+    if(StatusLn(i)/=stat) then
+      write(*, *) "================================================="
+      write(*, *) "Oops, check_stat found a bug!"
+      write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
+      write(*, *) "line's status is wrong!"
+      write(*, *) "line's number", i, "real status", stat, "line's status",StatusLn(i)
+      write(*, *) "================================================="
+
+      call print_config
+      stop
+    endif
+  enddo
+
+  do ikey = 1, NWLn
+    i = WLnKey2Value(ikey)
+    stat = 0
+    if(NeighLn(1,i)==MeasureGam .or. NeighLn(2,i)==MeasureGam) stat = stat+1
+    if(IsWormPresent) then
+      if(NeighLn(1,i)==Ira .or. NeighLn(2,i)==Ira .or. NeighLn(1,i)==Masha &
+        & .or. NeighLn(2,i)==Masha)                            stat = stat+2
     endif
     if(StatusLn(i)/=stat) then
       write(*, *) "================================================="
@@ -198,13 +215,51 @@ SUBROUTINE check_stat
   enddo
 END SUBROUTINE check_stat
   
+SUBROUTINE check_time
+  implicit none
+  integer :: ikey, i
+
+  do ikey = 1, NVertex
+    i = VertexKey2Value(ikey)
+    if(IsDeltaVertex(i)==1) then
+      if(T1Vertex(i)/=T2Vertex(i) .or. T1Vertex(i)/=T3Vertex(i) .or. T2Vertex(i) &
+        & /=T3Vertex(i)) then
+        write(*, *) "================================================="
+        write(*, *) "Oops, check_time found a bug!"
+        write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
+        write(*, *) "delta Gamma is wrong!"
+        write(*, *) "gamma's number", i, "time", T1Vertex(i), T2Vertex(i), T3Vertex(i)
+        write(*, *) "================================================="
+        call print_config
+        stop
+      endif
+    endif
+  enddo
+
+  do ikey = 1, NWLn
+    i = WLnKey2Value(ikey)
+    if(IsDeltaLn(i)==1) then
+      if(T3Vertex(NeighLn(1, i))/=T3Vertex(NeighLn(2, i))) then
+        write(*, *) "================================================="
+        write(*, *) "Oops, check_time found a bug!"
+        write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
+        write(*, *) "delta W is wrong!"
+        write(*, *) "W's number", i, "time", T3Vertex(NeighLn(1,i)),T3Vertex(NeighLn(2,i))
+        write(*, *) "================================================="
+        call print_config
+        stop
+      endif
+    endif
+  enddo
+  return
+END SUBROUTINE check_time
 
 SUBROUTINE check_site
   implicit none
-  integer :: i, j, k
-  integer :: omega
-  do i = 1, MxNVertex
-    if(StatusVertex(i)<0)  cycle
+  integer :: ikey, i, j, k
+
+  do ikey = 1, NVertex
+    i = VertexKey2Value(ikey)
     if(GXVertex(i)<0 .or. GXVertex(i)>Lx-1) then
       write(*, *) "================================================="
       write(*, *) "Oops, check_site found a bug!"
@@ -253,11 +308,12 @@ END SUBROUTINE check_site
 
 SUBROUTINE check_k_conserve
   implicit none
+  integer :: ikey
   integer :: i, j, k
   integer :: omega
   
-  do i = 1, MxNVertex
-    if(StatusVertex(i)==-1) cycle
+  do ikey = 1, NVertex
+    i = VertexKey2Value(ikey)
     if(DirecVertex(i)==1) then
       k = add_k(add_k(kLn(NeighVertex(1,i)), -kLn(NeighVertex(2,i))), -kLn(NeighVertex(3,i)))
     else
@@ -284,14 +340,13 @@ END SUBROUTINE check_k_conserve
 
 SUBROUTINE check_type
   implicit none
-  integer :: i
+  integer :: i, ikey
   integer :: Gam1, Gam2, G1, G2, G3, G4
   integer :: flag
   integer :: sum1
 
-  do i = 1, MxNLn
-    if(StatusLn(i)==-1) cycle
-    if(KindLn(i)==1)    cycle
+  do ikey = 1, NWLn
+    i = WLnKey2Value(ikey)
 
     Gam1 = NeighLn(1, i)
     Gam2 = NeighLn(2, i)
