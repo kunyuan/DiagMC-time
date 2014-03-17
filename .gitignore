@@ -11,4 +11,5 @@ out_*
 job_*
 program/infile
 program/outfile
+program/graph
 
