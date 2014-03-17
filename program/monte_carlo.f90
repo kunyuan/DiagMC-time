@@ -688,10 +688,10 @@ SUBROUTINE move_worm_along_gline
   !ProbProp(iupdate) = ProbProp(iupdate) + 1
 
   !------- step2 : propose a new config -----------------
-  iGam = Ira;  iW = NeighLn(3, iGam)
+  iGam = Ira;  iW = NeighVertex(3, iGam)
   dir = Floor(rn()*2.d0) + 1
   GLn = NeighVertex(dir, iGam)
-  jGam = NeighLn(dir, GLn);    jW = NeighLn(3, jGam)
+  jGam = NeighLn(dir, GLn);    jW = NeighVertex(3, jGam)
   if(jGam==Masha .or. jGam==Ira)    return
 
   if(dir==1) then
