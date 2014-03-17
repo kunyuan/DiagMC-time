@@ -1993,7 +1993,10 @@ END SUBROUTINE time_elapse
 
 
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> fix the small bug in check_config
 !============   initialize diagrams =================================
 SUBROUTINE first_order_diagram
   implicit none
