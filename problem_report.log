@@ -134,6 +134,19 @@ Test example:
 
 ====================================================
 
+9. mc updates: move worm
+
+Test example:
+1) Order1 diagram
+W(1:6) = 1.d0; Gam(1:2, 5:6) = 1.d0; G(:) = 1.d0
+
+Result: 
+conf(Ira===Masha):conf(other worm):conf(no worm) = 24:32:6
+!in the test code,
+!when Ira======Masha, allow the configuration in which Ira and Masha both cannot move
+
+====================================================
+
 
 
 

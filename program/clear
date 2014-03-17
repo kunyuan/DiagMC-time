@@ -1,6 +1,6 @@
-git rm *.bin.dat
-git rm *.conf
-git rm infile/*
-git rm outfile/*
-git rm logfile.log
-git rm all_input.log
+rm *.bin.dat
+rm *.conf
+rm infile/*
+rm outfile/*
+rm logfile.log
+rm all_input.log
