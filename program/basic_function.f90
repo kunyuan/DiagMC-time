@@ -1684,6 +1684,25 @@ END SUBROUTINE
     !call FFT_tau_single(Polar,1,Lx*Ly,BackForth)
 !END SUBROUTINE
 
+SUBROUTINE transfer_r(Backforth)
+  implicit none
+  integer,intent(in) :: Backforth
+
+  call transfer_W_r(Backforth)
+  call transfer_Gam_r(Backforth)
+  return
+END SUBROUTINE
+
+SUBROUTINE transfer_t(Backforth)
+  implicit none
+  integer,intent(in) :: Backforth
+
+  call transfer_G_t(Backforth)
+  call transfer_W_t(Backforth)
+  call transfer_Gam_t(Backforth)
+  return
+END SUBROUTINE
+
 SUBROUTINE transfer_Sigma_t(BackForth)
     implicit none
     integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
