@@ -337,6 +337,7 @@ line_stat	basic_function.f90	/^INTEGER FUNCTION line_stat(/;"	f
 line_stat	monte_carlo_old.f90	/^INTEGER FUNCTION line_stat(/;"	f
 logLx	vrbls_mc.f90	/^  double precision  ::  logLx,/;"	v	module:vrbls_mc
 logLy	vrbls_mc.f90	/^  double precision  ::  logLx,logLy$/;"	v	module:vrbls_mc
+logstr	vrbls_mc.f90	/^  character*100 :: logstr$/;"	v	module:vrbls_mc
 main	data_process/collapse_data.f90	/^  program main$/;"	p
 markov	monte_carlo.f90	/^SUBROUTINE markov$/;"	s
 markov	monte_carlo_old.f90	/^SUBROUTINE markov$/;"	s
@@ -463,6 +464,7 @@ weight_worm	basic_function.f90	/^DOUBLE PRECISION FUNCTION weight_worm(/;"	f
 weight_worm_Gam	basic_function.f90	/^complex*16 FUNCTION weight_worm_Gam(/;"	f
 weight_worm_W	basic_function.f90	/^complex*16 FUNCTION weight_worm_W(/;"	f
 write_GWGamma	read_write_data.f90	/^SUBROUTINE write_GWGamma$/;"	s
+write_log	read_write_data.f90	/^SUBROUTINE write_log$/;"	s
 write_monte_carlo_conf	read_write_data.f90	/^SUBROUTINE write_monte_carlo_conf$/;"	s
 write_monte_carlo_data	read_write_data.f90	/^SUBROUTINE write_monte_carlo_data$/;"	s
 write_monte_carlo_test	read_write_data.f90	/^SUBROUTINE write_monte_carlo_test$/;"	s

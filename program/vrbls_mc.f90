@@ -33,6 +33,7 @@ MODULE vrbls_mc
   character*100 :: title2
   character*100 :: title3
   character*100 :: title
+  character*100 :: logstr
 
   integer:: file_version
 
@@ -120,7 +121,7 @@ MODULE vrbls_mc
   double precision, allocatable :: GamSqMC(:,:,:,:,:,:,:)      ! the measurement of Gamma in MC
 
   double precision :: GamOrder(0:MxOrder)              ! the configuration number of different orders
-  double precision :: GamWormOrder(0:MxOrder)          ! the configuration number in worm section
+  double precision :: GamWormOrder(0:MxOrder)          ! the configuration number in whole section
 
   double precision :: WeightCurrent            ! the current weight of the configuration
   double precision :: CoefOfWorm

@@ -148,8 +148,8 @@ END SUBROUTINE def_diagram
 
 SUBROUTINE markov
   implicit none
-  integer :: iflag, istep,isamp
-  double precision :: nr
+  integer :: iflag, istep,isamp,i
+  double precision :: nr,x
 
   do isamp = 1, Nsamp
     istep = 0
@@ -201,10 +201,34 @@ SUBROUTINE markov
           call change_Gamma_isdelta       
       end select
 
-      imc = imc + 1
+      imc = imc + 1.0
 
+      if(mod(imc,1.e5)==0) then
+        call check_config
+        !call write_monte_carlo_test
+      endif
+
+      if(mod(imc,1.e7)==0) then
+        write(logstr,*) "Reweighting order of diagrams..."
+        call write_log
+        x=sum(GamWormOrder(:))
+        CoefOfWeight(:)=x/(GamWormOrder(:)+50.d0)
+        write(logstr,*) "Weight:"
+        call write_log
+        do i=0,MCOrder
+          write(logstr,"('Order ',i2,':',f10.4)") i, CoefOfWeight(i)
+          call write_log
+        enddo
+        write(logstr,*) "Reweighting is done!"
+        call write_log
+        if(imc<=2.e7) then
+          GamWormOrder=0.d0
+          GamOrder=0.d0
+        endif
+      endif
+
+      GamWormOrder(Order) = GamWormOrder(Order) + 1.0
       if(IsWormPresent) then
-        GamWormOrder(Order) = GamWormOrder(Order) + 1
         if(rn()<=0.5d0) call switch_ira_and_masha
       else
         istep = istep + 1
@@ -1610,7 +1634,6 @@ SUBROUTINE measure
   double precision :: tau1, tau2, tau3
 
   imeasure = imeasure + 1
-
   factorM = 1.d0
 
   !-------- find out the variables for Gamma ----------------
