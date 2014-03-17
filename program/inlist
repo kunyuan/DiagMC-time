@@ -1,7 +1,7 @@
 Block:  100
-Sample: 1000
+Sample: 5000
 Sweep:  5 
-Toss:  10
+Toss:  500
 IsLoad: 0
 Type: 2
 #1: self consist loop; 2: monte carlo; 3: test

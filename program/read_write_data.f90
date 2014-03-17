@@ -692,7 +692,8 @@ END SUBROUTINE output_Quantities
 
 SUBROUTINE write_monte_carlo_test
   implicit none
-  write(*, *) "conf(worm):", TestData(1)/(TestData(0)-TestData(1))
+  write(*, *) "conf(worm):", TestData(1)/TestData(3), TestData(2)/TestData(3)
+  write(*, *) "conf(no worm):)", TestData(0)/TestData(3)
   !write(*, *) "conf(Status(3)=measure):", TestData(2)/TestData(0)
   return
 END SUBROUTINE

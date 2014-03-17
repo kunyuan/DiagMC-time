@@ -254,7 +254,7 @@ SUBROUTINE create_worm_along_wline
   iGout = NeighVertex(2, iGam);         jGout = NeighVertex(2, jGam)
 
   spin = 4*(Floor(rn()*2.d0))-2         !spin = +/- 2
-  if(spin-2*(TypeLn(jGin)-TypeLn(jGout))==0)  return  !in this case, I/M cannot move
+  !if(spin-2*(TypeLn(jGin)-TypeLn(jGout))==0)  return  !in this case, I/M cannot move
 
   k = generate_k()
   kiWold = kLn(iWLn)
@@ -1508,9 +1508,16 @@ COMPLEX*16 FUNCTION weight_line(stat, isdelta, knd, dx0, dy0, tau, typ)
   !endif
 
   !---------------------- for test --------------------------------------
-  if(stat >= 0 .and. stat<=3) then
-    if(knd==1) weight_line = weight_meas_G(1, t)
-    if(knd==2) weight_line = weight_meas_W(1, dx, dy, t)
+  if(stat==0 .or. stat==1 .or. stat==3) then
+    if(knd==1) weight_line = weight_meas_G(typ, t)
+    if(knd==2) weight_line = weight_meas_W(typ, dx, dy, t)
+  else if(stat==2) then
+    if(knd==2) weight_line = weight_worm_W(typ, dx, dy, t)
+    if(knd==1) then
+      write(*, *) IsWormPresent, iupdate, "gline status == 2 or 3! Error!" 
+      call print_config
+      stop
+    endif
   else if(stat==-1) then
     write(*, *) IsWormPresent, iupdate, "line status == -1! There is no weight!" 
     stop
@@ -1558,8 +1565,10 @@ COMPLEX*16 FUNCTION weight_vertex(stat, isdelta, dx0, dy0, dtau1, dtau2, typ)
   !endif
 
   !---------------------- for test --------------------------------------
-  if(stat>=0 .and. stat<=3) then
-    weight_vertex = weight_meas_Gam(1, dx, dy, t1, t2)
+  if(stat==0 .or. stat==1 .or. stat==3) then
+    weight_vertex = weight_meas_Gam(typ, dx, dy, t1, t2)
+  else if(stat==2) then
+    weight_vertex = weight_worm_Gam(1, dx, dy, t1, t2)
   else if(stat==-1) then
     write(*, *) IsWormPresent, iupdate, "vertex status == -1! There is no weight!" 
     stop
@@ -1751,8 +1760,16 @@ SUBROUTINE measure
   !===============  test variables =================================
   !iGam=NeighLn(3,1)
   !if(IsDeltaLn(3)==0 .and. StatusLn(3)==0) TestData(1) = TestData(1) +1.d0
-  if(IsWormPresent)  TestData(1) = TestData(1) +1.d0
-  TestData(0)=TestData(0)+1.d0
+  if(IsWormPresent) then
+    if(NeighVertex(3, Ira)==NeighVertex(3, Masha)) then
+      TestData(1) = TestData(1) +1.d0
+    else
+      TestData(2) = TestData(2) +1.d0
+    endif
+  else
+    if(TypeLn(3)==1 .and. TypeLn(6)==1) TestData(3) = TestData(3) + 1.d0
+    TestData(0)=TestData(0)+1.d0
+  endif
   !================================================================
   
         

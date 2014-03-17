@@ -47,7 +47,8 @@ complex*16 FUNCTION weight_worm_W(ityp, dx, dy, t1)
   implicit none
   integer, intent(in)  :: dx, dy, t1, ityp
 
-  weight_worm_W = weight_W(1, dx, dy, t1)
+  !weight_worm_W = weight_W(1, dx, dy, t1)
+  weight_worm_W = weight_meas_W(1, dx, dy, t1)
   return
 END FUNCTION weight_worm_W
 
@@ -56,7 +57,8 @@ complex*16 FUNCTION weight_worm_Gam(ityp, dx, dy, t1, t2)
   implicit none
   integer, intent(in)  :: dx, dy, t1, t2, ityp
 
-  weight_worm_Gam = weight_Gam0(1, dx, dy)
+  !weight_worm_Gam = weight_Gam0(1, dx, dy)
+  weight_worm_Gam = weight_meas_Gam(1, dx, dy, t1, t2)
   return
 END FUNCTION weight_worm_Gam
 
@@ -71,7 +73,6 @@ END FUNCTION weight_meas_G
 complex*16 FUNCTION weight_meas_W(ityp, dx, dy, t1)
   implicit none
   integer, intent(in)  :: dx, dy, t1, ityp
-
   weight_meas_W = 1.d0
   return
 END FUNCTION weight_meas_W
@@ -90,6 +91,7 @@ complex*16 FUNCTION weight_meas_Gam(ityp, dx, dy, t1, t2)
       weight_meas_Gam = 1.d0
     endif
   endif
+
   !================   test ================
   !=======  r independent ================
   !weight_meas_Gam=0.d0
