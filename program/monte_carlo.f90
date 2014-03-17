@@ -1595,69 +1595,6 @@ END SUBROUTINE update_weight
 !====================================================================
 
 
-
-
-!====================================================================
-!===================== PRINT CONFIGURATION ==========================
-!====================================================================
-
-
-SUBROUTINE print_config
-  implicit none
-  integer :: i, iln, iv
-  
-  open(8, access='append', file=trim(title1)//"_mc.conf")
-  
-  write(8, *) "============================================================"
-  write(8, *) imc, IsWormPresent, iupdate
-
-  if(IsWormPresent .eqv. .true.) then
-    write(8, *) "Ira", Ira, "Masha", Masha, "SpinMasha", SpinMasha
-    write(8, *) "kMasha", kMasha
-  endif
-
-  write(8, *) "Order", Order
-  write(8, *) "SignFermiLoop", SignFermiLoop
-
-  write(8, *) "Measuring Gamma", MeasureGam
-  write(8, *) "Phase", Phase
-  write(8, *) "Weight", WeightCurrent
-
-  do i = 1, NGLn
-    iln = GLnKey2Value(i)
-    if(StatusLn(iln) <0) cycle
-    write(8, 10) iln, KindLn(iln), IsDeltaLn(iln), TypeLn(iln), kLn(iln), StatusLn(iln), NeighLn(1:2,iln)
-  enddo
-
-  do i = 1, NWLn
-    iln = WLnKey2Value(i)
-    if(StatusLn(iln) <0) cycle
-    write(8, 10) iln, KindLn(iln), IsDeltaLn(iln), TypeLn(iln), kLn(iln), StatusLn(iln), NeighLn(1:2,iln)
-  enddo
-
-  do i = 1, NVertex
-    iv = VertexKey2Value(i)
-    if(StatusVertex(iv) <0) cycle
-    write(8, 12) iv,IsDeltaVertex(iv), TypeVertex(iv),SpInVertex(1, iv),SpInVertex(2, iv), &
-      & GXVertex(iv),GYVertex(iv),WXVertex(iv),WYVertex(iv), T1Vertex(iv), T2Vertex(iv),  &
-      & T3Vertex(iv), DirecVertex(iv), StatusVertex(iv), NeighVertex(:,iv)
-  enddo
-  write(8, *) "============================================================"
-
-  10 format(' Line:',i2,2x,'kind:',i2,2x,'isdelta:',i2,2x,'type:',i2,2x,'k:',i8,2x,'stat:',i2, 2x,&
-    & 'neigh:',i6,i6)
-  12 format('Gamma:',i2,2x,'isdelta:',i2,2x,'type:',i2,2x,'typein:',i2,2x,'typeout:',i2,2x,&
-    & 'gr:(',i4,i4,'), wr:(',i4,i4,')', 't:(', f7.4, f7.4, f7.4, ')',2x, &
-    & 'direction:', i2,2x, 'stat:',i2, 2x,'neigh:', i6,i6,i6)
-
-  close(8)
-END SUBROUTINE print_config
-!====================================================================
-!====================================================================
-
-
-
-
 !!=======================================================================
 !!============================= MEASURE =================================
 !!=======================================================================

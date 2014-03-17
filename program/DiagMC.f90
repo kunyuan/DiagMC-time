@@ -386,7 +386,7 @@ SUBROUTINE test_subroutine
     !close(11)
     !========  test drawing subroutine =====================
     call initialize_markov
-    call DRAW
+    call print_config
 END SUBROUTINE
 
 

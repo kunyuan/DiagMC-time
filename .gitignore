@@ -7,9 +7,11 @@
 *.out
 *.log
 *.dwarf
+*.eps
 _in_*
 out_*
 job_*
 program/infile
 program/outfile
+program/graph
 
