@@ -147,6 +147,15 @@ conf(Ira===Masha):conf(other worm):conf(no worm) = 24:32:6
 
 ====================================================
 
+8. DRAW configuration
+
+Test example:
+1) Order1 diagram without bubble
+2) Order2 diagram
+3) Order1 diagram with a bubble
+
+====================================================
+
 
 
 ====================================================
