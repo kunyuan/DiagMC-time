@@ -175,7 +175,7 @@ MODULE vrbls_mc
   !  T1: outgoing G, T2: ingoing G, T3: W attached
   integer, dimension(MxNVertex) :: DirecVertex              ! Gamma is 1: left, 2: right
   integer, dimension(MxNVertex) :: TypeVertex               ! type of Gamma: 1-6
-  integer, dimension(MxNVertex) :: TypeVertexIn, TypeVertexOut ! type of Gamma inside spin: 1-2
+  integer, dimension(2,MxNVertex) :: SpInVertex             ! type of Gamma inside spin: 1-2
   integer, dimension(3,MxNVertex) :: NeighVertex            ! 1: in gline; 2: out gline; 3: wline
   COMPLEX*16, dimension(MxNVertex) :: WeightVertex          ! weight of  gamma
   integer, dimension(MxNLn) :: IsDeltaVertex                ! 0: not delta; 1: delta
@@ -188,7 +188,7 @@ MODULE vrbls_mc
 
   !----------- spin for W and Gamma---------------------------------------------
   integer, dimension(6,6)   :: TypeGam2W
-  integer, dimension(2,2,2,2) :: TypeGW2Gam
+  integer, dimension(2,2,2,2) :: TypeSp2Gam
 
   !------------ probabilities functions for updates -----------------------------
   integer, parameter :: Nupdate = 19

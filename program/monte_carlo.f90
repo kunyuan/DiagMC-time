@@ -99,7 +99,7 @@ SUBROUTINE def_spin
   implicit none
 
   TypeGam2W(:,:) = 0
-  TypeGW2Gam(:,:,:,:) = 0
+  TypeSp2Gam(:,:,:,:) = 0
 
   !-- calculate the type of W according to the neighbor vertexes --
   !---- TypeGam2W(Type(Gamleft), Type(Gamright)) = Type(W)
@@ -118,13 +118,13 @@ SUBROUTINE def_spin
   TypeGam2W(5,6) = 5;      TypeGam2W(6,5) = 6
 
   !-- calculate the type of Gam according to the neighbor G, W --
-  !---- TypeGW2Gam(Type(Gin), Type(Gout), Type(Gamin), Type(Gamout)) = Type(Gam)
-  TypeGW2Gam(1,1,1,1) = 1
-  TypeGW2Gam(2,2,2,2) = 2
-  TypeGW2Gam(1,1,2,2) = 3
-  TypeGW2Gam(2,2,1,1) = 4
-  TypeGW2Gam(1,2,1,2) = 5
-  TypeGW2Gam(2,1,2,1) = 6
+  !---- TypeSp2Gam(Type(Gin), Type(Gout), Type(Gamin), Type(Gamout)) = Type(Gam)
+  TypeSp2Gam(1,1,1,1) = 1
+  TypeSp2Gam(2,2,2,2) = 2
+  TypeSp2Gam(1,1,2,2) = 3
+  TypeSp2Gam(2,2,1,1) = 4
+  TypeSp2Gam(1,2,1,2) = 5
+  TypeSp2Gam(2,1,2,1) = 6
 
 END SUBROUTINE def_spin
 
@@ -169,10 +169,10 @@ SUBROUTINE markov
           !call create_worm_along_gline  
         !case( 4) 
           !call delete_worm_along_gline  
-        !case( 5) 
-          !call move_worm_along_wline             
-        !case( 6) 
-          !call move_worm_along_gline              
+        case( 5) 
+          call move_worm_along_wline             
+        case( 6) 
+          call move_worm_along_gline              
         !case( 7) 
           !call add_interaction                  
         !case( 8) 
@@ -433,8 +433,8 @@ SUBROUTINE delete_worm_along_wline
   statMasha = delete_ira_stat(StatusVertex(Masha))
   statW     = line_stat(statIra, statMasha)
 
-  typIra = TypeGW2Gam(TypeLn(iGin),TypeLn(iGout),TypeVertexIn(Ira), TypeVertexOut(Ira))
-  typMasha = TypeGW2Gam(TypeLn(jGin),TypeLn(jGout),TypeVertexIn(Masha),TypeVertexOut(Masha))
+  typIra = TypeSp2Gam(TypeLn(iGin),TypeLn(iGout),SpInVertex(1, Ira), SpInVertex(2, Ira))
+  typMasha = TypeSp2Gam(TypeLn(jGin),TypeLn(jGout),SpInVertex(1,Masha),SpInVertex(2, Masha))
   if(dir==1) then
     typW = TypeGam2W(typIra, typMasha)
   else
@@ -540,6 +540,376 @@ SUBROUTINE delete_worm_along_wline
 END SUBROUTINE delete_worm_along_wline
 
 
+
+!----- move worm along wline : Pupdate(5) --------------
+!-----   \2       4/                  \2        4/    ------
+!-----Ira ========= jGam     ==>  iGam ========== Ira ------
+!-----   /1       3\                  /1        3\    ------
+!-----------------------------------------------------------
+SUBROUTINE move_worm_along_wline
+  implicit none
+  integer :: dir, kW, kWold, flag
+  integer :: iGam, jGam, WLn, GLn1, GLn2
+  integer :: typiGam, typW
+  integer :: statiGam, statjGam, statW
+  double precision :: tau1, tau2, tau
+  double precision :: WWorm, Pacc
+  complex*16 :: WiGam, WjGam, WW
+  complex*16 :: Anew, Aold, sgn
+
+  !------- step1 : check if worm is present -------------
+  if(IsWormPresent .eqv. .false.)  return
+
+  !------- step2 : propose a new config -----------------
+  !propose to move Ira from iGam to jGam
+  iGam = Ira;  dir = DirecVertex(iGam)
+  WLn = NeighVertex(3, Ira)
+  jGam = NeighLn(3-dir, WLn)
+  if(jGam == Masha .or. jGam==Ira)  return
+
+  GLn1 = NeighVertex(1, iGam);     GLn2 = NeighVertex(2, iGam)
+
+  !------- step3 : configuration check ------------------
+  !-------- irreducibility check ------------------------
+  kWold = kLn(WLn)
+  kLn(WLn) = add_k(kWold, (-1)**dir *kMasha)
+
+  flag = 0
+  if(Is_reducible_W(WLn))   flag=1
+  if(flag==0) then
+    if(Is_reducible_W_Gam(WLn))  flag=1
+  endif
+
+  if(flag==1) then
+    kLn(WLn) = kWold
+    return
+  endif
+
+  !-------- the stat, type of the new config ----
+  statiGam = delete_ira_stat(StatusVertex(iGam))
+  statjGam = add_ira_stat(StatusVertex(jGam))
+  statW = line_stat(statiGam, statjGam)
+
+  typW = TypeLn(WLn)
+  typiGam = TypeSp2Gam(TypeLn(GLn1), TypeLn(GLn2), SpInVertex(1, iGam), SpInVertex(2, iGam))
+
+  !------- step4 : weight calculation -------------------
+  WWorm = weight_worm(GXVertex(jGam)-GXVertex(Masha), GYVertex(jGam)-GYVertex(Masha),  &
+    & WXVertex(jGam)-WXVertex(Masha), WYVertex(jGam)-WYVertex(Masha),T3Vertex(jGam)-T3Vertex(Masha))
+
+  tau1 = T3Vertex(iGam)-T2Vertex(iGam)
+  tau2 = T1Vertex(iGam)-T3Vertex(iGam)
+  WiGam = weight_vertex(statiGam, IsDeltaVertex(iGam), GXVertex(iGam)-WXVertex(iGam), &
+    GYVertex(iGam)-WYVertex(iGam), tau1, tau2, typiGam)
+
+  tau1 = T3Vertex(jGam)-T2Vertex(jGam)
+  tau2 = T1Vertex(jGam)-T3Vertex(jGam)
+  WjGam = weight_vertex(statjGam, IsDeltaVertex(jGam), GXVertex(jGam)-WXVertex(jGam), &
+    GYVertex(jGam)-WYVertex(jGam), tau1, tau2, TypeVertex(jGam))
+
+  tau = (-1.d0)**dir *(T3Vertex(iGam)-T3Vertex(jGam))
+  WW = weight_line(statW, IsDeltaLn(WLn), 2, WXVertex(iGam)-WXVertex(jGam), WYVertex(iGam) &
+    & -WYVertex(jGam), tau, typW)
+
+  Anew = WiGam *WjGam *WW 
+  Aold = WeightVertex(iGam) *WeightVertex(jGam) *WeightLn(WLn) 
+
+  call weight_ratio(Pacc, sgn, Anew, Aold)
+
+  Pacc = Pacc *WWorm/WeightWorm
+
+  !------- step5 : accept the update --------------------
+  ProbProp(Order, iupdate) = ProbProp(Order, iupdate) + 1
+  if(rn()<=Pacc) then
+
+    !------ update diagram info ---------------
+    Phase = Phase *sgn
+
+    !------ update Ira ------------------------
+    Ira = jGam
+
+    !------ update k --------------------------
+    call update_Hash4W(kWold, kLn(WLn)) 
+
+    !------ update type of elements -----------
+    TypeVertex(iGam) = typiGam
+    TypeLn(WLn) = typW
+
+    !------ update status of elements ---------
+    StatusVertex(iGam) = statiGam
+    StatusVertex(jGam) = statjGam
+
+    StatusLn(WLn) = statW
+
+    !------ update weight of elements ---------
+    WeightWorm = WWorm
+    WeightLn(WLn) = WW
+    WeightVertex(iGam) = WiGam
+    WeightVertex(jGam) = WjGam
+
+    call update_weight(Anew, Aold)
+
+    ProbAcc(Order, 5) = ProbAcc(Order, 5) + 1
+  else
+    kLn(WLn) = kWold
+  endif
+  return
+END SUBROUTINE move_worm_along_wline
+
+
+
+!----- move worm along gline : Pupdate(6) --------------
+!---------------------- dir = 1 ----------------------------
+!-----      Ira   jGam              iGam    Ira
+!----- --<--||--<--||--<--  =>  --<--||--<--||--<--
+!-----      ||     ||                ||     ||  
+!-----      ||     ||                ||     ||
+!-----------------------------------------------------------
+!---------------------- dir = 2 ----------------------------
+!-----      Ira   jGam              iGam    Ira
+!----- -->--||-->--||-->--  =>  -->--||-->--||-->--
+!-----      ||     ||                ||     ||  
+!-----      ||     ||                ||     ||
+!-----------------------------------------------------------
+SUBROUTINE move_worm_along_gline
+  implicit none
+  integer :: dir, kGold, flag, dx, dy
+  integer :: iGam, jGam, iW, jW, GLn
+  integer :: vertex1, vertex2
+  integer :: typG, typiGam, typjGam, typiW
+  integer, dimension(2) :: spiGam, spjGam
+  integer :: statiGam, statjGam, statiW, statjW, stat1, stat2
+  double precision :: tau1, tau2, tau
+  double precision :: WWorm, Pacc
+  complex*16 :: WiW, WjW, WiGam, WjGam, WG, Anew, Aold, sgn
+
+  !------- step1 : check if worm is present -------------
+  if(IsWormPresent .eqv. .false.)   return
+  !ProbProp(iupdate) = ProbProp(iupdate) + 1
+
+  !------- step2 : propose a new config -----------------
+  iGam = Ira;  iW = NeighLn(3, iGam)
+  dir = Floor(rn()*2.d0) + 1
+  GLn = NeighVertex(dir, iGam)
+  jGam = NeighLn(dir, GLn);    jW = NeighLn(3, jGam)
+  if(jGam==Masha .or. jGam==Ira)    return
+
+  if(dir==1) then
+    if(SpinMasha+TypeLn(GLn)==0 .or. SpinMasha+TypeLn(GLn)==3)  return
+  else 
+    if(SpinMasha+TypeLn(GLn)==-1 .or. SpinMasha+TypeLn(GLn)==4) return
+  endif
+  
+  kGold = kLn(GLn)
+  kLn(GLn) = add_k(kLn(GLn), (-1)**(dir+1) *kMasha)
+
+  !------- step3 : configuration check ------------------
+  !-------- irreducibility  check -----------------------
+  flag = 0
+  if(Is_reducible_G(GLn))          flag = 1
+  if(flag==0) then
+    if(Is_reducible_G_Gam(GLn))    flag = 1
+  endif
+
+  if(flag == 1) then
+    kLn(GLn) = kGold
+    return
+  endif
+
+  !----- type and status of the new config ---
+  statiGam = delete_ira_stat(StatusVertex(iGam))
+  statjGam = add_ira_stat(StatusVertex(jGam))
+
+  stat1 = StatusVertex(NeighLn(3-DirecVertex(iGam), iW))
+  statiW = line_stat(statiGam,  stat1)
+
+  stat2 = StatusVertex(NeighLn(3-DirecVertex(jGam), jW))
+  statjW = line_stat(statjGam,  stat2)
+
+  if(iW == jW) then
+    statiW = line_stat(statiGam, statjGam)
+    statjW = statiW
+  endif
+
+  typG = 3 - TypeLn(GLn)
+
+  if(SpInVertex(dir, iGam)==TypeLn(GLn)) then
+    !spiGam(dir) = 3- SpInVertex(dir, iGam)
+    spiGam(dir) = typG
+    spiGam(3-dir) = SpInVertex(3-dir, iGam)
+  else
+    spiGam(dir) = SpInVertex(dir, iGam)
+    spiGam(3-dir) = 3 - SpInVertex(3-dir, iGam)
+  endif
+
+  if(SpInVertex(3-dir, jGam)==TypeLn(GLn)) then
+    !spjGam(3-dir) = 3- SpInVertex(3-dir, jGam)
+    spjGam(3-dir) = typG
+    spjGam(dir) = SpInVertex(dir, jGam)
+  else
+    spjGam(3-dir) = SpInVertex(3-dir, jGam)
+    spjGam(dir) = 3 - SpInVertex(dir, jGam)
+  endif
+
+  if(dir == 1) then
+    typiGam = TypeSp2Gam(typG, TypeLn(NeighVertex(2, iGam)), spiGam(1), spiGam(2)) 
+    typjGam = TypeSp2Gam(TypeLn(NeighVertex(1, jGam)), typG, spjGam(1), spjGam(2))
+  else
+    typiGam = TypeSp2Gam(TypeLn(NeighVertex(1, iGam)), typG, spiGam(1), spiGam(2)) 
+    typjGam = TypeSp2Gam(typG, TypeLn(NeighVertex(2, jGam)), spjGam(1), spjGam(2))
+  endif
+
+  if(statiW==2 .or. statiW==3) then
+    typiW = TypeLn(iW)
+  else
+    if(DirecVertex(iGam)==1) then
+      typiW = TypeGam2W(typiGam, TypeVertex(NeighLn(2, iW)))
+    else 
+      typiW = TypeGam2W(TypeVertex(NeighLn(1, iW)), typiGam)
+    endif
+  endif
+
+  !------- step4 : weight calculation -------------------
+  WWorm = weight_worm(GXVertex(jGam)-GXVertex(Masha), GYVertex(jGam)-GYVertex(Masha),  &
+    & WXVertex(jGam)-WXVertex(Masha), WYVertex(jGam)-WYVertex(Masha),T3Vertex(jGam)-T3Vertex(Masha))
+
+  tau1 = T3Vertex(iGam)-T2Vertex(iGam)
+  tau2 = T1Vertex(iGam)-T1Vertex(iGam)
+  WiGam = weight_vertex(statiGam, IsDeltaVertex(iGam),GXVertex(iGam)-WXVertex(iGam),   &
+    & GYVertex(iGam)-WYVertex(iGam), tau1, tau2, typiGam)
+
+  tau1 = T3Vertex(jGam)-T2Vertex(jGam)
+  tau2 = T1Vertex(jGam)-T1Vertex(jGam)
+  WjGam = weight_vertex(statjGam, IsDeltaVertex(jGam),GXVertex(jGam)-WXVertex(jGam),   &
+    & GYVertex(jGam)-WYVertex(jGam), tau1, tau2, typjGam)
+
+  vertex1 = NeighLn(1, iW)
+  vertex2 = NeighLn(2, iW)
+  tau = T3Vertex(vertex2) - T3Vertex(vertex1)
+  dx  = WXVertex(vertex2) - WXVertex(vertex1)
+  dy  = WYVertex(vertex2) - WYVertex(vertex1)
+  WiW = weight_line(statiW, IsDeltaLn(iW), 2, dx, dy, tau, typiW)
+
+  vertex1 = NeighLn(1, jW)
+  vertex2 = NeighLn(2, jW)
+  tau = T3Vertex(vertex2) - T3Vertex(vertex1)
+  dx  = WXVertex(vertex2) - WXVertex(vertex1)
+  dy  = WYVertex(vertex2) - WYVertex(vertex1)
+  WjW = weight_line(statjW, IsDeltaLn(jW), 2, dx, dy, tau, TypeLn(jW))
+
+  tau = T2Vertex(NeighLn(2, GLn)) - T1Vertex(NeighLn(1, GLn))
+  WG = weight_line(StatusLn(GLn), IsDeltaLn(GLn), 1, 0, 0, tau, typG)
+
+  Anew = WiGam *WjGam *WiW *WjW *WG
+  Aold = WeightVertex(iGam) *WeightVertex(jGam) *WeightLn(iW) *WeightLn(jW) *WeightLn(GLn)
+
+  if(Anew==0.d0)  return
+
+  if(iW==jW) then
+    Anew = Anew/WjW
+    Aold = Aold/WeightLn(jW)
+  endif
+
+  call weight_ratio(Pacc, sgn, Anew, Aold)
+
+  Pacc = Pacc *WWorm/WeightWorm
+
+  !------- step5 : accept the update --------------------
+  ProbProp(Order, iupdate) = ProbProp(Order, iupdate) + 1
+  if(rn()<=Pacc) then
+
+    !----- update the diagram info -------------- 
+    Phase = Phase *sgn
+
+    !---- update Ira and Masha ------------------
+    Ira = jGam
+
+    !---- update omega and k --------------------
+    call update_Hash4G(kGold, kLn(GLn))
+    
+    !----- update type configuration ------------
+    TypeLn(GLn) = typG
+    TypeLn(iW)  = typiW
+
+    TypeVertex(iGam) = typiGam
+    TypeVertex(jGam) = typjGam
+
+    SpInVertex(:, iGam) = spiGam(:)
+    SpInVertex(:, jGam) = spjGam(:)
+
+    !---- update the status of elements ---------
+    StatusVertex(iGam) = statiGam
+    StatusVertex(jGam) = statjGam
+    StatusLn(iW) = statiW
+    StatusLn(jW) = statjW
+
+    !---- update the weight of elements ---------
+    WeightWorm = WWorm
+
+    WeightLn(GLn) = WG
+    WeightLn(iW) = WiW
+    WeightLn(jW) = WjW
+    WeightVertex(iGam) = WiGam
+    WeightVertex(jGam) = WjGam
+
+    call update_weight(Anew, Aold)
+
+    ProbAcc(Order, 6) = ProbAcc(Order, 6) + 1
+  else
+    kLn(GLn) = kGold
+  endif
+END SUBROUTINE move_worm_along_gline
+!-----------------------------------------------------------
+
+
+
+
+
+
+!------------- add interaction : Pupdate(7) -----------------
+!---------------------- dir = 1, dirW = 1 ------------------------
+!------               GamC                     GamA     GamC -----
+!------    Ira ----<----            Ira ----<---||---<-----  -----
+!------                     ==>                 \/           -----
+!------  Masha ----<----          Masha ----<---||---<-----  -----
+!------               GamD                     GamB     GamD -----
+!-----------------------------------------------------------------
+!---------------------- dir = 1, dirW = 2 ------------------------
+!------               GamC                     GamA     GamC -----
+!------    Ira ----<----            Ira ----<---||---<-----  -----
+!------                     ==>                 /\           -----
+!------  Masha ----<----          Masha ----<---||---<-----  -----
+!------               GamD                     GamB     GamD -----
+!-----------------------------------------------------------------
+!---------------------- dir = 2, dirW = 1 ------------------------
+!------               GamC                     GamA     GamC -----
+!------    Ira ---->----            Ira ---->---||--->-----  -----
+!------                     ==>                 \/           -----
+!------  Masha ---->----          Masha ---->---||--->-----  -----
+!------               GamD                     GamB     GamD -----
+!-----------------------------------------------------------------
+!---------------------- dir = 2, dirW = 2 ------------------------
+!------               GamC                     GamA     GamC -----
+!------    Ira ---->----            Ira ---->---||--->-----  -----
+!------                     ==>                 /\           -----
+!------  Masha ---->----          Masha ---->---||--->-----  -----
+!------               GamD                     GamB     GamD -----
+!-----------------------------------------------------------------
+!SUBROUTINE add_interaction
+  !implicit none
+  !integer :: i, dir, dirW, flag
+  !integer :: WAB, GIC, GMD, GIA, GMB
+  !integer :: GamA, GamB, GamC, GamD
+  !integer :: sp, typGamA, typGamB, typAB
+  !integer :: statIA, statAC, statMB, statBD
+  !integer :: kIA, kMB, kM, q
+  !integer :: dxwA, dywA, dxwB, dywB, xwA, ywA, xwB, ywB
+  !double precision :: WWorm, Pacc
+  !complex*16 :: WA, WB, WGIA, WGAC, WGMB, WGBD, WIra, WMasha, WWAB, WMeasureGam
+  !double precision :: Anew, Aold, sgn
+
+  !return
+!END SUBROUTINE add_interaction
 
 
 SUBROUTINE change_gline_time
@@ -707,8 +1077,7 @@ SUBROUTINE change_Gamma_type
 
     !------ update the site of elements --------------
     TypeVertex(iGam)    = typGam
-    TypeVertexIn(iGam)  = 3-TypeVertexIn(iGam)
-    TypeVertexOut(iGam) = 3-TypeVertexOut(iGam)
+    SpInVertex(:, iGam)  = 3-SpInVertex(:, iGam)
     TypeLn(iWLn)     = typW
 
     !------ update the weight of elements ------------
@@ -1093,691 +1462,6 @@ END SUBROUTINE switch_ira_and_masha
 !====================================================================
 
 
-
-!!=======================================================================
-!!================= IRREDUCIBILITY CHECK ================================
-!!=======================================================================
-
-!-------- update G Hash table -----------------------------------
-SUBROUTINE update_Hash4G(oldk, newk)
-  implicit none
-  integer, intent(in) :: oldk, newk
-
-  if(Hash4G(oldk)==1) then
-    Hash4G(oldk)=0
-  else
-    if(CheckG) then
-      write(*, *) "===================================="
-      write(*, *) "Oops, update_Hash4G found a bug!"
-      write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-      write(*, *) "G Hash table for old k", oldk, " is not 1!!", Hash4G(oldk)
-      write(*, *) "===================================="
-      call print_config
-      stop
-    endif
-  endif
-
-  if(Hash4G(newk)==0) then
-    Hash4G(newk)=1
-  else
-    if(CheckG) then
-      write(*, *) "===================================="
-      write(*, *) "Oops, update_Hash4G found a bug!"
-      write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-      write(*, *) "G Hash table for new k", newk, " is not 0!!", Hash4G(newk)
-      write(*, *) "===================================="
-      call print_config
-      stop
-    endif
-  endif
-
-  return
-END SUBROUTINE update_Hash4G
-
-SUBROUTINE add_Hash4G(newk)
-  implicit none
-  integer, intent(in) :: newk
-  if(Hash4G(newk)==0) then
-    Hash4G(newk)=1
-  else
-    if(CheckG) then
-      write(*, *) "===================================="
-      write(*, *) "Oops, add_Hash4G found a bug!"
-      write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-      write(*, *) "G Hash table for new k", newk, " is not 0!!", Hash4G(newk)
-      write(*, *) "===================================="
-      call print_config
-      stop
-    endif
-  endif
-  return
-END SUBROUTINE add_Hash4G
-
-SUBROUTINE delete_Hash4G(oldk)
-  implicit none
-  integer, intent(in) :: oldk
-  if(Hash4G(oldk)==1) then
-    Hash4G(oldk)=0
-  else
-    if(CheckG) then
-      write(*, *) "===================================="
-      write(*, *) "Oops, delete_Hash4G found a bug!"
-      write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-      write(*, *) "G Hash table for old k", oldk, " is not 1!!", Hash4G(oldk)
-      write(*, *) "===================================="
-      call print_config
-      stop
-    endif
-  endif
-  return
-END SUBROUTINE delete_Hash4G
-
-
-!-------- update W Hash table -----------------------------------
-SUBROUTINE update_Hash4W(oldk, newk)
-  implicit none
-  integer, intent(in) :: oldk, newk
-  integer :: aoldk, anewk
-  aoldk = abs(oldk)
-  anewk = abs(newk)
-
-  if(Hash4W(aoldk)==1) then
-    Hash4W(aoldk)=0
-  else
-    if(CheckW) then
-      write(*, *) "===================================="
-      write(*, *) "Oops, update_Hash4W found a bug!"
-      write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-      write(*, *) "W Hash table for old k", aoldk, " is not 1!!", Hash4W(aoldk)
-      write(*, *) "===================================="
-      call print_config
-      stop
-    endif
-  endif
-
-  if(Hash4W(anewk)==0) then
-    Hash4W(anewk)=1
-  else
-    if(CheckW) then
-      write(*, *) "===================================="
-      write(*, *) "Oops, update_Hash4W found a bug!"
-      write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-      write(*, *) "W Hash table for new k", anewk, " is not 0!!", Hash4W(anewk)
-      write(*, *) "===================================="
-      call print_config
-      stop
-    endif
-  endif
-  return
-END SUBROUTINE update_Hash4W
-
-SUBROUTINE add_Hash4W(newk)
-  implicit none
-  integer, intent(in) :: newk
-  integer :: anewk
-  anewk = abs(newk)
-
-  if(Hash4W(anewk)==0) then
-    Hash4W(anewk)=1
-  else
-    if(CheckW) then
-      write(*, *) "===================================="
-      write(*, *) "Oops, add_Hash4W found a bug!"
-      write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-      write(*, *) "W Hash table for new k", anewk, " is not 0!!", Hash4W(anewk)
-      write(*, *) "===================================="
-      call print_config
-      stop
-    endif
-  endif
-  return
-END SUBROUTINE add_Hash4W
-
-SUBROUTINE delete_Hash4W(oldk)
-  implicit none
-  integer, intent(in) :: oldk
-  integer :: aoldk
-  aoldk = abs(oldk)
-
-  if(Hash4W(aoldk)==1) then
-    Hash4W(aoldk)=0
-  else
-    if(CheckW) then
-      write(*, *) "===================================="
-      write(*, *) "Oops, delete_Hash4W found a bug!"
-      write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-      write(*, *) "W Hash table for old k", aoldk, " is not 1!!", Hash4W(aoldk)
-      write(*, *) "===================================="
-      call print_config
-      stop
-    endif
-  endif
-  return
-END SUBROUTINE delete_Hash4W
-
-
-
-!--------- check the irreducibility for G -----------------------
-LOGICAL FUNCTION Is_reducible_G(GLn)
-  implicit none
-  integer, intent(in) :: GLn
-  integer :: newk
-
-  Is_reducible_G = .false.
-  newk = kLn(GLn)
-
-  if(Is_k_valid(newk) .eqv. .false.) then
-    Is_reducible_G = .true.
-    return
-  endif
-
-  if(CheckG) then
-    if(Hash4G(newk)==1) then
-      Is_reducible_G = .true.
-      return
-    else if(Hash4G(newk)/=0) then
-      write(*, *) "===================================="
-      write(*, *) "Oops, Is_reducible_G found a bug!"
-      write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-      write(*, *) "G Hash table for new k", newk, " is not 0 or 1!!", Hash4G(newk)
-      write(*, *) "===================================="
-      call print_config
-      stop
-    endif
-  endif
-    
-  return
-END FUNCTION Is_reducible_G
-
-
-LOGICAL FUNCTION Is_reducible_G_Gam(GLn)
-  implicit none
-  integer, intent(in) :: GLn
-  integer :: nG, Gam1, Gam2, W1, W2, nW
-  integer :: newk, kG 
-  integer :: i, nnk1, nnk2
-
-  Is_reducible_G_Gam = .false.
-  newk = kLn(GLn)
-
-  Gam1 = NeighLn(1, GLn)
-  Gam2 = NeighLn(2, GLn)
-  W1 = NeighVertex(3, Gam1)
-  W2 = NeighVertex(3, Gam2)
-
-  if(CheckGam) then
-    do i = 1, NGLn
-      nG = GLnKey2Value(i)
-      kG = kLn(nG)
-      if(nG==GLn)   cycle             !! rule out the line itself
-      if(nG==NeighVertex(1, Gam1) .or. nG==NeighVertex(2, Gam2)) cycle
-      if(abs(add_k(newk,-kG))==abs(kLn(W1)) .or. &
-        & abs(add_k(newk,-kG))==abs(kLn(W2))) cycle !! rule out the neighbor wlines of newk
-      nnk1 = kLn(NeighVertex(3, NeighLn(1, nG)))
-      nnk2 = kLn(NeighVertex(3, NeighLn(2, nG)))
-      if(abs(add_k(newk, -kG))==abs(nnk1) .or. &
-        & abs(add_k(newk, -kG))==abs(nnk2)) cycle !! rule out the neighbor wlines of neighbor of newk
-
-      if(Hash4W(abs(add_k(newk,-kG)))==1) then
-        Is_reducible_G_Gam = .true.
-      endif
-    enddo
-  endif
-    
-  return
-END FUNCTION Is_reducible_G_Gam
-
-
-
-
-!--------- check the irreducibility for W -----------------------
-LOGICAL FUNCTION Is_reducible_W(WLn)
-  implicit none
-  integer, intent(in) :: WLn
-  integer :: absk 
-
-  absk = abs(kLn(WLn))
-  Is_reducible_W = .false.
-
-  if(Is_k_valid(absk) .eqv. .false. ) then
-    Is_reducible_W = .true.
-    return
-  endif
-
-  if(CheckW) then
-    if(absk==0) then
-      Is_reducible_W = .true.
-      return
-    endif
-
-    if(Hash4W(absk)==1) then
-      Is_reducible_W = .true.
-      return
-    else if(Hash4W(absk)/=0) then
-      write(*, *) "===================================="
-      write(*, *) "Oops, Is_reducible_W found a bug!"
-      write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-      write(*, *) "W Hash table for new k", absk, " is not 0 or 1!!", Hash4W(absk)
-      write(*, *) "===================================="
-      call print_config
-      stop
-    endif
-  endif
-
-  return
-END FUNCTION Is_reducible_W
-
-
-
-!--------- check the irreducibility for W -----------------------
-LOGICAL FUNCTION Is_reducible_W_Gam(WLn)
-  implicit none
-  integer, intent(in) :: WLn
-  integer :: absk, i, Gam1, Gam2, G1, G2, G3, G4, kG5, kG6
-  integer :: nG, kG, pkGG, nkGG
-
-  absk = abs(kLn(WLn))
-  Is_reducible_W_Gam = .false.
-  Gam1 = NeighLn(1, WLn)
-  Gam2 = NeighLn(2, WLn)
-  G1 = NeighVertex(1, Gam1)
-  G2 = NeighVertex(2, Gam1)
-  G3 = NeighVertex(1, Gam2)
-  G4 = NeighVertex(2, Gam2)
-
-  if(CheckGam) then
-    do i = 1, NGLn
-      nG = GLnKey2Value(i)
-      kG5 = kLn(NeighVertex(1, NeighLn(1,nG)))
-      kG6 = kLn(NeighVertex(2, NeighLn(2,nG)))
-      kG = kLn(nG)
-      if(nG==G1 .or. nG==G2 .or. nG==G3 .or. nG==G4) cycle
-      pkGG = add_k(kG, absk)
-      nkGG = add_k(kG, -absk)
-      if(pkGG==kLn(G1) .or. pkGG==kLn(G2) .or. pkGG==kLn(G3) .or. pkGG==kLn(G4)) cycle
-      if(nkGG==kLn(G1) .or. nkGG==kLn(G2) .or. nkGG==kLn(G3) .or. nkGG==kLn(G4)) cycle
-      if(pkGG==kG5 .or. pkGG==kG6 .or. nkGG==kG5 .or. nkGG==kG6) cycle
-
-      if(Hash4G(pkGG)==1 .or. Hash4G(nkGG)==1) then
-        Is_reducible_W_Gam = .true.
-      endif
-    enddo
-  endif
-  return
-END FUNCTION Is_reducible_W_Gam
-
-!!=======================================================================
-!!=======================================================================
-!!=======================================================================
-
-
-
-
-
-
-!!=======================================================================
-!!================= SUBROUTINES IN UPDATES ==============================
-!!=======================================================================
-
-!-- change the status from normal or measuring to i/m or measuring+i/m --
-INTEGER FUNCTION add_ira_stat(stat)
-  implicit none
-  integer, intent(in) :: stat
-  if(stat == -1) then
-    write(*, *)  "add_ira_stat, stat = -1"
-    call print_config
-    stop
-  endif
-  if(stat<=1) then
-    add_ira_stat = stat + 2
-  else
-    add_ira_stat = stat
-  endif
-  if(add_ira_stat>=4) then
-    write(*, *)  IsWormPresent, iupdate, "add_ira_stat, stat > 3", add_ira_stat
-    call print_config
-    stop
-  endif
-END FUNCTION add_ira_stat
-
-!-- change the status from i/m or measuring+i/m to normal or measuring--
-INTEGER FUNCTION delete_ira_stat(stat)
-  implicit none
-  integer, intent(in) :: stat
-  if(stat == -1) then
-    write(*, *)  IsWormPresent, iupdate, "del_ira_stat, stat = -1"
-    call print_config
-    stop
-  endif
-  delete_ira_stat = stat - 2
-  if(delete_ira_stat == -2) delete_ira_stat = 0
-  if(delete_ira_stat == -1) delete_ira_stat = 1
-  if(delete_ira_stat<0) then
-    write(*, *)  IsWormPresent, iupdate, "del_ira_stat, stat < 0", delete_ira_stat
-    call print_config
-    stop
-  endif
-END FUNCTION delete_ira_stat
-
-!-- change the status from normal or i/m to measuring or measuring+i/m --
-INTEGER FUNCTION add_mea_stat(stat)
-  implicit none
-  integer, intent(in) :: stat
-  if(stat == -1) then
-    write(*, *)  "add_mea_stat, stat = -1"
-    call print_config
-    stop
-  endif
-
-  add_mea_stat = stat + 1
-  if(add_mea_stat == 2)   add_mea_stat = 1
-
-  if(add_mea_stat>=4) then
-    write(*, *)  IsWormPresent, iupdate, "add_mea_stat, stat > 3", add_mea_stat
-    call print_config
-    stop
-  endif
-END FUNCTION add_mea_stat
-
-!-- change the status from measuring or measuring+i/m to normal or i/m--
-INTEGER FUNCTION delete_mea_stat(stat)
-  implicit none
-  integer,intent(in) :: stat
-  if(stat == -1) then
-    write(*, *)  "del_mea_stat, stat = -1"
-    call print_config
-    stop
-  endif
-  delete_mea_stat = stat - 1
-  if(delete_mea_stat<0) then
-    write(*, *)  IsWormPresent, iupdate, "del_mea_stat, stat < 0", delete_mea_stat
-    call print_config
-    stop
-  endif
-END FUNCTION delete_mea_stat
-
-!--- calculate the status of a line according to the neighbor vertexes --
-INTEGER FUNCTION line_stat(stat1, stat2)
-  implicit none
-  integer :: stat1, stat2
-  if(stat1 == -1) stop
-  if(stat2 == -1) stop
-  line_stat = stat1 + stat2
-  if(stat1 == stat2) then
-    line_stat = stat1
-  else if(line_stat == 5) then
-    line_stat = 3
-  endif
-
-  if(line_stat>3) then
-    write(*, *) "line_stat error!", line_stat, stat1, stat2
-    call print_config
-    stop
-  endif
-  return
-END FUNCTION line_stat
-
-
-!------------- insert a line to the link -------------------
-SUBROUTINE insert_line(newline, isdelta, k, knd, typ, stat, weigh)
-  implicit none
-  integer, intent(out) :: newline
-  integer, intent(in) :: isdelta, k, knd, typ, stat
-  double precision, intent(in) :: weigh
-
-  newline = TailLn
-  TailLn  = NextLn(TailLn)
-  if(StatusLn(TailLn)>=0) then
-    write(*, *) IsWormPresent, iupdate, "insert_line error!!!"
-    call print_config
-    stop
-  endif
-
-  if(TailLn == -1) then
-    write(*, *) "Tail=-1! Too many lines!"
-    call print_config
-    stop
-  endif
-
-  if(knd==1) then
-    NGLn = NGLn + 1
-    GLnKey2Value(NGLn) = newline
-    LnValue2Key(newline) = NGLn
-  else
-    NWLn = NWLn + 1
-    WLnKey2Value(NWLn) = newline
-    LnValue2Key(newline) = NWLn
-  endif
-
-  kLn(newline) = k
-  IsDeltaLn(newline) = isdelta
-  KindLn(newline) = knd
-  TypeLn(newline) = typ
-  StatusLn(newline) = stat
-  WeightLn(newline) = weigh
-  return
-END SUBROUTINE insert_line
-
-!------------- undo_insert a line from the link -------------------
-SUBROUTINE undo_insert_line(occline, knd)
-  implicit none
-  integer, intent(in) :: occline, knd
-  integer :: tmp
-
-  if(StatusLn(occline)==-1) then
-    write(*, *) IsWormPresent, iupdate, "delete_line error!!!"
-    call print_config
-    stop
-  endif
-
-  NextLn(occline) = TailLn
-  StatusLn(occline) = -1
-  TailLn = occline
-
-  if(knd==1) then
-
-    tmp = GLnKey2Value(NGLn)
-    GLnKey2Value(NGLn) = 0
-    GLnKey2Value(LnValue2Key(occline)) = tmp
-    LnValue2Key(tmp) = LnValue2Key(occline)
-    NGLn = NGLn -1
-  else
-
-    tmp = WLnKey2Value(NWLn)
-    WLnKey2Value(NWLn) = 0
-    WLnKey2Value(LnValue2Key(occline)) = tmp
-    LnValue2Key(tmp) = LnValue2Key(occline)
-    NWLn = NWLn -1
-  endif
-
-  if(TailLn == -1) then
-    write(*, *) "Tail=-1! Too many lines!"
-    stop
-  endif
-  return
-END SUBROUTINE undo_insert_line
-
-
-!------------- insert a gamma to the link -------------------
-SUBROUTINE insert_gamma(newgamma, isdelta, gx, gy, wx, wy, t1, t2, t3, dir, typ, stat, weigh)
-  implicit none
-  integer, intent(out) :: newgamma
-  integer, intent(in) :: gx, gy, wx, wy, isdelta, dir, typ, stat
-  double precision, intent(in) :: weigh, t1, t2, t3
-
-  newgamma = TailVertex
-  TailVertex = NextVertex(TailVertex)
-  if(StatusVertex(TailVertex)>=0) then
-    write(*, *) IsWormPresent, iupdate, "insert_gamma error!!!"
-    call print_config
-    stop
-  endif
-
-  if(TailVertex == -1) then
-    write(*, *) "Tail=-1! Too many gammas!"
-    stop
-  endif
-   
-  NVertex = NVertex + 1
-  VertexKey2Value(NVertex) = newgamma
-  VertexValue2Key(newgamma) = NVertex
-
-  IsDeltaVertex(newgamma) = isdelta
-  GXVertex(newgamma) = gx
-  GYVertex(newgamma) = gy
-  WXVertex(newgamma) = wx
-  WYVertex(newgamma) = wy
-  T1Vertex(newgamma) = t1
-  T2Vertex(newgamma) = t2
-  T3Vertex(newgamma) = t3
-  DirecVertex(newgamma) = dir
-  TypeVertex(newgamma) = typ
-  TypeVertexIn(newgamma) = typ
-  TypeVertexOut(newgamma) = typ
-  StatusVertex(newgamma) = stat
-  WeightVertex(newgamma) = weigh
-  return
-END SUBROUTINE insert_gamma
-
-!------------- delete a line from the link -------------------
-SUBROUTINE delete_line(occline, knd)
-  implicit none
-  integer, intent(in) :: occline, knd
-  integer :: tmp
-
-  
-  if(knd==1) then
-    !call delete_Hash4G(kLn(occline))
-  else
-    call delete_Hash4W(kLn(occline))
-  endif
-
-  if(StatusLn(occline)==-1) then
-    write(*, *) IsWormPresent, iupdate, "delete_line error!!!"
-    call print_config
-    stop
-  endif
-
-  NextLn(occline) = TailLn
-  StatusLn(occline) = -1
-  TailLn = occline
-
-  if(knd==1) then
-
-    tmp = GLnKey2Value(NGLn)
-    GLnKey2Value(NGLn) = 0
-    GLnKey2Value(LnValue2Key(occline)) = tmp
-    LnValue2Key(tmp) = LnValue2Key(occline)
-    NGLn = NGLn -1
-  else
-
-    tmp = WLnKey2Value(NWLn)
-    WLnKey2Value(NWLn) = 0
-    WLnKey2Value(LnValue2Key(occline)) = tmp
-    LnValue2Key(tmp) = LnValue2Key(occline)
-    NWLn = NWLn -1
-  endif
-
-  if(TailLn == -1) then
-    write(*, *) "Tail=-1! Too many lines!"
-    stop
-  endif
-  return
-END SUBROUTINE delete_line
-
-!------------- insert a gamma to the link -------------------
-SUBROUTINE undo_delete_line(newline, knd, stat)
-  implicit none
-  integer, intent(in) :: newline, knd, stat
-
-  if(TailLn/=newline)    then
-    write(*, *) "undo_delete_line error!"
-    call print_config
-    stop
-  endif
-  StatusLn(newline) = stat
-  TailLn = NextLn(newline)
-  if(TailLn == -1) then
-    write(*, *) "Tail=-1! Too many glines!"
-    call print_config
-    stop
-  endif
-
-  if(knd==1) then
-    NGLn = NGLn + 1
-    GLnKey2Value(NGLn) = newline
-    LnValue2Key(newline) = NGLn
-    !call add_Hash4G(kLn(newline))
-  else
-    NWLn = NWLn + 1
-    WLnKey2Value(NWLn) = newline
-    LnValue2Key(newline) = NWLn
-    call add_Hash4W(kLn(newline))
-  endif
-  return
-END SUBROUTINE undo_delete_line
-
-
-!------------- delete a gamma from the link -------------------
-SUBROUTINE delete_gamma(occgamma)
-  implicit none
-  integer, intent(in) :: occgamma
-  integer :: tmp
-
-  if(StatusVertex(occgamma)==-1) then
-    write(*, *) IsWormPresent, iupdate, occgamma, StatusVertex(occgamma), "delete_gamma error!!!"
-    call print_config
-    stop
-  endif
-  NextVertex(occgamma) = TailVertex
-  StatusVertex(occgamma) = -1
-  TailVertex = occgamma
-
-  tmp = VertexKey2Value(NVertex)
-  VertexKey2Value(NVertex) = 0
-  VertexKey2Value(VertexValue2Key(occgamma)) = tmp
-  VertexValue2Key(tmp) = VertexValue2Key(occgamma)
-  NVertex = NVertex -1
-
-  if(TailVertex == -1) then
-    write(*, *) "Tail=-1! Too many vertexes!"
-    stop
-  endif
-  return
-END SUBROUTINE delete_gamma
-
-
-SUBROUTINE undo_delete_gamma(newgamma)
-  implicit none
-  integer, intent(in) :: newgamma
-
-  if(TailVertex/=newgamma)    then
-    write(*, *) "undo_delete_gamma error!"
-    stop
-  endif
-  StatusVertex(newgamma) = 0
-
-  TailVertex = NextVertex(newgamma)
-  if(TailVertex == -1) then
-    write(*, *) "Tail=-1! Too many gammas!"
-    stop
-  endif
-   
-  NVertex = NVertex + 1
-  VertexKey2Value(NVertex) = newgamma
-  VertexValue2Key(newgamma) = NVertex
-
-  return
-END SUBROUTINE undo_delete_gamma
-!!=======================================================================
-!!=======================================================================
-!!=======================================================================
-
-
-
-
-
-
 !====================================================================
 !============================== WEIGHTS =============================
 !====================================================================
@@ -1954,7 +1638,7 @@ SUBROUTINE print_config
   do i = 1, NVertex
     iv = VertexKey2Value(i)
     if(StatusVertex(iv) <0) cycle
-    write(8, 12) iv,IsDeltaVertex(iv), TypeVertex(iv),TypeVertexIn(iv),TypeVertexOut(iv), &
+    write(8, 12) iv,IsDeltaVertex(iv), TypeVertex(iv),SpInVertex(1, iv),SpInVertex(2, iv), &
       & GXVertex(iv),GYVertex(iv),WXVertex(iv),WYVertex(iv), T1Vertex(iv), T2Vertex(iv),  &
       & T3Vertex(iv), DirecVertex(iv), StatusVertex(iv), NeighVertex(:,iv)
   enddo
@@ -2017,9 +1701,9 @@ SUBROUTINE measure
   if(TypeVertex(MeasureGam)==5 .or. TypeVertex(MeasureGam)==6) then
     typ = 11-TypeVertex(MeasureGam)
   else if(TypeVertex(MeasureGam)==1 .or. TypeVertex(MeasureGam)==3) then
-    typ = TypeGW2Gam(1,1,spw,spw)
+    typ = TypeSp2Gam(1,1,spw,spw)
   else if(TypeVertex(MeasureGam)==2 .or. TypeVertex(MeasureGam)==4) then
-    typ = TypeGW2Gam(2,2,spw,spw)
+    typ = TypeSp2Gam(2,2,spw,spw)
   endif
   ityp = (typ+1)/2
 

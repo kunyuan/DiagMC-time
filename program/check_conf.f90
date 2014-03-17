@@ -315,14 +315,14 @@ SUBROUTINE check_type
 
     flag = 0
     if(StatusLn(i)<=1) then
-      if(TypeVertex(Gam1)/=TypeGW2Gam(TypeLn(G1),TypeLn(G2),&
-        & TypeVertexIn(Gam1),TypeVertexOut(Gam1))) flag=1
-      if(TypeVertex(Gam2)/=TypeGW2Gam(TypeLn(G3),TypeLn(G4),&
-        & TypeVertexIn(Gam2),TypeVertexOut(Gam2))) flag=2
+      if(TypeVertex(Gam1)/=TypeSp2Gam(TypeLn(G1),TypeLn(G2),&
+        & SpInVertex(1, Gam1),SpInVertex(2, Gam1))) flag=1
+      if(TypeVertex(Gam2)/=TypeSp2Gam(TypeLn(G3),TypeLn(G4),&
+        & SpInVertex(1, Gam2),SpInVertex(2, Gam2))) flag=2
       if(TypeLn(i)/=TypeGam2W(TypeVertex(Gam1), TypeVertex(Gam2)))  flag=3
     endif
     if(sum1+2*(TypeLn(G1)+TypeLn(G3)-TypeLn(G2)-TypeLn(G4))/=0) flag=4
-    if(sum1+2*(TypeVertexIn(Gam1)+TypeVertexIn(Gam2)-TypeVertexOut(Gam1)-TypeVertexOut(Gam2))/=0) flag=5
+    if(sum1+2*(SpInVertex(1, Gam1)+SpInVertex(1, Gam2)-SpInVertex(2, Gam1)-SpInVertex(2, Gam2))/=0) flag=5
 
     if(flag==1 .or. flag==2) then
       write(*, *) "================================================="
@@ -359,8 +359,7 @@ SUBROUTINE check_type
       write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
       write(*, *) "The type of gamma inside lines are wrong!"
       write(*, *) "wline's number", i, "Gamma", Gam1, Gam2
-      write(*, *) sum1, TypeVertexIn(Gam1), TypeVertexIn(Gam2), TypeVertexOut(Gam2), &
-        & TypeVertexOut(Gam2)
+      write(*, *) sum1, SpInVertex(:, Gam1), SpInVertex(:, Gam2)
       write(*, *) "================================================="
       call print_config
       stop

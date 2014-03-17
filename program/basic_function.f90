@@ -345,6 +345,689 @@ END FUNCTION generate_gamma
 
 
 
+!!=======================================================================
+!!================= IRREDUCIBILITY CHECK ================================
+!!=======================================================================
+
+!-------- update G Hash table -----------------------------------
+SUBROUTINE update_Hash4G(oldk, newk)
+  implicit none
+  integer, intent(in) :: oldk, newk
+
+  if(Hash4G(oldk)==1) then
+    Hash4G(oldk)=0
+  else
+    if(CheckG) then
+      write(*, *) "===================================="
+      write(*, *) "Oops, update_Hash4G found a bug!"
+      write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
+      write(*, *) "G Hash table for old k", oldk, " is not 1!!", Hash4G(oldk)
+      write(*, *) "===================================="
+      call print_config
+      stop
+    endif
+  endif
+
+  if(Hash4G(newk)==0) then
+    Hash4G(newk)=1
+  else
+    if(CheckG) then
+      write(*, *) "===================================="
+      write(*, *) "Oops, update_Hash4G found a bug!"
+      write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
+      write(*, *) "G Hash table for new k", newk, " is not 0!!", Hash4G(newk)
+      write(*, *) "===================================="
+      call print_config
+      stop
+    endif
+  endif
+
+  return
+END SUBROUTINE update_Hash4G
+
+SUBROUTINE add_Hash4G(newk)
+  implicit none
+  integer, intent(in) :: newk
+  if(Hash4G(newk)==0) then
+    Hash4G(newk)=1
+  else
+    if(CheckG) then
+      write(*, *) "===================================="
+      write(*, *) "Oops, add_Hash4G found a bug!"
+      write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
+      write(*, *) "G Hash table for new k", newk, " is not 0!!", Hash4G(newk)
+      write(*, *) "===================================="
+      call print_config
+      stop
+    endif
+  endif
+  return
+END SUBROUTINE add_Hash4G
+
+SUBROUTINE delete_Hash4G(oldk)
+  implicit none
+  integer, intent(in) :: oldk
+  if(Hash4G(oldk)==1) then
+    Hash4G(oldk)=0
+  else
+    if(CheckG) then
+      write(*, *) "===================================="
+      write(*, *) "Oops, delete_Hash4G found a bug!"
+      write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
+      write(*, *) "G Hash table for old k", oldk, " is not 1!!", Hash4G(oldk)
+      write(*, *) "===================================="
+      call print_config
+      stop
+    endif
+  endif
+  return
+END SUBROUTINE delete_Hash4G
+
+
+!-------- update W Hash table -----------------------------------
+SUBROUTINE update_Hash4W(oldk, newk)
+  implicit none
+  integer, intent(in) :: oldk, newk
+  integer :: aoldk, anewk
+  aoldk = abs(oldk)
+  anewk = abs(newk)
+
+  if(Hash4W(aoldk)==1) then
+    Hash4W(aoldk)=0
+  else
+    if(CheckW) then
+      write(*, *) "===================================="
+      write(*, *) "Oops, update_Hash4W found a bug!"
+      write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
+      write(*, *) "W Hash table for old k", aoldk, " is not 1!!", Hash4W(aoldk)
+      write(*, *) "===================================="
+      call print_config
+      stop
+    endif
+  endif
+
+  if(Hash4W(anewk)==0) then
+    Hash4W(anewk)=1
+  else
+    if(CheckW) then
+      write(*, *) "===================================="
+      write(*, *) "Oops, update_Hash4W found a bug!"
+      write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
+      write(*, *) "W Hash table for new k", anewk, " is not 0!!", Hash4W(anewk)
+      write(*, *) "===================================="
+      call print_config
+      stop
+    endif
+  endif
+  return
+END SUBROUTINE update_Hash4W
+
+SUBROUTINE add_Hash4W(newk)
+  implicit none
+  integer, intent(in) :: newk
+  integer :: anewk
+  anewk = abs(newk)
+
+  if(Hash4W(anewk)==0) then
+    Hash4W(anewk)=1
+  else
+    if(CheckW) then
+      write(*, *) "===================================="
+      write(*, *) "Oops, add_Hash4W found a bug!"
+      write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
+      write(*, *) "W Hash table for new k", anewk, " is not 0!!", Hash4W(anewk)
+      write(*, *) "===================================="
+      call print_config
+      stop
+    endif
+  endif
+  return
+END SUBROUTINE add_Hash4W
+
+SUBROUTINE delete_Hash4W(oldk)
+  implicit none
+  integer, intent(in) :: oldk
+  integer :: aoldk
+  aoldk = abs(oldk)
+
+  if(Hash4W(aoldk)==1) then
+    Hash4W(aoldk)=0
+  else
+    if(CheckW) then
+      write(*, *) "===================================="
+      write(*, *) "Oops, delete_Hash4W found a bug!"
+      write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
+      write(*, *) "W Hash table for old k", aoldk, " is not 1!!", Hash4W(aoldk)
+      write(*, *) "===================================="
+      call print_config
+      stop
+    endif
+  endif
+  return
+END SUBROUTINE delete_Hash4W
+
+
+
+!--------- check the irreducibility for G -----------------------
+LOGICAL FUNCTION Is_reducible_G(GLn)
+  implicit none
+  integer, intent(in) :: GLn
+  integer :: newk
+
+  Is_reducible_G = .false.
+  newk = kLn(GLn)
+
+  if(Is_k_valid(newk) .eqv. .false.) then
+    Is_reducible_G = .true.
+    return
+  endif
+
+  if(CheckG) then
+    if(Hash4G(newk)==1) then
+      Is_reducible_G = .true.
+      return
+    else if(Hash4G(newk)/=0) then
+      write(*, *) "===================================="
+      write(*, *) "Oops, Is_reducible_G found a bug!"
+      write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
+      write(*, *) "G Hash table for new k", newk, " is not 0 or 1!!", Hash4G(newk)
+      write(*, *) "===================================="
+      call print_config
+      stop
+    endif
+  endif
+    
+  return
+END FUNCTION Is_reducible_G
+
+
+LOGICAL FUNCTION Is_reducible_G_Gam(GLn)
+  implicit none
+  integer, intent(in) :: GLn
+  integer :: nG, Gam1, Gam2, W1, W2, nW
+  integer :: newk, kG 
+  integer :: i, nnk1, nnk2
+
+  Is_reducible_G_Gam = .false.
+  newk = kLn(GLn)
+
+  Gam1 = NeighLn(1, GLn)
+  Gam2 = NeighLn(2, GLn)
+  W1 = NeighVertex(3, Gam1)
+  W2 = NeighVertex(3, Gam2)
+
+  if(CheckGam) then
+    do i = 1, NGLn
+      nG = GLnKey2Value(i)
+      kG = kLn(nG)
+      if(nG==GLn)   cycle             !! rule out the line itself
+      if(nG==NeighVertex(1, Gam1) .or. nG==NeighVertex(2, Gam2)) cycle
+      if(abs(add_k(newk,-kG))==abs(kLn(W1)) .or. &
+        & abs(add_k(newk,-kG))==abs(kLn(W2))) cycle !! rule out the neighbor wlines of newk
+      nnk1 = kLn(NeighVertex(3, NeighLn(1, nG)))
+      nnk2 = kLn(NeighVertex(3, NeighLn(2, nG)))
+      if(abs(add_k(newk, -kG))==abs(nnk1) .or. &
+        & abs(add_k(newk, -kG))==abs(nnk2)) cycle !! rule out the neighbor wlines of neighbor of newk
+
+      if(Hash4W(abs(add_k(newk,-kG)))==1) then
+        Is_reducible_G_Gam = .true.
+      endif
+    enddo
+  endif
+    
+  return
+END FUNCTION Is_reducible_G_Gam
+
+
+
+
+!--------- check the irreducibility for W -----------------------
+LOGICAL FUNCTION Is_reducible_W(WLn)
+  implicit none
+  integer, intent(in) :: WLn
+  integer :: absk 
+
+  absk = abs(kLn(WLn))
+  Is_reducible_W = .false.
+
+  if(Is_k_valid(absk) .eqv. .false. ) then
+    Is_reducible_W = .true.
+    return
+  endif
+
+  if(CheckW) then
+    if(absk==0) then
+      Is_reducible_W = .true.
+      return
+    endif
+
+    if(Hash4W(absk)==1) then
+      Is_reducible_W = .true.
+      return
+    else if(Hash4W(absk)/=0) then
+      write(*, *) "===================================="
+      write(*, *) "Oops, Is_reducible_W found a bug!"
+      write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
+      write(*, *) "W Hash table for new k", absk, " is not 0 or 1!!", Hash4W(absk)
+      write(*, *) "===================================="
+      call print_config
+      stop
+    endif
+  endif
+
+  return
+END FUNCTION Is_reducible_W
+
+
+
+!--------- check the irreducibility for W -----------------------
+LOGICAL FUNCTION Is_reducible_W_Gam(WLn)
+  implicit none
+  integer, intent(in) :: WLn
+  integer :: absk, i, Gam1, Gam2, G1, G2, G3, G4, kG5, kG6
+  integer :: nG, kG, pkGG, nkGG
+
+  absk = abs(kLn(WLn))
+  Is_reducible_W_Gam = .false.
+  Gam1 = NeighLn(1, WLn)
+  Gam2 = NeighLn(2, WLn)
+  G1 = NeighVertex(1, Gam1)
+  G2 = NeighVertex(2, Gam1)
+  G3 = NeighVertex(1, Gam2)
+  G4 = NeighVertex(2, Gam2)
+
+  if(CheckGam) then
+    do i = 1, NGLn
+      nG = GLnKey2Value(i)
+      kG5 = kLn(NeighVertex(1, NeighLn(1,nG)))
+      kG6 = kLn(NeighVertex(2, NeighLn(2,nG)))
+      kG = kLn(nG)
+      if(nG==G1 .or. nG==G2 .or. nG==G3 .or. nG==G4) cycle
+      pkGG = add_k(kG, absk)
+      nkGG = add_k(kG, -absk)
+      if(pkGG==kLn(G1) .or. pkGG==kLn(G2) .or. pkGG==kLn(G3) .or. pkGG==kLn(G4)) cycle
+      if(nkGG==kLn(G1) .or. nkGG==kLn(G2) .or. nkGG==kLn(G3) .or. nkGG==kLn(G4)) cycle
+      if(pkGG==kG5 .or. pkGG==kG6 .or. nkGG==kG5 .or. nkGG==kG6) cycle
+
+      if(Hash4G(pkGG)==1 .or. Hash4G(nkGG)==1) then
+        Is_reducible_W_Gam = .true.
+      endif
+    enddo
+  endif
+  return
+END FUNCTION Is_reducible_W_Gam
+
+!!=======================================================================
+!!=======================================================================
+!!=======================================================================
+
+
+
+
+
+
+!!=======================================================================
+!!================= SUBROUTINES IN UPDATES ==============================
+!!=======================================================================
+
+!-- change the status from normal or measuring to i/m or measuring+i/m --
+INTEGER FUNCTION add_ira_stat(stat)
+  implicit none
+  integer, intent(in) :: stat
+  if(stat == -1) then
+    write(*, *)  "add_ira_stat, stat = -1"
+    call print_config
+    stop
+  endif
+  if(stat<=1) then
+    add_ira_stat = stat + 2
+  else
+    add_ira_stat = stat
+  endif
+  if(add_ira_stat>=4) then
+    write(*, *)  IsWormPresent, iupdate, "add_ira_stat, stat > 3", add_ira_stat
+    call print_config
+    stop
+  endif
+END FUNCTION add_ira_stat
+
+!-- change the status from i/m or measuring+i/m to normal or measuring--
+INTEGER FUNCTION delete_ira_stat(stat)
+  implicit none
+  integer, intent(in) :: stat
+  if(stat == -1) then
+    write(*, *)  IsWormPresent, iupdate, "del_ira_stat, stat = -1"
+    call print_config
+    stop
+  endif
+  delete_ira_stat = stat - 2
+  if(delete_ira_stat == -2) delete_ira_stat = 0
+  if(delete_ira_stat == -1) delete_ira_stat = 1
+  if(delete_ira_stat<0) then
+    write(*, *)  IsWormPresent, iupdate, "del_ira_stat, stat < 0", delete_ira_stat
+    call print_config
+    stop
+  endif
+END FUNCTION delete_ira_stat
+
+!-- change the status from normal or i/m to measuring or measuring+i/m --
+INTEGER FUNCTION add_mea_stat(stat)
+  implicit none
+  integer, intent(in) :: stat
+  if(stat == -1) then
+    write(*, *)  "add_mea_stat, stat = -1"
+    call print_config
+    stop
+  endif
+
+  add_mea_stat = stat + 1
+  if(add_mea_stat == 2)   add_mea_stat = 1
+
+  if(add_mea_stat>=4) then
+    write(*, *)  IsWormPresent, iupdate, "add_mea_stat, stat > 3", add_mea_stat
+    call print_config
+    stop
+  endif
+END FUNCTION add_mea_stat
+
+!-- change the status from measuring or measuring+i/m to normal or i/m--
+INTEGER FUNCTION delete_mea_stat(stat)
+  implicit none
+  integer,intent(in) :: stat
+  if(stat == -1) then
+    write(*, *)  "del_mea_stat, stat = -1"
+    call print_config
+    stop
+  endif
+  delete_mea_stat = stat - 1
+  if(delete_mea_stat<0) then
+    write(*, *)  IsWormPresent, iupdate, "del_mea_stat, stat < 0", delete_mea_stat
+    call print_config
+    stop
+  endif
+END FUNCTION delete_mea_stat
+
+!--- calculate the status of a line according to the neighbor vertexes --
+INTEGER FUNCTION line_stat(stat1, stat2)
+  implicit none
+  integer :: stat1, stat2
+  if(stat1 == -1) stop
+  if(stat2 == -1) stop
+  line_stat = stat1 + stat2
+  if(stat1 == stat2) then
+    line_stat = stat1
+  else if(line_stat == 5) then
+    line_stat = 3
+  endif
+
+  if(line_stat>3) then
+    write(*, *) "line_stat error!", line_stat, stat1, stat2
+    call print_config
+    stop
+  endif
+  return
+END FUNCTION line_stat
+
+
+!------------- insert a line to the link -------------------
+SUBROUTINE insert_line(newline, isdelta, k, knd, typ, stat, weigh)
+  implicit none
+  integer, intent(out) :: newline
+  integer, intent(in) :: isdelta, k, knd, typ, stat
+  double precision, intent(in) :: weigh
+
+  newline = TailLn
+  TailLn  = NextLn(TailLn)
+  if(StatusLn(TailLn)>=0) then
+    write(*, *) IsWormPresent, iupdate, "insert_line error!!!"
+    call print_config
+    stop
+  endif
+
+  if(TailLn == -1) then
+    write(*, *) "Tail=-1! Too many lines!"
+    call print_config
+    stop
+  endif
+
+  if(knd==1) then
+    NGLn = NGLn + 1
+    GLnKey2Value(NGLn) = newline
+    LnValue2Key(newline) = NGLn
+  else
+    NWLn = NWLn + 1
+    WLnKey2Value(NWLn) = newline
+    LnValue2Key(newline) = NWLn
+  endif
+
+  kLn(newline) = k
+  IsDeltaLn(newline) = isdelta
+  KindLn(newline) = knd
+  TypeLn(newline) = typ
+  StatusLn(newline) = stat
+  WeightLn(newline) = weigh
+  return
+END SUBROUTINE insert_line
+
+!------------- undo_insert a line from the link -------------------
+SUBROUTINE undo_insert_line(occline, knd)
+  implicit none
+  integer, intent(in) :: occline, knd
+  integer :: tmp
+
+  if(StatusLn(occline)==-1) then
+    write(*, *) IsWormPresent, iupdate, "delete_line error!!!"
+    call print_config
+    stop
+  endif
+
+  NextLn(occline) = TailLn
+  StatusLn(occline) = -1
+  TailLn = occline
+
+  if(knd==1) then
+
+    tmp = GLnKey2Value(NGLn)
+    GLnKey2Value(NGLn) = 0
+    GLnKey2Value(LnValue2Key(occline)) = tmp
+    LnValue2Key(tmp) = LnValue2Key(occline)
+    NGLn = NGLn -1
+  else
+
+    tmp = WLnKey2Value(NWLn)
+    WLnKey2Value(NWLn) = 0
+    WLnKey2Value(LnValue2Key(occline)) = tmp
+    LnValue2Key(tmp) = LnValue2Key(occline)
+    NWLn = NWLn -1
+  endif
+
+  if(TailLn == -1) then
+    write(*, *) "Tail=-1! Too many lines!"
+    stop
+  endif
+  return
+END SUBROUTINE undo_insert_line
+
+
+!------------- insert a gamma to the link -------------------
+SUBROUTINE insert_gamma(newgamma, isdelta, gx, gy, wx, wy, t1, t2, t3, dir, typ, stat, weigh)
+  implicit none
+  integer, intent(out) :: newgamma
+  integer, intent(in) :: gx, gy, wx, wy, isdelta, dir, typ, stat
+  double precision, intent(in) :: weigh, t1, t2, t3
+
+  newgamma = TailVertex
+  TailVertex = NextVertex(TailVertex)
+  if(StatusVertex(TailVertex)>=0) then
+    write(*, *) IsWormPresent, iupdate, "insert_gamma error!!!"
+    call print_config
+    stop
+  endif
+
+  if(TailVertex == -1) then
+    write(*, *) "Tail=-1! Too many gammas!"
+    stop
+  endif
+   
+  NVertex = NVertex + 1
+  VertexKey2Value(NVertex) = newgamma
+  VertexValue2Key(newgamma) = NVertex
+
+  IsDeltaVertex(newgamma) = isdelta
+  GXVertex(newgamma) = gx
+  GYVertex(newgamma) = gy
+  WXVertex(newgamma) = wx
+  WYVertex(newgamma) = wy
+  T1Vertex(newgamma) = t1
+  T2Vertex(newgamma) = t2
+  T3Vertex(newgamma) = t3
+  DirecVertex(newgamma) = dir
+  TypeVertex(newgamma) = typ
+  SpInVertex(1, newgamma) = typ
+  SpInVertex(2, newgamma) = typ
+  StatusVertex(newgamma) = stat
+  WeightVertex(newgamma) = weigh
+  return
+END SUBROUTINE insert_gamma
+
+!------------- delete a line from the link -------------------
+SUBROUTINE delete_line(occline, knd)
+  implicit none
+  integer, intent(in) :: occline, knd
+  integer :: tmp
+
+  
+  if(knd==1) then
+    !call delete_Hash4G(kLn(occline))
+  else
+    call delete_Hash4W(kLn(occline))
+  endif
+
+  if(StatusLn(occline)==-1) then
+    write(*, *) IsWormPresent, iupdate, "delete_line error!!!"
+    call print_config
+    stop
+  endif
+
+  NextLn(occline) = TailLn
+  StatusLn(occline) = -1
+  TailLn = occline
+
+  if(knd==1) then
+
+    tmp = GLnKey2Value(NGLn)
+    GLnKey2Value(NGLn) = 0
+    GLnKey2Value(LnValue2Key(occline)) = tmp
+    LnValue2Key(tmp) = LnValue2Key(occline)
+    NGLn = NGLn -1
+  else
+
+    tmp = WLnKey2Value(NWLn)
+    WLnKey2Value(NWLn) = 0
+    WLnKey2Value(LnValue2Key(occline)) = tmp
+    LnValue2Key(tmp) = LnValue2Key(occline)
+    NWLn = NWLn -1
+  endif
+
+  if(TailLn == -1) then
+    write(*, *) "Tail=-1! Too many lines!"
+    stop
+  endif
+  return
+END SUBROUTINE delete_line
+
+!------------- insert a gamma to the link -------------------
+SUBROUTINE undo_delete_line(newline, knd, stat)
+  implicit none
+  integer, intent(in) :: newline, knd, stat
+
+  if(TailLn/=newline)    then
+    write(*, *) "undo_delete_line error!"
+    call print_config
+    stop
+  endif
+  StatusLn(newline) = stat
+  TailLn = NextLn(newline)
+  if(TailLn == -1) then
+    write(*, *) "Tail=-1! Too many glines!"
+    call print_config
+    stop
+  endif
+
+  if(knd==1) then
+    NGLn = NGLn + 1
+    GLnKey2Value(NGLn) = newline
+    LnValue2Key(newline) = NGLn
+    !call add_Hash4G(kLn(newline))
+  else
+    NWLn = NWLn + 1
+    WLnKey2Value(NWLn) = newline
+    LnValue2Key(newline) = NWLn
+    call add_Hash4W(kLn(newline))
+  endif
+  return
+END SUBROUTINE undo_delete_line
+
+
+!------------- delete a gamma from the link -------------------
+SUBROUTINE delete_gamma(occgamma)
+  implicit none
+  integer, intent(in) :: occgamma
+  integer :: tmp
+
+  if(StatusVertex(occgamma)==-1) then
+    write(*, *) IsWormPresent, iupdate, occgamma, StatusVertex(occgamma), "delete_gamma error!!!"
+    call print_config
+    stop
+  endif
+  NextVertex(occgamma) = TailVertex
+  StatusVertex(occgamma) = -1
+  TailVertex = occgamma
+
+  tmp = VertexKey2Value(NVertex)
+  VertexKey2Value(NVertex) = 0
+  VertexKey2Value(VertexValue2Key(occgamma)) = tmp
+  VertexValue2Key(tmp) = VertexValue2Key(occgamma)
+  NVertex = NVertex -1
+
+  if(TailVertex == -1) then
+    write(*, *) "Tail=-1! Too many vertexes!"
+    stop
+  endif
+  return
+END SUBROUTINE delete_gamma
+
+
+SUBROUTINE undo_delete_gamma(newgamma)
+  implicit none
+  integer, intent(in) :: newgamma
+
+  if(TailVertex/=newgamma)    then
+    write(*, *) "undo_delete_gamma error!"
+    stop
+  endif
+  StatusVertex(newgamma) = 0
+
+  TailVertex = NextVertex(newgamma)
+  if(TailVertex == -1) then
+    write(*, *) "Tail=-1! Too many gammas!"
+    stop
+  endif
+   
+  NVertex = NVertex + 1
+  VertexKey2Value(NVertex) = newgamma
+  VertexValue2Key(newgamma) = NVertex
+
+  return
+END SUBROUTINE undo_delete_gamma
+!!=======================================================================
+!!=======================================================================
+!!=======================================================================
+
+
+
+
+
 !!============== GRAM-SCHMIDT BASIS ==================================
 
 !!-------------- generate the Gram-Schmidt basis --------------
@@ -1308,6 +1991,9 @@ SUBROUTINE time_elapse
   return
 END SUBROUTINE time_elapse
 
+
+
+
 !=================== VISUALIZATION  ==================================
 SUBROUTINE DRAW
     IMPLICIT NONE
@@ -1520,6 +2206,8 @@ INTEGER FUNCTION site_num(X,Y)
 END FUNCTION site_num
 
 
+
+
 !============   initialize diagrams =================================
 SUBROUTINE first_order_diagram
   implicit none
@@ -1571,7 +2259,7 @@ SUBROUTINE first_order_diagram
   IsDeltaLn(6) = 0
 
   !type of gamma inside spins: 1: spin up; 2: spin down
-  TypeVertexIn(:) = 1;   TypeVertexOut(:) = 1
+  SpInVertex(:, :) = 1
 
   !type of Gamma: 1: gin, 2: gout, 3: win, 4: wout
   TypeVertex(1) = 1
@@ -1665,6 +2353,9 @@ SUBROUTINE first_order_diagram
   !-------------------------------------------------------
 end SUBROUTINE first_order_diagram
 
+
+
+
 SUBROUTINE first_order_diagram_with_bubble
   implicit none
   integer :: i
@@ -1715,7 +2406,7 @@ SUBROUTINE first_order_diagram_with_bubble
   IsDeltaLn(6) = 0
 
   !type of gamma inside spins: 1: spin up; 2: spin down
-  TypeVertexIn(:) = 1;   TypeVertexOut(:) = 1
+  SpInVertex(:, :) = 1
 
   !type of Gamma: 1: gin, 2: gout, 3: win, 4: wout
   TypeVertex(1) = 1
@@ -1809,6 +2500,9 @@ SUBROUTINE first_order_diagram_with_bubble
   !-------------------------------------------------------
 end SUBROUTINE first_order_diagram_with_bubble
 
+
+
+
 SUBROUTINE second_order_diagram
   implicit none
   integer :: i
@@ -1866,7 +2560,7 @@ SUBROUTINE second_order_diagram
   IsDeltaLn(9) = 0
 
   !type of gamma inside spins: 1: spin up; 2: spin down
-  TypeVertexIn(:) = 1;   TypeVertexOut(:) = 1
+  SpInVertex(:, :) = 1
 
   !type of Gamma: 1: gin, 2: gout, 3: win, 4: wout
   TypeVertex(:) = 1
