@@ -286,7 +286,7 @@ SUBROUTINE DRAW()
     write(11,*) '%%Trailer'
 
     close (11)
-	return
+  return
 !******************************************************************
  777  format ('Nsolid ',f6.1,x,f6.1,x,f9.3,' Y')
  778  format ('N ',f6.1,x,f6.1,x,' M')
