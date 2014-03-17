@@ -896,21 +896,59 @@ END SUBROUTINE move_worm_along_gline
 !------  Masha ---->----          Masha ---->---||--->-----  -----
 !------               GamD                     GamB     GamD -----
 !-----------------------------------------------------------------
-!SUBROUTINE add_interaction
-  !implicit none
-  !integer :: i, dir, dirW, flag
-  !integer :: WAB, GIC, GMD, GIA, GMB
-  !integer :: GamA, GamB, GamC, GamD
-  !integer :: sp, typGamA, typGamB, typAB
-  !integer :: statIA, statAC, statMB, statBD
-  !integer :: kIA, kMB, kM, q
-  !integer :: dxwA, dywA, dxwB, dywB, xwA, ywA, xwB, ywB
-  !double precision :: WWorm, Pacc
-  !complex*16 :: WA, WB, WGIA, WGAC, WGMB, WGBD, WIra, WMasha, WWAB, WMeasureGam
-  !double precision :: Anew, Aold, sgn
+SUBROUTINE add_interaction
+  implicit none
+  integer :: dir, dirW, flag, kIA, kMB, kM, q
+  integer :: WAB, GIC, GMD, GIA, GMB
+  integer :: GamA, GamB, GamC, GamD
+  integer :: sp, typGamA, typGamB, typAB
+  integer :: statIA, statAC, statMB, statBD
+  double precision :: WWorm, Pacc
+  complex*16 :: WA, WB, WGIA, WGAC, WGMB, WGBD, WIra, WMasha, WWAB, WMeasureGam
+  double precision :: Anew, Aold, sgn
 
-  !return
-!END SUBROUTINE add_interaction
+  
+  !---------- step1 : check if worm is present ------------------
+  if(IsWormPresent .eqv. .false.)    return
+
+  !------------ step2 : propose the new config ------------------
+  !-------- the new spin, type and status for the new config ----
+  !-------------- step3 : weight calculation --------------------
+  
+  !---  change the topology for the configuration after update --
+  !------------ update the topology -----------------------------
+  !------------ step4 : configuration check ---------------------
+  !------------- weight calculation -----------------------------
+
+  !------------ step5 : accept the update -----------------------
+  ProbProp(Order, iupdate) = ProbProp(Order, iupdate) + 1
+  if(rn()<=Pacc) then
+
+    !--------------- update the diagram info --------------------
+    Order = Order + 1
+    Phase = Phase *sgn
+
+    !--------------- update k and omega -------------------------
+    kMasha = kM
+
+    call add_Hash4G(kIA)
+    call add_Hash4G(kMB)
+    call add_Hash4W(q)
+
+    !--------------- update the status of elements --------------
+
+    !--------------- update weight of elements ------------------
+
+    call update_weight(Anew, Aold)
+
+    ProbAcc(Order-1, 7) = ProbAcc(Order-1, 7) + 1
+  else
+    
+    !-------------- delete line and vertexes --------------------
+
+  endif
+  return
+END SUBROUTINE add_interaction
 
 
 SUBROUTINE change_gline_time
