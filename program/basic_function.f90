@@ -2127,7 +2127,7 @@ SUBROUTINE first_order_diagram
   WeightVertex(4) = weight_vertex(StatusVertex(4), 1, 0, 0, 0.d0, 0.d0, TypeVertex(4))
 
 
-  ratio = CoefOfWeight(1)*(1.d0/Beta)**Order *SignFermiLoop
+  ratio = (1.d0/Beta)**Order *SignFermiLoop
   Anew = d_times_cd(ratio, WeightLn(1)*WeightLn(2)*WeightLn(3)*WeightLn(4)* &
     & WeightLn(5)*WeightLn(6)*WeightVertex(1)*WeightVertex(2)*WeightVertex(3)* &
     & WeightVertex(4))
@@ -2274,7 +2274,7 @@ SUBROUTINE first_order_diagram_with_bubble
   WeightVertex(4) = weight_vertex(StatusVertex(4), 1, 0, 0, 0.d0, 0.d0, TypeVertex(4))
 
 
-  ratio = CoefOfWeight(1)*(1.d0/Beta)**Order *SignFermiLoop
+  ratio = (1.d0/Beta)**Order *SignFermiLoop
   Anew = d_times_cd(ratio, WeightLn(1)*WeightLn(2)*WeightLn(3)*WeightLn(4)* &
     & WeightLn(5)*WeightLn(6)*WeightVertex(1)*WeightVertex(2)*WeightVertex(3)* &
     & WeightVertex(4))
@@ -2444,7 +2444,7 @@ SUBROUTINE second_order_diagram
   WeightVertex(6) = weight_vertex(StatusVertex(6), 1, 0, 0, 0.d0, 0.d0, TypeVertex(6))
 
 
-  ratio = CoefOfWeight(2)*(1.d0/Beta)**Order *SignFermiLoop
+  ratio = (1.d0/Beta)**Order *SignFermiLoop
   Anew = d_times_cd(ratio, WeightLn(1)*WeightLn(2)*WeightLn(3)*WeightLn(4)* &
     & WeightLn(5)*WeightLn(6)*WeightLn(7) *WeightLn(8) *WeightLn(9) *WeightVertex(1) &
     & *WeightVertex(2)*WeightVertex(3)*WeightVertex(4)*WeightVertex(5)*WeightVertex(6))
