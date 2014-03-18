@@ -33,6 +33,9 @@ SUBROUTINE initialize_markov
     call def_spatial_weight
     call def_spin
     call def_diagram
+
+    write(logstr, *) WeightCurrent
+    call write_log
     return
 end SUBROUTINE initialize_markov
 
@@ -63,12 +66,14 @@ SUBROUTINE def_spatial_weight
   double precision :: tt,logL(2)
   integer :: ix,iy,i
   integer,dimension(2) :: L
-! initializing logscale sampling of space
-! for seeding rx coordinate displacement do this
-!     x=rndm(); rx=0.5d0*dexp(x*logL); ix=rx
-!     IF(rndm()>0.5d0) ix=L(1)-1-ix
-! this gives you displacement ix in the affine basis called with probability
-! SpatialWeight(i,ix)
+
+  ! initializing logscale sampling of space
+  ! for seeding rx coordinate displacement do this
+  !     x=rndm(); rx=0.5d0*dexp(x*logL); ix=rx
+  !     IF(rndm()>0.5d0) ix=L(1)-1-ix
+  ! this gives you displacement ix in the affine basis called with probability
+  ! SpatialWeight(i,ix)
+
   L(1)=Lx
   L(2)=Ly
   logL(1)=logLx
@@ -148,8 +153,8 @@ END SUBROUTINE def_diagram
 
 SUBROUTINE markov
   implicit none
-  integer :: iflag, istep,isamp
-  double precision :: nr
+  integer :: iflag, istep,isamp,i
+  double precision :: nr,x
 
   do isamp = 1, Nsamp
     istep = 0
@@ -201,16 +206,42 @@ SUBROUTINE markov
           call change_Gamma_isdelta       
       end select
 
-      imc = imc + 1
+      imc = imc + 1.0
 
+      if(mod(imc,1.e5)==0) then
+        call print_config
+        call check_config
+        !call write_monte_carlo_test
+      endif
+
+      !========================== REWEIGHTING =========================
+      if(mod(imc,1.e7)==0) then
+        write(logstr,*) "Reweighting order of diagrams..."
+        call write_log
+        x=sum(GamWormOrder(:))
+        CoefOfWeight(:)=x/(GamWormOrder(:)+50.d0)
+        write(logstr,*) "Weight:"
+        call write_log
+        do i=0,MCOrder
+          write(logstr,"('Order ',i2,':',f10.4)") i, CoefOfWeight(i)
+          call write_log
+        enddo
+        write(logstr,*) "Reweighting is done!"
+        call write_log
+        if(imc<=2.e7) then
+          GamWormOrder=0.d0
+          GamOrder=0.d0
+        endif
+      endif
+      !================================================================
+
+      GamWormOrder(Order) = GamWormOrder(Order) + 1.0
       if(IsWormPresent) then
-        GamWormOrder(Order) = GamWormOrder(Order) + 1
         if(rn()<=0.5d0) call switch_ira_and_masha
       else
         istep = istep + 1
         GamOrder(Order) = GamOrder(Order) + 1
       endif
-      if(Mod(Floor(imc), 100)==0) call check_config
     enddo
     if(IsToss==0) call measure
   enddo
@@ -1086,7 +1117,8 @@ SUBROUTINE change_Gamma_type
     else if(TypeLn(iWLn)<=4) then
       typW = TypeLn(iWLn)-2
     else
-      write(*, *) "change Gamma type error!"
+      write(logstr, *) "change Gamma type error!"
+      call write_log
       stop
     endif
   endif
@@ -1311,7 +1343,8 @@ SUBROUTINE change_wline_isdelta
     t3jGam = t3iGam
   else 
     if(t3jGam/=t3iGam) then
-      write(*, *) "There is a bug in delta-W!"
+      write(logstr, *) "There is a bug in delta-W!"
+      call write_log
       call print_config
       stop
     endif
@@ -1416,13 +1449,15 @@ SUBROUTINE change_gamma_isdelta
     t2iGam = t3iGam
   else 
     if(t1iGam/=t3iGam) then
-      write(*, *) "There is a bug in delta-Gam!"
+      write(logstr, *) "There is a bug in delta-Gam!"
+      call write_log
       call print_config
       stop
     endif
 
     if(t2iGam/=t3iGam) then
-      write(*, *) "There is a bug in delta-Gam!"
+      write(logstr, *) "There is a bug in delta-Gam!"
+      call write_log
       call print_config
       stop
     endif
@@ -1531,16 +1566,19 @@ COMPLEX*16 FUNCTION weight_line(stat, isdelta, knd, dx0, dy0, tau, typ)
     ! Have Ira or Masha around (no influence on G)
     if(knd==2) weight_line = weight_worm_W(typ, dx, dy, t)
     if(knd==1) then
-      write(*, *) IsWormPresent, iupdate, "gline status == 2 or 3! Error!" 
+      write(logstr, *) IsWormPresent, iupdate, "gline status == 2 or 3! Error!" 
+      call write_log
       call print_config
       stop
     endif
   else if(stat==-1) then
-    write(*, *) IsWormPresent, iupdate, "line status == -1! There is no weight!" 
+    write(logstr, *) IsWormPresent, iupdate, "line status == -1! There is no weight!" 
+    call write_log
     call print_config
     stop
   else
-    write(*, *) IsWormPresent, iupdate, "line status error!", stat
+    write(logstr, *) IsWormPresent, iupdate, "line status error!", stat
+    call write_log
     call print_config
     stop
   endif
@@ -1550,10 +1588,12 @@ COMPLEX*16 FUNCTION weight_line(stat, isdelta, knd, dx0, dy0, tau, typ)
     !if(knd==1) weight_line = weight_meas_G(1, t)
     !if(knd==2) weight_line = weight_meas_W(1, dx, dy, t)
   !else if(stat==-1) then
-    !write(*, *) IsWormPresent, iupdate, "line status == -1! There is no weight!" 
+    !write(logstr, *) IsWormPresent, iupdate, "line status == -1! There is no weight!" 
+    !call write_log
     !stop
   !else
-    !write(*, *) IsWormPresent, iupdate, "line status error!", stat
+    !write(logstr, *) IsWormPresent, iupdate, "line status error!", stat
+    !call write_log
     !stop
   !endif
   !------------------------ end -----------------------------------------
@@ -1588,10 +1628,12 @@ COMPLEX*16 FUNCTION weight_vertex(stat, isdelta, dx0, dy0, dtau1, dtau2, typ)
   else if(stat==1 .or. stat==3) then
     weight_vertex = weight_meas_Gam(typ, dx, dy, t1, t2)
   else if(stat==-1) then 
-    write(*, *) IsWormPresent, iupdate, "vertex status == -1! There is no weight!" 
+    write(logstr, *) IsWormPresent, iupdate, "vertex status == -1! There is no weight!" 
+    call write_log
     stop
   else
-    write(*, *) IsWormPresent, iupdate, "vertex status error!", stat
+    write(logstr, *) IsWormPresent, iupdate, "vertex status error!", stat
+    call write_log
     stop
   endif
 
@@ -1599,10 +1641,12 @@ COMPLEX*16 FUNCTION weight_vertex(stat, isdelta, dx0, dy0, dtau1, dtau2, typ)
   !if(stat>=0 .and. stat<=3) then
     !weight_vertex = weight_meas_Gam(1, dx, dy, t1, t2)
   !else if(stat==-1) then
-    !write(*, *) IsWormPresent, iupdate, "vertex status == -1! There is no weight!" 
+    !write(logstr, *) IsWormPresent, iupdate, "vertex status == -1! There is no weight!" 
+    !call write_log
     !stop
   !else
-    !write(*, *) IsWormPresent, iupdate, "vertex status error!", stat
+    !write(logstr, *) IsWormPresent, iupdate, "vertex status error!", stat
+    !call write_log
     !stop
   !endif
   !------------------------ end -----------------------------------------
@@ -1649,7 +1693,6 @@ SUBROUTINE measure
   double precision :: tau1, tau2, tau3
 
   imeasure = imeasure + 1
-
   factorM = 1.d0
 
   !-------- find out the variables for Gamma ----------------

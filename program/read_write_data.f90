@@ -1008,6 +1008,13 @@ END SUBROUTINE output_Quantities
   !close(36)
 !END SUBROUTINE output_GamMC
 
+SUBROUTINE write_log
+  implicit none
+  open(36, access="append", file=trim(title3)//".log")
+  write(36,'(A)', advance='no') trim(logstr)
+  close(36)
+end SUBROUTINE
+
 SUBROUTINE write_monte_carlo_test
   implicit none
   !write(*, *) "conf(IsDelta(3)=1):", TestData(1)/TestData(0)

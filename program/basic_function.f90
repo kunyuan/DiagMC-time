@@ -358,12 +358,14 @@ SUBROUTINE update_Hash4G(oldk, newk)
     Hash4G(oldk)=0
   else
     if(CheckG) then
-      write(*, *) "===================================="
-      write(*, *) "Oops, update_Hash4G found a bug!"
-      write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-      write(*, *) "G Hash table for old k", oldk, " is not 1!!", Hash4G(oldk)
-      write(*, *) "===================================="
+      open(36, access="append", file=trim(title3)//".log")
+      write(36, *) "===================================="
+      write(36, *) "Oops, update_Hash4G found a bug!"
+      write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
+      write(36, *) "G Hash table for old k", oldk, " is not 1!!", Hash4G(oldk)
+      write(36, *) "===================================="
       call print_config
+      close(36)
       stop
     endif
   endif
@@ -372,12 +374,14 @@ SUBROUTINE update_Hash4G(oldk, newk)
     Hash4G(newk)=1
   else
     if(CheckG) then
-      write(*, *) "===================================="
-      write(*, *) "Oops, update_Hash4G found a bug!"
-      write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-      write(*, *) "G Hash table for new k", newk, " is not 0!!", Hash4G(newk)
-      write(*, *) "===================================="
+      open(36, access="append", file=trim(title3)//".log")
+      write(36, *) "===================================="
+      write(36, *) "Oops, update_Hash4G found a bug!"
+      write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
+      write(36, *) "G Hash table for new k", newk, " is not 0!!", Hash4G(newk)
+      write(36, *) "===================================="
       call print_config
+      close(36)
       stop
     endif
   endif
@@ -392,12 +396,14 @@ SUBROUTINE add_Hash4G(newk)
     Hash4G(newk)=1
   else
     if(CheckG) then
-      write(*, *) "===================================="
-      write(*, *) "Oops, add_Hash4G found a bug!"
-      write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-      write(*, *) "G Hash table for new k", newk, " is not 0!!", Hash4G(newk)
-      write(*, *) "===================================="
+      open(36, access="append", file=trim(title3)//".log")
+      write(36, *) "===================================="
+      write(36, *) "Oops, add_Hash4G found a bug!"
+      write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
+      write(36, *) "G Hash table for new k", newk, " is not 0!!", Hash4G(newk)
+      write(36, *) "===================================="
       call print_config
+      close(36)
       stop
     endif
   endif
@@ -411,12 +417,14 @@ SUBROUTINE delete_Hash4G(oldk)
     Hash4G(oldk)=0
   else
     if(CheckG) then
-      write(*, *) "===================================="
-      write(*, *) "Oops, delete_Hash4G found a bug!"
-      write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-      write(*, *) "G Hash table for old k", oldk, " is not 1!!", Hash4G(oldk)
-      write(*, *) "===================================="
+      open(36, access="append", file=trim(title3)//".log")
+      write(36, *) "===================================="
+      write(36, *) "Oops, delete_Hash4G found a bug!"
+      write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
+      write(36, *) "G Hash table for old k", oldk, " is not 1!!", Hash4G(oldk)
+      write(36, *) "===================================="
       call print_config
+      close(36)
       stop
     endif
   endif
@@ -436,12 +444,14 @@ SUBROUTINE update_Hash4W(oldk, newk)
     Hash4W(aoldk)=0
   else
     if(CheckW) then
-      write(*, *) "===================================="
-      write(*, *) "Oops, update_Hash4W found a bug!"
-      write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-      write(*, *) "W Hash table for old k", aoldk, " is not 1!!", Hash4W(aoldk)
-      write(*, *) "===================================="
+      open(36, access="append", file=trim(title3)//".log")
+      write(36, *) "===================================="
+      write(36, *) "Oops, update_Hash4W found a bug!"
+      write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
+      write(36, *) "W Hash table for old k", aoldk, " is not 1!!", Hash4W(aoldk)
+      write(36, *) "===================================="
       call print_config
+      close(36)
       stop
     endif
   endif
@@ -450,12 +460,14 @@ SUBROUTINE update_Hash4W(oldk, newk)
     Hash4W(anewk)=1
   else
     if(CheckW) then
-      write(*, *) "===================================="
-      write(*, *) "Oops, update_Hash4W found a bug!"
-      write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-      write(*, *) "W Hash table for new k", anewk, " is not 0!!", Hash4W(anewk)
-      write(*, *) "===================================="
+      open(36, access="append", file=trim(title3)//".log")
+      write(36, *) "===================================="
+      write(36, *) "Oops, update_Hash4W found a bug!"
+      write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
+      write(36, *) "W Hash table for new k", anewk, " is not 0!!", Hash4W(anewk)
+      write(36, *) "===================================="
       call print_config
+      close(36)
       stop
     endif
   endif
@@ -472,12 +484,14 @@ SUBROUTINE add_Hash4W(newk)
     Hash4W(anewk)=1
   else
     if(CheckW) then
-      write(*, *) "===================================="
-      write(*, *) "Oops, add_Hash4W found a bug!"
-      write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-      write(*, *) "W Hash table for new k", anewk, " is not 0!!", Hash4W(anewk)
-      write(*, *) "===================================="
+      open(36, access="append", file=trim(title3)//".log")
+      write(36, *) "===================================="
+      write(36, *) "Oops, add_Hash4W found a bug!"
+      write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
+      write(36, *) "W Hash table for new k", anewk, " is not 0!!", Hash4W(anewk)
+      write(36, *) "===================================="
       call print_config
+      close(36)
       stop
     endif
   endif
@@ -494,12 +508,14 @@ SUBROUTINE delete_Hash4W(oldk)
     Hash4W(aoldk)=0
   else
     if(CheckW) then
-      write(*, *) "===================================="
-      write(*, *) "Oops, delete_Hash4W found a bug!"
-      write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-      write(*, *) "W Hash table for old k", aoldk, " is not 1!!", Hash4W(aoldk)
-      write(*, *) "===================================="
+      open(36, access="append", file=trim(title3)//".log")
+      write(36, *) "===================================="
+      write(36, *) "Oops, delete_Hash4W found a bug!"
+      write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
+      write(36, *) "W Hash table for old k", aoldk, " is not 1!!", Hash4W(aoldk)
+      write(36, *) "===================================="
       call print_config
+      close(36)
       stop
     endif
   endif
@@ -527,12 +543,14 @@ LOGICAL FUNCTION Is_reducible_G(GLn)
       Is_reducible_G = .true.
       return
     else if(Hash4G(newk)/=0) then
-      write(*, *) "===================================="
-      write(*, *) "Oops, Is_reducible_G found a bug!"
-      write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-      write(*, *) "G Hash table for new k", newk, " is not 0 or 1!!", Hash4G(newk)
-      write(*, *) "===================================="
+      open(36, access="append", file=trim(title3)//".log")
+      write(36, *) "===================================="
+      write(36, *) "Oops, Is_reducible_G found a bug!"
+      write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
+      write(36, *) "G Hash table for new k", newk, " is not 0 or 1!!", Hash4G(newk)
+      write(36, *) "===================================="
       call print_config
+      close(36)
       stop
     endif
   endif
@@ -605,12 +623,14 @@ LOGICAL FUNCTION Is_reducible_W(WLn)
       Is_reducible_W = .true.
       return
     else if(Hash4W(absk)/=0) then
-      write(*, *) "===================================="
-      write(*, *) "Oops, Is_reducible_W found a bug!"
-      write(*, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-      write(*, *) "W Hash table for new k", absk, " is not 0 or 1!!", Hash4W(absk)
-      write(*, *) "===================================="
+      open(36, access="append", file=trim(title3)//".log")
+      write(36, *) "===================================="
+      write(36, *) "Oops, Is_reducible_W found a bug!"
+      write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
+      write(36, *) "W Hash table for new k", absk, " is not 0 or 1!!", Hash4W(absk)
+      write(36, *) "===================================="
       call print_config
+      close(36)
       stop
     endif
   endif
@@ -675,7 +695,8 @@ INTEGER FUNCTION add_ira_stat(stat)
   implicit none
   integer, intent(in) :: stat
   if(stat == -1) then
-    write(*, *)  "add_ira_stat, stat = -1"
+    write(logstr, *)  "add_ira_stat, stat = -1"
+    call write_log
     call print_config
     stop
   endif
@@ -685,7 +706,8 @@ INTEGER FUNCTION add_ira_stat(stat)
     add_ira_stat = stat
   endif
   if(add_ira_stat>=4) then
-    write(*, *)  IsWormPresent, iupdate, "add_ira_stat, stat > 3", add_ira_stat
+    write(logstr, *)  IsWormPresent, iupdate, "add_ira_stat, stat > 3", add_ira_stat
+    call write_log
     call print_config
     stop
   endif
@@ -696,7 +718,8 @@ INTEGER FUNCTION delete_ira_stat(stat)
   implicit none
   integer, intent(in) :: stat
   if(stat == -1) then
-    write(*, *)  IsWormPresent, iupdate, "del_ira_stat, stat = -1"
+    write(logstr, *)  IsWormPresent, iupdate, "del_ira_stat, stat = -1"
+    call write_log
     call print_config
     stop
   endif
@@ -704,7 +727,8 @@ INTEGER FUNCTION delete_ira_stat(stat)
   if(delete_ira_stat == -2) delete_ira_stat = 0
   if(delete_ira_stat == -1) delete_ira_stat = 1
   if(delete_ira_stat<0) then
-    write(*, *)  IsWormPresent, iupdate, "del_ira_stat, stat < 0", delete_ira_stat
+    write(logstr, *)  IsWormPresent, iupdate, "del_ira_stat, stat < 0", delete_ira_stat
+    call write_log
     call print_config
     stop
   endif
@@ -715,7 +739,8 @@ INTEGER FUNCTION add_mea_stat(stat)
   implicit none
   integer, intent(in) :: stat
   if(stat == -1) then
-    write(*, *)  "add_mea_stat, stat = -1"
+    write(logstr, *)  "add_mea_stat, stat = -1"
+    call write_log
     call print_config
     stop
   endif
@@ -724,7 +749,8 @@ INTEGER FUNCTION add_mea_stat(stat)
   if(add_mea_stat == 2)   add_mea_stat = 1
 
   if(add_mea_stat>=4) then
-    write(*, *)  IsWormPresent, iupdate, "add_mea_stat, stat > 3", add_mea_stat
+    write(logstr, *)  IsWormPresent, iupdate, "add_mea_stat, stat > 3", add_mea_stat
+    call write_log
     call print_config
     stop
   endif
@@ -735,13 +761,15 @@ INTEGER FUNCTION delete_mea_stat(stat)
   implicit none
   integer,intent(in) :: stat
   if(stat == -1) then
-    write(*, *)  "del_mea_stat, stat = -1"
+    write(logstr, *)  "del_mea_stat, stat = -1"
+    call write_log
     call print_config
     stop
   endif
   delete_mea_stat = stat - 1
   if(delete_mea_stat<0) then
-    write(*, *)  IsWormPresent, iupdate, "del_mea_stat, stat < 0", delete_mea_stat
+    write(logstr, *)  IsWormPresent, iupdate, "del_mea_stat, stat < 0", delete_mea_stat
+    call write_log
     call print_config
     stop
   endif
@@ -761,7 +789,8 @@ INTEGER FUNCTION line_stat(stat1, stat2)
   endif
 
   if(line_stat>3) then
-    write(*, *) "line_stat error!", line_stat, stat1, stat2
+    write(logstr, *) "line_stat error!", line_stat, stat1, stat2
+    call write_log
     call print_config
     stop
   endif
@@ -779,13 +808,15 @@ SUBROUTINE insert_line(newline, isdelta, k, knd, typ, stat, weigh)
   newline = TailLn
   TailLn  = NextLn(TailLn)
   if(StatusLn(TailLn)>=0) then
-    write(*, *) IsWormPresent, iupdate, "insert_line error!!!"
+    write(logstr, *) IsWormPresent, iupdate, "insert_line error!!!"
+    call write_log
     call print_config
     stop
   endif
 
   if(TailLn == -1) then
-    write(*, *) "Tail=-1! Too many lines!"
+    write(logstr, *) "Tail=-1! Too many lines!"
+    call write_log
     call print_config
     stop
   endif
@@ -816,7 +847,8 @@ SUBROUTINE undo_insert_line(occline, knd)
   integer :: tmp
 
   if(StatusLn(occline)==-1) then
-    write(*, *) IsWormPresent, iupdate, "delete_line error!!!"
+    write(logstr, *) IsWormPresent, iupdate, "delete_line error!!!"
+    call write_log
     call print_config
     stop
   endif
@@ -842,7 +874,8 @@ SUBROUTINE undo_insert_line(occline, knd)
   endif
 
   if(TailLn == -1) then
-    write(*, *) "Tail=-1! Too many lines!"
+    write(logstr, *) "Tail=-1! Too many lines!"
+    call write_log
     stop
   endif
   return
@@ -859,13 +892,15 @@ SUBROUTINE insert_gamma(newgamma, isdelta, gx, gy, wx, wy, t1, t2, t3, dir, typ,
   newgamma = TailVertex
   TailVertex = NextVertex(TailVertex)
   if(StatusVertex(TailVertex)>=0) then
-    write(*, *) IsWormPresent, iupdate, "insert_gamma error!!!"
+    write(logstr, *) IsWormPresent, iupdate, "insert_gamma error!!!"
+    call write_log
     call print_config
     stop
   endif
 
   if(TailVertex == -1) then
-    write(*, *) "Tail=-1! Too many gammas!"
+    write(logstr, *) "Tail=-1! Too many gammas!"
+    call write_log
     stop
   endif
    
@@ -904,7 +939,8 @@ SUBROUTINE delete_line(occline, knd)
   endif
 
   if(StatusLn(occline)==-1) then
-    write(*, *) IsWormPresent, iupdate, "delete_line error!!!"
+    write(logstr, *) IsWormPresent, iupdate, "delete_line error!!!"
+    call write_log
     call print_config
     stop
   endif
@@ -930,7 +966,8 @@ SUBROUTINE delete_line(occline, knd)
   endif
 
   if(TailLn == -1) then
-    write(*, *) "Tail=-1! Too many lines!"
+    write(logstr, *) "Tail=-1! Too many lines!"
+    call write_log
     stop
   endif
   return
@@ -942,14 +979,16 @@ SUBROUTINE undo_delete_line(newline, knd, stat)
   integer, intent(in) :: newline, knd, stat
 
   if(TailLn/=newline)    then
-    write(*, *) "undo_delete_line error!"
+    write(logstr, *) "undo_delete_line error!"
+    call write_log
     call print_config
     stop
   endif
   StatusLn(newline) = stat
   TailLn = NextLn(newline)
   if(TailLn == -1) then
-    write(*, *) "Tail=-1! Too many glines!"
+    write(logstr, *) "Tail=-1! Too many glines!"
+    call write_log
     call print_config
     stop
   endif
@@ -976,7 +1015,8 @@ SUBROUTINE delete_gamma(occgamma)
   integer :: tmp
 
   if(StatusVertex(occgamma)==-1) then
-    write(*, *) IsWormPresent, iupdate, occgamma, StatusVertex(occgamma), "delete_gamma error!!!"
+    write(logstr, *) IsWormPresent, iupdate, occgamma, StatusVertex(occgamma), "delete_gamma error!!!"
+    call write_log
     call print_config
     stop
   endif
@@ -991,7 +1031,8 @@ SUBROUTINE delete_gamma(occgamma)
   NVertex = NVertex -1
 
   if(TailVertex == -1) then
-    write(*, *) "Tail=-1! Too many vertexes!"
+    write(logstr, *) "Tail=-1! Too many vertexes!"
+    call write_log
     stop
   endif
   return
@@ -1003,14 +1044,16 @@ SUBROUTINE undo_delete_gamma(newgamma)
   integer, intent(in) :: newgamma
 
   if(TailVertex/=newgamma)    then
-    write(*, *) "undo_delete_gamma error!"
+    write(logstr, *) "undo_delete_gamma error!"
+    call write_log
     stop
   endif
   StatusVertex(newgamma) = 0
 
   TailVertex = NextVertex(newgamma)
   if(TailVertex == -1) then
-    write(*, *) "Tail=-1! Too many gammas!"
+    write(logstr, *) "Tail=-1! Too many gammas!"
+    call write_log
     stop
   endif
    
@@ -1301,21 +1344,33 @@ END SUBROUTINE undo_delete_gamma
     !do  n = OmegaMin, OmegaMax
       !y = y + weight_basis(CoefP(i,:), n)**2.d0
     !enddo
-    !if(dabs(y-1.d0)>1.d-10) write(*, *) i, y, "Positive Basis error!!"
+    !if(dabs(y-1.d0)>1.d-10) then
+      !write(logstr, *) i, y, "Positive Basis error!!"
+      !call write_log
+    !endif
 
     !y = 0.d0
     !do  n = -OmegaMax, -OmegaMin
       !y = y + weight_basis(CoefN(i,:), n)**2.d0
     !enddo
-    !if(dabs(y-1.d0)>1.d-10) write(*, *) i, y, "Negative Basis error!!"
+    !if(dabs(y-1.d0)>1.d-10) then
+      !write(logstr, *) i, y, "Negative Basis error!!"
+      !call write_log
+    !endif
   !enddo
 
   !do i = 1, nbasis
     !do j = i+1, nbasis
       !y = projector(CoefP(i, :), CoefP(j, :), OmegaMin, OmegaMax)
-      !if(dabs(y)>1.d-10) write(*, *) i, j, y, "Positive Basis error!!"
+      !if(dabs(y)>1.d-10) then
+        !write(logstr, *) i, j, y, "Positive Basis error!!"
+        !call write_log
+      !endif
       !y = projector(CoefN(i, :), CoefN(j, :), -OmegaMax, -OmegaMin)
-      !if(dabs(y)>1.d-10) write(*, *) i, j, y, "Negative Basis error!!"
+      !if(dabs(y)>1.d-10) then
+        !write(logstr, *) i, j, y, "Negative Basis error!!"
+        !call write_log
+      !endif
     !enddo
   !enddo
 
@@ -1342,7 +1397,10 @@ END SUBROUTINE undo_delete_gamma
         !y = y + weight_basis_Gamma(EPPR(i,:), n1, n2)**2.d0*ReweightBasis(n1, n2)
       !enddo
     !enddo
-    !if(dabs(y-1.d0)>1.d-8) write(*, *) i, y-1.d0, "++R Gamma Basis error!!"
+    !if(dabs(y-1.d0)>1.d-8) then
+      !write(logstr, *) i, y-1.d0, "++R Gamma Basis error!!"
+      !call write_log
+    !endif
 
     !y = 0.d0
     !do  n1 = OmegaMin, OmegaMax-1
@@ -1350,7 +1408,10 @@ END SUBROUTINE undo_delete_gamma
         !y = y + weight_basis_Gamma(EPPL(i,:), n1, n2)**2.d0*ReweightBasis(n1, n2)
       !enddo
     !enddo
-    !if(dabs(y-1.d0)>1.d-8) write(*, *) i, y-1.d0, "++L Gamma Basis error!!"
+    !if(dabs(y-1.d0)>1.d-8) then
+      !write(logstr, *) i, y-1.d0, "++L Gamma Basis error!!"
+      !call write_log
+    !endif
 
     !y = 0.d0
     !do  n1 = OmegaMin, OmegaMax
@@ -1358,7 +1419,10 @@ END SUBROUTINE undo_delete_gamma
         !y = y + weight_basis_Gamma(EPN(i,:), n1, n2)**2.d0*ReweightBasis(n1, n2)
       !enddo
     !enddo
-    !if(dabs(y-1.d0)>1.d-8) write(*, *) i, y-1.d0, "+- Gamma Basis error!!"
+    !if(dabs(y-1.d0)>1.d-8) then
+      !write(logstr, *) i, y-1.d0, "+- Gamma Basis error!!"
+      !call write_log
+    !endif
 
     !y = 0.d0
     !do  n1 = -OmegaMax, -OmegaMin
@@ -1366,7 +1430,10 @@ END SUBROUTINE undo_delete_gamma
         !y = y + weight_basis_Gamma(ENP(i,:), n1, n2)**2.d0*ReweightBasis(n1, n2)
       !enddo
     !enddo
-    !if(dabs(y-1.d0)>1.d-8) write(*, *) i, y-1.d0, "-+ Gamma Basis error!!"
+    !if(dabs(y-1.d0)>1.d-8) then
+      !write(logstr, *) i, y-1.d0, "-+ Gamma Basis error!!"
+      !call write_log
+    !endif
 
     !y = 0.d0
     !do  n1 = -OmegaMax+1, -OmegaMin
@@ -1374,7 +1441,10 @@ END SUBROUTINE undo_delete_gamma
         !y = y + weight_basis_Gamma(ENNR(i,:), n1, n2)**2.d0*ReweightBasis(n1, n2)
       !enddo
     !enddo
-    !if(dabs(y-1.d0)>1.d-8) write(*, *) i, y-1.d0, "--R Gamma Basis error!!"
+    !if(dabs(y-1.d0)>1.d-8) then
+      !write(logstr, *) i, y-1.d0, "--R Gamma Basis error!!"
+      !call write_log
+    !endif
 
     !y = 0.d0
     !do  n1 = -OmegaMax, -OmegaMin-1
@@ -1382,24 +1452,45 @@ END SUBROUTINE undo_delete_gamma
         !y = y + weight_basis_Gamma(ENNL(i,:), n1, n2)**2.d0*ReweightBasis(n1, n2)
       !enddo
     !enddo
-    !if(dabs(y-1.d0)>1.d-8) write(*, *) i, y-1.d0, "--L Gamma Basis error!!"
+    !if(dabs(y-1.d0)>1.d-8) then
+      !write(logstr, *) i, y-1.d0, "--L Gamma Basis error!!"
+      !call write_log
+    !endif
   !enddo
 
 
   !do i = 1, nbasisGamma
     !do j = i+1, nbasisGamma
       !y = projector_Gamma(EPN(i, :), EPN(j, :), OmegaMin, OmegaMax,-OmegaMax,-OmegaMin)
-      !if(dabs(y)>1.d-8) write(*, *) i, j, y, "+- Gamma Basis error!!"
+      !if(dabs(y)>1.d-8) then
+        !write(logstr, *) i, j, y, "+- Gamma Basis error!!"
+        !call write_log
+      !endif
       !y = projector_Gamma(ENP(i, :), ENP(j, :),-OmegaMax,-OmegaMin, OmegaMin, OmegaMax)
-      !if(dabs(y)>1.d-8) write(*, *) i, j, y, "-+ Gamma Basis error!!"
+      !if(dabs(y)>1.d-8) then
+        !write(logstr, *) i, j, y, "-+ Gamma Basis error!!"
+        !call write_log
+      !endif
       !y = projector_Gamma(EPPR(i, :), EPPR(j, :), OmegaMin, OmegaMax, OmegaMin, 0)
-      !if(dabs(y)>1.d-7) write(*, *) i, j, y, "++R Gamma Basis error!!"
+      !if(dabs(y)>1.d-7) then
+        !write(logstr, *) i, j, y, "++R Gamma Basis error!!"
+        !call write_log
+      !endif
       !y = projector_Gamma(EPPL(i, :), EPPL(j, :), OmegaMin, OmegaMax, 0, OmegaMax)
-      !if(dabs(y)>1.d-7) write(*, *) i, j, y, "++L Gamma Basis error!!"
+      !if(dabs(y)>1.d-7) then
+        !write(logstr, *) i, j, y, "++L Gamma Basis error!!"
+        !call write_log
+      !endif
       !y = projector_Gamma(ENNR(i, :), ENNR(j, :),-OmegaMax,-OmegaMin,-OmegaMax, 0)
-      !if(dabs(y)>1.d-7) write(*, *) i, j, y, "--R Gamma Basis error!!"
+      !if(dabs(y)>1.d-7) then
+        !write(logstr, *) i, j, y, "--R Gamma Basis error!!"
+        !call write_log
+      !endif
       !y = projector_Gamma(ENNL(i, :), ENNL(j, :),-OmegaMax,-OmegaMin, 0, -OmegaMin)
-      !if(dabs(y)>1.d-7) write(*, *) i, j, y, "--L Gamma Basis error!!"
+      !if(dabs(y)>1.d-7) then
+        !write(logstr, *) i, j, y, "--L Gamma Basis error!!"
+        !call write_log
+      !endif
     !enddo
   !enddo
 
@@ -1592,6 +1683,25 @@ END SUBROUTINE
     !integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
     !call FFT_tau_single(Polar,1,Lx*Ly,BackForth)
 !END SUBROUTINE
+
+SUBROUTINE transfer_r(Backforth)
+  implicit none
+  integer,intent(in) :: Backforth
+
+  call transfer_W_r(Backforth)
+  call transfer_Gam_r(Backforth)
+  return
+END SUBROUTINE
+
+SUBROUTINE transfer_t(Backforth)
+  implicit none
+  integer,intent(in) :: Backforth
+
+  call transfer_G_t(Backforth)
+  call transfer_W_t(Backforth)
+  call transfer_Gam_t(Backforth)
+  return
+END SUBROUTINE
 
 SUBROUTINE transfer_Sigma_t(BackForth)
     implicit none
@@ -2128,7 +2238,7 @@ SUBROUTINE first_order_diagram
   WeightVertex(4) = weight_vertex(StatusVertex(4), 1, 0, 0, 0.d0, 0.d0, TypeVertex(4))
 
 
-  ratio = CoefOfWeight(1)*(1.d0/Beta)**Order *SignFermiLoop
+  ratio = (1.d0/Beta)**Order *SignFermiLoop
   Anew = d_times_cd(ratio, WeightLn(1)*WeightLn(2)*WeightLn(3)*WeightLn(4)* &
     & WeightLn(5)*WeightLn(6)*WeightVertex(1)*WeightVertex(2)*WeightVertex(3)* &
     & WeightVertex(4))
@@ -2275,7 +2385,7 @@ SUBROUTINE first_order_diagram_with_bubble
   WeightVertex(4) = weight_vertex(StatusVertex(4), 1, 0, 0, 0.d0, 0.d0, TypeVertex(4))
 
 
-  ratio = CoefOfWeight(1)*(1.d0/Beta)**Order *SignFermiLoop
+  ratio = (1.d0/Beta)**Order *SignFermiLoop
   Anew = d_times_cd(ratio, WeightLn(1)*WeightLn(2)*WeightLn(3)*WeightLn(4)* &
     & WeightLn(5)*WeightLn(6)*WeightVertex(1)*WeightVertex(2)*WeightVertex(3)* &
     & WeightVertex(4))
@@ -2445,7 +2555,7 @@ SUBROUTINE second_order_diagram
   WeightVertex(6) = weight_vertex(StatusVertex(6), 1, 0, 0, 0.d0, 0.d0, TypeVertex(6))
 
 
-  ratio = CoefOfWeight(2)*(1.d0/Beta)**Order *SignFermiLoop
+  ratio = (1.d0/Beta)**Order *SignFermiLoop
   Anew = d_times_cd(ratio, WeightLn(1)*WeightLn(2)*WeightLn(3)*WeightLn(4)* &
     & WeightLn(5)*WeightLn(6)*WeightLn(7) *WeightLn(8) *WeightLn(9) *WeightVertex(1) &
     & *WeightVertex(2)*WeightVertex(3)*WeightVertex(4)*WeightVertex(5)*WeightVertex(6))
