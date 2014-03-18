@@ -1289,12 +1289,15 @@ SUBROUTINE move_measuring_index
   endif
 END SUBROUTINE move_measuring_index
 
+
+
 !------------- change gamma time : Pupdate(16) -----------------
 SUBROUTINE change_gamma_time
   implicit none
-  integer :: iLn,iGam, jGam, dir, dirGam
+  integer :: isdelta
+  integer :: iLn, iLn1, iLn2, iLn3, iGam, jGam, dir, dirGam
   double precision :: Pacc, tau, tau1, tau2, newtau
-  complex*16 :: WGam, WLn, Anew, Aold, sgn
+  complex*16 :: WGam, WLn, WLn1, WLn2, WLn3, Anew, Aold, sgn
 
   !------- step1 : check if worm is present -------------
   if(IsWormPresent .eqv. .true.)    return
@@ -1303,43 +1306,70 @@ SUBROUTINE change_gamma_time
   !------- step2 : propose a new config -----------------
   iGam=generate_vertex()
   dir = Floor(rn()*3.d0) + 1  !dir=1: in;  dir=2: out; dir=3 : w
-
   iLn = NeighVertex(dir, iGam)
-  if(IsDeltaVertex(iGam)==1) return
   if(dir==3 .and. IsDeltaLn(iLn)==1)  return
+
+  isdelta=0
+  if(IsDeltaVertex(iGam)==1) isdelta=1
 
   newtau=generate_tau()
 
   !------- step3 : weight calculation -------------------
-  if(dir==1) then
-    tau1 = TVertex(3, iGam) - TVertex(2, iGam)
-    tau2 = newtau - TVertex(3, iGam)
-  else if(dir==2) then
-    tau1 = TVertex(3, iGam) - newtau
-    tau2 = TVertex(1, iGam) - TVertex(3, iGam)
-  else if(dir==3) then
-    tau1 = newtau - TVertex(2, iGam)
-    tau2 = TVertex(1, iGam) - newtau
+  if(isdelta==0) then
+    if(dir==1) then
+      tau1 = TVertex(3, iGam) - TVertex(2, iGam)
+      tau2 = newtau - TVertex(3, iGam)
+    else if(dir==2) then
+      tau1 = TVertex(3, iGam) - newtau
+      tau2 = TVertex(1, iGam) - TVertex(3, iGam)
+    else if(dir==3) then
+      tau1 = newtau - TVertex(2, iGam)
+      tau2 = TVertex(1, iGam) - newtau
+    endif
+  else
+    tau1 = 0
+    tau2 = 0
   endif
 
   WGam = weight_vertex(StatusVertex(iGam),IsDeltaVertex(iGam),GRVertex(1, iGam)-WRVertex(1, iGam), &
     & GRVertex(2, iGam)-WRVertex(2, iGam), tau1, tau2, TypeVertex(iGam))
 
-  if(dir==1 .or. dir==2) then
-    jGam = NeighLn(dir, iLn)
-    tau = (-1)**dir *(TVertex(dir, jGam) - tau)
-    WLn = weight_line(StatusLn(iLn),IsDeltaLn(iLn),1,0,0, tau, TypeLn(iLn))
+  if(isdelta==0) then
+    if(dir==1 .or. dir==2) then
+      jGam = NeighLn(dir, iLn)
+      tau = (-1)**dir *(TVertex(dir, jGam) - newtau)
+      WLn = weight_line(StatusLn(iLn),IsDeltaLn(iLn),1,0,0, tau, TypeLn(iLn))
+    else if(dir==3) then
+      dirGam = DirecVertex(iGam)
+      jGam = NeighLn(3-dirGam, iLn)
+      tau = (-1)**dirGam*(newtau -TVertex(3, jGam))
+      WLn = weight_line(StatusLn(iLn),IsDeltaLn(iLn),2, WRVertex(1, iGam)-WRVertex(1, jGam), &
+        & WRVertex(2, iGam)-WRVertex(2, jGam), tau, TypeLn(iLn))
+    endif
+    Anew = WGam*WLn
+    Aold = WeightLn(iLn)*WeightVertex(iGam)
 
-  else if(dir==3) then
+  else if(isdelta==1) then
+    iLn1 = NeighVertex(1, iGam)
+    jGam = NeighLn(1, iLn1)
+    tau = newtau - TVertex(1, jGam)
+    WLn1 = weight_line(StatusLn(iLn1),IsDeltaLn(iLn1),1,0,0, tau, TypeLn(iLn1))
+
+    iLn2 = NeighVertex(2, iGam)
+    jGam = NeighLn(2, iLn2)
+    tau = TVertex(2, jGam) - newtau
+    WLn2 = weight_line(StatusLn(iLn2),IsDeltaLn(iLn2),1,0,0, tau, TypeLn(iLn2))
+
+    iLn3 = NeighVertex(3, iGam)
     dirGam = DirecVertex(iGam)
-    jGam = NeighLn(3-dirGam, iLn)
+    jGam = NeighLn(3-dirGam, iLn3)
     tau = (-1)**dirGam*(newtau -TVertex(3, jGam))
-    WLn = weight_line(StatusLn(iLn),IsDeltaLn(iLn),2, WRVertex(1, iGam)-WRVertex(1, jGam), &
-      & WRVertex(2, iGam)-WRVertex(2, jGam), tau, TypeLn(iLn))
-  endif
+    WLn3 = weight_line(StatusLn(iLn3),IsDeltaLn(iLn3),2, WRVertex(1, iGam)-WRVertex(1, jGam), &
+      & WRVertex(2, iGam)-WRVertex(2, jGam), tau, TypeLn(iLn3))
 
-  Anew = WGam*WLn
-  Aold = WeightLn(iLn)*WeightVertex(iGam)
+    Anew = WGam *WLn1 *WLn2 *WLn3
+    Aold = WeightVertex(iGam) *WeightLn(iLn1) *WeightLn(iLn2) *WeightLn(iLn3)
+  endif
 
   call weight_ratio(Pacc, sgn, Anew, Aold)
 
@@ -1352,10 +1382,17 @@ SUBROUTINE change_gamma_time
     Phase = Phase *sgn
 
     !------ update the time of elements --------------
-    TVertex(dir, iGam) = newtau
-
     !------ update the weight of elements ------------
-    WeightLn(iLn) = WLn
+    if(isdelta==0) then
+      TVertex(dir, iGam) = newtau
+      WeightLn(iLn) = WLn
+    else 
+      TVertex(:, iGam) = newtau
+      WeightLn(iLn1) = WLn1
+      WeightLn(iLn2) = WLn2
+      WeightLn(iLn3) = WLn3
+    endif
+
     WeightVertex(iGam) = WGam
 
     call update_weight(Anew, Aold)
