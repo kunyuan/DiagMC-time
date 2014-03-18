@@ -196,10 +196,10 @@ SUBROUTINE markov
           call change_Gamma_type     
         case(15) 
           call move_measuring_index       
-        !case(16)  
-          !call change_gline_time        
-        !case(17)  
-          !call change_wline_time        
+        case(16)  
+          call change_gline_time        
+        case(17)  
+          call change_wline_time        
         case(18)  
           call change_wline_isdelta       
         case(19)  
@@ -936,7 +936,7 @@ SUBROUTINE add_interaction
   integer :: statIA, statAC, statMB, statBD
   double precision :: WWorm, Pacc
   complex*16 :: WA, WB, WGIA, WGAC, WGMB, WGBD, WIra, WMasha, WWAB, WMeasureGam
-  double precision :: Anew, Aold, sgn
+  complex*16 :: Anew, Aold, sgn
 
   
   !---------- step1 : check if worm is present ------------------
@@ -982,8 +982,74 @@ SUBROUTINE add_interaction
 END SUBROUTINE add_interaction
 
 
+!------------- change gline time : Pupdate(16) -----------------
 SUBROUTINE change_gline_time
-    implicit none
+  implicit none
+  integer :: iGLn,iGam, jGam, dir
+  double precision :: Pacc, tau, tau1, tau2, newtau
+  complex*16 :: WGam, WG, Anew, Aold, sgn
+
+  !------- step1 : check if worm is present -------------
+  if(IsWormPresent .eqv. .true.)    return
+  !ProbProp(iupdate) = ProbProp(iupdate) + 1
+
+  !------- step2 : propose a new config -----------------
+  iGam=generate_vertex()
+  dir = Floor(rn()*2.d0) + 1  !dir=1: in;  dir=2: out
+
+  iGLn = NeighVertex(dir, iGam)
+  if(IsDeltaVertex(iGam)==1) return
+
+  newtau=generate_tau()
+
+  !------- step3 : weight calculation -------------------
+  if(dir==1) then
+    tau1 = T3Vertex(iGam) - T2Vertex(iGam)
+    tau2 = newtau - T3Vertex(iGam)
+  else
+    tau1 = T3Vertex(iGam) - newtau
+    tau2 = T1Vertex(iGam) - T3Vertex(iGam)
+  endif
+  WGam = weight_vertex(StatusVertex(iGam),IsDeltaVertex(iGam),GXVertex(iGam)-WXVertex(iGam), &
+    & GYVertex(iGam)-WYVertex(iGam), tau1, tau2, TypeVertex(iGam))
+
+  jGam = NeighLn(dir, iGLn)
+  if(dir==1) then
+    tau = newtau - T1Vertex(jGam)
+  else
+    tau = T2Vertex(jGam) - newtau
+  endif
+  WG = weight_line(StatusLn(iGLn),IsDeltaLn(iGLn),1,0,0, tau, TypeLn(iGLn))
+
+  Anew = WGam*WG
+  Aold = WeightLn(iGLn)*WeightVertex(iGam)
+
+  call weight_ratio(Pacc, sgn, Anew, Aold)
+
+  !------- step5 : accept the update --------------------
+  ProbProp(Order, iupdate) = ProbProp(Order, iupdate) + 1
+
+  if(rn()<=Pacc) then
+
+    !------ update the diagram info -------------------
+    Phase = Phase *sgn
+
+    !------ update the time of elements --------------
+    if(dir==1) then
+      T1Vertex(iGam) = newtau
+    else 
+      T2Vertex(iGam) = newtau
+    endif
+
+    !------ update the weight of elements ------------
+    WeightLn(iGLn) = WG
+    WeightVertex(iGam) = WGam
+
+    call update_weight(Anew, Aold)
+
+    ProbAcc(Order, 16) = ProbAcc(Order, 16) + 1
+  endif
+  return
     
 end SUBROUTINE
 
@@ -992,28 +1058,72 @@ SUBROUTINE change_gline_space
     
 end SUBROUTINE
 
+!------------- change wline time : Pupdate(17) -----------------
 SUBROUTINE change_wline_time
     implicit none
-    !integer :: iWLn,iGam
-    !double precision :: Pacc,WNewTau
-    !complex*16 :: WOldWeight,WNewWeight,GamOldWeight,GamNewWeight,Anew,Aold,sgn
-    !!------- step1 : check if worm is present -------------
-    !if(IsWormPresent .eqv. .true.)    return
-    !!ProbProp(iupdate) = ProbProp(iupdate) + 1
+    integer :: iWLn,iGam, jGam, dir
+    double precision :: Pacc, tau, tau1, tau2, newtau3
+    complex*16 :: WGam, WW, Anew, Aold, sgn
 
-    !!------- step2 : propose a new config -----------------
-    !iGam=generate_gamma()
-    !if(IsDeltaVertex(iGam))return
-    !WNewTau=generate_tau()
+    !------- step1 : check if worm is present -------------
+    if(IsWormPresent .eqv. .true.)    return
+    !ProbProp(iupdate) = ProbProp(iupdate) + 1
 
-    
-end SUBROUTINE
+    !------- step2 : propose a new config -----------------
+    iGam=generate_vertex()
+    iWLn = NeighVertex(3, iGam)
+
+    if(IsDeltaVertex(iGam)==1) return
+    if(IsDeltaLn(iWLn)==1)     return
+
+    newtau3=generate_tau()
+
+    !------- step3 : weight calculation -------------------
+    tau1 = newtau3 - T2Vertex(iGam)
+    tau2 = T1Vertex(iGam) - newtau3
+    WGam = weight_vertex(StatusVertex(iGam),IsDeltaVertex(iGam),GXVertex(iGam)-WXVertex(iGam), &
+      & GYVertex(iGam)-WYVertex(iGam), tau1, tau2, TypeVertex(iGam))
+
+    dir = DirecVertex(iGam)
+    jGam = NeighLn(3-dir, iWLn)
+    tau = (-1)**dir*(newtau3 -T3Vertex(jGam))
+    WW = weight_line(StatusLn(iWLn),IsDeltaLn(iWLn),2, WXVertex(iGam)-WXVertex(jGam), &
+      & WYVertex(iGam)-WYVertex(jGam), tau, TypeLn(iWLn))
+
+
+    Anew = WGam*WW
+    Aold = WeightLn(iWLn)*WeightVertex(iGam)
+
+    call weight_ratio(Pacc, sgn, Anew, Aold)
+
+    !------- step5 : accept the update --------------------
+    ProbProp(Order, iupdate) = ProbProp(Order, iupdate) + 1
+
+    if(rn()<=Pacc) then
+
+      !------ update the diagram info -------------------
+      Phase = Phase *sgn
+
+      !------ update the time of elements --------------
+      T3Vertex(iGam) = newtau3
+
+      !------ update the weight of elements ------------
+      WeightLn(iWLn) = WW
+      WeightVertex(iGam) = WGam
+
+      call update_weight(Anew, Aold)
+
+      ProbAcc(Order, 17) = ProbAcc(Order, 17) + 1
+    endif
+    return
+END SUBROUTINE change_wline_time
 
 SUBROUTINE change_wline_space
     implicit none
     integer :: iGam, iWLn, jGam, dxw, dyw, xwi, ywi, xwj, ywj, dir
     double precision :: Pacc,T1,T2,T3,T4,T5,T6,WeightIX,WeightIY,WeightJX,WeightJY
     complex*16  ::  WiGam,WjGam, WW, Anew, Aold, sgn
+
     !------- step1 : check if worm is present -------------
     if(IsWormPresent .eqv. .true.)    return
     !ProbProp(iupdate) = ProbProp(iupdate) + 1
@@ -1094,7 +1204,7 @@ SUBROUTINE change_Gamma_type
   !ProbProp(iupdate) = ProbProp(iupdate) + 1
 
   !------- step2 : propose a new config -----------------
-  iGam = generate_gamma()
+  iGam = generate_vertex()
   if(IsDeltaVertex(iGam)==1)  return
 
   dir  = DirecVertex(iGam)
@@ -1179,7 +1289,7 @@ SUBROUTINE move_measuring_index
   !ProbProp(iupdate) = ProbProp(iupdate) + 1
 
   !------- step2 : propose a new config -----------------
-  iGam = generate_gamma()
+  iGam = generate_vertex()
   if(IsDeltaVertex(iGam)/=1)   return
 
   iGin  = NeighVertex(1, iGam);      iGout = NeighVertex(2, iGam)
@@ -1432,7 +1542,7 @@ SUBROUTINE change_gamma_isdelta
   !ProbProp(iupdate) = ProbProp(iupdate) + 1
 
   !------- step2 : propose a new config -----------------
-  iGam = generate_gamma()
+  iGam = generate_vertex()
   if(iGam==MeasureGam)  return
 
   iGin = NeighVertex(1, iGam)
@@ -1517,10 +1627,6 @@ SUBROUTINE change_gamma_isdelta
   return
 END SUBROUTINE change_Gamma_isdelta
   
-
-
-
-
 
 !--------- exchange the location of Ira and Masha  -----
 SUBROUTINE switch_ira_and_masha

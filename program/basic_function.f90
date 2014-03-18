@@ -332,13 +332,13 @@ INTEGER FUNCTION generate_wline()
 END FUNCTION generate_wline
 
 !----------- randomly pick a gamma -------------
-INTEGER FUNCTION generate_gamma()
+INTEGER FUNCTION generate_vertex()
   implicit none
   integer :: rand
   rand = Floor(rn()*NVertex)+1
-  generate_gamma = VertexKey2Value(rand)
+  generate_vertex = VertexKey2Value(rand)
   return
-END FUNCTION generate_gamma
+END FUNCTION generate_vertex
 !!!=======================================================================
 !!!=======================================================================
 !!!=======================================================================
