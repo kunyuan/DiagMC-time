@@ -2210,9 +2210,9 @@ SUBROUTINE first_order_diagram
 
   ! the time variables of Gamma 1, 2, 3 and 4
   TVertex(1, 1)=0.d0; TVertex(2, 1)=0.d0; TVertex(3, 1)=0.d0
-  TVertex(1, 2)=0.1; TVertex(2, 2)=0.1; TVertex(3, 2)=0.1
-  TVertex(1, 3)=0.2; TVertex(2, 3)=0.2; TVertex(3, 3)=0.2
-  TVertex(1, 4)=0.3; TVertex(2, 4)=0.3; TVertex(3, 4)=0.3
+  TVertex(1, 2)=0.01; TVertex(2, 2)=0.01; TVertex(3, 2)=0.01
+  TVertex(1, 3)=0.02; TVertex(2, 3)=0.02; TVertex(3, 3)=0.02
+  TVertex(1, 4)=0.03; TVertex(2, 4)=0.03; TVertex(3, 4)=0.03
 
   ! Direction of Gamma: 1: left of W;  2: right of W
   DirecVertex(1) = 1;                DirecVertex(2) = 2
@@ -2357,9 +2357,9 @@ SUBROUTINE first_order_diagram_with_bubble
 
   ! the time variables of Gamma 1, 2, 3 and 4
   TVertex(1, 1)=0.d0; TVertex(2, 1)=0.d0; TVertex(3, 1)=0.d0
-  TVertex(1, 2)=0.1; TVertex(2, 2)=0.1; TVertex(3, 2)=0.1
-  TVertex(1, 3)=0.2; TVertex(2, 3)=0.2; TVertex(3, 3)=0.2
-  TVertex(1, 4)=0.3; TVertex(2, 4)=0.3; TVertex(3, 4)=0.3
+  TVertex(1, 2)=0.01; TVertex(2, 2)=0.01; TVertex(3, 2)=0.01
+  TVertex(1, 3)=0.02; TVertex(2, 3)=0.02; TVertex(3, 3)=0.02
+  TVertex(1, 4)=0.03; TVertex(2, 4)=0.03; TVertex(3, 4)=0.03
 
   ! Direction of Gamma: 1: left of W;  2: right of W
   DirecVertex(1) = 1;                DirecVertex(2) = 2
@@ -2517,11 +2517,11 @@ SUBROUTINE second_order_diagram
 
   ! the time variables of Gamma 1, 2, 3 and 4
   TVertex(1, 1)=0.d0;  TVertex(2, 1)=0.d0;  TVertex(3, 1)=0.d0
-  TVertex(1, 2)=0.1d0; TVertex(2, 2)=0.1d0; TVertex(3, 2)=0.1d0
-  TVertex(1, 3)=0.2d0; TVertex(2, 3)=0.2d0; TVertex(3, 3)=0.2d0
-  TVertex(1, 4)=0.3d0; TVertex(2, 4)=0.3d0; TVertex(3, 4)=0.3d0
-  TVertex(1, 5)=0.4d0; TVertex(2, 5)=0.4d0; TVertex(3, 5)=0.4d0
-  TVertex(1, 6)=0.5d0; TVertex(2, 6)=0.5d0; TVertex(3, 6)=0.5d0
+  TVertex(1, 2)=0.01d0; TVertex(2, 2)=0.01d0; TVertex(3, 2)=0.01d0
+  TVertex(1, 3)=0.02d0; TVertex(2, 3)=0.02d0; TVertex(3, 3)=0.02d0
+  TVertex(1, 4)=0.03d0; TVertex(2, 4)=0.03d0; TVertex(3, 4)=0.03d0
+  TVertex(1, 5)=0.04d0; TVertex(2, 5)=0.04d0; TVertex(3, 5)=0.04d0
+  TVertex(1, 6)=0.05d0; TVertex(2, 6)=0.05d0; TVertex(3, 6)=0.05d0
 
   ! Direction of Gamma: 1: left of W;  2: right of W
   DirecVertex(1) = 1;                DirecVertex(2) = 2
