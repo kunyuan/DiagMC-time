@@ -45,8 +45,8 @@ SUBROUTINE print_config
     iv = VertexKey2Value(i)
     if(StatusVertex(iv) <0) cycle
     write(8, 12) iv,IsDeltaVertex(iv), TypeVertex(iv), SpInVertex(1, iv),SpInVertex(2, iv), &
-      & GXVertex(iv),GYVertex(iv),WXVertex(iv),WYVertex(iv), T1Vertex(iv), T2Vertex(iv),  &
-      & T3Vertex(iv), DirecVertex(iv), StatusVertex(iv), NeighVertex(:,iv)
+      & GRVertex(1, iv),GRVertex(2, iv),WRVertex(1, iv),WRVertex(2, iv), TVertex(1, iv), TVertex(2, iv),  &
+      & TVertex(3, iv), DirecVertex(iv), StatusVertex(iv), NeighVertex(:,iv)
   enddo
   write(8, *) "============================================================"
 
@@ -181,14 +181,14 @@ SUBROUTINE DRAW()
     do i=1,NWLn;
       iWLn=WLnKey2Value(i)
       Vertex1=NeighLn(1,iWLn)
-      x1=scx*T3Vertex(Vertex1)
-      y1=scy*site_num(GXVertex(Vertex1),GYVertex(Vertex1))
+      x1=scx*TVertex(3, Vertex1)
+      y1=scy*site_num(GRVertex(1, Vertex1),GRVertex(2, Vertex1))
       !write(*,*) "W"
-      !write(*,*) T3Vertex(Vertex1),Vertex1
+      !write(*,*) TVertex(3, Vertex1),Vertex1
       Vertex2=NeighLn(2,iWLn)
-      !write(*,*) T3Vertex(Vertex2),Vertex2
-      x2=scx*T3Vertex(Vertex2)
-      y2=scy*site_num(GXVertex(Vertex2),GYVertex(Vertex2))
+      !write(*,*) TVertex(3, Vertex2),Vertex2
+      x2=scx*TVertex(3, Vertex2)
+      y2=scy*site_num(GRVertex(1, Vertex2),GRVertex(2, Vertex2))
 
       if(Vertex1 .ne. Ira .and. Vertex2 .ne. Masha &
           & .and. Vertex1 .ne. Masha .and. Vertex2 .ne. Ira) then
@@ -207,16 +207,16 @@ SUBROUTINE DRAW()
     do i=1,NGLn;
       iGLn=GLnKey2Value(i)
       Vertex1=NeighLn(1,iGLn)
-      x1=scx*T3Vertex(Vertex1)
-      y1=scy*site_num(GXVertex(Vertex1),GYVertex(Vertex1))
+      x1=scx*TVertex(3, Vertex1)
+      y1=scy*site_num(GRVertex(1, Vertex1),GRVertex(2, Vertex1))
       !write(*,*) "G"
       !write(*,*) "V1",Vertex1
-      !write(*,*) T3Vertex(Vertex1),GXVertex(Vertex1),GYVertex(Vertex1)
+      !write(*,*) TVertex(3, Vertex1),GRVertex(1, Vertex1),GRVertex(2, Vertex1)
       Vertex2=NeighLn(2,iGLn)
       !write(*,*) "V2",Vertex2
-      x2=scx*T3Vertex(Vertex2)
-      y2=scy*site_num(GXVertex(Vertex2),GYVertex(Vertex2))
-      !write(*,*) T3Vertex(Vertex2),GXVertex(Vertex2),GYVertex(Vertex2)
+      x2=scx*TVertex(3, Vertex2)
+      y2=scy*site_num(GRVertex(1, Vertex2),GRVertex(2, Vertex2))
+      !write(*,*) TVertex(3, Vertex2),GRVertex(1, Vertex2),GRVertex(2, Vertex2)
 
       if(TypeLn(iGLn)==1) then
         write(11,*) '1 0 0 setrgbcolor'
@@ -253,7 +253,7 @@ SUBROUTINE DRAW()
       else
         iWLn=NeighVertex(3,Vertex1)
         Vertex3=NeighLn(3-DirecVertex(Vertex1),iWLn)
-        y3=scy*site_num(GXVertex(Vertex3),GYVertex(Vertex3))
+        y3=scy*site_num(GRVertex(1, Vertex3),GRVertex(2, Vertex3))
         sgn=1.d0
         IF(y3>y1) sgn=-1.d0   
         write(11,780) x1, y1+sgn*scy/5. , scy/5. 
@@ -264,8 +264,8 @@ SUBROUTINE DRAW()
     write(11,"(f6.1,x,f6.1,x,' M (Gamma info) C')") 520.0,350.0
     do i=1,NVertex
       Vertex1=VertexKey2Value(i)
-      x1=scx*T3Vertex(Vertex1)
-      y1=scy*site_num(GXVertex(Vertex1),GYVertex(Vertex1))
+      x1=scx*TVertex(3, Vertex1)
+      y1=scy*site_num(GRVertex(1, Vertex1),GRVertex(2, Vertex1))
       if(Vertex1==Ira) then
         write(11,*) '1 0 0 setrgbcolor'
       elseif(Vertex1==Masha) then
@@ -277,8 +277,8 @@ SUBROUTINE DRAW()
       endif
       write(11,777) x1, y1, scy/20.
       write(11,801) x1-5., y1+7., i
-      write(11,802) 500.0,350.0-i*15,i,T3Vertex(Vertex1), &
-         & GXVertex(Vertex1),GYVertex(Vertex2)
+      write(11,802) 500.0,350.0-i*15,i,TVertex(3, Vertex1), &
+         & GRVertex(1, Vertex1),GRVertex(2, Vertex2)
     enddo
 
     write(11,*) ''
@@ -516,9 +516,9 @@ SUBROUTINE write_monte_carlo_conf
   write(103)  kLn(:)
   write(103)  Hash4G(:) 
   write(103)  Hash4W(:)
-  write(103)  GXVertex(:), GYVertex(:)
-  write(103)  WXVertex(:), WYVertex(:)
-  write(103)  T1Vertex(:), T2Vertex(:), T3Vertex(:)
+  write(103)  GRVertex(1, :), GRVertex(2, :)
+  write(103)  WRVertex(1, :), WRVertex(2, :)
+  write(103)  TVertex(1, :), TVertex(2, :), TVertex(3, :)
   write(103)  DirecVertex(:)             
   write(103)  WeightLn(:) 
   write(103)  WeightVertex(:) 
@@ -589,9 +589,9 @@ SUBROUTINE read_monte_carlo_conf
   read(106)  kLn(:)
   read(106)  Hash4G(:) 
   read(106)  Hash4W(:)
-  read(106)  GXVertex(:), GYVertex(:)
-  read(106)  WXVertex(:), WYVertex(:)
-  read(106)  T1Vertex(:), T2Vertex(:), T3Vertex(:)
+  read(106)  GRVertex(1, :), GRVertex(2, :)
+  read(106)  WRVertex(1, :), WRVertex(2, :)
+  read(106)  TVertex(1, :), TVertex(2, :), TVertex(3, :)
   read(106)  DirecVertex(:)             
   read(106)  WeightLn(:) 
   read(106)  WeightVertex(:) 

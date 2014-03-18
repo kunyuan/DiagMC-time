@@ -226,13 +226,13 @@ SUBROUTINE check_time
   do ikey = 1, NVertex
     i = VertexKey2Value(ikey)
     if(IsDeltaVertex(i)==1) then
-      if(T1Vertex(i)/=T2Vertex(i) .or. T1Vertex(i)/=T3Vertex(i) .or. T2Vertex(i) &
-        & /=T3Vertex(i)) then
+      if(TVertex(1, i)/=TVertex(2, i) .or. TVertex(1, i)/=TVertex(3, i) .or. TVertex(2, i) &
+        & /=TVertex(3, i)) then
         write(36, *) "================================================="
         write(36, *) "Oops, check_time found a bug!"
         write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
         write(36, *) "delta Gamma is wrong!"
-        write(36, *) "gamma's number", i, "time", T1Vertex(i), T2Vertex(i), T3Vertex(i)
+        write(36, *) "gamma's number", i, "time", TVertex(1, i), TVertex(2, i), TVertex(3, i)
         write(36, *) "================================================="
         call print_config
         stop
@@ -243,12 +243,12 @@ SUBROUTINE check_time
   do ikey = 1, NWLn
     i = WLnKey2Value(ikey)
     if(IsDeltaLn(i)==1) then
-      if(T3Vertex(NeighLn(1, i))/=T3Vertex(NeighLn(2, i))) then
+      if(TVertex(3, NeighLn(1, i))/=TVertex(3, NeighLn(2, i))) then
         write(36, *) "================================================="
         write(36, *) "Oops, check_time found a bug!"
         write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
         write(36, *) "delta W is wrong!"
-        write(36, *) "W's number", i, "time", T3Vertex(NeighLn(1,i)),T3Vertex(NeighLn(2,i))
+        write(36, *) "W's number", i, "time", TVertex(3, NeighLn(1,i)),TVertex(3, NeighLn(2,i))
         write(36, *) "================================================="
         call print_config
         stop
@@ -264,42 +264,42 @@ SUBROUTINE check_site
 
   do ikey = 1, NVertex
     i = VertexKey2Value(ikey)
-    if(GXVertex(i)<0 .or. GXVertex(i)>Lx-1) then
+    if(GRVertex(1, i)<0 .or. GRVertex(1, i)>Lx-1) then
       write(36, *) "================================================="
       write(36, *) "Oops, check_site found a bug!"
       write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
       write(36, *) "GX is wrong!"
-      write(36, *) "gamma's number", i, "GX", GXVertex(i)
+      write(36, *) "gamma's number", i, "GX", GRVertex(1, i)
       write(36, *) "================================================="
       call print_config
       stop
     endif
-    if(GYVertex(i)<0 .or. GYVertex(i)>Ly-1) then
+    if(GRVertex(2, i)<0 .or. GRVertex(2, i)>Ly-1) then
       write(36, *) "================================================="
       write(36, *) "Oops, check_site found a bug!"
       write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
       write(36, *) "GY is wrong!"
-      write(36, *) "gamma's number", i, "GY", GYVertex(i)
+      write(36, *) "gamma's number", i, "GY", GRVertex(2, i)
       write(36, *) "================================================="
       call print_config
       stop
     endif
-    if(WXVertex(i)<0 .or. WXVertex(i)>Lx-1) then
+    if(WRVertex(1, i)<0 .or. WRVertex(1, i)>Lx-1) then
       write(36, *) "================================================="
       write(36, *) "Oops, check_site found a bug!"
       write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
       write(36, *) "WX is wrong!"
-      write(36, *) "gamma's number", i, "WX", WXVertex(i)
+      write(36, *) "gamma's number", i, "WX", WRVertex(1, i)
       write(36, *) "================================================="
       call print_config
       stop
     endif
-    if(WYVertex(i)<0 .or. WYVertex(i)>Ly-1) then
+    if(WRVertex(2, i)<0 .or. WRVertex(2, i)>Ly-1) then
       write(36, *) "================================================="
       write(36, *) "Oops, check_site found a bug!"
       write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
       write(36, *) "WY is wrong!"
-      write(36, *) "gamma's number", i, "WY", WYVertex(i)
+      write(36, *) "gamma's number", i, "WY", WRVertex(2, i)
       write(36, *) "================================================="
       call print_config
       stop
@@ -529,13 +529,13 @@ SUBROUTINE check_weight
   do i = 1, MxNLn
     if(StatusLn(i)<0)  cycle
     if(KindLn(i)==1) then
-      tau = T2Vertex(NeighLn(2, i))-T1Vertex(NeighLn(1, i))
+      tau = TVertex(2, NeighLn(2, i))-TVertex(1, NeighLn(1, i))
       wln(i) = weight_line(StatusLn(i),IsDeltaLn(i),1,0,0, tau, TypeLn(i))
     else
       Gam1 = NeighLn(1,i);       Gam2 = NeighLn(2,i)
-      tau = T3Vertex(NeighLn(2, i))-T3Vertex(NeighLn(1, i))
-      wln(i) = weight_line(StatusLn(i),IsDeltaLn(i),2,WXVertex(Gam1)-WXVertex(Gam2), &
-        & WYVertex(Gam1)-WYVertex(Gam2), tau, TypeLn(i))
+      tau = TVertex(3, NeighLn(2, i))-TVertex(3, NeighLn(1, i))
+      wln(i) = weight_line(StatusLn(i),IsDeltaLn(i),2,WRVertex(1, Gam1)-WRVertex(1, Gam2), &
+        & WRVertex(2, Gam1)-WRVertex(2, Gam2), tau, TypeLn(i))
     endif
     weight = weight *wln(i)
   enddo
@@ -544,10 +544,10 @@ SUBROUTINE check_weight
     if(StatusVertex(i)<0)  cycle
     G1 = NeighVertex(1, i);           G2 = NeighVertex(2, i)
     W = NeighVertex(3, i)
-    tau1 = T3Vertex(i)-T2Vertex(i)
-    tau2 = T1Vertex(i)-T3Vertex(i)
-    wgam(i) = weight_vertex(StatusVertex(i), IsDeltaVertex(i), GXVertex(i)-WXVertex(i), &
-      & GYVertex(i)-WYVertex(i), tau1, tau2, TypeVertex(i))
+    tau1 = TVertex(3, i)-TVertex(2, i)
+    tau2 = TVertex(1, i)-TVertex(3, i)
+    wgam(i) = weight_vertex(StatusVertex(i), IsDeltaVertex(i), GRVertex(1, i)-WRVertex(1, i), &
+      & GRVertex(2, i)-WRVertex(2, i), tau1, tau2, TypeVertex(i))
     weight = weight *wgam(i)
   enddo
 
