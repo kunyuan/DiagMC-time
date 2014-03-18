@@ -132,7 +132,8 @@ SUBROUTINE self_consistent
       !call calculate_Gamma1   
       !flag = self_consistent_GW(1.d-7)
       !WWR = weight_W(1, 0, 0, 1)
-      !write(*, *) "first order self-consistent loop:", iloop, WOldR, WWR
+      !write(logstr, *) "first order self-consistent loop:", iloop, WOldR, WWR
+      !call write_log
     !enddo
 
     !call calculate_Gamma1
@@ -207,7 +208,8 @@ LOGICAL FUNCTION self_consistent_GW(err)
 
       WNow = weight_W(1, 0, 0, 0)
 
-      write(*, *) "G-W loop:", iloop, real(WOld), real(WNow)
+      write(logstr, *) "G-W loop:", iloop, real(WOld), real(WNow)
+      call write_log
     enddo
   !else
     !do iloop = 1, 10 
@@ -217,7 +219,8 @@ LOGICAL FUNCTION self_consistent_GW(err)
       !call calculate_W
       !WWR = weight_W(0, 0, 1, 1)
 
-      !write(*, *) "G-W loop:", iloop, WOldR, WWR
+      !write(logstr, *) "G-W loop:", iloop, WOldR, WWR
+      !write_log
     !enddo
   endif
 
@@ -229,25 +232,6 @@ LOGICAL FUNCTION self_consistent_GW(err)
   call transfer_t(-1)
   return
 END FUNCTION self_consistent_GW
-
-SUBROUTINE transfer_r(Backforth)
-  implicit none
-  integer,intent(in) :: Backforth
-
-  call transfer_W_r(Backforth)
-  call transfer_Gam_r(Backforth)
-  return
-END SUBROUTINE
-
-SUBROUTINE transfer_t(Backforth)
-  implicit none
-  integer,intent(in) :: Backforth
-
-  call transfer_G_t(Backforth)
-  call transfer_W_t(Backforth)
-  call transfer_Gam_t(Backforth)
-  return
-END SUBROUTINE
 
 SUBROUTINE monte_carlo
   implicit none
@@ -273,8 +257,9 @@ SUBROUTINE monte_carlo
 
     call time_elapse
     t_simu = t_elap
-    write(*,52) t_simu
-    52 format(/'thermalization time:',f16.7,2x,'s')
+    write(logstr,52) t_simu
+    call write_log
+    52 format('thermalization time:',f16.7,2x,'s')
 
   else if(InpMC==1) then
 
@@ -305,7 +290,8 @@ SUBROUTINE monte_carlo
   IsToss=0
 
   do iblck = 1, Nblck
-    write(*,*) "Block",iblck," Started!"
+    write(logstr,*) "Block",iblck," started!"
+    call write_log
     call markov
 
     !call output_GamMC
@@ -318,16 +304,21 @@ SUBROUTINE monte_carlo
       !mc_version = file_version
     !endif
 
-    call print_config
     !call write_monte_carlo_conf
     !call write_monte_carlo_data
     !call write_monte_carlo_test
+
+    write(logstr,*) "Block",iblck," is done!"
+    call write_log
+    write(logstr,*) "Average worm steps/block: ",imc/iblck
+    call write_log
   enddo
 
   call time_elapse
   t_simu = t_elap
-  write(*,51) t_simu
-  51 format(/'simulation time:',f16.7,2x,'s')
+  write(logstr,51) t_simu
+  call write_log
+  51 format('simulation time:',f16.7,2x,'s')
 
   return
 END SUBROUTINE monte_carlo
