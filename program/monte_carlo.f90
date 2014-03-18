@@ -932,6 +932,7 @@ SUBROUTINE add_interaction
   integer :: WAB, GIA, GMB, GamA, GamB
   integer :: typGamA, typGamB, typAB
   integer :: statA, statB, statIA, statAC, statMB, statBD
+  double precision :: tauA, tauB
   double precision :: tau, tau1, tau2, WWorm, Pacc
   complex*16 :: WA, WB, WGIA, WGAC, WGMB, WGBD, WWAB, WMeasureGam
   complex*16 :: Anew, Aold, sgn
@@ -956,14 +957,9 @@ SUBROUTINE add_interaction
   if(Hash4W(abs(add_k(kIA,-kMB)))==1)  return
   if(Hash4W(abs(add_k(kIA,-kLn(GMD))))==1)  return
   if(Hash4W(abs(add_k(kLn(GIC),-kMB)))==1)  return
-  !-------- the new spin, type and status for the new config ----
-  statA = 0
-  statB = 0
-
-  statIA = line_stat(statA, StatusVertex(Ira)) 
-  statMB = line_stat(statB, StatusVertex(Masha)) 
-  statAC = line_stat(statA, StatusVertex(GamC))
-  statBD = line_stat(statB, StatusVertex(GamD))
+  !-------- the new time, spin, type and status for the new config ----
+  tauA = generate_tau()
+  tauB = generate_tau()
 
   typGamA = TypeSp2Gam(TypeLn(GIC), TypeLn(GIC), TypeLn(GIC), TypeLn(GIC))
   typGamB = TypeSp2Gam(TypeLn(GMD), TypeLn(GMD), TypeLn(GMD), TypeLn(GMD))
@@ -974,29 +970,37 @@ SUBROUTINE add_interaction
     typAB = TypeGam2W(typGamB, typGamA)
   endif
 
+  statA = 0
+  statB = 0
+  statIA = line_stat(statA, StatusVertex(Ira)) 
+  statMB = line_stat(statB, StatusVertex(Masha)) 
+  statAC = line_stat(statA, StatusVertex(GamC))
+  statBD = line_stat(statB, StatusVertex(GamD))
+
   Order = Order + 1 !!!!! add Order to the next Order
 
   !-------------- step3 : weight calculation --------------------
-  !! TVertex(:, GamA)=TVertex(3-dir, Ira)
-  !! TVertex(:, GamB)=TVertex(3-dir, Masha)
+  !! TVertex(:, GamA)=tauA
+  !! TVertex(:, GamB)=tauB
   WA = weight_vertex(statA, 1, 0, 0, 0.d0, 0.d0, typGamA)  
   WB = weight_vertex(statB, 1, 0, 0, 0.d0, 0.d0, typGamB)  
 
-  WGIA = weight_line(statIA, -1, 1, 0, 0, 0.d0, TypeLn(GIC))
-  WGMB = weight_line(statMB, -1, 1, 0, 0, 0.d0, TypeLn(GMB))
+  tau = (-1)**dir*(tauA - TVertex(3-dir, Ira))
+  WGIA = weight_line(statIA, -1, 1, 0, 0, tau, TypeLn(GIC))
 
-  tau = (-1)**dirW*(TVertex(3-dir, Masha)-TVertex(3-dir, Ira))
+  tau = (-1)**dir*(tauB - TVertex(3-dir, Masha))
+  WGMB = weight_line(statMB, -1, 1, 0, 0, tau, TypeLn(GMB))
+
+  tau = (-1)**dirW*(tauA-tauB)
   WWAB = weight_line(0, 0, 2, GRVertex(1, GamA)-GRVertex(1, GamB), &
     & GRVertex(2,GamA)-GRVertex(2,GamB), tau, typAB)
   
   !---  change the topology for the configuration after update --
   call insert_gamma(GamA, 1, GRVertex(1,GamC), GRVertex(2,GamC),WRVertex(1,GamC), &
-    &  WRVertex(2,GamC),TVertex(3-dir,Ira),TVertex(3-dir,Ira),TVertex(3-dir,Ira), &
-    &  dirW, typGamA, statA, WA)
+    &  WRVertex(2,GamC), tauA, tauA, tauA, dirW, typGamA, statA, WA)
 
   call insert_gamma(GamB, 1, GRVertex(1,GamD), GRVertex(2,GamD),WRVertex(1,GamD), &
-    &  WRVertex(2,GamD),TVertex(3-dir,Masha),TVertex(3-dir,Masha),TVertex(3-dir,Masha), &
-    &  3-dirW, typGamB, statB, WB)
+    &  WRVertex(2,GamD), tauB, tauB, tauB, 3-dirW, typGamB, statB, WB)
 
   call insert_line(GIA, -1, kIA, 1, TypeLn(GIC), statIA, WGIA)
   call insert_line(GMB, -1, kMB, 1, TypeLn(GMD), statMB, WGMB)
@@ -1010,7 +1014,7 @@ SUBROUTINE add_interaction
   NeighVertex(3-dir,GamA)= GIA;      NeighVertex(3-dir,GamB)= GMB
   NeighVertex(3,   GamA) = WAB;      NeighVertex(3,   GamB) = WAB
 
-  NeighLn(dir, GIA) = GamC;          NeighLn(dir, GMB) = GamD
+  NeighLn(dir, GIA) = GamA;          NeighLn(dir, GMB) = GamB
   NeighLn(3-dir,GIA)= Ira;           NeighLn(3-dir,GMB)= Masha
 
   NeighLn(dirW, WAB)= GamA;          NeighLn(3-dirW,WAB)= GamB
@@ -1054,9 +1058,9 @@ SUBROUTINE add_interaction
   endif
 
   !------------- weight calculation -----------------------------
-  tau = (-1)**dir*(TVertex(dir, GamC)-TVertex(3-dir, Ira))
+  tau = (-1)**dir*(TVertex(dir, GamC)-tauA)
   WGAC = weight_line(statAC, IsDeltaLn(GIC), 1, 0, 0, tau, TypeLn(GIC))
-  tau = (-1)**dir*(TVertex(dir, GamD)-TVertex(3-dir, Masha))
+  tau = (-1)**dir*(TVertex(dir, GamD)-tauB)
   WGBD = weight_line(statBD, IsDeltaLn(GMD), 1, 0, 0, tau, TypeLn(GMD))
 
   tau1 = TVertex(3,MeasureGam)-TVertex(2,MeasureGam)
@@ -1070,8 +1074,8 @@ SUBROUTINE add_interaction
   Aold = WeightLn(GIC) *WeightLn(GMD) *WeightVertex(MeasureGam)
 
   call weight_ratio(Pacc, sgn, Anew, Aold)
-  Pacc = Pacc *CoefOfWeight(Order)/CoefOfWeight(Order-1)
-  !Pacc = Pacc *Pupdate(8)/Pupdate(7)
+  Pacc = Pacc *CoefOfWeight(Order)*prob_tau(tauA)*prob_tau(tauB)/CoefOfWeight(Order-1)
+  Pacc = Pacc *Pupdate(8)/Pupdate(7)
 
   !------------ step5 : accept the update -----------------------
   ProbProp(Order, iupdate) = ProbProp(Order, iupdate) + 1
@@ -1828,7 +1832,8 @@ COMPLEX*16 FUNCTION weight_line(stat, isdelta, knd, dx0, dy0, tau, typ)
   !---------------------- for test --------------------------------------
   if(stat >= 0 .and. stat<=3) then
     if(knd==1) weight_line = weight_meas_G(1, t)
-    if(knd==2) weight_line = weight_meas_W(1, dx, dy, t)
+    if(knd==2 .and. isdelta==0) weight_line = weight_meas_W(1, dx, dy, t)
+    if(knd==2 .and. isdelta==1) weight_line = 0.01*weight_meas_W(1, dx, dy, 0)
   else if(stat==-1) then
     write(logstr, *) IsWormPresent, iupdate, "line status == -1! There is no weight!" 
     call write_log
