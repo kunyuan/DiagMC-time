@@ -173,7 +173,7 @@ MODULE vrbls_mc
   integer, dimension(2, MxNVertex) :: GRVertex      ! gline sites for Gamma
   integer, dimension(2, MxNVertex) :: WRVertex      ! wline sites for Gamma
   double precision, dimension(3, MxNVertex) :: TVertex! times for Gamma
-  !  T1: outgoing G, T2: ingoing G, T3: W attached
+  !  1: outgoing G, 2: ingoing G, 3: W attached
   integer, dimension(MxNVertex) :: DirecVertex              ! Gamma is 1: left, 2: right
   integer, dimension(MxNVertex) :: TypeVertex               ! type of Gamma: 1-6
   integer, dimension(2,MxNVertex) :: SpInVertex             ! type of Gamma inside spin: 1-2
