@@ -1292,7 +1292,7 @@ END SUBROUTINE move_measuring_index
 
 
 !------------- change gamma time : Pupdate(16) -----------------
-SUBROUTINE change_gamma_time
+SUBROUTINE change_Gamma_time
   implicit none
   integer :: isdelta
   integer :: iLn, iLn1, iLn2, iLn3, iGam, jGam, dir, dirGam
@@ -1307,7 +1307,11 @@ SUBROUTINE change_gamma_time
   iGam=generate_vertex()
   dir = Floor(rn()*3.d0) + 1  !dir=1: in;  dir=2: out; dir=3 : w
   iLn = NeighVertex(dir, iGam)
-  if(dir==3 .and. IsDeltaLn(iLn)==1)  return
+  if(isdelta==0) then
+    if(dir==3 .and. IsDeltaLn(iLn)==1)  return
+  else
+    if(IsDeltaLn(NeighVertex(3, iGam))==1) return
+  endif
 
   isdelta=0
   if(IsDeltaVertex(iGam)==1) isdelta=1
