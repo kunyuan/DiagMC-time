@@ -186,8 +186,8 @@ SUBROUTINE markov
           !call add_interaction_cross              
         !case(10)
           !call remove_interaction_cross                  
-        !case(11) 
-          !call reconnect                      
+        case(11) 
+          call reconnect                      
         !case(12) 
           !call change_gline_space          
         case(13)  
@@ -986,8 +986,90 @@ SUBROUTINE remove_interaction
 END SUBROUTINE remove_interaction
 
 !----------------- reconnect: Pupdate(11) ----------------
+!------------------------- dir = 1 ------------------------------
+!------  Ira           GamA            Ira            GamA   -----
+!------    ------<-------                  --<-\    /-<--    -----
+!------                                         \  /         -----
+!------                           ==>            \/          -----
+!------    ------<-------                  --<---/\---<---   -----
+!------  Masha         GamB            Masha          GamB   -----
+!-----------------------------------------------------------------
+!------------------------- dir = 2 ------------------------------
+!------  Ira           GamA            Ira            GamA   -----
+!------    ------>-------                  -->-\    /->--    -----
+!------                                         \  /         -----
+!------                           ==>            \/          -----
+!------    ------>-------                  -->---/\--->---   -----
+!------  Masha         GamB            Masha          GamB   -----
+!-----------------------------------------------------------------
 SUBROUTINE reconnect
   implicit none
+  integer :: GamA,GamB,dir
+  integer :: GIA,GMB
+  integer :: kGIA,kGMB
+  complex*16 :: Anew, Aold, sgn
+  !---------- step1 : check if worm is present ------------------
+  if(IsWormPresent .eqv. .false.)    return
+  if(GRVertex(1,Ira)/=GRVertex(1,Masha) .or. &
+      & GRVertex(2,Ira)/=GRVertex(2,Masha)) return
+
+  dir=int(rn()*2.d0)+1
+  GIA=NeighVertex(dir,Ira)
+  GMB=NeighVertex(dir,Masha)
+  if(TypeLn(GIA)/=TypeLn(GMB))return
+
+  GamA=NeighLn(dir,GIA)
+  GamB=NeighLn(dir,GMB)
+  kGIA=kLn(GIA)
+  kGMB=kLn(GMB)
+
+  !------------ step2 : propose the new config ------------------
+  NeighLn(dir,GIA)=GamB
+  NeighVertex(3-dir,GamB)=GIA
+  NeighLn(dir,GMB)=GamA
+  NeighVertex(3-dir,GamA)=GMB
+  kLn(GIA)=kGMB
+  kLn(GMB)=kGIA
+  !Don't have change delta_k of Ira and Masha yet here
+
+  !------------ step4 : configuration check ---------------------
+  ! do the step4 here so we can save some time
+
+  !-------- the new spin, type and status for the new config ----
+  !-------------- step3 : weight calculation --------------------
+  
+  !---  change the topology for the configuration after update --
+  !------------ update the topology -----------------------------
+  !------------- weight calculation -----------------------------
+
+  !------------ step5 : accept the update -----------------------
+  ProbProp(Order, iupdate) = ProbProp(Order, iupdate) + 1
+  if(rn()<=Pacc) then
+
+    !--------------- update the diagram info --------------------
+    Order = Order + 1
+    Phase = Phase *sgn
+
+    !--------------- update k and omega -------------------------
+    kMasha = kM
+
+    call add_Hash4G(kIA)
+    call add_Hash4G(kMB)
+    call add_Hash4W(q)
+
+    !--------------- update the status of elements --------------
+
+    !--------------- update weight of elements ------------------
+
+    call update_weight(Anew, Aold)
+
+    ProbAcc(Order-1, 11) = ProbAcc(Order-1, 11) + 1
+  else
+    
+    !-------------- delete line and vertexes --------------------
+
+  endif
+  return
 
 END SUBROUTINE reconnect
 
