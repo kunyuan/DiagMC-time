@@ -1006,8 +1006,10 @@ SUBROUTINE reconnect
   implicit none
   integer :: GamA,GamB,dir
   integer :: GIA,GMB
-  integer :: kGIA,kGMB
+  integer :: statIA,statMB
   complex*16 :: Anew, Aold, sgn
+  complex*16 :: WGIA,WGMB
+  double precision :: Pacc
   !---------- step1 : check if worm is present ------------------
   if(IsWormPresent .eqv. .false.)    return
   if(GRVertex(1,Ira)/=GRVertex(1,Masha) .or. &
@@ -1020,54 +1022,74 @@ SUBROUTINE reconnect
 
   GamA=NeighLn(dir,GIA)
   GamB=NeighLn(dir,GMB)
-  kGIA=kLn(GIA)
-  kGMB=kLn(GMB)
 
   !------------ step2 : propose the new config ------------------
-  NeighLn(dir,GIA)=GamB
-  NeighVertex(3-dir,GamB)=GIA
-  NeighLn(dir,GMB)=GamA
-  NeighVertex(3-dir,GamA)=GMB
-  kLn(GIA)=kGMB
-  kLn(GMB)=kGIA
+  NeighLn(3-dir,GIA)=Masha
+  NeighVertex(dir,GamA)=GMB
+  NeighLn(3-dir,GMB)=Ira
+  NeighVertex(dir,GamB)=GIA
   !Don't have change delta_k of Ira and Masha yet here
 
   !------------ step4 : configuration check ---------------------
   ! do the step4 here so we can save some time
+  !if(Is_reducible_G_Gamma(GIA) .or. Is_reducible_G_Gamma(GMB)) then
+    !NeighLn(3-dir, GIA)=Ira
+    !NeighVertex(dir, GamA)=GMB
+    !NeighLn(3-dir, GMB)=Masha
+    !NeighVertex(dir, GamB)=GIA
+    !return
+  !endif
 
   !-------- the new spin, type and status for the new config ----
-  !-------------- step3 : weight calculation --------------------
-  
-  !---  change the topology for the configuration after update --
-  !------------ update the topology -----------------------------
-  !------------- weight calculation -----------------------------
+  if(GamA==MeasureGam .or. Masha==MeasureGam) then
+    statIA = 1
+  else
+    statIA = 0
+  endif
+  if(GamB==MeasureGam .or. Ira==MeasureGam) then
+    statMB = 1
+  else
+    statMB = 0
+  endif
 
-  !------------ step5 : accept the update -----------------------
+  !-------------- step3 : weight calculation --------------------
+!COMPLEX*16 FUNCTION weight_line(stat, isdelta, knd, dx0, dy0, tau, typ)
+  WGIA=weight_line(statIA,0,1,0,0,TVertex(3-dir,Masha)-TVertex(dir,GamA),TypeLn(GIA))
+  WGMB=weight_line(statMB,0,1,0,0,TVertex(3-dir,Ira)-TVertex(dir,GamB),TypeLn(GMB))
+
+  Anew=WGIA*WGMB*(-1.d0)
+  Aold=WeightLn(GIA)*WeightLn(GMB)
+
+  call weight_ratio(Pacc, sgn, Anew, Aold)
+
+  !------- step5 : accept the update --------------------
   ProbProp(Order, iupdate) = ProbProp(Order, iupdate) + 1
   if(rn()<=Pacc) then
 
     !--------------- update the diagram info --------------------
-    Order = Order + 1
+    SignFermiloop=-SignFermiloop
     Phase = Phase *sgn
 
     !--------------- update k and omega -------------------------
-    kMasha = kM
-
-    call add_Hash4G(kIA)
-    call add_Hash4G(kMB)
-    call add_Hash4W(q)
+    kMasha = add_k(kMasha, (-1)**dir*(kLn(GMB)-kLn(GIA)))
 
     !--------------- update the status of elements --------------
+    StatusLn(GIA) = statIA
+    StatusLn(GMB) = statMB
 
     !--------------- update weight of elements ------------------
+    WeightLn(GIA)=WGIA
+    WeightLn(GMB)=WGMB
 
     call update_weight(Anew, Aold)
 
-    ProbAcc(Order-1, 11) = ProbAcc(Order-1, 11) + 1
+    ProbAcc(Order, 11) = ProbAcc(Order, 11) + 1
   else
-    
     !-------------- delete line and vertexes --------------------
-
+    NeighLn(3-dir, GIA)=Ira
+    NeighVertex(dir, GamA)=GMB
+    NeighLn(3-dir, GMB)=Masha
+    NeighVertex(dir, GamB)=GIA
   endif
   return
 
