@@ -178,6 +178,10 @@ SUBROUTINE DRAW()
     ini=ini-seg
     write(11,803) 0.,ini,tempstr
 
+    !write(11,*) '0 1 0 setrgbcolor'
+    !write(11,777) 600.0, 450.0, scy/15.
+    !write(11,803) 500.0, 450.0, "MeasureGam"
+
     do i=1,NWLn;
       iWLn=WLnKey2Value(i)
       Vertex1=NeighLn(1,iWLn)
@@ -266,12 +270,14 @@ SUBROUTINE DRAW()
       Vertex1=VertexKey2Value(i)
       x1=scx*TVertex(3, Vertex1)
       y1=scy*site_num(GRVertex(1, Vertex1),GRVertex(2, Vertex1))
+      if(Vertex1==MeasureGam) then
+        write(11,*) '0 1 0 setrgbcolor'
+        write(11,777) x1, y1, scy/15.
+      endif
       if(Vertex1==Ira) then
         write(11,*) '1 0 0 setrgbcolor'
       elseif(Vertex1==Masha) then
         write(11,*) '0 0 1 setrgbcolor'
-      elseif(Vertex1==MeasureGam) then
-        write(11,*) '0 1 0 setrgbcolor'
       else
         write(11,*) '0 0 0 setrgbcolor'
       endif
