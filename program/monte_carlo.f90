@@ -979,14 +979,26 @@ SUBROUTINE add_interaction
   return
 END SUBROUTINE add_interaction
 
+!----------------- remove_interaction: Pupdate(8) ----------------
+SUBROUTINE remove_interaction
+  implicit none
 
+END SUBROUTINE remove_interaction
 
+!----------------- reconnect: Pupdate(11) ----------------
+SUBROUTINE reconnect
+  implicit none
+
+END SUBROUTINE reconnect
+
+!------------ change gline space: Pupdate(12) ------------
 SUBROUTINE change_gline_space
-    implicit none
-    
-end SUBROUTINE
+  implicit none
+  
+END SUBROUTINE
 
 
+!------------ change wline space: Pupdate(13) ------------
 SUBROUTINE change_wline_space
     implicit none
     integer :: iGam, iWLn, jGam, dxw, dyw, xwi, ywi, xwj, ywj, dir
@@ -1019,13 +1031,15 @@ SUBROUTINE change_wline_space
     T1=TVertex(1, iGam);
     T2=TVertex(2, iGam);
     T3=TVertex(3, iGam);
-    WiGam = weight_vertex(StatusVertex(iGam),IsDeltaVertex(iGam),GRVertex(1, iGam)-xwi,GRVertex(2, iGam)-ywi, &
-      & T3-T2, T1-T3, TypeVertex(iGam))
+    WiGam = weight_vertex(StatusVertex(iGam),IsDeltaVertex(iGam),GRVertex(1, iGam)-xwi, &
+      & GRVertex(2, iGam)-ywi, T3-T2, T1-T3, TypeVertex(iGam))
+
     T4=TVertex(1, jGam);
     T5=TVertex(2, jGam);
     T6=TVertex(3, jGam);
-    WjGam = weight_vertex(StatusVertex(jGam),IsDeltaVertex(jGam),GRVertex(1, jGam)-xwj,GRVertex(2, jGam)-ywj, &
-      & T6-T5, T4-T6, TypeVertex(jGam))
+    WjGam = weight_vertex(StatusVertex(jGam),IsDeltaVertex(jGam),GRVertex(1, jGam)-xwj, &
+      & GRVertex(2, jGam)-ywj, T6-T5, T4-T6, TypeVertex(jGam))
+
     WW = weight_line(StatusLn(iWLn),IsDeltaLn(iWLn),2, xwi-xwj, ywi-ywj,T3-T6,TypeLn(iWLn))
 
 
