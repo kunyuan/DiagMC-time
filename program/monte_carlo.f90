@@ -992,8 +992,8 @@ SUBROUTINE add_interaction
   WGMB = weight_line(statMB, -1, 1, 0, 0, tau, TypeLn(GMB))
 
   tau = (-1)**dirW*(tauA-tauB)
-  WWAB = weight_line(0, 0, 2, GRVertex(1, GamA)-GRVertex(1, GamB), &
-    & GRVertex(2,GamA)-GRVertex(2,GamB), tau, typAB)
+  WWAB = weight_line(0, 0, 2, GRVertex(1, GamC)-GRVertex(1, GamD), &
+    & GRVertex(2,GamC)-GRVertex(2,GamD), tau, typAB)
   
   !---  change the topology for the configuration after update --
   call insert_gamma(GamA, 1, GRVertex(1,GamC), GRVertex(2,GamC),WRVertex(1,GamC), &
