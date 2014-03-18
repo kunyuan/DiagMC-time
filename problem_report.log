@@ -160,6 +160,18 @@ conf(tau(3)<=0.325) = 0.65
 
 ====================================================
 
+11. mc updates: add_interaction
+
+Test example:
+1) Order1 diagram
+IsDeltaGamma(:) = 1; IsDeltaW(:) = 0; Uniform weight
+
+Result: 
+can generate Order=2 diagram
+the detail balance can not be tested for now since we don't have remove_interaction yet.
+
+====================================================
+
 
 ====================================================
 ========== TEST  BY  KUN ===========================
