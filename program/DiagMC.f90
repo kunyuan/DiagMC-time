@@ -43,6 +43,7 @@ PROGRAM MAIN
   Pupdate( 2)  = 1.d0
   Pupdate( 5)  = 1.d0
   Pupdate( 6)  = 1.d0
+  Pupdate( 7)  = 1.d0
   Pupdate(13)  = 1.d0
   Pupdate(14)  = 1.d0
   Pupdate(15)  = 1.d0
@@ -307,7 +308,7 @@ SUBROUTINE monte_carlo
 
     !call write_monte_carlo_conf
     !call write_monte_carlo_data
-    !call write_monte_carlo_test
+    call write_monte_carlo_test
 
     write(logstr,*) "Block",iblck," is done!"
     call write_log
