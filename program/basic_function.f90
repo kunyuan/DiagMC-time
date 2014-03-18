@@ -138,8 +138,8 @@ END SUBROUTINE def_symmetry
       !wln(i) = weight_line(StatusLn(i),1,0,0,OmegaLn(i),TypeLn(i))
     !else
       !Gam1 = NeighLn(1,i);       Gam2 = NeighLn(2,i)
-      !wln(i) = weight_line(StatusLn(i),2,WXVertex(Gam1)-WXVertex(Gam2), &
-        !& WYVertex(Gam1)-WYVertex(Gam2), OmegaLn(i), TypeLn(i))
+      !wln(i) = weight_line(StatusLn(i),2,WRVertex(1, Gam1)-WRVertex(1, Gam2), &
+        !& WRVertex(2, Gam1)-WRVertex(2, Gam2), OmegaLn(i), TypeLn(i))
     !endif
     !WeightLn(i) = wln(i)
     !weight = weight *wln(i)
@@ -148,8 +148,8 @@ END SUBROUTINE def_symmetry
   !do i = 1, MxNVertex
     !if(StatusVertex(i)<0)  cycle
     !G = NeighVertex(1, i);           W = NeighVertex(3, i)
-    !wgam(i) = weight_vertex(Order, StatusVertex(i),GXVertex(i)-WXVertex(i), &
-      !& GYVertex(i)-WYVertex(i), OmegaLn(G), OmegaLn(W), TypeVertex(i))
+    !wgam(i) = weight_vertex(Order, StatusVertex(i),GRVertex(1, i)-WRVertex(1, i), &
+      !& GRVertex(2, i)-WRVertex(2, i), OmegaLn(G), OmegaLn(W), TypeVertex(i))
     !WeightVertex(i) = wgam(i)
     !weight = weight *wgam(i)
   !enddo
@@ -909,13 +909,13 @@ SUBROUTINE insert_gamma(newgamma, isdelta, gx, gy, wx, wy, t1, t2, t3, dir, typ,
   VertexValue2Key(newgamma) = NVertex
 
   IsDeltaVertex(newgamma) = isdelta
-  GXVertex(newgamma) = gx
-  GYVertex(newgamma) = gy
-  WXVertex(newgamma) = wx
-  WYVertex(newgamma) = wy
-  T1Vertex(newgamma) = t1
-  T2Vertex(newgamma) = t2
-  T3Vertex(newgamma) = t3
+  GRVertex(1, newgamma) = gx
+  GRVertex(2, newgamma) = gy
+  WRVertex(1, newgamma) = wx
+  WRVertex(2, newgamma) = wy
+  TVertex(1, newgamma) = t1
+  TVertex(2, newgamma) = t2
+  TVertex(3, newgamma) = t3
   DirecVertex(newgamma) = dir
   TypeVertex(newgamma) = typ
   SpInVertex(1, newgamma) = typ
@@ -2205,14 +2205,14 @@ SUBROUTINE first_order_diagram
   IsDeltaVertex(1:4) = 1
 
   ! the site variables of Gamma 1, 2, 3 and 4
-  GXVertex(1:4) = 0;            GYVertex(1:4) = 0
-  WXVertex(1:4) = 0;            WYVertex(1:4) = 0
+  GRVertex(1, 1:4) = 0;            GRVertex(2, 1:4) = 0
+  WRVertex(1, 1:4) = 0;            WRVertex(2, 1:4) = 0
 
   ! the time variables of Gamma 1, 2, 3 and 4
-  T1Vertex(1)=0.d0; T2Vertex(1)=0.d0; T3Vertex(1)=0.d0
-  T1Vertex(2)=0.1; T2Vertex(2)=0.1; T3Vertex(2)=0.1
-  T1Vertex(3)=0.2; T2Vertex(3)=0.2; T3Vertex(3)=0.2
-  T1Vertex(4)=0.3; T2Vertex(4)=0.3; T3Vertex(4)=0.3
+  TVertex(1, 1)=0.d0; TVertex(2, 1)=0.d0; TVertex(3, 1)=0.d0
+  TVertex(1, 2)=0.1; TVertex(2, 2)=0.1; TVertex(3, 2)=0.1
+  TVertex(1, 3)=0.2; TVertex(2, 3)=0.2; TVertex(3, 3)=0.2
+  TVertex(1, 4)=0.3; TVertex(2, 4)=0.3; TVertex(3, 4)=0.3
 
   ! Direction of Gamma: 1: left of W;  2: right of W
   DirecVertex(1) = 1;                DirecVertex(2) = 2
@@ -2352,14 +2352,14 @@ SUBROUTINE first_order_diagram_with_bubble
   IsDeltaVertex(1:4) = 1
 
   ! the site variables of Gamma 1, 2, 3 and 4
-  GXVertex(1:4) = 0;            GYVertex(1:4) = 0
-  WXVertex(1:4) = 0;            WYVertex(1:4) = 0
+  GRVertex(1, 1:4) = 0;            GRVertex(2, 1:4) = 0
+  WRVertex(1, 1:4) = 0;            WRVertex(2, 1:4) = 0
 
   ! the time variables of Gamma 1, 2, 3 and 4
-  T1Vertex(1)=0.d0; T2Vertex(1)=0.d0; T3Vertex(1)=0.d0
-  T1Vertex(2)=0.1; T2Vertex(2)=0.1; T3Vertex(2)=0.1
-  T1Vertex(3)=0.2; T2Vertex(3)=0.2; T3Vertex(3)=0.2
-  T1Vertex(4)=0.3; T2Vertex(4)=0.3; T3Vertex(4)=0.3
+  TVertex(1, 1)=0.d0; TVertex(2, 1)=0.d0; TVertex(3, 1)=0.d0
+  TVertex(1, 2)=0.1; TVertex(2, 2)=0.1; TVertex(3, 2)=0.1
+  TVertex(1, 3)=0.2; TVertex(2, 3)=0.2; TVertex(3, 3)=0.2
+  TVertex(1, 4)=0.3; TVertex(2, 4)=0.3; TVertex(3, 4)=0.3
 
   ! Direction of Gamma: 1: left of W;  2: right of W
   DirecVertex(1) = 1;                DirecVertex(2) = 2
@@ -2512,16 +2512,16 @@ SUBROUTINE second_order_diagram
   IsDeltaVertex(1:6) = 1
 
   ! the site variables of Gamma 1, 2, 3 and 4
-  GXVertex(1:6) = 0;            GYVertex(1:6) = 0
-  WXVertex(1:6) = 0;            WYVertex(1:6) = 0
+  GRVertex(1, 1:6) = 0;            GRVertex(2, 1:6) = 0
+  WRVertex(1, 1:6) = 0;            WRVertex(2, 1:6) = 0
 
   ! the time variables of Gamma 1, 2, 3 and 4
-  T1Vertex(1)=0.d0;  T2Vertex(1)=0.d0;  T3Vertex(1)=0.d0
-  T1Vertex(2)=0.1d0; T2Vertex(2)=0.1d0; T3Vertex(2)=0.1d0
-  T1Vertex(3)=0.2d0; T2Vertex(3)=0.2d0; T3Vertex(3)=0.2d0
-  T1Vertex(4)=0.3d0; T2Vertex(4)=0.3d0; T3Vertex(4)=0.3d0
-  T1Vertex(5)=0.4d0; T2Vertex(5)=0.4d0; T3Vertex(5)=0.4d0
-  T1Vertex(6)=0.5d0; T2Vertex(6)=0.5d0; T3Vertex(6)=0.5d0
+  TVertex(1, 1)=0.d0;  TVertex(2, 1)=0.d0;  TVertex(3, 1)=0.d0
+  TVertex(1, 2)=0.1d0; TVertex(2, 2)=0.1d0; TVertex(3, 2)=0.1d0
+  TVertex(1, 3)=0.2d0; TVertex(2, 3)=0.2d0; TVertex(3, 3)=0.2d0
+  TVertex(1, 4)=0.3d0; TVertex(2, 4)=0.3d0; TVertex(3, 4)=0.3d0
+  TVertex(1, 5)=0.4d0; TVertex(2, 5)=0.4d0; TVertex(3, 5)=0.4d0
+  TVertex(1, 6)=0.5d0; TVertex(2, 6)=0.5d0; TVertex(3, 6)=0.5d0
 
   ! Direction of Gamma: 1: left of W;  2: right of W
   DirecVertex(1) = 1;                DirecVertex(2) = 2
