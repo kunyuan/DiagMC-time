@@ -65,7 +65,7 @@ SUBROUTINE DRAW()
     IMPLICIT NONE
     DOUBLE PRECISION :: x1,y1, x2,y2, y3, scx, scy, sgn   
     DOUBLE PRECISION :: scydash, ca1,ca2,ra,a1,a2, radian
-    DOUBLE PRECISION :: phi1, phi2, pi2, pi4,ini,seg
+    DOUBLE PRECISION :: phi1, phi2, pi2, pi4,ini,seg,theta2
     INTEGER :: i
     INTEGER :: FEXIST, RES
     integer :: iWLn,iGLn,Vertex1,Vertex2,Vertex3
@@ -74,6 +74,8 @@ SUBROUTINE DRAW()
     
     pi2=dasin(1.d0)
     pi4=pi2/2.d0
+    theta2=dasin(0.2d0)
+    !theta2=pi4
     radian=90.d0/pi2
     scx=500/beta
     scy=400./Lx/Ly
@@ -107,7 +109,7 @@ SUBROUTINE DRAW()
     write(11,*) '% Replace x2 y2 with coordinates of arrowbase:'
     write(11,*) '% the point to connect lines to'
     write(11,*) '% ArrowHeadSize gives the size of the arrow'
-    write(11,*) '/ArrowHeadSize 20 def'
+    write(11,*) '/ArrowHeadSize 10 def'
     write(11,*) '/ahead {'
     write(11,*) '    1 index 4 index sub'
     write(11,*) '    1 index 4 index sub'
@@ -136,7 +138,7 @@ SUBROUTINE DRAW()
     write(11,*) ''
     write(11,*) '%%EndProlog'
     write(11,*) '%%BeginSetup'
-    write(11,*) '2 setlinewidth'
+    write(11,*) '1 setlinewidth'
     write(11,*) '5 140 translate'
     write(11,*) '1 1 scale'
     write(11,*) '%%EndSetup'
@@ -178,30 +180,55 @@ SUBROUTINE DRAW()
     ini=ini-seg
     write(11,803) 0.,ini,tempstr
 
+    ini=455.0
+    write(11,*) '0 1 0 setrgbcolor'
+    write(11,777) 500.0, ini, scy/20.
+    write(11,803) 520.0, ini-5.0, "MeasureGam"
+    ini=ini-seg
+    write(11,*) '1 0 0 setrgbcolor'
+    write(11,777) 500.0, ini, scy/30.
+    write(11,803) 520.0, ini-5.0, "Ira"
+    ini=ini-seg
+    write(11,*) '0 0 1 setrgbcolor'
+    write(11,777) 500.0, ini, scy/30.
+    write(11,803) 520.0, ini-5.0, "Masha"
+
+    write(11,*) '0 0 0 setrgbcolor'
     do i=1,NWLn;
       iWLn=WLnKey2Value(i)
       Vertex1=NeighLn(1,iWLn)
       x1=scx*TVertex(3, Vertex1)
       y1=scy*site_num(GRVertex(1, Vertex1),GRVertex(2, Vertex1))
-      !write(*,*) "W"
-      !write(*,*) TVertex(3, Vertex1),Vertex1
       Vertex2=NeighLn(2,iWLn)
-      !write(*,*) TVertex(3, Vertex2),Vertex2
       x2=scx*TVertex(3, Vertex2)
       y2=scy*site_num(GRVertex(1, Vertex2),GRVertex(2, Vertex2))
 
-      if(Vertex1 .ne. Ira .and. Vertex2 .ne. Masha &
-          & .and. Vertex1 .ne. Masha .and. Vertex2 .ne. Ira) then
-        if(TypeLn(iWLn)<=4) then
-          write(11,*) '0 0 0 setrgbcolor'
-        else
-          write(11,*) '0 1 0 setrgbcolor'
-        endif
-      else
-        if(Vertex1==Ira .or. Vertex2==Ira) write(11,*)'0 1 1 setrgbcolor'
-        if(Vertex1==Masha .or. Vertex2==Masha) write(11,*)'0 1 1 setrgbcolor'
+      !if(TypeLn(iWLn)<=4) then
+        !write(11,*) '0 0 0 setrgbcolor'
+      !else
+        !write(11,*) '1 0 1 setrgbcolor'
+      !endif
+      ra=dsqrt((x2-x1)**2+(y2-y1)**2)/2.d0
+      if(ra==0.d0) continue
+      phi1=(y2-y1)/(2.d0*ra)
+      phi2=(x2-x1)/(2.d0*ra)
+      ca1=(x1+x2)/2.d0
+      ca2=(y1+y2)/2.d0;
+      ra=ra/sin(theta2)*cos(theta2)
+      ca1=ca1+phi1*ra
+      ca2=ca2-phi2*ra; 
+      ra=ra/cos(theta2)
+      a1=pi2-theta2+dasin(phi1)
+      a2=a1+2.0*theta2
+      IF(phi2.lt.0) then
+        a2=4*pi2-pi2+theta2-dasin(phi1)
+        a1=a2-2.0*theta2
       endif
-      write(11,791) x1,y1,x2,y2 
+      a1=a1*radian
+      a2=a2*radian 
+
+      write(11,791)  ca1, ca2, ra, a1, a2
+      !write(11,791) x1,y1,x2,y2 
     enddo
   
     do i=1,NGLn;
@@ -209,14 +236,9 @@ SUBROUTINE DRAW()
       Vertex1=NeighLn(1,iGLn)
       x1=scx*TVertex(3, Vertex1)
       y1=scy*site_num(GRVertex(1, Vertex1),GRVertex(2, Vertex1))
-      !write(*,*) "G"
-      !write(*,*) "V1",Vertex1
-      !write(*,*) TVertex(3, Vertex1),GRVertex(1, Vertex1),GRVertex(2, Vertex1)
       Vertex2=NeighLn(2,iGLn)
-      !write(*,*) "V2",Vertex2
       x2=scx*TVertex(3, Vertex2)
       y2=scy*site_num(GRVertex(1, Vertex2),GRVertex(2, Vertex2))
-      !write(*,*) TVertex(3, Vertex2),GRVertex(1, Vertex2),GRVertex(2, Vertex2)
 
       if(TypeLn(iGLn)==1) then
         write(11,*) '1 0 0 setrgbcolor'
@@ -229,6 +251,7 @@ SUBROUTINE DRAW()
         if(x1==x2) x2=500 !unphysical situation
 
         ra=dsqrt((x2-x1)**2+(y2-y1)**2)/2.d0
+        if(ra==0.d0) continue
         phi1=(y2-y1)/(2.d0*ra)
         phi2=(x2-x1)/(2.d0*ra)
         ca1=(x1+x2)/2.d0
@@ -244,8 +267,8 @@ SUBROUTINE DRAW()
         endif
         a1=a1*radian
         a2=a2*radian 
-
         write(11,781)  ca1, ca2, ra, a1, a2  ! propagator lines - arcs 
+
         ca1=x1+(phi2-phi1)*scy/2.;     
         ca2=y1+(phi2+phi1)*scy/2. 
 
@@ -262,24 +285,54 @@ SUBROUTINE DRAW()
 
     write(11,*) '0 0 0 setrgbcolor'
     write(11,"(f6.1,x,f6.1,x,' M (Gamma info) C')") 520.0,350.0
+    ini=350.0-seg
     do i=1,NVertex
       Vertex1=VertexKey2Value(i)
       x1=scx*TVertex(3, Vertex1)
       y1=scy*site_num(GRVertex(1, Vertex1),GRVertex(2, Vertex1))
+      if(Vertex1==MeasureGam) then
+        write(11,*) '0 1 0 setrgbcolor'
+        write(11,777) x1, y1, scy/20.
+      endif
       if(Vertex1==Ira) then
         write(11,*) '1 0 0 setrgbcolor'
       elseif(Vertex1==Masha) then
         write(11,*) '0 0 1 setrgbcolor'
-      elseif(Vertex1==MeasureGam) then
-        write(11,*) '0 1 0 setrgbcolor'
       else
         write(11,*) '0 0 0 setrgbcolor'
       endif
-      write(11,777) x1, y1, scy/20.
+      write(11,777) x1, y1, scy/30.
       write(11,801) x1-5., y1+7., i
-      write(11,802) 500.0,350.0-i*15,i,TVertex(3, Vertex1), &
+      write(11,802) 500.0,ini,i,TVertex(3, Vertex1), &
          & GRVertex(1, Vertex1),GRVertex(2, Vertex2)
+      ini=ini-seg
     enddo
+    write(11,*) '0 0 0 setrgbcolor'
+    write(11,"(f6.1,x,f6.1,x,' M (G info) C')") 530.0,ini
+    ini=ini-seg
+    do i=1,NGLn
+      iGLn=GLnKey2Value(i)
+      Vertex1=NeighLn(1,iGLn)
+      Vertex2=NeighLn(2,iGLn)
+      if(TypeLn(i)==1) then
+        write(11,*) '1 0 0 setrgbcolor'
+      else
+        write(11,*) '0 0 1 setrgbcolor'
+      endif
+      write(11,804) 500.0, ini, Vertex2,Vertex1
+      ini=ini-seg
+    enddo
+    write(11,*) '0 0 0 setrgbcolor'
+    write(11,"(f6.1,x,f6.1,x,' M (W info) C')") 530.0,ini
+    ini=ini-seg
+    do i=1,NWLn;
+      iWLn=WLnKey2Value(i)
+      Vertex1=NeighLn(1,iWLn)
+      Vertex2=NeighLn(2,iWLn)
+      write(11,805) 500.0, ini, Vertex1,Vertex2
+      ini=ini-seg
+    enddo
+
 
     write(11,*) ''
     write(11,*) 'stroke showpage'
@@ -294,10 +347,13 @@ SUBROUTINE DRAW()
  780  format ('Nsolid ',f6.1,x,f6.1,x,f9.3,' YL')
  781  format ('Nsolid ',f6.1,x,f6.1,x,f6.1,x,f6.1,x,f6.1,' Y45')
  790  format ('Nsolid ',f6.1,x,f6.1,x,f6.1,x,f6.1,x,' ahead')
- 791  format ('Ndashed ',f6.1,x,f6.1,' M',f6.1,x,f6.1,' L')
+ !791  format ('Ndashed ',f6.1,x,f6.1,' M',f6.1,x,f6.1,' L')
+ 791  format ('Ndashed ',f6.1,x,f6.1,x,f6.1,x,f6.1,x,f6.1,' Y45')
  801  format (f6.1,x,f6.1,x,' M (',i2,') C')
  802  format (f6.1,x,f6.1,x,' M (',i2,':',f6.3,'; (',i3,',',i3,')) C')
  803  format (f6.1,x,f6.1,x,' M (',A,') C')
+ 804  format (f6.1,x,f6.1,x,' M (G: ',i2,' ------>',i2') C')
+ 805  format (f6.1,x,f6.1,x,' M (W: ',i2,' <====>',i2') C')
  
 END SUBROUTINE DRAW
 
