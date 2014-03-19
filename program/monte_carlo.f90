@@ -151,12 +151,20 @@ END SUBROUTINE def_diagram
 !========================= UPDATES =====================================
 !=======================================================================
 
-SUBROUTINE markov
+SUBROUTINE markov(MaxSamp)
   implicit none
-  integer :: iflag, istep,isamp,i
-  double precision :: nr,x, y
+  integer :: iflag, istep,isamp,i,MaxSamp,seg
+  double precision :: nr,x
 
-  do isamp = 1, Nsamp
+  if(IsToss .or. .not. IsForever) then
+    seg=1
+  else
+    seg=0
+  endif
+
+  isamp=0
+  do while(isamp<=MaxSamp)
+    isamp=isamp+seg
     istep = 0
     do while(istep < NStep)
       nr=rn()
@@ -207,6 +215,7 @@ SUBROUTINE markov
       imc = imc + 1.0
 
       if(mod(imc,1.e5)==0) then
+        call print_status
         call print_config
         call check_config
         !call write_monte_carlo_test
@@ -233,16 +242,35 @@ SUBROUTINE markov
       endif
       !================================================================
 
-      GamWormOrder(Order) = GamWormOrder(Order) + 1.d0
+      if(mod(imc,1.e8)==0) then
+        write(logstr,*) "Writing data and configuration..."
+        call write_log
+        call write_monte_carlo_conf
+        call write_monte_carlo_data
+        !call write_monte_carlo_test
+        write(logstr,*) "Writing data and configuration done!"
+        call write_log
+      endif
+
+        !call output_GamMC
+        !call output_prob_MC
+
+        !call read_flag
+        !if(mc_version/=file_version) then
+          !call read_GWGamma
+          !call update_WeightCurrent
+          !mc_version = file_version
+        !endif
+
+      GamWormOrder(Order) = GamWormOrder(Order) + 1.0
       if(IsWormPresent) then
         if(rn()<=0.5d0) call switch_ira_and_masha
       else
         istep = istep + 1
-        GamOrder(Order) = GamOrder(Order) + 1.d0
+        GamOrder(Order) = GamOrder(Order) + 1.0
       endif
     enddo
-
-    if(IsToss==0) call measure
+    if(.not. IsToss) call measure
   enddo
 
 END SUBROUTINE markov

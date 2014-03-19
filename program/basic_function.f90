@@ -361,7 +361,7 @@ SUBROUTINE update_Hash4G(oldk, newk)
     Hash4G(oldk)=0
   else
     if(CheckG) then
-      open(36, access="append", file=trim(title3)//".log")
+      open(36, access="append", file=trim(title4)//".log")
       write(36, *) "===================================="
       write(36, *) "Oops, update_Hash4G found a bug!"
       write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
@@ -377,7 +377,7 @@ SUBROUTINE update_Hash4G(oldk, newk)
     Hash4G(newk)=1
   else
     if(CheckG) then
-      open(36, access="append", file=trim(title3)//".log")
+      open(36, access="append", file=trim(title4)//".log")
       write(36, *) "===================================="
       write(36, *) "Oops, update_Hash4G found a bug!"
       write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
@@ -399,7 +399,7 @@ SUBROUTINE add_Hash4G(newk)
     Hash4G(newk)=1
   else
     if(CheckG) then
-      open(36, access="append", file=trim(title3)//".log")
+      open(36, access="append", file=trim(title4)//".log")
       write(36, *) "===================================="
       write(36, *) "Oops, add_Hash4G found a bug!"
       write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
@@ -420,7 +420,7 @@ SUBROUTINE delete_Hash4G(oldk)
     Hash4G(oldk)=0
   else
     if(CheckG) then
-      open(36, access="append", file=trim(title3)//".log")
+      open(36, access="append", file=trim(title4)//".log")
       write(36, *) "===================================="
       write(36, *) "Oops, delete_Hash4G found a bug!"
       write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
@@ -447,7 +447,7 @@ SUBROUTINE update_Hash4W(oldk, newk)
     Hash4W(aoldk)=0
   else
     if(CheckW) then
-      open(36, access="append", file=trim(title3)//".log")
+      open(36, access="append", file=trim(title4)//".log")
       write(36, *) "===================================="
       write(36, *) "Oops, update_Hash4W found a bug!"
       write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
@@ -463,7 +463,7 @@ SUBROUTINE update_Hash4W(oldk, newk)
     Hash4W(anewk)=1
   else
     if(CheckW) then
-      open(36, access="append", file=trim(title3)//".log")
+      open(36, access="append", file=trim(title4)//".log")
       write(36, *) "===================================="
       write(36, *) "Oops, update_Hash4W found a bug!"
       write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
@@ -487,7 +487,7 @@ SUBROUTINE add_Hash4W(newk)
     Hash4W(anewk)=1
   else
     if(CheckW) then
-      open(36, access="append", file=trim(title3)//".log")
+      open(36, access="append", file=trim(title4)//".log")
       write(36, *) "===================================="
       write(36, *) "Oops, add_Hash4W found a bug!"
       write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
@@ -511,7 +511,7 @@ SUBROUTINE delete_Hash4W(oldk)
     Hash4W(aoldk)=0
   else
     if(CheckW) then
-      open(36, access="append", file=trim(title3)//".log")
+      open(36, access="append", file=trim(title4)//".log")
       write(36, *) "===================================="
       write(36, *) "Oops, delete_Hash4W found a bug!"
       write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
@@ -546,7 +546,7 @@ LOGICAL FUNCTION Is_reducible_G(GLn)
       Is_reducible_G = .true.
       return
     else if(Hash4G(newk)/=0) then
-      open(36, access="append", file=trim(title3)//".log")
+      open(36, access="append", file=trim(title4)//".log")
       write(36, *) "===================================="
       write(36, *) "Oops, Is_reducible_G found a bug!"
       write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
@@ -626,7 +626,7 @@ LOGICAL FUNCTION Is_reducible_W(WLn)
       Is_reducible_W = .true.
       return
     else if(Hash4W(absk)/=0) then
-      open(36, access="append", file=trim(title3)//".log")
+      open(36, access="append", file=trim(title4)//".log")
       write(36, *) "===================================="
       write(36, *) "Oops, Is_reducible_W found a bug!"
       write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
