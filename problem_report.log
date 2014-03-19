@@ -172,6 +172,17 @@ the detail balance can not be tested for now since we don't have remove_interact
 
 ====================================================
 
+12. mc updates: remove_interaction
+
+Test example:
+1) initialize: Order1 diagram, IsDeltaGamma(:) = 1; IsDeltaW(:) = 0; Uniform weight
+
+Result: 
+conf(order2)/conf(order1) = 52
+conf(order2, typ==1)/conf(order1, typ==1) = 30
+
+====================================================
+
 
 ====================================================
 ========== TEST  BY  KUN ===========================
