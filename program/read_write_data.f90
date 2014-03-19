@@ -1073,8 +1073,8 @@ end SUBROUTINE
 
 SUBROUTINE write_monte_carlo_test
   implicit none
-  write(*, *) "conf(Order=2):", TestData(1)/TestData(0)
-  !write(*, *) "conf(Status(3)=measure):", TestData(2)/TestData(0)
+  !write(*, *) "conf(Order=2):", TestData(1)/TestData(2)
+  !write(*, *) "conf(Order=2, typ==1):", TestData(3)/TestData(4)
   return
 END SUBROUTINE
 
