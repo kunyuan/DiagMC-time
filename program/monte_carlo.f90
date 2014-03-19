@@ -165,52 +165,48 @@ SUBROUTINE markov(MaxSamp)
   isamp=0
   do while(isamp<=MaxSamp)
     isamp=isamp+seg
+
     istep = 0
     do while(istep < NStep)
       nr=rn()
-      iupdate = 1
-      do while(nr>Fupdate(iupdate))
-        iupdate = iupdate + 1
-      enddo
-
-      select case(iupdate)
-        case( 1) 
-          call create_worm_along_wline          
-        case( 2)      
-          call delete_worm_along_wline                       
-        !case( 3) 
-          !call create_worm_along_gline  
-        !case( 4) 
-          !call delete_worm_along_gline  
-        case( 5) 
-          call move_worm_along_wline             
-        case( 6) 
-          call move_worm_along_gline              
-        case( 7) 
-          call add_interaction                  
-        case( 8) 
-          call remove_interaction             
-        !case( 9) 
-          !call add_interaction_cross              
-        !case(10)
-          !call remove_interaction_cross                  
-        case(11) 
-          call reconnect                      
-        !case(12) 
-          !call change_gline_space          
-        case(13)  
-          call change_wline_space         
-        case(14) 
-          call change_Gamma_type     
-        case(15) 
-          call move_measuring_index       
-        case(16)  
-          call change_Gamma_time        
-        case(17)  
-          call change_wline_isdelta       
-        case(18)  
-          call change_Gamma_isdelta       
-      end select
+      
+      if(nr<Fupdate(1)) then
+        call create_worm_along_wline          
+      else if(nr<Fupdate(2)) then
+        call delete_worm_along_wline                       
+      else if(nr<Fupdate(3)) then
+        !call create_worm_along_gline  
+      else if(nr<Fupdate(4)) then
+        !call delete_worm_along_gline  
+      else if(nr<Fupdate(5)) then
+        call move_worm_along_wline             
+      else if(nr<Fupdate(6)) then
+        call move_worm_along_gline              
+      else if(nr<Fupdate(7)) then
+        call add_interaction                  
+      else if(nr<Fupdate(8)) then
+        call remove_interaction             
+      else if(nr<Fupdate(9)) then
+        !call add_interaction_cross              
+      else if(nr<Fupdate(10)) then
+        !call remove_interaction_cross                  
+      else if(nr<Fupdate(11)) then
+        call reconnect                      
+      else if(nr<Fupdate(12)) then
+        !call change_gline_space          
+      else if(nr<Fupdate(13)) then
+        call change_wline_space         
+      else if(nr<Fupdate(14)) then
+        call change_Gamma_type     
+      else if(nr<Fupdate(15)) then
+        call move_measuring_index       
+      else if(nr<Fupdate(16)) then
+        call change_Gamma_time        
+      else if(nr<Fupdate(17)) then
+        call change_wline_isdelta       
+      else if(nr<Fupdate(18)) then
+        call change_Gamma_isdelta       
+      endif
 
       imc = imc + 1.0
 
@@ -222,24 +218,24 @@ SUBROUTINE markov(MaxSamp)
       endif
 
       !========================== REWEIGHTING =========================
-      if(mod(imc,1.e7)==0) then
-        write(logstr,*) "Reweighting order of diagrams..."
-        call write_log
-        x=sum(GamWormOrder(:))
-        CoefOfWeight(:)=x/(GamWormOrder(:)+50.d0)
-        write(logstr,*) "Weight:"
-        call write_log
-        do i=0,MCOrder
-          write(logstr,"('Order ',i2,':',f10.4)") i, CoefOfWeight(i)
-          call write_log
-        enddo
-        write(logstr,*) "Reweighting is done!"
-        call write_log
-        if(imc<=2.e7) then
-          GamWormOrder=0.d0
-          GamOrder=0.d0
-        endif
-      endif
+      !if(mod(imc,1.e7)==0) then
+        !write(logstr,*) "Reweighting order of diagrams..."
+        !call write_log
+        !x=sum(GamWormOrder(:))
+        !CoefOfWeight(:)=x/(GamWormOrder(:)+50.d0)
+        !write(logstr,*) "Weight:"
+        !call write_log
+        !do i=0,MCOrder
+          !write(logstr,"('Order ',i2,':',f10.4)") i, CoefOfWeight(i)
+          !call write_log
+        !enddo
+        !write(logstr,*) "Reweighting is done!"
+        !call write_log
+        !if(imc<=2.e7) then
+          !GamWormOrder=0.d0
+          !GamOrder=0.d0
+        !endif
+      !endif
       !================================================================
 
       if(mod(imc,1.e8)==0) then
@@ -262,12 +258,12 @@ SUBROUTINE markov(MaxSamp)
           !mc_version = file_version
         !endif
 
-      GamWormOrder(Order) = GamWormOrder(Order) + 1.0
+      GamWormOrder(Order) = GamWormOrder(Order) + 1.d0
       if(IsWormPresent) then
         if(rn()<=0.5d0) call switch_ira_and_masha
       else
         istep = istep + 1
-        GamOrder(Order) = GamOrder(Order) + 1.0
+        GamOrder(Order) = GamOrder(Order) + 1.d0
       endif
     enddo
     if(.not. IsToss) call measure
@@ -1348,7 +1344,7 @@ SUBROUTINE reconnect
   if(GRVertex(1,Ira)/=GRVertex(1,Masha) .or. &
       & GRVertex(2,Ira)/=GRVertex(2,Masha)) return
 
-  dir=int(rn()*2.d0)+1
+  dir=Floor(rn()*2.d0)+1
   GIA=NeighVertex(dir,Ira)
   GMB=NeighVertex(dir,Masha)
   if(TypeLn(GIA)/=TypeLn(GMB))return
@@ -2305,35 +2301,13 @@ SUBROUTINE measure
   !endif
 
   !===============  test variables =================================
-  if(Order==2) then
-    TestData(1) = TestData(1) +1.d0/factorM
-    sumt = 0
-    do ikey = 1, 3
-      sumt = sumt + TypeLn(WLnKey2Value(ikey))
-    enddo
-    if(sumt==3)   TestData(3) = TestData(3) + 1.d0/factorM
-  endif
+  TestData(Order) = TestData(Order)+ 1.d0/factorM
+  sumt = 0
+  do ikey = 1, 1+Order
+    sumt = sumt + TypeLn(WLnKey2Value(ikey))
+  enddo
+  if(sumt==Order+1) TestData(MCOrder+1+Order) = TestData(MCOrder+1+Order) +1.d0/factorM
 
-  if(Order==1) then
-    !TestData(2) = TestData(2) +1.d0/factorM
-    sumt = 0
-    do ikey = 1, 2
-      sumt = sumt + TypeLn(WLnKey2Value(ikey))
-    enddo
-    if(sumt==2)   TestData(4) = TestData(4) + 1.d0/factorM
-  endif
-
-  if(Order==0) then
-    !TestData(5) = TestData(5) + 1.d0/factorM
-    sumt = TypeLn(WLnKey2Value(1))
-    if(sumt==1)   TestData(6) = TestData(6) + 1.d0/factorM
-  endif
-
-  if(SignFermiloop==-1.d0) then
-    TestData(7) = TestData(7) + 1.d0/factorM
-  endif
-
-  TestData(0)=TestData(0)+1.d0/factorM
   !================================================================
   
         

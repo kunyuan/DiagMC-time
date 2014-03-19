@@ -189,9 +189,11 @@ checkGam = .false.
 Result: 
 conf(order2)/conf(order1) = 0.75
 conf(order1)/conf(order0) = 3.33
+
 conf(order2)/conf(order2, typ==1) = 10
 conf(order1)/conf(order1, typ==1) = 6 
 conf(order0)/conf(order0, typ==1) = 4 
+
 conf(order2, typ==1)/conf(order1, typ==1) = 2
 conf(order1, typ==1)/conf(order0, typ==1) = 0.5
 

@@ -8,12 +8,42 @@
 !If you want to log staff when runing markov, log here!
 SUBROUTINE print_status
     implicit none
+    integer :: iorder
+
     open(36, access="append", file=trim(title4)//".log")
     write(36,*) "MC steps: ",imc
     call time_elapse
     write(36,251) t_elap
   251 format(' Printing interval:',f16.7,2x,'s')
     write(36,*) "Efficiency: ",imc/t_elap," per second."
+
+    write(36, *) " 1: create worm along wline"
+    write(36, *) " 2: delete worm along wline"
+    write(36, *) " 3: create worm along gline"
+    write(36, *) " 4: delete worm along gline"
+    write(36, *) " 5: move worm along wline"
+    write(36, *) " 6: move worm along gline"
+    write(36, *) " 7: add interaction"
+    write(36, *) " 8: remove interaction"
+    write(36, *) " 9: add interaction cross"
+    write(36, *) "10: remove interaction cross"
+    write(36, *) "11: reconnect"
+    write(36, *) "12: shift gline in space"
+    write(36, *) "13: shift wline in space"
+    write(36, *) "14: change Gamma type"
+    write(36, *) "15: move measuring index"
+    write(36, *) "16: change Gamma time"
+    write(36, *) "17: change wline isdelta"
+    write(36, *) "18: change Gamma isdelta"
+    do iorder = 0, MCOrder
+      write(36, *) "Order", iorder
+      do i = 1, Nupdate
+        if(ProbProp(iorder, i)/=0.d0) then
+          write(36, '(i3,3f17.5)') i, ProbProp(iorder, i), ProbAcc(iorder, i), ProbAcc(iorder, i)/ProbProp(iorder, i)
+        endif
+      enddo
+      write(36, *)
+    enddo
 
     close(36)
 END SUBROUTINE print_status
@@ -1089,9 +1119,17 @@ END SUBROUTINE output_Quantities
 
 SUBROUTINE write_monte_carlo_test
   implicit none
-  write(*, *) "conf(2)/conf(2, up):", TestData(1)/TestData(3)
-  write(*, *) "conf(2, up)/conf(1, up):", TestData(3)/TestData(4)
-  write(*, *) "conf(loop=2)/conf(1, up):", TestData(7)/TestData(4)
+  integer :: iorder
+  open(11, access="append", file=trim(title3)//"_test.dat")
+  do iorder = 0, MCOrder
+    write(11, *) iorder, "conf(total)/conf(all spin up)", TestData(iorder)/TestData(MCOrder+iorder+1)
+  enddo
+  write(11, *)
+
+  do iorder = 1, MCOrder
+    write(11, *) iorder, "conf(all spin up)/conf(0, all spin up)", TestData(MCOrder+iorder+1)/TestData(MCOrder+1)
+  enddo
+  close(11)
   return
 END SUBROUTINE
 
