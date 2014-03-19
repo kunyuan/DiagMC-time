@@ -213,24 +213,24 @@ SUBROUTINE markov
       endif
 
       !========================== REWEIGHTING =========================
-      if(mod(imc,1.e7)==0) then
-        write(logstr,*) "Reweighting order of diagrams..."
-        call write_log
-        x=sum(GamWormOrder(:))
-        CoefOfWeight(:)=x/(GamWormOrder(:)+50.d0)
-        write(logstr,*) "Weight:"
-        call write_log
-        do i=0,MCOrder
-          write(logstr,"('Order ',i2,':',f10.4)") i, CoefOfWeight(i)
-          call write_log
-        enddo
-        write(logstr,*) "Reweighting is done!"
-        call write_log
-        if(imc<=2.e7) then
-          GamWormOrder=0.d0
-          GamOrder=0.d0
-        endif
-      endif
+      !if(mod(imc,1.e7)==0) then
+        !write(logstr,*) "Reweighting order of diagrams..."
+        !call write_log
+        !x=sum(GamWormOrder(:))
+        !CoefOfWeight(:)=x/(GamWormOrder(:)+50.d0)
+        !write(logstr,*) "Weight:"
+        !call write_log
+        !do i=0,MCOrder
+          !write(logstr,"('Order ',i2,':',f10.4)") i, CoefOfWeight(i)
+          !call write_log
+        !enddo
+        !write(logstr,*) "Reweighting is done!"
+        !call write_log
+        !if(imc<=2.e7) then
+          !GamWormOrder=0.d0
+          !GamOrder=0.d0
+        !endif
+      !endif
       !================================================================
 
       GamWormOrder(Order) = GamWormOrder(Order) + 1.0
@@ -241,6 +241,7 @@ SUBROUTINE markov
         GamOrder(Order) = GamOrder(Order) + 1
       endif
     enddo
+
     if(IsToss==0) call measure
   enddo
 
@@ -305,7 +306,7 @@ SUBROUTINE create_worm_along_wline
 
   statiGam = add_ira_stat(StatusVertex(iGam))
   statjGam = add_ira_stat(StatusVertex(jGam))
-  statW    = line_stat(statiGam, statjGam)
+  statW    = wline_stat(statiGam, statjGam)
 
   !------------ step4 : weight calculation ----------------------
   tau = TVertex(2, NeighLn(2, iGin))- TVertex(1, NeighLn(1, iGin))
@@ -461,7 +462,7 @@ SUBROUTINE delete_worm_along_wline
   !------------ status, type for the new configuration ------------
   statIra   = delete_ira_stat(StatusVertex(Ira))
   statMasha = delete_ira_stat(StatusVertex(Masha))
-  statW     = line_stat(statIra, statMasha)
+  statW     = wline_stat(statIra, statMasha)
 
   typIra = TypeSp2Gam(TypeLn(iGin),TypeLn(iGout),SpInVertex(1, Ira), SpInVertex(2, Ira))
   typMasha = TypeSp2Gam(TypeLn(jGin),TypeLn(jGout),SpInVertex(1,Masha),SpInVertex(2, Masha))
@@ -618,7 +619,7 @@ SUBROUTINE move_worm_along_wline
   !-------- the stat, type of the new config ----
   statiGam = delete_ira_stat(StatusVertex(iGam))
   statjGam = add_ira_stat(StatusVertex(jGam))
-  statW = line_stat(statiGam, statjGam)
+  statW = wline_stat(statiGam, statjGam)
 
   typW = TypeLn(WLn)
   typiGam = TypeSp2Gam(TypeLn(GLn1), TypeLn(GLn2), SpInVertex(1, iGam), SpInVertex(2, iGam))
@@ -751,13 +752,13 @@ SUBROUTINE move_worm_along_gline
   statjGam = add_ira_stat(StatusVertex(jGam))
 
   stat1 = StatusVertex(NeighLn(3-DirecVertex(iGam), iW))
-  statiW = line_stat(statiGam,  stat1)
+  statiW = wline_stat(statiGam,  stat1)
 
   stat2 = StatusVertex(NeighLn(3-DirecVertex(jGam), jW))
-  statjW = line_stat(statjGam,  stat2)
+  statjW = wline_stat(statjGam,  stat2)
 
   if(iW == jW) then
-    statiW = line_stat(statiGam, statjGam)
+    statiW = wline_stat(statiGam, statjGam)
     statjW = statiW
   endif
 
@@ -972,10 +973,10 @@ SUBROUTINE add_interaction
 
   statA = 0
   statB = 0
-  statIA = line_stat(statA, StatusVertex(Ira)) 
-  statMB = line_stat(statB, StatusVertex(Masha)) 
-  statAC = line_stat(statA, StatusVertex(GamC))
-  statBD = line_stat(statB, StatusVertex(GamD))
+  statIA = gline_stat(statA, StatusVertex(Ira)) 
+  statMB = gline_stat(statB, StatusVertex(Masha)) 
+  statAC = gline_stat(statA, StatusVertex(GamC))
+  statBD = gline_stat(statB, StatusVertex(GamD))
 
   Order = Order + 1 !!!!! add Order to the next Order
 
@@ -1183,6 +1184,7 @@ SUBROUTINE remove_interaction
   GAC = NeighVertex(dir, GamA);         GBD = NeighVertex(dir, GamB)
   GamC = NeighLn(dir, GAC);             GamD = NeighLn(dir, GBD)
 
+  dirW = DirecVertex(GamA)
   kM = add_k(kMasha, (-1)**dirW*kLn(WAB))
 
   statIA = StatusLn(GIA)
@@ -1211,11 +1213,11 @@ SUBROUTINE remove_interaction
 
   if(flag==1) then
     Order = Order + 1
-    call undo_delete_gamma(GamA)
     call undo_delete_gamma(GamB)
-    call undo_delete_line(GIA, 1, statIA)
-    call undo_delete_line(GMB, 1, statMB)
+    call undo_delete_gamma(GamA)
     call undo_delete_line(WAB, 2, statAB)
+    call undo_delete_line(GMB, 1, statMB)
+    call undo_delete_line(GIA, 1, statIA)
 
     NeighLn(3-dir, GAC) = GamA;        NeighLn(3-dir, GBD) = GamB
     NeighVertex(dir, Ira) = GIA;       NeighVertex(dir, Masha)=GMB
@@ -1223,8 +1225,8 @@ SUBROUTINE remove_interaction
   endif
 
   !-------- the new status for the new config ----
-  statIC = line_stat(StatusVertex(Ira), StatusVertex(GamC))
-  statMD = line_stat(StatusVertex(Masha),StatusVertex(GamD))
+  statIC = gline_stat(StatusVertex(Ira), StatusVertex(GamC))
+  statMD = gline_stat(StatusVertex(Masha),StatusVertex(GamD))
 
   !-------------- step4 : weight calculation --------------------
   tau = (-1)**dir *(TVertex(dir, GamC)-TVertex(3-dir, Ira))
@@ -1239,7 +1241,7 @@ SUBROUTINE remove_interaction
     & tau1, tau2, TypeVertex(MeasureGam))
 
   Anew = WGIC *WGMD *WMeasureGam
-  Aold = WeightVertex(GamA)*WeightVertex(GamB)*WeightLn(GIA)*WeightLn(GMB)*WeightLn(WAB)* &
+  Aold = (1.d0/Beta)*WeightVertex(GamA)*WeightVertex(GamB)*WeightLn(GIA)*WeightLn(GMB)*WeightLn(WAB)* &
     & WeightLn(GAC) *WeightLn(GBD) *WeightVertex(MeasureGam)
 
   call weight_ratio(Pacc, sgn, Anew, Aold)
@@ -1275,11 +1277,11 @@ SUBROUTINE remove_interaction
   else
     !-------------- undo delete line and vertexes --------------------
     Order = Order + 1
-    call undo_delete_gamma(GamA)
     call undo_delete_gamma(GamB)
-    call undo_delete_line(GIA, 1, statIA)
-    call undo_delete_line(GMB, 1, statMB)
+    call undo_delete_gamma(GamA)
     call undo_delete_line(WAB, 2, statAB)
+    call undo_delete_line(GMB, 1, statMB)
+    call undo_delete_line(GIA, 1, statIA)
 
     NeighLn(3-dir, GAC) = GamA;        NeighLn(3-dir, GBD) = GamB
     NeighVertex(dir, Ira) = GIA;       NeighVertex(dir, Masha)=GMB
@@ -1597,11 +1599,11 @@ SUBROUTINE move_measuring_index
   statjGam  = delete_mea_stat(StatusVertex(jGam))
 
   if(jW/=iW) then
-    statiW    = line_stat(statiGam, StatusVertex(NeighLn(3-DirecVertex(iGam), iW)))
-    statjW    = line_stat(statjGam, StatusVertex(NeighLn(3-DirecVertex(jGam), jW)))
+    statiW    = wline_stat(statiGam, StatusVertex(NeighLn(3-DirecVertex(iGam), iW)))
+    statjW    = wline_stat(statjGam, StatusVertex(NeighLn(3-DirecVertex(jGam), jW)))
   else
-    statiW    = line_stat(statiGam, statjGam)
-    statjW    = line_stat(statjGam, statiGam)
+    statiW    = wline_stat(statiGam, statjGam)
+    statjW    = wline_stat(statjGam, statiGam)
   endif
 
   statiGin    = 1
@@ -2203,6 +2205,7 @@ SUBROUTINE measure
   integer :: ityp, nloop
   integer :: MeaGin, MeaGout, MeaW, xg, yg, xw, yw, dir, typ
   integer :: dx, dy, dt1, dt2
+  integer :: ikey, sumt
   double precision :: factorM
   double precision :: tau1, tau2, tau3
 
@@ -2276,14 +2279,29 @@ SUBROUTINE measure
   GamSqMC(Order,nloop, ityp, dx, dy, dt1, dt2 ) = GamSqMC(Order,nloop, ityp, dx, dy, dt1, dt2) &
     & + (Phase/factorM)**2.d0
 
-  if(Order==0) then
-    GamNorm = GamNorm + Phase
-  endif
+  !if(Order==0) then
+    !GamNorm = GamNorm + Phase
+  !endif
 
   !===============  test variables =================================
   !iGam=NeighLn(3,1)
   !if(IsDeltaLn(3)==0 .and. StatusLn(3)==0) TestData(1) = TestData(1) +1.d0
-  !if(Order==2)  TestData(1) = TestData(1) +1.d0
+  !if(Order==2) then
+    !TestData(1) = TestData(1) +1.d0
+    !sumt = 0
+    !do ikey = 1, 3
+      !sumt = sumt + TypeLn(WLnKey2Value(ikey))
+    !enddo
+    !if(sumt==3)   TestData(3) = TestData(3) + 1.d0
+  !endif
+  !if(Order==1) then
+    !TestData(2) = TestData(2) +1.d0
+    !sumt = 0
+    !do ikey = 1, 2
+      !sumt = sumt + TypeLn(WLnKey2Value(ikey))
+    !enddo
+    !if(sumt==2)   TestData(4) = TestData(4) + 1.d0
+  !endif
   !TestData(0)=TestData(0)+1.d0
   !================================================================
   
