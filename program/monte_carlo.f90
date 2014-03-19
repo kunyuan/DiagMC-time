@@ -188,8 +188,8 @@ SUBROUTINE markov(MaxSamp)
           call move_worm_along_gline              
         case( 7) 
           call add_interaction                  
-        !case( 8) 
-          !call remove_interaction             
+        case( 8) 
+          call remove_interaction             
         !case( 9) 
           !call add_interaction_cross              
         !case(10)
@@ -334,7 +334,7 @@ SUBROUTINE create_worm_along_wline
 
   statiGam = add_ira_stat(StatusVertex(iGam))
   statjGam = add_ira_stat(StatusVertex(jGam))
-  statW    = line_stat(statiGam, statjGam)
+  statW    = wline_stat(statiGam, statjGam)
 
   !------------ step4 : weight calculation ----------------------
   tau = TVertex(2, NeighLn(2, iGin))- TVertex(1, NeighLn(1, iGin))
@@ -391,7 +391,7 @@ SUBROUTINE create_worm_along_wline
   endif
 
   call weight_ratio(Pacc, sgn, Anew, Aold)
-  Pacc = Pacc *Wworm *(Order+1.d0)/(CoefOfWorm*0.5d0) 
+  Pacc = Pacc *CoefOfWorm *Wworm *(Order+1.d0)/0.5d0 
   Pacc = Pacc *Pupdate(2)/Pupdate(1)
 
   !------------ step5 : accept the update -----------------------
@@ -490,7 +490,7 @@ SUBROUTINE delete_worm_along_wline
   !------------ status, type for the new configuration ------------
   statIra   = delete_ira_stat(StatusVertex(Ira))
   statMasha = delete_ira_stat(StatusVertex(Masha))
-  statW     = line_stat(statIra, statMasha)
+  statW     = wline_stat(statIra, statMasha)
 
   typIra = TypeSp2Gam(TypeLn(iGin),TypeLn(iGout),SpInVertex(1, Ira), SpInVertex(2, Ira))
   typMasha = TypeSp2Gam(TypeLn(jGin),TypeLn(jGout),SpInVertex(1,Masha),SpInVertex(2, Masha))
@@ -555,7 +555,7 @@ SUBROUTINE delete_worm_along_wline
   endif
 
   call weight_ratio(Pacc, sgn, Anew, Aold)
-  Pacc = Pacc *(CoefOfWorm*0.5d0)/WeightWorm/(Order+1.d0) 
+  Pacc = Pacc *0.5d0/(CoefOfWorm*WeightWorm*(Order+1.d0)) 
   Pacc = Pacc *Pupdate(1)/Pupdate(2)
 
   ProbProp(Order, iupdate) = ProbProp(Order, iupdate) + 1
@@ -647,7 +647,7 @@ SUBROUTINE move_worm_along_wline
   !-------- the stat, type of the new config ----
   statiGam = delete_ira_stat(StatusVertex(iGam))
   statjGam = add_ira_stat(StatusVertex(jGam))
-  statW = line_stat(statiGam, statjGam)
+  statW = wline_stat(statiGam, statjGam)
 
   typW = TypeLn(WLn)
   typiGam = TypeSp2Gam(TypeLn(GLn1), TypeLn(GLn2), SpInVertex(1, iGam), SpInVertex(2, iGam))
@@ -780,13 +780,13 @@ SUBROUTINE move_worm_along_gline
   statjGam = add_ira_stat(StatusVertex(jGam))
 
   stat1 = StatusVertex(NeighLn(3-DirecVertex(iGam), iW))
-  statiW = line_stat(statiGam,  stat1)
+  statiW = wline_stat(statiGam,  stat1)
 
   stat2 = StatusVertex(NeighLn(3-DirecVertex(jGam), jW))
-  statjW = line_stat(statjGam,  stat2)
+  statjW = wline_stat(statjGam,  stat2)
 
   if(iW == jW) then
-    statiW = line_stat(statiGam, statjGam)
+    statiW = wline_stat(statiGam, statjGam)
     statjW = statiW
   endif
 
@@ -962,7 +962,7 @@ SUBROUTINE add_interaction
   integer :: typGamA, typGamB, typAB
   integer :: statA, statB, statIA, statAC, statMB, statBD
   double precision :: tauA, tauB
-  double precision :: tau, tau1, tau2, WWorm, Pacc
+  double precision :: tau, tau1, tau2, Pacc
   complex*16 :: WA, WB, WGIA, WGAC, WGMB, WGBD, WWAB, WMeasureGam
   complex*16 :: Anew, Aold, sgn
   
@@ -1001,10 +1001,10 @@ SUBROUTINE add_interaction
 
   statA = 0
   statB = 0
-  statIA = line_stat(statA, StatusVertex(Ira)) 
-  statMB = line_stat(statB, StatusVertex(Masha)) 
-  statAC = line_stat(statA, StatusVertex(GamC))
-  statBD = line_stat(statB, StatusVertex(GamD))
+  statIA = gline_stat(statA, StatusVertex(Ira)) 
+  statMB = gline_stat(statB, StatusVertex(Masha)) 
+  statAC = gline_stat(statA, StatusVertex(GamC))
+  statBD = gline_stat(statB, StatusVertex(GamD))
 
   Order = Order + 1 !!!!! add Order to the next Order
 
@@ -1103,7 +1103,7 @@ SUBROUTINE add_interaction
   Aold = WeightLn(GIC) *WeightLn(GMD) *WeightVertex(MeasureGam)
 
   call weight_ratio(Pacc, sgn, Anew, Aold)
-  Pacc = Pacc *CoefOfWeight(Order)*prob_tau(tauA)*prob_tau(tauB)/CoefOfWeight(Order-1)
+  Pacc = Pacc *CoefOfWeight(Order)/(prob_tau(tauA)*prob_tau(tauB)*CoefOfWeight(Order-1))
   Pacc = Pacc *Pupdate(8)/Pupdate(7)
 
   !------------ step5 : accept the update -----------------------
@@ -1148,9 +1148,173 @@ SUBROUTINE add_interaction
   return
 END SUBROUTINE add_interaction
 
+
+
+
+
 !----------------- remove_interaction: Pupdate(8) ----------------
+!---------------------- dir = 1, dirW = 1 ------------------------
+!------               GamC                     GamA     GamC -----
+!------    Ira ----<----            Ira ----<---||---<-----  -----
+!------                     <==                 \/           -----
+!------  Masha ----<----          Masha ----<---||---<-----  -----
+!------               GamD                     GamB     GamD -----
+!-----------------------------------------------------------------
+!---------------------- dir = 1, dirW = 2 ------------------------
+!------               GamC                     GamA     GamC -----
+!------    Ira ----<----            Ira ----<---||---<-----  -----
+!------                     <==                 /\           -----
+!------  Masha ----<----          Masha ----<---||---<-----  -----
+!------               GamD                     GamB     GamD -----
+!-----------------------------------------------------------------
+!---------------------- dir = 2, dirW = 1 ------------------------
+!------               GamC                     GamA     GamC -----
+!------    Ira ---->----            Ira ---->---||--->-----  -----
+!------                     <==                 \/           -----
+!------  Masha ---->----          Masha ---->---||--->-----  -----
+!------               GamD                     GamB     GamD -----
+!-----------------------------------------------------------------
+!---------------------- dir = 2, dirW = 2 ------------------------
+!------               GamC                     GamA     GamC -----
+!------    Ira ---->----            Ira ---->---||--->-----  -----
+!------                     <==                 /\           -----
+!------  Masha ---->----          Masha ---->---||--->-----  -----
+!------               GamD                     GamB     GamD -----
+!-----------------------------------------------------------------
 SUBROUTINE remove_interaction
   implicit none
+  integer :: dir, dirW, flag, kM
+  integer :: GAC, GBD, GamC, GamD
+  integer :: WAB, GIA, GMB, GamA, GamB
+  integer :: statIC, statMD, statIA, statMB, statAB
+  double precision :: tau, tau1, tau2, Pacc
+  complex*16 :: WGIC, WGMD, WMeasureGam
+  complex*16 :: Anew, Aold, sgn
+  
+  !---------- step1 : check if worm is present ------------------
+  if(IsWormPresent .eqv. .false.)    return
+  !if(Order==1) return
+  if(Order==0) return
+
+  !------------ step2 : propose the new config ------------------
+  dir = Floor(rn()*2.d0)+1
+  GIA = NeighVertex(dir, Ira);          GMB = NeighVertex(dir, Masha)
+  GamA = NeighLn(dir, GIA);             GamB = NeighLn(dir, GMB)
+
+  if(NeighVertex(3, GamA)/=NeighVertex(3, GamB))  return
+  if(StatusVertex(GamA)/=0 .or. StatusVertex(GamB)/=0) return
+  if(IsDeltaVertex(GamA)/=1 .or. IsDeltaVertex(GamB)/=1) return
+  if(TypeVertex(GamA)>2 .or. TypeVertex(GamB)>2) return
+  if(GRVertex(1,GamA)/=WRVertex(1,GamA) .or. GRVertex(2,GamA)/=WRVertex(2,GamA)) return
+  if(GRVertex(1,GamB)/=WRVertex(1,GamB) .or. GRVertex(2,GamB)/=WRVertex(2,GamB)) return
+
+  WAB = NeighVertex(3, GamA)
+  GAC = NeighVertex(dir, GamA);         GBD = NeighVertex(dir, GamB)
+  GamC = NeighLn(dir, GAC);             GamD = NeighLn(dir, GBD)
+
+  dirW = DirecVertex(GamA)
+  kM = add_k(kMasha, (-1)**dirW*kLn(WAB))
+
+  statIA = StatusLn(GIA)
+  statMB = StatusLn(GMB)
+  statAB = StatusLn(WAB)
+
+  !------------ update the topology -----------------------------
+  Order = Order - 1
+  call delete_gamma(GamA)
+  call delete_gamma(GamB)
+  call delete_line(GIA, 1)
+  call delete_line(GMB, 1)
+  call delete_line(WAB, 2)
+
+  NeighLn(3-dir, GAC) = Ira;            NeighLn(3-dir, GBD) = Masha
+  NeighVertex(dir, Ira) = GAC;          NeighVertex(dir, Masha)=GBD
+
+  !------------ step3 : configuration check ---------------------
+  flag = 0
+  if(flag ==0) then
+    if(Is_reducible_G_Gam(GAC))     flag = 1
+  endif
+  if(flag ==0) then
+    if(Is_reducible_G_Gam(GAC))     flag = 1
+  endif
+
+  if(flag==1) then
+    Order = Order + 1
+    call undo_delete_gamma(GamB)
+    call undo_delete_gamma(GamA)
+    call undo_delete_line(WAB, 2, statAB)
+    call undo_delete_line(GMB, 1, statMB)
+    call undo_delete_line(GIA, 1, statIA)
+
+    NeighLn(3-dir, GAC) = GamA;        NeighLn(3-dir, GBD) = GamB
+    NeighVertex(dir, Ira) = GIA;       NeighVertex(dir, Masha)=GMB
+    return
+  endif
+
+  !-------- the new status for the new config ----
+  statIC = gline_stat(StatusVertex(Ira), StatusVertex(GamC))
+  statMD = gline_stat(StatusVertex(Masha),StatusVertex(GamD))
+
+  !-------------- step4 : weight calculation --------------------
+  tau = (-1)**dir *(TVertex(dir, GamC)-TVertex(3-dir, Ira))
+  WGIC = weight_line(statIC, IsDeltaLn(GAC), 1, 0, 0, tau, TypeLn(GAC))
+  tau = (-1)**dir *(TVertex(dir, GamD)-TVertex(3-dir, Masha))
+  WGMD = weight_line(statMD, IsDeltaLn(GBD), 1, 0, 0, tau, TypeLn(GBD))
+
+  tau1 = TVertex(3,MeasureGam)-TVertex(2,MeasureGam)
+  tau2 = TVertex(1,MeasureGam)-TVertex(3,MeasureGam)
+  WMeasureGam = weight_vertex(StatusVertex(MeasureGam), IsDeltaVertex(MeasureGam), &
+    & GRVertex(1,MeasureGam)-WRVertex(1,MeasureGam), GRVertex(2,MeasureGam)-WRVertex(2,MeasureGam), &
+    & tau1, tau2, TypeVertex(MeasureGam))
+
+  Anew = WGIC *WGMD *WMeasureGam
+  Aold = (1.d0/Beta)*WeightVertex(GamA)*WeightVertex(GamB)*WeightLn(GIA)*WeightLn(GMB)*WeightLn(WAB)* &
+    & WeightLn(GAC) *WeightLn(GBD) *WeightVertex(MeasureGam)
+
+  call weight_ratio(Pacc, sgn, Anew, Aold)
+
+  Pacc = Pacc *CoefOfWeight(Order)*prob_tau(TVertex(1,GamA))*prob_tau(TVertex(1,GamB))/ &
+    & CoefOfWeight(Order+1)
+  Pacc = Pacc *Pupdate(7)/Pupdate(8)
+
+  !------------ step5 : accept the update -----------------------
+  ProbProp(Order, iupdate) = ProbProp(Order, iupdate) + 1
+  if(rn()<=Pacc) then
+
+    !--------------- update the diagram info --------------------
+    Phase = Phase *sgn
+
+    !--------------- update k -----------------------------------
+    kMasha = kM
+    call delete_Hash4G(kLn(GIA))
+    call delete_Hash4G(kLn(GMB))
+
+    !--------------- update the status of elements --------------
+    StatusLn(GAC) = statIC
+    StatusLn(GBD) = statMD
+
+    !--------------- update weight of elements ------------------
+    WeightVertex(MeasureGam) = WMeasureGam
+    WeightLn(GAC) = WGIC
+    WeightLn(GBD) = WGMD
+
+    call update_weight(Anew, Aold)
+
+    ProbAcc(Order+1, 8) = ProbAcc(Order+1, 8) + 1
+  else
+    !-------------- undo delete line and vertexes --------------------
+    Order = Order + 1
+    call undo_delete_gamma(GamB)
+    call undo_delete_gamma(GamA)
+    call undo_delete_line(WAB, 2, statAB)
+    call undo_delete_line(GMB, 1, statMB)
+    call undo_delete_line(GIA, 1, statIA)
+
+    NeighLn(3-dir, GAC) = GamA;        NeighLn(3-dir, GBD) = GamB
+    NeighVertex(dir, Ira) = GIA;       NeighVertex(dir, Masha)=GMB
+    return
+  endif
 
 END SUBROUTINE remove_interaction
 
@@ -1463,11 +1627,11 @@ SUBROUTINE move_measuring_index
   statjGam  = delete_mea_stat(StatusVertex(jGam))
 
   if(jW/=iW) then
-    statiW    = line_stat(statiGam, StatusVertex(NeighLn(3-DirecVertex(iGam), iW)))
-    statjW    = line_stat(statjGam, StatusVertex(NeighLn(3-DirecVertex(jGam), jW)))
+    statiW    = wline_stat(statiGam, StatusVertex(NeighLn(3-DirecVertex(iGam), iW)))
+    statjW    = wline_stat(statjGam, StatusVertex(NeighLn(3-DirecVertex(jGam), jW)))
   else
-    statiW    = line_stat(statiGam, statjGam)
-    statjW    = line_stat(statjGam, statiGam)
+    statiW    = wline_stat(statiGam, statjGam)
+    statjW    = wline_stat(statjGam, statiGam)
   endif
 
   statiGin    = 1
@@ -1966,7 +2130,7 @@ COMPLEX*16 FUNCTION weight_line(stat, isdelta, knd, dx0, dy0, tau, typ)
   if(stat >= 0 .and. stat<=3) then
     if(knd==1) weight_line = weight_meas_G(1, t)
     if(knd==2 .and. isdelta==0) weight_line = weight_meas_W(1, dx, dy, t)
-    if(knd==2 .and. isdelta==1) weight_line = 0.01*weight_meas_W(1, dx, dy, 0)
+    if(knd==2 .and. isdelta==1) weight_line = weight_meas_W(1, dx, dy, 0)
   else if(stat==-1) then
     write(logstr, *) IsWormPresent, iupdate, "line status == -1! There is no weight!" 
     call write_log
@@ -2069,6 +2233,7 @@ SUBROUTINE measure
   integer :: ityp, nloop
   integer :: MeaGin, MeaGout, MeaW, xg, yg, xw, yw, dir, typ
   integer :: dx, dy, dt1, dt2
+  integer :: ikey, sumt
   double precision :: factorM
   double precision :: tau1, tau2, tau3
 
@@ -2142,15 +2307,36 @@ SUBROUTINE measure
   GamSqMC(Order,nloop, ityp, dx, dy, dt1, dt2 ) = GamSqMC(Order,nloop, ityp, dx, dy, dt1, dt2) &
     & + (Phase/factorM)**2.d0
 
-  if(Order==0) then
-    GamNorm = GamNorm + Phase
-  endif
+  !if(Order==0) then
+    !GamNorm = GamNorm + Phase
+  !endif
 
   !===============  test variables =================================
-  !iGam=NeighLn(3,1)
-  !if(IsDeltaLn(3)==0 .and. StatusLn(3)==0) TestData(1) = TestData(1) +1.d0
-  !if(Order==2)  TestData(1) = TestData(1) +1.d0
-  !TestData(0)=TestData(0)+1.d0
+  !if(Order==2) then
+    !TestData(1) = TestData(1) +1.d0/factorM
+    !sumt = 0
+    !do ikey = 1, 3
+      !sumt = sumt + TypeLn(WLnKey2Value(ikey))
+    !enddo
+    !if(sumt==3)   TestData(3) = TestData(3) + 1.d0/factorM
+  !endif
+
+  !if(Order==1) then
+    !TestData(2) = TestData(2) +1.d0/factorM
+    !sumt = 0
+    !do ikey = 1, 2
+      !sumt = sumt + TypeLn(WLnKey2Value(ikey))
+    !enddo
+    !if(sumt==2)   TestData(4) = TestData(4) + 1.d0/factorM
+  !endif
+
+  !if(Order==0) then
+    !TestData(5) = TestData(5) + 1.d0/factorM
+    !sumt = TypeLn(WLnKey2Value(1))
+    !if(sumt==1)   TestData(6) = TestData(6) + 1.d0/factorM
+  !endif
+
+  !TestData(0)=TestData(0)+1.d0/factorM
   !================================================================
   
         
