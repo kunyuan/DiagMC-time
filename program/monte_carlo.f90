@@ -218,16 +218,12 @@ SUBROUTINE markov
         call write_log
         x=sum(GamWormOrder(:))
         CoefOfWeight(:)=x/(GamWormOrder(:)+50.d0)
-        y=sum(GamOrder(:))
-        CoefOfWorm = x/(x-y+50.d0)
         write(logstr,*) "Weight:"
         call write_log
         do i=0,MCOrder
           write(logstr,"('Order ',i2,':',f10.4)") i, CoefOfWeight(i)
           call write_log
         enddo
-        write(logstr,"('Worm',f10.4)") CoefOfWorm
-        call write_log
         write(logstr,*) "Reweighting is done!"
         call write_log
         if(imc<=2.e7) then
