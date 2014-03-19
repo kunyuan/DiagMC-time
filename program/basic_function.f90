@@ -803,7 +803,7 @@ SUBROUTINE insert_line(newline, isdelta, k, knd, typ, stat, weigh)
   implicit none
   integer, intent(out) :: newline
   integer, intent(in) :: isdelta, k, knd, typ, stat
-  double precision, intent(in) :: weigh
+  complex*16, intent(in) :: weigh
 
   newline = TailLn
   TailLn  = NextLn(TailLn)
@@ -887,7 +887,8 @@ SUBROUTINE insert_gamma(newgamma, isdelta, gx, gy, wx, wy, t1, t2, t3, dir, typ,
   implicit none
   integer, intent(out) :: newgamma
   integer, intent(in) :: gx, gy, wx, wy, isdelta, dir, typ, stat
-  double precision, intent(in) :: weigh, t1, t2, t3
+  complex*16, intent(in) :: weigh
+  double precision, intent(in) :: t1, t2, t3
 
   newgamma = TailVertex
   TailVertex = NextVertex(TailVertex)
