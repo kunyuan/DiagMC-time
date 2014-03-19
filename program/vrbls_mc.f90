@@ -32,6 +32,7 @@ MODULE vrbls_mc
   character*100 :: title1
   character*100 :: title2
   character*100 :: title3
+  character*100 :: title4
   character*100 :: title
   character*100 :: logstr
 
@@ -134,10 +135,10 @@ MODULE vrbls_mc
   double precision :: imc               ! imc: the MC step
   double precision :: imeasure
   integer          :: NSamp             ! # total MC steps
-  integer          :: NBlck             ! # total blocks
   integer          :: NToss             ! # MC steps for toss
   integer          :: NStep             ! # MC steps for one measurement
-  integer          :: IsToss
+  logical          :: IsToss
+  logical          :: IsForever
 
   !------------ basic variables for a diagram --------------------------
   integer          :: Order             ! order of the simulating diagram 

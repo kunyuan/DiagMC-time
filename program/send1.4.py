@@ -16,7 +16,7 @@ proclist=[]
 
 def para_init():
     para=dict()
-    para["Block"]=[]
+    para["IsForever"]=[]
     para["Sample"]=[]
     para["Sweep"]=[]
     para["Toss"]=[]
@@ -68,7 +68,7 @@ def submit_jobs(para,i,execute,homedir):
                 item.append(para["Ly"][0])
                 item.append(para["Toss"][0])
                 item.append(para["Sample"][0])
-                item.append(para["Block"][0])
+                item.append(para["IsForever"][0])
                 item.append(para["Sweep"][0])
                 item.append(jelem)  #jcp
                 item.append(belem)  #beta
@@ -96,7 +96,7 @@ def submit_jobs(para,i,execute,homedir):
                 item.append(para["Ly"][0])
                 item.append(para["Toss"][0])
                 item.append(para["Sample"][0])
-                item.append(para["Block"][0])
+                item.append(para["IsForever"][0])
                 item.append(para["Sweep"][0])
                 item.append(jelem)  #jcp
                 item.append(belem)  #beta
@@ -104,6 +104,7 @@ def submit_jobs(para,i,execute,homedir):
                 item.append(str(-int(random.random()*2**30)))   #Seed
                 item.append(para["Type"][0])
                 item.append(para["IsLoad"][0])
+                item.append(str(pid))
                 item.append(para["ReadFile"][0])
                 stri=" ".join(item)
                 for eve in para["Reweight"]:
@@ -179,7 +180,7 @@ for eachline in inlist:
     
     if eachline=="":
         continue
-    if eachline[0]=='%' and para["Block"]!=0:
+    if eachline[0]=='%' and para["Sample"]!=0:
     #if you want to check the parameter in inlist, put the codes here
         flag=False
         for kelem in para.keys():
