@@ -112,7 +112,11 @@ SUBROUTINE def_symmetry
   implicit none
   integer :: i, j, omega
 
-  CoefOfSymmetry(:,:) = 2.d0
+  do j = 0, Lx-1
+    do i = 0, Lx-1
+      CoefOfSymmetry(i,j) = 2.d0   !typ 1,2; 3,4; 5,6
+    enddo
+  enddo
 
   !do i = 1, Lx-1
     !CoefOfSymmetry(i, :) = 2.d0* CoefOfSymmetry(i, :)
@@ -121,7 +125,6 @@ SUBROUTINE def_symmetry
   !do j = 1, Ly-1
     !CoefOfSymmetry(:, j) = 2.d0* CoefOfSymmetry(:, j)
   !enddo
-  
   return
 END SUBROUTINE def_symmetry
 
