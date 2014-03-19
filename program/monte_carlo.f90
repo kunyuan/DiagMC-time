@@ -933,7 +933,7 @@ SUBROUTINE add_interaction
   integer :: typGamA, typGamB, typAB
   integer :: statA, statB, statIA, statAC, statMB, statBD
   double precision :: tauA, tauB
-  double precision :: tau, tau1, tau2, WWorm, Pacc
+  double precision :: tau, tau1, tau2, Pacc
   complex*16 :: WA, WB, WGIA, WGAC, WGMB, WGBD, WWAB, WMeasureGam
   complex*16 :: Anew, Aold, sgn
   
@@ -1119,39 +1119,134 @@ SUBROUTINE add_interaction
   return
 END SUBROUTINE add_interaction
 
+
+
+
+
 !----------------- remove_interaction: Pupdate(8) ----------------
+!---------------------- dir = 1, dirW = 1 ------------------------
+!------               GamC                     GamA     GamC -----
+!------    Ira ----<----            Ira ----<---||---<-----  -----
+!------                     <==                 \/           -----
+!------  Masha ----<----          Masha ----<---||---<-----  -----
+!------               GamD                     GamB     GamD -----
+!-----------------------------------------------------------------
+!---------------------- dir = 1, dirW = 2 ------------------------
+!------               GamC                     GamA     GamC -----
+!------    Ira ----<----            Ira ----<---||---<-----  -----
+!------                     <==                 /\           -----
+!------  Masha ----<----          Masha ----<---||---<-----  -----
+!------               GamD                     GamB     GamD -----
+!-----------------------------------------------------------------
+!---------------------- dir = 2, dirW = 1 ------------------------
+!------               GamC                     GamA     GamC -----
+!------    Ira ---->----            Ira ---->---||--->-----  -----
+!------                     <==                 \/           -----
+!------  Masha ---->----          Masha ---->---||--->-----  -----
+!------               GamD                     GamB     GamD -----
+!-----------------------------------------------------------------
+!---------------------- dir = 2, dirW = 2 ------------------------
+!------               GamC                     GamA     GamC -----
+!------    Ira ---->----            Ira ---->---||--->-----  -----
+!------                     <==                 /\           -----
+!------  Masha ---->----          Masha ---->---||--->-----  -----
+!------               GamD                     GamB     GamD -----
+!-----------------------------------------------------------------
 SUBROUTINE remove_interaction
   implicit none
-  integer :: dir, dirW, flag, kIA, kMB, kM, q
-  integer :: GIC, GMD, GamC, GamD
+  integer :: dir, dirW, flag, kM
+  integer :: GAC, GBD, GamC, GamD
   integer :: WAB, GIA, GMB, GamA, GamB
-  integer :: typGamA, typGamB, typAB
-  integer :: statA, statB, statIA, statAC, statMB, statBD
-  double precision :: tauA, tauB
-  double precision :: tau, tau1, tau2, WWorm, Pacc
-  complex*16 :: WA, WB, WGIA, WGAC, WGMB, WGBD, WWAB, WMeasureGam
+  integer :: statIC, statMD, statIA, statMB, statAB
+  double precision :: tau, tau1, tau2, Pacc
+  complex*16 :: WGIC, WGMD, WMeasureGam
   complex*16 :: Anew, Aold, sgn
   
   !---------- step1 : check if worm is present ------------------
   if(IsWormPresent .eqv. .false.)    return
-  if(Order>=MCOrder) return
+  !if(Order==1) return
+  if(Order==0) return
 
   !------------ step2 : propose the new config ------------------
+  dir = Floor(rn()*2.d0)+1
+  GIA = NeighVertex(dir, Ira);          GMB = NeighVertex(dir, Masha)
+  GamA = NeighLn(dir, GIA);             GamB = NeighLn(dir, GMB)
 
-  !-------- the new time, spin, type and status for the new config ----
+  if(NeighVertex(3, GamA)/=NeighVertex(3, GamB))  return
+  if(StatusVertex(GamA)/=0 .or. StatusVertex(GamB)/=0) return
+  if(IsDeltaVertex(GamA)/=1 .or. IsDeltaVertex(GamB)/=1) return
+  if(TypeVertex(GamA)>2 .or. TypeVertex(GamB)>2) return
+  if(GRVertex(1,GamA)/=WRVertex(1,GamA) .or. GRVertex(2,GamA)/=WRVertex(2,GamA)) return
+  if(GRVertex(1,GamB)/=WRVertex(1,GamB) .or. GRVertex(2,GamB)/=WRVertex(2,GamB)) return
 
-  !-------------- step3 : weight calculation --------------------
-  !---  change the topology for the configuration after update --
-  
+  WAB = NeighVertex(3, GamA)
+  GAC = NeighVertex(dir, GamA);         GBD = NeighVertex(dir, GamB)
+  GamC = NeighLn(dir, GAC);             GamD = NeighLn(dir, GBD)
+
+  kM = add_k(kMasha, (-1)**dirW*kLn(WAB))
+
+  statIA = StatusLn(GIA)
+  statMB = StatusLn(GMB)
+  statAB = StatusLn(WAB)
+
   !------------ update the topology -----------------------------
+  Order = Order - 1
+  call delete_gamma(GamA)
+  call delete_gamma(GamB)
+  call delete_line(GIA, 1)
+  call delete_line(GMB, 1)
+  call delete_line(WAB, 2)
 
-  !------------ step4 : configuration check ---------------------
+  NeighLn(3-dir, GAC) = Ira;            NeighLn(3-dir, GBD) = Masha
+  NeighVertex(dir, Ira) = GAC;          NeighVertex(dir, Masha)=GBD
 
-  !------------- weight calculation -----------------------------
+  !------------ step3 : configuration check ---------------------
+  flag = 0
+  if(flag ==0) then
+    if(Is_reducible_G_Gam(GAC))     flag = 1
+  endif
+  if(flag ==0) then
+    if(Is_reducible_G_Gam(GAC))     flag = 1
+  endif
+
+  if(flag==1) then
+    Order = Order + 1
+    call undo_delete_gamma(GamA)
+    call undo_delete_gamma(GamB)
+    call undo_delete_line(GIA, 1, statIA)
+    call undo_delete_line(GMB, 1, statMB)
+    call undo_delete_line(WAB, 2, statAB)
+
+    NeighLn(3-dir, GAC) = GamA;        NeighLn(3-dir, GBD) = GamB
+    NeighVertex(dir, Ira) = GIA;       NeighVertex(dir, Masha)=GMB
+    return
+  endif
+
+  !-------- the new status for the new config ----
+  statIC = line_stat(StatusVertex(Ira), StatusVertex(GamC))
+  statMD = line_stat(StatusVertex(Masha),StatusVertex(GamD))
+
+  !-------------- step4 : weight calculation --------------------
+  tau = (-1)**dir *(TVertex(dir, GamC)-TVertex(3-dir, Ira))
+  WGIC = weight_line(statIC, IsDeltaLn(GAC), 1, 0, 0, tau, TypeLn(GAC))
+  tau = (-1)**dir *(TVertex(dir, GamD)-TVertex(3-dir, Masha))
+  WGMD = weight_line(statMD, IsDeltaLn(GBD), 1, 0, 0, tau, TypeLn(GBD))
+
+  tau1 = TVertex(3,MeasureGam)-TVertex(2,MeasureGam)
+  tau2 = TVertex(1,MeasureGam)-TVertex(3,MeasureGam)
+  WMeasureGam = weight_vertex(StatusVertex(MeasureGam), IsDeltaVertex(MeasureGam), &
+    & GRVertex(1,MeasureGam)-WRVertex(1,MeasureGam), GRVertex(2,MeasureGam)-WRVertex(2,MeasureGam), &
+    & tau1, tau2, TypeVertex(MeasureGam))
+
+  Anew = WGIC *WGMD *WMeasureGam
+  Aold = WeightVertex(GamA)*WeightVertex(GamB)*WeightLn(GIA)*WeightLn(GMB)*WeightLn(WAB)* &
+    & WeightLn(GAC) *WeightLn(GBD) *WeightVertex(MeasureGam)
 
   call weight_ratio(Pacc, sgn, Anew, Aold)
-  Pacc = Pacc *CoefOfWeight(Order)*prob_tau(tauA)*prob_tau(tauB)/CoefOfWeight(Order-1)
-  Pacc = Pacc *Pupdate(8)/Pupdate(7)
+
+  Pacc = Pacc *CoefOfWeight(Order)/(prob_tau(TVertex(1,GamA))*prob_tau(TVertex(1,GamB))* &
+    & CoefOfWeight(Order+1))
+  Pacc = Pacc *Pupdate(7)/Pupdate(8)
 
   !------------ step5 : accept the update -----------------------
   ProbProp(Order, iupdate) = ProbProp(Order, iupdate) + 1
@@ -1160,17 +1255,34 @@ SUBROUTINE remove_interaction
     !--------------- update the diagram info --------------------
     Phase = Phase *sgn
 
-    !--------------- update k and omega -------------------------
+    !--------------- update k -----------------------------------
+    kMasha = kM
+    call delete_Hash4G(kLn(GIA))
+    call delete_Hash4G(kLn(GMB))
 
     !--------------- update the status of elements --------------
+    StatusLn(GAC) = statIC
+    StatusLn(GBD) = statMD
 
     !--------------- update weight of elements ------------------
+    WeightVertex(MeasureGam) = WMeasureGam
+    WeightLn(GAC) = WGIC
+    WeightLn(GBD) = WGMD
 
     call update_weight(Anew, Aold)
 
     ProbAcc(Order+1, 8) = ProbAcc(Order+1, 8) + 1
   else
-    !-------------- delete line and vertexes --------------------
+    !-------------- undo delete line and vertexes --------------------
+    Order = Order + 1
+    call undo_delete_gamma(GamA)
+    call undo_delete_gamma(GamB)
+    call undo_delete_line(GIA, 1, statIA)
+    call undo_delete_line(GMB, 1, statMB)
+    call undo_delete_line(WAB, 2, statAB)
+
+    NeighLn(3-dir, GAC) = GamA;        NeighLn(3-dir, GBD) = GamB
+    NeighVertex(dir, Ira) = GIA;       NeighVertex(dir, Masha)=GMB
     return
   endif
 
