@@ -147,15 +147,30 @@ conf(Ira===Masha):conf(other worm):conf(no worm) = 24:32:6
 
 ====================================================
 
-8. DRAW configuration
+10. mc updates: change_Gamma_time
 
 Test example:
-1) Order1 diagram without bubble
-2) Order2 diagram
-3) Order1 diagram with a bubble
+1) Order1 diagram
+IsDeltaGamma(:) = 1; IsDeltaW(:) = 0; Uniform weight
+
+Result: 
+conf(tau(3)<=0.125) = 0.25
+conf(tau(3)<=0.25) = 0.50
+conf(tau(3)<=0.325) = 0.65
 
 ====================================================
 
+11. mc updates: add_interaction
+
+Test example:
+1) Order1 diagram
+IsDeltaGamma(:) = 1; IsDeltaW(:) = 0; Uniform weight
+
+Result: 
+can generate Order=2 diagram
+the detail balance can not be tested for now since we don't have remove_interaction yet.
+
+====================================================
 
 
 ====================================================
