@@ -775,28 +775,50 @@ INTEGER FUNCTION delete_mea_stat(stat)
   endif
 END FUNCTION delete_mea_stat
 
-!--- calculate the status of a line according to the neighbor vertexes --
-INTEGER FUNCTION line_stat(stat1, stat2)
+!--- calculate the status of a wline according to the neighbor vertexes --
+INTEGER FUNCTION wline_stat(stat1, stat2)
   implicit none
-  integer :: stat1, stat2
+  integer, intent(in) :: stat1, stat2
   if(stat1 == -1) stop
   if(stat2 == -1) stop
-  line_stat = stat1 + stat2
+  wline_stat = stat1 + stat2
   if(stat1 == stat2) then
-    line_stat = stat1
-  else if(line_stat == 5) then
-    line_stat = 3
+    wline_stat = stat1
+  else if(wline_stat == 5) then
+    wline_stat = 3
   endif
 
-  if(line_stat>3) then
-    write(logstr, *) "line_stat error!", line_stat, stat1, stat2
+  if(wline_stat>3) then
+    write(logstr, *) "wline_stat error!", wline_stat, stat1, stat2
     call write_log
     call print_config
     stop
   endif
   return
-END FUNCTION line_stat
+END FUNCTION wline_stat
 
+!--- calculate the status of a line according to the neighbor vertexes --
+INTEGER FUNCTION gline_stat(stat1, stat2)
+  implicit none
+  integer, intent(in) :: stat1, stat2
+  integer :: mstat1, mstat2
+  if(stat1 == -1) stop
+  if(stat2 == -1) stop
+  mstat1 = Mod(stat1, 2)
+  mstat2 = Mod(stat2, 2)
+  gline_stat = mstat1 + mstat2
+  if(mstat1 == mstat2) then
+    gline_stat = mstat1
+  endif
+
+  if(gline_stat>1) then
+    write(logstr, *) "gline_stat error!", gline_stat, mstat1, mstat2, stat1, stat2
+    call write_log
+    call print_config
+    stop
+  endif
+  return
+END FUNCTION gline_stat
 
 !------------- insert a line to the link -------------------
 SUBROUTINE insert_line(newline, isdelta, k, knd, typ, stat, weigh)
