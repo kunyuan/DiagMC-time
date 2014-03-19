@@ -154,7 +154,7 @@ END SUBROUTINE def_diagram
 SUBROUTINE markov
   implicit none
   integer :: iflag, istep,isamp,i
-  double precision :: nr,x
+  double precision :: nr,x, y
 
   do isamp = 1, Nsamp
     istep = 0
@@ -213,32 +213,36 @@ SUBROUTINE markov
       endif
 
       !========================== REWEIGHTING =========================
-      !if(mod(imc,1.e7)==0) then
-        !write(logstr,*) "Reweighting order of diagrams..."
-        !call write_log
-        !x=sum(GamWormOrder(:))
-        !CoefOfWeight(:)=x/(GamWormOrder(:)+50.d0)
-        !write(logstr,*) "Weight:"
-        !call write_log
-        !do i=0,MCOrder
-          !write(logstr,"('Order ',i2,':',f10.4)") i, CoefOfWeight(i)
-          !call write_log
-        !enddo
-        !write(logstr,*) "Reweighting is done!"
-        !call write_log
-        !if(imc<=2.e7) then
-          !GamWormOrder=0.d0
-          !GamOrder=0.d0
-        !endif
-      !endif
+      if(mod(imc,1.e7)==0) then
+        write(logstr,*) "Reweighting order of diagrams..."
+        call write_log
+        x=sum(GamWormOrder(:))
+        CoefOfWeight(:)=x/(GamWormOrder(:)+50.d0)
+        y=sum(GamOrder(:))
+        CoefOfWorm = x/(x-y+50.d0)
+        write(logstr,*) "Weight:"
+        call write_log
+        do i=0,MCOrder
+          write(logstr,"('Order ',i2,':',f10.4)") i, CoefOfWeight(i)
+          call write_log
+        enddo
+        write(logstr,"('Worm',f10.4)") CoefOfWorm
+        call write_log
+        write(logstr,*) "Reweighting is done!"
+        call write_log
+        if(imc<=2.e7) then
+          GamWormOrder=0.d0
+          GamOrder=0.d0
+        endif
+      endif
       !================================================================
 
-      GamWormOrder(Order) = GamWormOrder(Order) + 1.0
+      GamWormOrder(Order) = GamWormOrder(Order) + 1.d0
       if(IsWormPresent) then
         if(rn()<=0.5d0) call switch_ira_and_masha
       else
         istep = istep + 1
-        GamOrder(Order) = GamOrder(Order) + 1
+        GamOrder(Order) = GamOrder(Order) + 1.d0
       endif
     enddo
 
@@ -363,7 +367,7 @@ SUBROUTINE create_worm_along_wline
   endif
 
   call weight_ratio(Pacc, sgn, Anew, Aold)
-  Pacc = Pacc *Wworm *(Order+1.d0)/(CoefOfWorm*0.5d0) 
+  Pacc = Pacc *CoefOfWorm *Wworm *(Order+1.d0)/0.5d0 
   Pacc = Pacc *Pupdate(2)/Pupdate(1)
 
   !------------ step5 : accept the update -----------------------
@@ -527,7 +531,7 @@ SUBROUTINE delete_worm_along_wline
   endif
 
   call weight_ratio(Pacc, sgn, Anew, Aold)
-  Pacc = Pacc *(CoefOfWorm*0.5d0)/WeightWorm/(Order+1.d0) 
+  Pacc = Pacc *0.5d0/(CoefOfWorm*WeightWorm*(Order+1.d0)) 
   Pacc = Pacc *Pupdate(1)/Pupdate(2)
 
   ProbProp(Order, iupdate) = ProbProp(Order, iupdate) + 1
@@ -1075,7 +1079,7 @@ SUBROUTINE add_interaction
   Aold = WeightLn(GIC) *WeightLn(GMD) *WeightVertex(MeasureGam)
 
   call weight_ratio(Pacc, sgn, Anew, Aold)
-  Pacc = Pacc *CoefOfWeight(Order)*prob_tau(tauA)*prob_tau(tauB)/CoefOfWeight(Order-1)
+  Pacc = Pacc *CoefOfWeight(Order)/(prob_tau(tauA)*prob_tau(tauB)*CoefOfWeight(Order-1))
   Pacc = Pacc *Pupdate(8)/Pupdate(7)
 
   !------------ step5 : accept the update -----------------------
@@ -1246,8 +1250,8 @@ SUBROUTINE remove_interaction
 
   call weight_ratio(Pacc, sgn, Anew, Aold)
 
-  Pacc = Pacc *CoefOfWeight(Order)/(prob_tau(TVertex(1,GamA))*prob_tau(TVertex(1,GamB))* &
-    & CoefOfWeight(Order+1))
+  Pacc = Pacc *CoefOfWeight(Order)*prob_tau(TVertex(1,GamA))*prob_tau(TVertex(1,GamB))/ &
+    & CoefOfWeight(Order+1)
   Pacc = Pacc *Pupdate(7)/Pupdate(8)
 
   !------------ step5 : accept the update -----------------------
@@ -2284,25 +2288,31 @@ SUBROUTINE measure
   !endif
 
   !===============  test variables =================================
-  !iGam=NeighLn(3,1)
-  !if(IsDeltaLn(3)==0 .and. StatusLn(3)==0) TestData(1) = TestData(1) +1.d0
   !if(Order==2) then
-    !TestData(1) = TestData(1) +1.d0
+    !TestData(1) = TestData(1) +1.d0/factorM
     !sumt = 0
     !do ikey = 1, 3
       !sumt = sumt + TypeLn(WLnKey2Value(ikey))
     !enddo
-    !if(sumt==3)   TestData(3) = TestData(3) + 1.d0
+    !if(sumt==3)   TestData(3) = TestData(3) + 1.d0/factorM
   !endif
+
   !if(Order==1) then
-    !TestData(2) = TestData(2) +1.d0
+    !TestData(2) = TestData(2) +1.d0/factorM
     !sumt = 0
     !do ikey = 1, 2
       !sumt = sumt + TypeLn(WLnKey2Value(ikey))
     !enddo
-    !if(sumt==2)   TestData(4) = TestData(4) + 1.d0
+    !if(sumt==2)   TestData(4) = TestData(4) + 1.d0/factorM
   !endif
-  !TestData(0)=TestData(0)+1.d0
+
+  !if(Order==0) then
+    !TestData(5) = TestData(5) + 1.d0/factorM
+    !sumt = TypeLn(WLnKey2Value(1))
+    !if(sumt==1)   TestData(6) = TestData(6) + 1.d0/factorM
+  !endif
+
+  !TestData(0)=TestData(0)+1.d0/factorM
   !================================================================
   
         

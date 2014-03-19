@@ -11,6 +11,7 @@ PROGRAM MAIN
   logLy=dlog(Ly*1.d0)
   SpatialWeight(:,:)=0.d0
 
+  CoefOfWeight(0) = 1.d0
   do i = 1, MCOrder
     read *, CoefOfWeight(i)
   enddo
@@ -36,6 +37,7 @@ PROGRAM MAIN
   CheckG = .true.
   CheckW = .true.
   CheckGam = .false.
+  !CheckGam = .true.
 
   !================ updates frequency   ================================
   Pupdate( :)  = 0.d0
@@ -45,12 +47,12 @@ PROGRAM MAIN
   Pupdate( 6)  = 1.d0
   Pupdate( 7)  = 1.d0
   Pupdate( 8)  = 1.d0
-  !Pupdate(13)  = 1.d0
-  !Pupdate(14)  = 1.d0
-  !Pupdate(15)  = 1.d0
-  !Pupdate(16)  = 1.d0
-  !Pupdate(17)  = 1.d0
-  !Pupdate(18)  = 1.d0
+  Pupdate(13)  = 1.d0
+  Pupdate(14)  = 1.d0
+  Pupdate(15)  = 1.d0
+  Pupdate(16)  = 1.d0
+  Pupdate(17)  = 1.d0
+  Pupdate(18)  = 1.d0
 
   !===============  Test variables ==================================
   TestData(:)=0.d0
@@ -309,7 +311,7 @@ SUBROUTINE monte_carlo
 
     !call write_monte_carlo_conf
     !call write_monte_carlo_data
-    !call write_monte_carlo_test
+    call write_monte_carlo_test
 
     write(logstr,*) "Block",iblck," is done!"
     call write_log
