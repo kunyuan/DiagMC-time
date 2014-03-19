@@ -1073,13 +1073,9 @@ end SUBROUTINE
 
 SUBROUTINE write_monte_carlo_test
   implicit none
-  !write(*, *) "conf(1)/conf(0):", TestData(2)/TestData(5)
-  !write(*, *) "conf(2)/conf(1):", TestData(1)/TestData(2)
-  !write(*, *) "conf(0)/conf(0, up):", TestData(5)/TestData(6)
-  !write(*, *) "conf(1)/conf(1, up):", TestData(2)/TestData(4)
-  !write(*, *) "conf(2)/conf(2, up):", TestData(1)/TestData(3)
-  !write(*, *) "conf(1, up)/conf(0, up):", TestData(4)/TestData(6)
-  !write(*, *) "conf(2, up)/conf(1, up):", TestData(3)/TestData(4)
+  write(*, *) "conf(2)/conf(2, up):", TestData(1)/TestData(3)
+  write(*, *) "conf(2, up)/conf(1, up):", TestData(3)/TestData(4)
+  write(*, *) "conf(loop=2)/conf(1, up):", TestData(7)/TestData(4)
   return
 END SUBROUTINE
 
