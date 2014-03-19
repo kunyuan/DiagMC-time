@@ -23,8 +23,9 @@ PROGRAM MAIN
   write(title4,'(i4)') ID
 
   title2 = trim(adjustl(title1))//'_'//trim(adjustl(title2))
-  title4 = trim(adjustl(title4))//'_'//trim(adjustl(title3))
   title3 = trim(adjustl(title2))//'_'//trim(adjustl(title3))
+  title4 = trim(adjustl(title4))//'_'//trim(adjustl(title3))
+  title3 = title4
 
   !!================= INITIALIZATION =======================================
   Mu(1)  = 1.d0
@@ -49,7 +50,7 @@ PROGRAM MAIN
   Pupdate( 6)  = 1.d0
   Pupdate( 7)  = 1.d0
   Pupdate( 8)  = 1.d0
-  Pupdate(11)  = 1.d0
+  !Pupdate(11)  = 1.d0
   Pupdate(13)  = 1.d0
   Pupdate(14)  = 1.d0
   Pupdate(15)  = 1.d0
@@ -291,6 +292,7 @@ SUBROUTINE monte_carlo
   GamMC(:,:,:,:,:,:,:) = 0.d0
   GamSqMC(:,:,:,:,:,:,:) = 0.d0
   GamNorm = 0.d0
+  TestData(:)=0.d0
 
   mc_version = 0
 

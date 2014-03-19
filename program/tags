@@ -17,8 +17,8 @@
 251	read_write_data.f90	/^  251 format(' Printing interval:',f16.7,2x,'s')$/;"	l	subroutine:print_status	file:
 40	basic_function.f90	/^40        do I0 = IS, N-1, ID$/;"	l	subroutine:SFFTEU	file:
 50	basic_function.f90	/^50  do I0 = IS, N, ID$/;"	l	subroutine:SFFTEU	file:
-51	DiagMC.f90	/^  51 format('simulation time:',f16.7,2x,'s')$/;"	l	subroutine:monte_carlo	file:
-52	DiagMC.f90	/^    52 format('thermalization time:',f16.7,2x,'s')$/;"	l	subroutine:monte_carlo	file:
+51	DiagMC.f90	/^  51 format(' Simulation time:',f16.7,2x,'s')$/;"	l	subroutine:monte_carlo	file:
+52	DiagMC.f90	/^    52 format(' Thermalization time:',f16.7,2x,'s')$/;"	l	subroutine:monte_carlo	file:
 777	read_write_data.f90	/^ 777  format ('Nsolid ',f6.1,x,f6.1,x,f9.3,' Y')$/;"	l	subroutine:DRAW	file:
 778	read_write_data.f90	/^ 778  format ('N ',f6.1,x,f6.1,x,' M')$/;"	l	subroutine:DRAW	file:
 779	read_write_data.f90	/^ 779  format (     f6.1,x,f6.1,x,' L')$/;"	l	subroutine:DRAW	file:
@@ -128,7 +128,6 @@ MxOrder	vrbls_mc.f90	/^  integer, parameter :: MxOrder /;"	v	module:vrbls_mc
 MxT	vrbls_mc.f90	/^  integer, parameter :: MxT /;"	v	module:vrbls_mc
 MxVol	vrbls_mc.f90	/^  integer, parameter :: MxVol /;"	v	module:vrbls_mc
 Mxint	vrbls_mc.f90	/^  integer, parameter          :: Mxint /;"	v	module:vrbls_mc
-NBlck	vrbls_mc.f90	/^  integer          :: NBlck /;"	v	module:vrbls_mc
 NGLn	vrbls_mc.f90	/^  integer          :: NGLn,/;"	v	module:vrbls_mc
 NSamp	vrbls_mc.f90	/^  integer          :: NSamp /;"	v	module:vrbls_mc
 NStep	vrbls_mc.f90	/^  integer          :: NStep /;"	v	module:vrbls_mc
@@ -279,6 +278,7 @@ generate_vertex	basic_function.f90	/^INTEGER FUNCTION generate_vertex(/;"	f
 generate_wline	basic_function.f90	/^INTEGER FUNCTION generate_wline(/;"	f
 generate_x	basic_function.f90	/^SUBROUTINE generate_x(/;"	s
 generate_y	basic_function.f90	/^SUBROUTINE generate_y(/;"	s
+gline_stat	basic_function.f90	/^INTEGER FUNCTION gline_stat(/;"	f
 h_curr	vrbls_mc.f90	/^  integer               :: h_prev, h_curr$/;"	v	module:vrbls_mc
 h_prev	vrbls_mc.f90	/^  integer               :: h_prev,/;"	v	module:vrbls_mc
 homedir	send1.4.py	/^homedir=os.getcwd()$/;"	v
@@ -334,7 +334,6 @@ last	send1.4.py	/^    last="\\n"$/;"	v
 last	send1.4.py	/^last=inlist.readline()[-2:]$/;"	v
 len1	vrbls_mc.f90	/^  integer, parameter           :: len1=/;"	v	module:vrbls_mc
 len2	vrbls_mc.f90	/^  integer, parameter           :: len2=/;"	v	module:vrbls_mc
-line_stat	basic_function.f90	/^INTEGER FUNCTION line_stat(/;"	f
 line_stat	monte_carlo_old.f90	/^INTEGER FUNCTION line_stat(/;"	f
 logLx	vrbls_mc.f90	/^  double precision  ::  logLx,/;"	v	module:vrbls_mc
 logLy	vrbls_mc.f90	/^  double precision  ::  logLx,logLy$/;"	v	module:vrbls_mc
@@ -420,6 +419,7 @@ title	vrbls_mc.f90	/^  character*100 :: title$/;"	v	module:vrbls_mc
 title1	vrbls_mc.f90	/^  character*100 :: title1$/;"	v	module:vrbls_mc
 title2	vrbls_mc.f90	/^  character*100 :: title2$/;"	v	module:vrbls_mc
 title3	vrbls_mc.f90	/^  character*100 :: title3$/;"	v	module:vrbls_mc
+title4	vrbls_mc.f90	/^  character*100 :: title4$/;"	v	module:vrbls_mc
 tm32	vrbls_mc.f90	/^  double precision, parameter :: tm32 /;"	v	module:vrbls_mc
 transfer_Chi_r	basic_function.f90	/^SUBROUTINE transfer_Chi_r(/;"	s
 transfer_Chi_t	basic_function.f90	/^SUBROUTINE transfer_Chi_t(/;"	s
@@ -467,6 +467,7 @@ weight_vertex	monte_carlo_old.f90	/^DOUBLE PRECISION FUNCTION weight_vertex(/;"	
 weight_worm	basic_function.f90	/^DOUBLE PRECISION FUNCTION weight_worm(/;"	f
 weight_worm_Gam	basic_function.f90	/^complex*16 FUNCTION weight_worm_Gam(/;"	f
 weight_worm_W	basic_function.f90	/^complex*16 FUNCTION weight_worm_W(/;"	f
+wline_stat	basic_function.f90	/^INTEGER FUNCTION wline_stat(/;"	f
 write_GWGamma	read_write_data.f90	/^SUBROUTINE write_GWGamma$/;"	s
 write_log	read_write_data.f90	/^SUBROUTINE write_log$/;"	s
 write_monte_carlo_conf	read_write_data.f90	/^SUBROUTINE write_monte_carlo_conf$/;"	s
