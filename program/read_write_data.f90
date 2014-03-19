@@ -232,7 +232,10 @@ SUBROUTINE DRAW()
         !write(11,*) '1 0 1 setrgbcolor'
       !endif
       ra=dsqrt((x2-x1)**2+(y2-y1)**2)/2.d0
-      if(ra==0.d0) continue
+      if(dabs(ra)<1e-6) then
+        write(11,792) x1, y1+scy/5. , scy/5. 
+        cycle
+      endif
       phi1=(y2-y1)/(2.d0*ra)
       phi2=(x2-x1)/(2.d0*ra)
       ca1=(x1+x2)/2.d0
@@ -271,10 +274,17 @@ SUBROUTINE DRAW()
 
 
       if(Vertex1/=Vertex2) then
-        if(x1==x2) x2=500 !unphysical situation
 
         ra=dsqrt((x2-x1)**2+(y2-y1)**2)/2.d0
-        if(ra==0.d0) continue
+        if(dabs(ra)<1e-6) then
+          iWLn=NeighVertex(3,Vertex1)
+          Vertex3=NeighLn(3-DirecVertex(Vertex1),iWLn)
+          y3=scy*site_num(GRVertex(1, Vertex3),GRVertex(2, Vertex3))
+          sgn=1.d0
+          IF(y3>y1) sgn=-1.d0   
+          write(11,780) x1, y1+sgn*scy/5. , scy/5. 
+          cycle
+        endif
         phi1=(y2-y1)/(2.d0*ra)
         phi2=(x2-x1)/(2.d0*ra)
         ca1=(x1+x2)/2.d0
@@ -372,6 +382,7 @@ SUBROUTINE DRAW()
  790  format ('Nsolid ',f6.1,x,f6.1,x,f6.1,x,f6.1,x,' ahead')
  !791  format ('Ndashed ',f6.1,x,f6.1,' M',f6.1,x,f6.1,' L')
  791  format ('Ndashed ',f6.1,x,f6.1,x,f6.1,x,f6.1,x,f6.1,' Y45')
+ 792  format ('Ndashed ',f6.1,x,f6.1,x,f9.3,' YL')
  801  format (f6.1,x,f6.1,x,' M (',i2,') C')
  802  format (f6.1,x,f6.1,x,' M (',i2,':',f6.3,'; (',i3,',',i3,')) C')
  803  format (f6.1,x,f6.1,x,' M (',A,') C')
