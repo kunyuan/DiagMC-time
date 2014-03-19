@@ -264,7 +264,7 @@ SUBROUTINE monte_carlo
     t_simu = t_elap
     write(logstr,52) t_simu
     call write_log
-    52 format('thermalization time:',f16.7,2x,'s')
+    52 format(' Thermalization time:',f16.7,2x,'s')
 
   else if(InpMC==1) then
 
@@ -302,7 +302,7 @@ SUBROUTINE monte_carlo
   t_simu = t_elap
   write(logstr,51) t_simu
   call write_log
-  51 format('simulation time:',f16.7,2x,'s')
+  51 format(' Simulation time:',f16.7,2x,'s')
 
   return
 END SUBROUTINE monte_carlo
