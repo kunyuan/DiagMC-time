@@ -1937,7 +1937,7 @@ COMPLEX*16 FUNCTION weight_line(stat, isdelta, knd, dx0, dy0, tau, typ)
   if(stat >= 0 .and. stat<=3) then
     if(knd==1) weight_line = weight_meas_G(1, t)
     if(knd==2 .and. isdelta==0) weight_line = weight_meas_W(1, dx, dy, t)
-    if(knd==2 .and. isdelta==1) weight_line = 0.01*weight_meas_W(1, dx, dy, 0)
+    if(knd==2 .and. isdelta==1) weight_line = weight_meas_W(1, dx, dy, 0)
   else if(stat==-1) then
     write(logstr, *) IsWormPresent, iupdate, "line status == -1! There is no weight!" 
     call write_log
