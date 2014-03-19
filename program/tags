@@ -16,8 +16,8 @@
 12	read_write_data.f90	/^  12 format('Gamma:',i2,2x,'isdelta:',i2,2x,'type:',i2,2x,'typein:',i2,2x,'typeout:',i2,2x,&$/;"	l	subroutine:print_config	file:
 40	basic_function.f90	/^40        do I0 = IS, N-1, ID$/;"	l	subroutine:SFFTEU	file:
 50	basic_function.f90	/^50  do I0 = IS, N, ID$/;"	l	subroutine:SFFTEU	file:
-51	DiagMC.f90	/^  51 format(\/'simulation time:',f16.7,2x,'s')$/;"	l	subroutine:monte_carlo	file:
-52	DiagMC.f90	/^    52 format(\/'thermalization time:',f16.7,2x,'s')$/;"	l	subroutine:monte_carlo	file:
+51	DiagMC.f90	/^  51 format('simulation time:',f16.7,2x,'s')$/;"	l	subroutine:monte_carlo	file:
+52	DiagMC.f90	/^    52 format('thermalization time:',f16.7,2x,'s')$/;"	l	subroutine:monte_carlo	file:
 777	read_write_data.f90	/^ 777  format ('Nsolid ',f6.1,x,f6.1,x,f9.3,' Y')$/;"	l	subroutine:DRAW	file:
 778	read_write_data.f90	/^ 778  format ('N ',f6.1,x,f6.1,x,' M')$/;"	l	subroutine:DRAW	file:
 779	read_write_data.f90	/^ 779  format (     f6.1,x,f6.1,x,' L')$/;"	l	subroutine:DRAW	file:
@@ -53,8 +53,7 @@ Fupdate	vrbls_mc.f90	/^  double precision :: Fupdate(/;"	v	module:vrbls_mc
 G	vrbls_mc.f90	/^  complex(kind=8) :: G(/;"	v	module:vrbls_mc
 G0F	vrbls_mc.f90	/^  complex(kind=8) :: G0F(/;"	v	module:vrbls_mc
 GLnKey2Value	vrbls_mc.f90	/^  integer, dimension(MxNGLn) :: GLnKey2Value /;"	v	module:vrbls_mc
-GXVertex	vrbls_mc.f90	/^  integer, dimension(MxNVertex) :: GXVertex,/;"	v	module:vrbls_mc
-GYVertex	vrbls_mc.f90	/^  integer, dimension(MxNVertex) :: GXVertex, GYVertex /;"	v	module:vrbls_mc
+GRVertex	vrbls_mc.f90	/^  integer, dimension(2, MxNVertex) :: GRVertex /;"	v	module:vrbls_mc
 Gam	vrbls_mc.f90	/^  complex(kind=8), allocatable :: Gam(/;"	v	module:vrbls_mc
 Gam0PF	vrbls_mc.f90	/^  complex(kind=8), allocatable :: Gam0PF(/;"	v	module:vrbls_mc
 Gam1	data_process/collapse_data.f90	/^    double precision :: Gam1,/;"	v	program:main
@@ -166,9 +165,7 @@ SpatialWeight	vrbls_mc.f90	/^  double precision :: SpatialWeight(/;"	v	module:vr
 SpinMasha	vrbls_mc.f90	/^  integer          :: SpinMasha /;"	v	module:vrbls_mc
 StatusLn	vrbls_mc.f90	/^  integer, dimension(MxNLn) :: StatusLn /;"	v	module:vrbls_mc
 StatusVertex	vrbls_mc.f90	/^  integer, dimension(MxNVertex):: StatusVertex /;"	v	module:vrbls_mc
-T1Vertex	vrbls_mc.f90	/^  double precision, dimension(MxNVertex) :: T1Vertex,/;"	v	module:vrbls_mc
-T2Vertex	vrbls_mc.f90	/^  double precision, dimension(MxNVertex) :: T1Vertex, T2Vertex,/;"	v	module:vrbls_mc
-T3Vertex	vrbls_mc.f90	/^  double precision, dimension(MxNVertex) :: T1Vertex, T2Vertex, T3Vertex /;"	v	module:vrbls_mc
+TVertex	vrbls_mc.f90	/^  double precision, dimension(3, MxNVertex) :: TVertex!/;"	v	module:vrbls_mc
 TailLn	vrbls_mc.f90	/^  integer                    :: TailLn /;"	v	module:vrbls_mc
 TailVertex	vrbls_mc.f90	/^  integer                      :: TailVertex /;"	v	module:vrbls_mc
 TestData	vrbls_mc.f90	/^  double precision,dimension(0:10)  :: TestData$/;"	v	module:vrbls_mc
@@ -182,8 +179,7 @@ Vol	vrbls_mc.f90	/^  integer          ::  Lx, Ly, Vol /;"	v	module:vrbls_mc
 W	vrbls_mc.f90	/^  complex(kind=8), allocatable :: W(/;"	v	module:vrbls_mc
 W0PF	vrbls_mc.f90	/^  complex(kind=8), allocatable :: W0PF(/;"	v	module:vrbls_mc
 WLnKey2Value	vrbls_mc.f90	/^  integer, dimension(MxNWLn) :: WLnKey2Value /;"	v	module:vrbls_mc
-WXVertex	vrbls_mc.f90	/^  integer, dimension(MxNVertex) :: WXVertex,/;"	v	module:vrbls_mc
-WYVertex	vrbls_mc.f90	/^  integer, dimension(MxNVertex) :: WXVertex, WYVertex /;"	v	module:vrbls_mc
+WRVertex	vrbls_mc.f90	/^  integer, dimension(2, MxNVertex) :: WRVertex /;"	v	module:vrbls_mc
 WeightCurrent	vrbls_mc.f90	/^  double precision :: WeightCurrent /;"	v	module:vrbls_mc
 WeightLn	vrbls_mc.f90	/^  COMPLEX*16, dimension(MxNLn) :: WeightLn /;"	v	module:vrbls_mc
 WeightVertex	vrbls_mc.f90	/^  COMPLEX*16, dimension(MxNVertex) :: WeightVertex /;"	v	module:vrbls_mc
@@ -192,6 +188,7 @@ add_Hash4G	basic_function.f90	/^SUBROUTINE add_Hash4G(/;"	s
 add_Hash4G	monte_carlo_old.f90	/^SUBROUTINE add_Hash4G(/;"	s
 add_Hash4W	basic_function.f90	/^SUBROUTINE add_Hash4W(/;"	s
 add_Hash4W	monte_carlo_old.f90	/^SUBROUTINE add_Hash4W(/;"	s
+add_interaction	monte_carlo.f90	/^SUBROUTINE add_interaction$/;"	s
 add_interaction	monte_carlo_old.f90	/^SUBROUTINE add_interaction$/;"	s
 add_interaction_cross	monte_carlo_old.f90	/^SUBROUTINE add_interaction_cross$/;"	s
 add_ira_stat	basic_function.f90	/^INTEGER FUNCTION add_ira_stat(/;"	f
@@ -208,20 +205,20 @@ calculate_Polar	self_consistent.f90	/^SUBROUTINE calculate_Polar$/;"	s
 calculate_Sigma	self_consistent.f90	/^SUBROUTINE calculate_Sigma$/;"	s
 calculate_W	self_consistent.f90	/^SUBROUTINE calculate_W$/;"	s
 calculate_W1	analytic_integration.f90	/^SUBROUTINE calculate_W1$/;"	s
+change_Gamma_time	monte_carlo.f90	/^SUBROUTINE change_Gamma_time$/;"	s
 change_Gamma_type	monte_carlo.f90	/^SUBROUTINE change_Gamma_type$/;"	s
 change_Gamma_type	monte_carlo_old.f90	/^SUBROUTINE change_Gamma_type$/;"	s
 change_gamma_isdelta	monte_carlo.f90	/^SUBROUTINE change_gamma_isdelta$/;"	s
 change_gline_space	monte_carlo.f90	/^SUBROUTINE change_gline_space$/;"	s
-change_gline_time	monte_carlo.f90	/^SUBROUTINE change_gline_time$/;"	s
 change_wline_isdelta	monte_carlo.f90	/^SUBROUTINE change_wline_isdelta$/;"	s
 change_wline_space	monte_carlo.f90	/^SUBROUTINE change_wline_space$/;"	s
-change_wline_time	monte_carlo.f90	/^SUBROUTINE change_wline_time$/;"	s
 check_config	check_conf.f90	/^SUBROUTINE check_config$/;"	s
 check_irreducibility	check_conf.f90	/^SUBROUTINE check_irreducibility$/;"	s
 check_k_conserve	check_conf.f90	/^SUBROUTINE check_k_conserve$/;"	s
 check_site	check_conf.f90	/^SUBROUTINE check_site$/;"	s
 check_stat	check_conf.f90	/^SUBROUTINE check_stat$/;"	s
 check_status	send1.4.py	/^def check_status():$/;"	f
+check_time	check_conf.f90	/^SUBROUTINE check_time$/;"	s
 check_topo	check_conf.f90	/^SUBROUTINE check_topo$/;"	s
 check_type	check_conf.f90	/^SUBROUTINE check_type$/;"	s
 check_weight	check_conf.f90	/^SUBROUTINE check_weight$/;"	s
@@ -271,10 +268,10 @@ first_order_diagram	basic_function.f90	/^SUBROUTINE first_order_diagram$/;"	s
 first_order_diagram_with_bubble	basic_function.f90	/^SUBROUTINE first_order_diagram_with_bubble$/;"	s
 flag	send1.4.py	/^                flag=True$/;"	v
 flag	send1.4.py	/^        flag=False$/;"	v
-generate_gamma	basic_function.f90	/^INTEGER FUNCTION generate_gamma(/;"	f
 generate_gline	basic_function.f90	/^INTEGER FUNCTION generate_gline(/;"	f
 generate_k	basic_function.f90	/^INTEGER FUNCTION generate_k(/;"	f
 generate_tau	basic_function.f90	/^DOUBLE PRECISION FUNCTION generate_tau(/;"	f
+generate_vertex	basic_function.f90	/^INTEGER FUNCTION generate_vertex(/;"	f
 generate_wline	basic_function.f90	/^INTEGER FUNCTION generate_wline(/;"	f
 generate_x	basic_function.f90	/^SUBROUTINE generate_x(/;"	s
 generate_y	basic_function.f90	/^SUBROUTINE generate_y(/;"	s
@@ -381,7 +378,9 @@ prt	vrbls_mc.f90	/^  logical :: prt$/;"	v	module:vrbls_mc
 read_GWGamma	read_write_data.f90	/^SUBROUTINE read_GWGamma$/;"	s
 read_monte_carlo_conf	read_write_data.f90	/^SUBROUTINE read_monte_carlo_conf$/;"	s
 read_monte_carlo_data	read_write_data.f90	/^SUBROUTINE read_monte_carlo_data$/;"	s
+reconnect	monte_carlo.f90	/^SUBROUTINE reconnect$/;"	s
 reconnect	monte_carlo_old.f90	/^SUBROUTINE reconnect$/;"	s
+remove_interaction	monte_carlo.f90	/^SUBROUTINE remove_interaction$/;"	s
 remove_interaction	monte_carlo_old.f90	/^SUBROUTINE remove_interaction$/;"	s
 remove_interaction_cross	monte_carlo_old.f90	/^SUBROUTINE remove_interaction_cross$/;"	s
 rn	basic_function.f90	/^DOUBLE PRECISION FUNCTION rn(/;"	f
@@ -428,8 +427,8 @@ transfer_Sigma_t	basic_function.f90	/^SUBROUTINE transfer_Sigma_t(/;"	s
 transfer_W0	basic_function.f90	/^SUBROUTINE transfer_W0(/;"	s
 transfer_W_r	basic_function.f90	/^SUBROUTINE transfer_W_r(/;"	s
 transfer_W_t	basic_function.f90	/^SUBROUTINE transfer_W_t(/;"	s
-transfer_r	DiagMC.f90	/^SUBROUTINE transfer_r(/;"	s
-transfer_t	DiagMC.f90	/^SUBROUTINE transfer_t(/;"	s
+transfer_r	basic_function.f90	/^SUBROUTINE transfer_r(/;"	s
+transfer_t	basic_function.f90	/^SUBROUTINE transfer_t(/;"	s
 tval	vrbls_mc.f90	/^  integer, dimension(8) :: tval$/;"	v	module:vrbls_mc
 undo_delete_gamma	basic_function.f90	/^SUBROUTINE undo_delete_gamma(/;"	s
 undo_delete_gamma	monte_carlo_old.f90	/^SUBROUTINE undo_delete_gamma(/;"	s
