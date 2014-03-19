@@ -1,7 +1,30 @@
 !================================================================
-!================= print/draw configuratoins ====================
+!================= print/draw information    ====================
 !================================================================
 
+!==================================================================
+!===================== PRINT STATUS ================================
+!==================================================================
+!If you want to log staff when runing markov, log here!
+SUBROUTINE print_status
+    implicit none
+    open(36, access="append", file=trim(title4)//".log")
+    write(36,*) "MC steps: ",imc
+    call time_elapse
+    write(36,251) t_elap
+  251 format(' Printing interval:',f16.7,2x,'s')
+    write(36,*) "Efficiency: ",imc/t_elap," per second."
+
+    close(36)
+END SUBROUTINE print_status
+
+
+SUBROUTINE write_log
+  implicit none
+  open(36, access="append", file=trim(title4)//".log")
+  write(36,'(A)', advance='no') trim(logstr)
+  close(36)
+end SUBROUTINE
 
 !====================================================================
 !===================== PRINT CONFIGURATION ==========================
@@ -1063,13 +1086,6 @@ END SUBROUTINE output_Quantities
   !close(35)
   !close(36)
 !END SUBROUTINE output_GamMC
-
-SUBROUTINE write_log
-  implicit none
-  open(36, access="append", file=trim(title3)//".log")
-  write(36,'(A)', advance='no') trim(logstr)
-  close(36)
-end SUBROUTINE
 
 SUBROUTINE write_monte_carlo_test
   implicit none

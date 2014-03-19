@@ -5,7 +5,7 @@
 SUBROUTINE check_config
   implicit none
 
-  open(36, access="append", file=trim(title3)//".log")
+  open(36, access="append", file=trim(title4)//".log")
 
   call check_topo
   call check_stat

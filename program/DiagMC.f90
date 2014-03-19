@@ -2,10 +2,10 @@ INCLUDE "vrbls_mc.f90"
 PROGRAM MAIN
   USE vrbls_mc
   implicit none
-  integer :: InpMC, it, i, ISub
+  integer :: InpMC, it, i, ISub,ID
 
-  print *, 'Lx, Ly, Ntoss, Nsamp, Nblck, NStep, Jcp, beta, MCOrder, Seed, ISub, InpMC, title'
-  read  *,  Lx, Ly, Ntoss, Nsamp, Nblck, NStep, Jcp, beta, MCOrder, Seed, ISub, InpMC, title
+  print *, 'Lx, Ly, Ntoss, Nsamp, IsForever, NStep, Jcp, beta, MCOrder, Seed, ISub, InpMC, ID, title'
+  read  *,  Lx, Ly, Ntoss, Nsamp, IsForever, NStep, Jcp, beta, MCOrder, Seed, ISub, InpMC, ID, title
 
   logLx=dlog(Lx*1.d0)
   logLy=dlog(Ly*1.d0)
@@ -19,8 +19,10 @@ PROGRAM MAIN
   write(title1, '(f5.2)') beta
   write(title2, '(i2)')  MCOrder
   write(title3, '(i14)') Seed
+  write(title4,'(i4)') ID
 
   title2 = trim(adjustl(title1))//'_'//trim(adjustl(title2))
+  title4 = trim(adjustl(title4))//'_'//trim(adjustl(title3))
   title3 = trim(adjustl(title2))//'_'//trim(adjustl(title3))
 
   !!================= INITIALIZATION =======================================
@@ -251,10 +253,8 @@ SUBROUTINE monte_carlo
     ProbAcc(:,:) = 0.d0
 
     !-------- throw away some configurations to thermalize -----------
-    IsToss=1
-    do isamp = 1, Ntoss
-      call markov
-    enddo
+    IsToss=.true.
+    call markov(Ntoss)
     !call print_config
 
     call time_elapse
@@ -289,32 +289,11 @@ SUBROUTINE monte_carlo
   GamNorm = 0.d0
 
   mc_version = 0
-  IsToss=0
 
-  do iblck = 1, Nblck
-    write(logstr,*) "Block",iblck," started!"
-    call write_log
-    call markov
-
-    !call output_GamMC
-    !call output_prob_MC
-
-    !call read_flag
-    !if(mc_version/=file_version) then
-      !call read_GWGamma
-      !call update_WeightCurrent
-      !mc_version = file_version
-    !endif
-
-    !call write_monte_carlo_conf
-    !call write_monte_carlo_data
-    !call write_monte_carlo_test
-
-    write(logstr,*) "Block",iblck," is done!"
-    call write_log
-    write(logstr,*) "Average worm steps/block: ",imc/iblck
-    call write_log
-  enddo
+  write(logstr,*) "Simulation started!"
+  call write_log
+  IsToss=.false.
+  call markov(Nsamp)
 
   call time_elapse
   t_simu = t_elap
