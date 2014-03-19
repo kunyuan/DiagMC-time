@@ -1,4 +1,4 @@
-Block:  100
+IsForever: .false.
 Sample: 1000
 Sweep:  10
 Toss:  100
