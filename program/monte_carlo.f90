@@ -218,7 +218,7 @@ SUBROUTINE markov(MaxSamp)
         call print_status
         call print_config
         call check_config
-        !call write_monte_carlo_test
+        call write_monte_carlo_test
       endif
 
       !========================== REWEIGHTING =========================
@@ -1358,35 +1358,28 @@ SUBROUTINE reconnect
 
   !------------ step2 : propose the new config ------------------
   NeighLn(3-dir,GIA)=Masha
-  NeighVertex(dir,GamA)=GMB
+  NeighVertex(dir, Masha) = GIA
   NeighLn(3-dir,GMB)=Ira
-  NeighVertex(dir,GamB)=GIA
+  NeighVertex(dir, Ira) = GMB
+
   !Don't have change delta_k of Ira and Masha yet here
 
   !------------ step4 : configuration check ---------------------
   ! do the step4 here so we can save some time
-  !if(Is_reducible_G_Gamma(GIA) .or. Is_reducible_G_Gamma(GMB)) then
-    !NeighLn(3-dir, GIA)=Ira
-    !NeighVertex(dir, GamA)=GMB
-    !NeighLn(3-dir, GMB)=Masha
-    !NeighVertex(dir, GamB)=GIA
-    !return
-  !endif
+  if(Is_reducible_G_Gam(GIA) .or. Is_reducible_G_Gam(GMB)) then
+    NeighLn(3-dir, GIA)=Ira
+    NeighVertex(dir, GamA)=GMB
+    NeighLn(3-dir, GMB)=Masha
+    NeighVertex(dir, GamB)=GIA
+    return
+  endif
 
   !-------- the new spin, type and status for the new config ----
-  if(GamA==MeasureGam .or. Masha==MeasureGam) then
-    statIA = 1
-  else
-    statIA = 0
-  endif
-  if(GamB==MeasureGam .or. Ira==MeasureGam) then
-    statMB = 1
-  else
-    statMB = 0
-  endif
+  statIA = gline_stat(StatusVertex(GamA), StatusVertex(Masha))
+  statMB = gline_stat(StatusVertex(GamB), StatusVertex(Ira))
 
   !-------------- step3 : weight calculation --------------------
-!COMPLEX*16 FUNCTION weight_line(stat, isdelta, knd, dx0, dy0, tau, typ)
+  !COMPLEX*16 FUNCTION weight_line(stat, isdelta, knd, dx0, dy0, tau, typ)
   WGIA=weight_line(statIA,0,1,0,0,TVertex(3-dir,Masha)-TVertex(dir,GamA),TypeLn(GIA))
   WGMB=weight_line(statMB,0,1,0,0,TVertex(3-dir,Ira)-TVertex(dir,GamB),TypeLn(GMB))
 
@@ -1404,7 +1397,7 @@ SUBROUTINE reconnect
     Phase = Phase *sgn
 
     !--------------- update k and omega -------------------------
-    kMasha = add_k(kMasha, (-1)**dir*(kLn(GMB)-kLn(GIA)))
+    kMasha = add_k(kMasha, (-1)**dir*(add_k(kLn(GMB),-kLn(GIA))))
 
     !--------------- update the status of elements --------------
     StatusLn(GIA) = statIA
@@ -2312,31 +2305,35 @@ SUBROUTINE measure
   !endif
 
   !===============  test variables =================================
-  !if(Order==2) then
-    !TestData(1) = TestData(1) +1.d0/factorM
-    !sumt = 0
-    !do ikey = 1, 3
-      !sumt = sumt + TypeLn(WLnKey2Value(ikey))
-    !enddo
-    !if(sumt==3)   TestData(3) = TestData(3) + 1.d0/factorM
-  !endif
+  if(Order==2) then
+    TestData(1) = TestData(1) +1.d0/factorM
+    sumt = 0
+    do ikey = 1, 3
+      sumt = sumt + TypeLn(WLnKey2Value(ikey))
+    enddo
+    if(sumt==3)   TestData(3) = TestData(3) + 1.d0/factorM
+  endif
 
-  !if(Order==1) then
+  if(Order==1) then
     !TestData(2) = TestData(2) +1.d0/factorM
-    !sumt = 0
-    !do ikey = 1, 2
-      !sumt = sumt + TypeLn(WLnKey2Value(ikey))
-    !enddo
-    !if(sumt==2)   TestData(4) = TestData(4) + 1.d0/factorM
-  !endif
+    sumt = 0
+    do ikey = 1, 2
+      sumt = sumt + TypeLn(WLnKey2Value(ikey))
+    enddo
+    if(sumt==2)   TestData(4) = TestData(4) + 1.d0/factorM
+  endif
 
-  !if(Order==0) then
+  if(Order==0) then
     !TestData(5) = TestData(5) + 1.d0/factorM
-    !sumt = TypeLn(WLnKey2Value(1))
-    !if(sumt==1)   TestData(6) = TestData(6) + 1.d0/factorM
-  !endif
+    sumt = TypeLn(WLnKey2Value(1))
+    if(sumt==1)   TestData(6) = TestData(6) + 1.d0/factorM
+  endif
 
-  !TestData(0)=TestData(0)+1.d0/factorM
+  if(SignFermiloop==-1.d0) then
+    TestData(7) = TestData(7) + 1.d0/factorM
+  endif
+
+  TestData(0)=TestData(0)+1.d0/factorM
   !================================================================
   
         
