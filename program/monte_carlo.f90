@@ -180,8 +180,8 @@ SUBROUTINE markov
           call move_worm_along_gline              
         case( 7) 
           call add_interaction                  
-        !case( 8) 
-          !call remove_interaction             
+        case( 8) 
+          call remove_interaction             
         !case( 9) 
           !call add_interaction_cross              
         !case(10)
@@ -1122,6 +1122,57 @@ END SUBROUTINE add_interaction
 !----------------- remove_interaction: Pupdate(8) ----------------
 SUBROUTINE remove_interaction
   implicit none
+  integer :: dir, dirW, flag, kIA, kMB, kM, q
+  integer :: GIC, GMD, GamC, GamD
+  integer :: WAB, GIA, GMB, GamA, GamB
+  integer :: typGamA, typGamB, typAB
+  integer :: statA, statB, statIA, statAC, statMB, statBD
+  double precision :: tauA, tauB
+  double precision :: tau, tau1, tau2, WWorm, Pacc
+  complex*16 :: WA, WB, WGIA, WGAC, WGMB, WGBD, WWAB, WMeasureGam
+  complex*16 :: Anew, Aold, sgn
+  
+  !---------- step1 : check if worm is present ------------------
+  if(IsWormPresent .eqv. .false.)    return
+  if(Order>=MCOrder) return
+
+  !------------ step2 : propose the new config ------------------
+
+  !-------- the new time, spin, type and status for the new config ----
+
+  !-------------- step3 : weight calculation --------------------
+  !---  change the topology for the configuration after update --
+  
+  !------------ update the topology -----------------------------
+
+  !------------ step4 : configuration check ---------------------
+
+  !------------- weight calculation -----------------------------
+
+  call weight_ratio(Pacc, sgn, Anew, Aold)
+  Pacc = Pacc *CoefOfWeight(Order)*prob_tau(tauA)*prob_tau(tauB)/CoefOfWeight(Order-1)
+  Pacc = Pacc *Pupdate(8)/Pupdate(7)
+
+  !------------ step5 : accept the update -----------------------
+  ProbProp(Order, iupdate) = ProbProp(Order, iupdate) + 1
+  if(rn()<=Pacc) then
+
+    !--------------- update the diagram info --------------------
+    Phase = Phase *sgn
+
+    !--------------- update k and omega -------------------------
+
+    !--------------- update the status of elements --------------
+
+    !--------------- update weight of elements ------------------
+
+    call update_weight(Anew, Aold)
+
+    ProbAcc(Order+1, 8) = ProbAcc(Order+1, 8) + 1
+  else
+    !-------------- delete line and vertexes --------------------
+    return
+  endif
 
 END SUBROUTINE remove_interaction
 
