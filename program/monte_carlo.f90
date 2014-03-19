@@ -2284,31 +2284,35 @@ SUBROUTINE measure
   !endif
 
   !===============  test variables =================================
-  !if(Order==2) then
-    !TestData(1) = TestData(1) +1.d0/factorM
-    !sumt = 0
-    !do ikey = 1, 3
-      !sumt = sumt + TypeLn(WLnKey2Value(ikey))
-    !enddo
-    !if(sumt==3)   TestData(3) = TestData(3) + 1.d0/factorM
-  !endif
+  if(Order==2) then
+    TestData(1) = TestData(1) +1.d0/factorM
+    sumt = 0
+    do ikey = 1, 3
+      sumt = sumt + TypeLn(WLnKey2Value(ikey))
+    enddo
+    if(sumt==3)   TestData(3) = TestData(3) + 1.d0/factorM
+  endif
 
-  !if(Order==1) then
+  if(Order==1) then
     !TestData(2) = TestData(2) +1.d0/factorM
-    !sumt = 0
-    !do ikey = 1, 2
-      !sumt = sumt + TypeLn(WLnKey2Value(ikey))
-    !enddo
-    !if(sumt==2)   TestData(4) = TestData(4) + 1.d0/factorM
-  !endif
+    sumt = 0
+    do ikey = 1, 2
+      sumt = sumt + TypeLn(WLnKey2Value(ikey))
+    enddo
+    if(sumt==2)   TestData(4) = TestData(4) + 1.d0/factorM
+  endif
 
-  !if(Order==0) then
+  if(Order==0) then
     !TestData(5) = TestData(5) + 1.d0/factorM
-    !sumt = TypeLn(WLnKey2Value(1))
-    !if(sumt==1)   TestData(6) = TestData(6) + 1.d0/factorM
-  !endif
+    sumt = TypeLn(WLnKey2Value(1))
+    if(sumt==1)   TestData(6) = TestData(6) + 1.d0/factorM
+  endif
 
-  !TestData(0)=TestData(0)+1.d0/factorM
+  if(SignFermiloop==-1.d0) then
+    TestData(7) = TestData(7) + 1.d0/factorM
+  endif
+
+  TestData(0)=TestData(0)+1.d0/factorM
   !================================================================
   
         

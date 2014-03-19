@@ -47,6 +47,7 @@ PROGRAM MAIN
   Pupdate( 6)  = 1.d0
   Pupdate( 7)  = 1.d0
   Pupdate( 8)  = 1.d0
+  Pupdate(11)  = 1.d0
   Pupdate(13)  = 1.d0
   Pupdate(14)  = 1.d0
   Pupdate(15)  = 1.d0
