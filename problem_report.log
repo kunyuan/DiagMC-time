@@ -180,6 +180,20 @@ Test example:
 Result: 
 conf(order2)/conf(order1) = 52
 conf(order2, typ==1)/conf(order1, typ==1) = 30
+wrong!!!
+
+2) initialize: Order1 diagram, IsDeltaGamma(:) = 1; IsDeltaW(:) = 0; Uniform weight
+update: only the topology and tau can change, no change_isdelta, change_measure, or change_r 
+checkGam = .false.
+
+Result: 
+conf(order2)/conf(order1) = 0.75
+conf(order1)/conf(order0) = 3.33
+conf(order2)/conf(order2, typ==1) = 10
+conf(order1)/conf(order1, typ==1) = 6 
+conf(order0)/conf(order0, typ==1) = 4 
+conf(order2, typ==1)/conf(order1, typ==1) = 2
+conf(order1, typ==1)/conf(order0, typ==1) = 0.5
 
 ====================================================
 
