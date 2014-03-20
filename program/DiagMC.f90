@@ -307,6 +307,7 @@ SUBROUTINE monte_carlo
 
   write(logstr,*) "Simulation started!"
   call write_log
+
   IsToss=.false.
   call markov(Nsamp)
 

@@ -160,7 +160,7 @@ ProbAcc	vrbls_mc.f90	/^  double precision :: ProbAcc(/;"	v	module:vrbls_mc
 ProbProp	vrbls_mc.f90	/^  double precision :: ProbProp(/;"	v	module:vrbls_mc
 Pupdate	vrbls_mc.f90	/^  double precision :: Pupdate(/;"	v	module:vrbls_mc
 Quan	vrbls_mc.f90	/^  double precision   :: Quan(/;"	v	module:vrbls_mc
-QuanName	vrbls_mc.f90	/^  character,dimension(10) :: QuanName$/;"	v	module:vrbls_mc
+QuanName	vrbls_mc.f90	/^  character(len=30),dimension(NObs) :: QuanName$/;"	v	module:vrbls_mc
 SFFTEU	basic_function.f90	/^subroutine SFFTEU(/;"	s
 Seed	data_process/collapse_statistics.f90	/^    integer :: Lx, Ly, MCOrder, Seed$/;"	v	program:MAIN
 Seed	vrbls_mc.f90	/^  integer                      :: Seed /;"	v	module:vrbls_mc
@@ -233,7 +233,6 @@ check_time	check_conf.f90	/^SUBROUTINE check_time$/;"	s
 check_topo	check_conf.f90	/^SUBROUTINE check_topo$/;"	s
 check_type	check_conf.f90	/^SUBROUTINE check_type$/;"	s
 check_weight	check_conf.f90	/^SUBROUTINE check_weight$/;"	s
-coll_data	statistics.f90	/^  SUBROUTINE coll_data(/;"	s
 cpu	send1.4.py	/^cpu=4$/;"	v
 create_worm_along_gline	monte_carlo_old.f90	/^SUBROUTINE create_worm_along_gline$/;"	s
 create_worm_along_wline	monte_carlo.f90	/^SUBROUTINE create_worm_along_wline$/;"	s
@@ -364,7 +363,6 @@ mult	vrbls_mc.f90	/^  integer, parameter           :: mult=/;"	v	module:vrbls_mc
 mxrn	vrbls_mc.f90	/^  integer, parameter           :: mxrn /;"	v	module:vrbls_mc
 nme	data_process/collapse_data.f90	/^    double precision :: ime(100), nme$/;"	v	program:main
 norm_data	data_process/collapse_statistics.f90	/^  SUBROUTINE norm_data$/;"	s	program:MAIN
-norm_data	statistics.f90	/^  SUBROUTINE norm_data$/;"	s
 nrannr	vrbls_mc.f90	/^  integer                      :: nrannr /;"	v	module:vrbls_mc
 num	send1.4.py	/^        num=submit_jobs(para,num,execute,homedir)$/;"	v
 num	send1.4.py	/^num=0$/;"	v
@@ -408,7 +406,6 @@ shift_gline_in_space	monte_carlo_old.f90	/^SUBROUTINE shift_gline_in_space$/;"	s
 shift_wline_in_space	monte_carlo_old.f90	/^SUBROUTINE shift_wline_in_space$/;"	s
 site_num	read_write_data.f90	/^INTEGER FUNCTION site_num(/;"	f
 stat_analy	data_process/collapse_statistics.f90	/^  SUBROUTINE stat_analy$/;"	s	program:MAIN
-stat_analy	statistics.f90	/^  SUBROUTINE stat_analy$/;"	s
 statistics	monte_carlo.f90	/^SUBROUTINE statistics$/;"	s
 str	data_process/collapse_statistics.f90	/^    character*100 :: str,/;"	v	program:MAIN
 submit_jobs	send1.4.py	/^def submit_jobs(para,i,execute,homedir):$/;"	f
@@ -490,5 +487,4 @@ write_GWGamma	read_write_data.f90	/^SUBROUTINE write_GWGamma$/;"	s
 write_log	read_write_data.f90	/^SUBROUTINE write_log$/;"	s
 write_monte_carlo_conf	read_write_data.f90	/^SUBROUTINE write_monte_carlo_conf$/;"	s
 write_monte_carlo_data	read_write_data.f90	/^SUBROUTINE write_monte_carlo_data$/;"	s
-write_monte_carlo_test	read_write_data.f90	/^SUBROUTINE write_monte_carlo_test$/;"	s
 zone	vrbls_mc.f90	/^  character(5 )         :: zone$/;"	v	module:vrbls_mc
