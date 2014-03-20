@@ -610,50 +610,6 @@ SUBROUTINE write_monte_carlo_data
   close(104)
 END SUBROUTINE write_monte_carlo_data
 
-SUBROUTINE write_monte_carlo_conf
-  implicit none
-  integer :: i
-
-  open(103, status="replace", &
-   & file=trim(title3)//"_monte_carlo_conf.bin.dat",form="binary")
-
-  write(103)  Order, NGLn, NWLn, NVertex, MeasureGam, SignFermiLoop, IsWormPresent 
-  write(103)  Ira, Masha, SpinMasha, kMasha
-  write(103)  TailLn, TailVertex
-  write(103)  NextLn(:)
-  write(103)  NextVertex(:)
-  write(103)  WeightCurrent, Phase
-  write(103)  StatusLn(:)
-  write(103)  GLnKey2Value(1:NGLn), WLnKey2Value(1:NWLn)
-  write(103)  LnValue2Key(:)
-  write(103)  StatusVertex(:)
-  write(103)  VertexKey2Value(:)
-  write(103)  VertexValue2Key(:)
-  write(103)  KindLn(:)
-  write(103)  TypeLn(:)
-  write(103)  SpInVertex(:, :)
-  write(103)  TypeVertex(:)
-  write(103)  kLn(:)
-  write(103)  Hash4G(:) 
-  write(103)  Hash4W(:)
-  write(103)  GRVertex(1, :), GRVertex(2, :)
-  write(103)  WRVertex(1, :), WRVertex(2, :)
-  write(103)  TVertex(1, :), TVertex(2, :), TVertex(3, :)
-  write(103)  DirecVertex(:)             
-  write(103)  WeightLn(:) 
-  write(103)  WeightVertex(:) 
-
-  do i = 1, 2
-    write(103)  NeighLn(i,:)
-  enddo
-
-  do i = 1, 3
-    write(103)  NeighVertex(i,:) 
-  enddo
-
-  close(103)
-END SUBROUTINE write_monte_carlo_conf
-
 
 SUBROUTINE read_monte_carlo_data
   implicit none
@@ -682,39 +638,66 @@ SUBROUTINE read_monte_carlo_data
   close(105)
 END SUBROUTINE read_monte_carlo_data
 
+SUBROUTINE write_monte_carlo_conf
+  implicit none
+  integer :: i
+
+  open(103, status="replace", &
+   & file=trim(title3)//"_monte_carlo_conf.bin.dat",form="binary")
+
+  write(103)  TailLn, TailVertex
+  write(103)  NextLn(:)
+  write(103)  NextVertex(:)
+  write(103)  Order, MeasureGam, SignFermiLoop, IsWormPresent 
+  write(103)  Ira, Masha, SpinMasha, kMasha
+  write(103)  StatusVertex(:)
+  write(103)  TypeVertex(:)
+  write(103)  GRVertex(1, :), GRVertex(2, :)
+  write(103)  WRVertex(1, :), WRVertex(2, :)
+  write(103)  TVertex(1, :), TVertex(2, :), TVertex(3, :)
+  write(103)  DirecVertex(:)             
+  write(103)  IsDeltaVertex(:)
+  write(103)  IsDeltaLn(:)
+  write(103)  kLn(:)
+
+  do i = 1, 2
+    write(103)  NeighLn(i,:)
+  enddo
+
+  do i = 1, 3
+    write(103)  NeighVertex(i,:) 
+  enddo
+
+  close(103)
+END SUBROUTINE write_monte_carlo_conf
+
 
 
 SUBROUTINE read_monte_carlo_conf
   implicit none
   integer :: i
+  integer :: ikey, ikeyG, ikeyW
+  integer :: iGin, iGout, iW
+  integer :: iGam, jGam
+  complex*16 :: ComCurrent
+  double precision :: tau
 
   open(106, status="old", file=trim(title)//"_monte_carlo_conf.bin.dat",form="binary")
 
-  read(106)  Order, NGLn, NWLn, NVertex, MeasureGam, SignFermiLoop, IsWormPresent 
-  read(106)  Ira, Masha, SpinMasha, kMasha
   read(106)  TailLn, TailVertex
   read(106)  NextLn(:)
   read(106)  NextVertex(:)
-  read(106)  WeightCurrent, Phase
-  read(106)  StatusLn(:)
-  read(106)  GLnKey2Value(1:NGLn), WLnKey2Value(1:NWLn)
-  read(106)  LnValue2Key(:)
+  read(106)  Order, MeasureGam, SignFermiLoop, IsWormPresent 
+  read(106)  Ira, Masha, SpinMasha, kMasha
   read(106)  StatusVertex(:)
-  read(106)  VertexKey2Value(:)
-  read(106)  VertexValue2Key(:)
-  read(106)  KindLn(:)
-  read(106)  TypeLn(:)
-  read(106)  SpInVertex(:, :)
   read(106)  TypeVertex(:)
-  read(106)  kLn(:)
-  read(106)  Hash4G(:) 
-  read(106)  Hash4W(:)
   read(106)  GRVertex(1, :), GRVertex(2, :)
   read(106)  WRVertex(1, :), WRVertex(2, :)
   read(106)  TVertex(1, :), TVertex(2, :), TVertex(3, :)
   read(106)  DirecVertex(:)             
-  read(106)  WeightLn(:) 
-  read(106)  WeightVertex(:) 
+  read(106)  IsDeltaVertex(:)
+  read(106)  IsDeltaLn(:)
+  read(106)  kLn(:)
 
   do i = 1, 2
     read(106)  NeighLn(i,:)
@@ -723,8 +706,123 @@ SUBROUTINE read_monte_carlo_conf
   do i = 1, 3
     read(106)  NeighVertex(i,:) 
   enddo
-
   close(106)
+
+  NVertex = 2*(Order+1)
+  NGLn = NVertex
+  NWLn = Order+1
+  ComCurrent = (1.d0, 0.d0)
+
+  ikey = 1
+  do i = 1, MxNVertex
+    if(StatusVertex(i)==-1) cycle
+    VertexValue2Key(i) = ikey
+    VertexKey2Value(ikey) = i
+    ikey = ikey + 1
+  enddo
+
+  if(ikey/=NVertex+1) then
+    write(logstr, *) "read_monte_carlo_conf: Number of Vertex Error!"
+    call write_log
+    stop
+  endif
+
+  StatusLn(:)=-1
+  do ikey = 1, NVertex
+    i = VertexKey2Value(ikey)
+    if(StatusVertex(i)==-1) then
+      write(logstr, *) "read_monte_carlo_conf: Status of Vertex Error!"
+      call write_log
+      stop
+    endif
+
+    iGin = NeighVertex(1, i)
+    iGout = NeighVertex(2, i)
+    iW = NeighVertex(3, i)
+
+    if(StatusLn(iGin)==-1) then
+      StatusLn(iGin) = gline_stat(StatusVertex(NeighLn(1, iGin)), StatusVertex(NeighLn(2, iGin)))
+      KindLn(iGin) = 1
+    endif
+    if(StatusLn(iGout)==-1) then
+      StatusLn(iGout) = gline_stat(StatusVertex(NeighLn(1, iGout)), StatusVertex(NeighLn(2, iGout)))
+      KindLn(iGout) = 1
+    endif
+    if(StatusLn(iW)==-1) then
+      StatusLn(iW) = wline_stat(StatusVertex(NeighLn(1, iW)), StatusVertex(NeighLn(2, iW)))
+      KindLn(iW) = 2
+    endif
+
+    if(TypeVertex(i)==1 .or. TypeVertex(i)==4) then
+      SpInVertex(:, i) = 1
+    else if(TypeVertex(i)==2 .or. TypeVertex(i)==3) then
+      SpInVertex(:, i) = 2
+    else if(TypeVertex(i)==5 .or. TypeVertex(i)==6) then
+      SpInVertex(2, i) = Mod(TypeVertex(i), 2)+1
+      SpInVertex(1, i) = 3 - SpInVertex(1, i)
+    endif
+
+    WeightVertex(i) = weight_vertex(StatusVertex(i), IsDeltaVertex(i), &
+      & GRVertex(1,i)-WRVertex(1,i), GRVertex(2,i)-WRVertex(2,i), &
+      & TVertex(3,i)-TVertex(2,i), TVertex(1,i)-TVertex(3,i), TypeVertex(i))
+
+    ComCurrent = ComCurrent* WeightVertex(i)
+  enddo
+
+  ikeyG = 1
+  ikeyW = 1
+  do i = 1, MxNLn
+    if(StatusLn(i)==-1) cycle
+    if(KindLn(i)==1) then
+      LnValue2Key(i) = ikeyG
+      GLnKey2Value(ikeyG) = i
+      ikeyG = ikeyG + 1
+    else if(KindLn(i)==2) then
+      LnValue2Key(i) = ikeyW
+      GLnKey2Value(ikeyW) = i
+      ikeyW = ikeyW + 1
+    endif
+  enddo
+
+  if(ikeyG/=NGLn+1) then
+    write(logstr, *) "read_monte_carlo_conf: Number of Glines Error!"
+    call write_log
+    stop
+  endif
+
+  if(ikeyW/=NWLn+1) then
+    write(logstr, *) "read_monte_carlo_conf: Number of Glines Error!"
+    call write_log
+    stop
+  endif
+
+  do ikeyG = 1, NGLn
+    i = GLnKey2Value(ikeyG)
+    call add_Hash4G(kLn(i))
+    TypeLn(i) = mod(TypeVertex(NeighLn(2,i)), 2)
+    if(TypeLn(i)==0)  TypeLn(i) = 2
+    tau = TVertex(2, NeighLn(2, i))-TVertex(1,NeighLn(1,i))
+    WeightLn(i) = weight_gline(StatusLn(i), tau, TypeLn(i))
+    ComCurrent = ComCurrent* WeightLn(i)
+  enddo
+
+  do ikeyW = 1, NWLn
+    i = WLnKey2Value(ikeyW)
+    call add_Hash4W(abs(kLn(i)))
+    iGam = NeighLn(1, i)
+    jGam = NeighLn(2, i)
+    TypeLn(i) = TypeGam2W(TypeVertex(iGam), TypeVertex(jGam))
+
+    tau = TVertex(3, iGam)-TVertex(3, jGam)
+    WeightLn(i) = weight_wline(StatusLn(i), IsDeltaLn(i), WRVertex(1,jGam)-WRVertex(1,iGam), &
+      & WRVertex(2,jGam)-WRVertex(2, iGam), tau, TypeLn(i))
+    ComCurrent = ComCurrent* WeightLn(i)
+  enddo
+
+  WeightCurrent = abs(ComCurrent) *(1.d0/Beta)**Order *SignFermiLoop
+  Phase = ComCurrent/abs(ComCurrent) *SignFermiLoop
+
+  return
 END SUBROUTINE read_monte_carlo_conf
 !!================================================================
 !!================================================================
@@ -1131,17 +1229,17 @@ END SUBROUTINE output_Quantities
 SUBROUTINE write_monte_carlo_test
   implicit none
   integer :: iorder
-  !open(11, access="append", file=trim(title3)//"_test.dat")
-  !do iorder = 0, MCOrder
-    !write(11, *) iorder, "conf(total)/conf(all spin up)", TestData(iorder)/TestData(MCOrder+iorder+1)
-  !enddo
-  !write(11, *)
+  open(11, access="append", file=trim(title3)//"_test.dat")
+  do iorder = 0, MCOrder
+    write(11, *) iorder, "conf(total)/conf(all spin up)", TestData(iorder)/TestData(MCOrder+iorder+1)
+  enddo
+  write(11, *)
 
-  !do iorder = 1, MCOrder
-    !write(11, *) iorder, iorder-1, TestData(MCOrder+iorder+1)/TestData(MCOrder+iorder)
-  !enddo
-  !write(11, *) 
-  !close(11)
+  do iorder = 1, MCOrder
+    write(11, *) iorder, iorder-1, TestData(MCOrder+iorder+1)/TestData(MCOrder+iorder)
+  enddo
+  write(11, *) 
+  close(11)
   return
 END SUBROUTINE
 

@@ -3,7 +3,7 @@
 !_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
 !_TAG_PROGRAM_NAME	Exuberant Ctags	//
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
-!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+!_TAG_PROGRAM_VERSION	5.8	//
 10	monte_carlo_old.f90	/^  10 format(' Line:',i2,2x,'kind:',i2,2x,'type:',i2,2x,'k:',i8,2x,'omega:',i6,2x,'stat:',i2, 2x,&$/;"	l	subroutine:print_config	file:
 10	read_write_data.f90	/^  10 format(' Line:',i2,2x,'kind:',i2,2x,'isdelta:',i2,2x,'type:',i2,2x,'k:',i8,2x,'stat:',i2, 2x,&$/;"	l	subroutine:print_config	file:
 100	basic_function.f90	/^100 J = 1$/;"	l	subroutine:SFFTEU	file:
@@ -26,6 +26,7 @@
 781	read_write_data.f90	/^ 781  format ('Nsolid ',f6.1,x,f6.1,x,f6.1,x,f6.1,x,f6.1,' Y45')$/;"	l	subroutine:DRAW	file:
 790	read_write_data.f90	/^ 790  format ('Nsolid ',f6.1,x,f6.1,x,f6.1,x,f6.1,x,' ahead')$/;"	l	subroutine:DRAW	file:
 791	read_write_data.f90	/^ 791  format ('Ndashed ',f6.1,x,f6.1,x,f6.1,x,f6.1,x,f6.1,' Y45')$/;"	l	subroutine:DRAW	file:
+792	read_write_data.f90	/^ 792  format ('Ndashed ',f6.1,x,f6.1,x,f9.3,' YL')$/;"	l	subroutine:DRAW	file:
 801	read_write_data.f90	/^ 801  format (f6.1,x,f6.1,x,' M (',i2,') C')$/;"	l	subroutine:DRAW	file:
 802	read_write_data.f90	/^ 802  format (f6.1,x,f6.1,x,' M (',i2,':',f6.3,'; (',i3,',',i3,')) C')$/;"	l	subroutine:DRAW	file:
 803	read_write_data.f90	/^ 803  format (f6.1,x,f6.1,x,' M (',A,') C')$/;"	l	subroutine:DRAW	file:
@@ -171,7 +172,7 @@ StatusVertex	vrbls_mc.f90	/^  integer, dimension(MxNVertex):: StatusVertex /;"	v
 TVertex	vrbls_mc.f90	/^  double precision, dimension(3, MxNVertex) :: TVertex!/;"	v	module:vrbls_mc
 TailLn	vrbls_mc.f90	/^  integer                    :: TailLn /;"	v	module:vrbls_mc
 TailVertex	vrbls_mc.f90	/^  integer                      :: TailVertex /;"	v	module:vrbls_mc
-TestData	vrbls_mc.f90	/^  double precision,dimension(0:10)  :: TestData$/;"	v	module:vrbls_mc
+TestData	vrbls_mc.f90	/^  double precision,dimension(0:20)  :: TestData$/;"	v	module:vrbls_mc
 TypeGam2W	vrbls_mc.f90	/^  integer, dimension(6,6)   :: TypeGam2W$/;"	v	module:vrbls_mc
 TypeLn	vrbls_mc.f90	/^  integer, dimension(MxNLn) :: TypeLn /;"	v	module:vrbls_mc
 TypeSp2Gam	vrbls_mc.f90	/^  integer, dimension(2,2,2,2) :: TypeSp2Gam$/;"	v	module:vrbls_mc
@@ -362,6 +363,8 @@ num	send1.4.py	/^        num=submit_jobs(para,num,execute,homedir)$/;"	v
 num	send1.4.py	/^num=0$/;"	v
 omega	data_process/collapse_statistics.f90	/^    integer :: iblck, omega,/;"	v	program:MAIN
 order	data_process/collapse_data.f90	/^    character*1 :: order$/;"	v	program:main
+os	data_process/collapse.py	/^import os$/;"	i
+os	send1.4.py	/^import os$/;"	i
 output_GamMC	data_process/collapse_statistics.f90	/^  SUBROUTINE output_GamMC$/;"	s	program:MAIN
 output_Quantities	read_write_data.f90	/^SUBROUTINE output_Quantities$/;"	s
 para	send1.4.py	/^        para=para_init()$/;"	v
@@ -379,6 +382,7 @@ prob_tau	basic_function.f90	/^DOUBLE PRECISION FUNCTION prob_tau(/;"	f
 proclist	send1.4.py	/^proclist=[]$/;"	v
 prt	data_process/collapse_statistics.f90	/^    logical :: prt$/;"	v	program:MAIN
 prt	vrbls_mc.f90	/^  logical :: prt$/;"	v	module:vrbls_mc
+random	send1.4.py	/^import random$/;"	i
 read_GWGamma	read_write_data.f90	/^SUBROUTINE read_GWGamma$/;"	s
 read_monte_carlo_conf	read_write_data.f90	/^SUBROUTINE read_monte_carlo_conf$/;"	s
 read_monte_carlo_data	read_write_data.f90	/^SUBROUTINE read_monte_carlo_data$/;"	s
@@ -400,7 +404,9 @@ stat_analy	data_process/collapse_statistics.f90	/^  SUBROUTINE stat_analy$/;"	s	
 stat_analy	statistics.f90	/^  SUBROUTINE stat_analy$/;"	s
 str	data_process/collapse_statistics.f90	/^    character*100 :: str,/;"	v	program:MAIN
 submit_jobs	send1.4.py	/^def submit_jobs(para,i,execute,homedir):$/;"	f
+subprocess	send1.4.py	/^import subprocess$/;"	i
 switch_ira_and_masha	monte_carlo.f90	/^SUBROUTINE switch_ira_and_masha$/;"	s
+sys	send1.4.py	/^import sys$/;"	i
 t_curr	vrbls_mc.f90	/^  double precision      :: t_prev, t_curr,/;"	v	module:vrbls_mc
 t_elap	vrbls_mc.f90	/^  double precision      :: t_prev, t_curr, t_elap$/;"	v	module:vrbls_mc
 t_init	vrbls_mc.f90	/^  double precision      :: t_init,/;"	v	module:vrbls_mc
@@ -410,6 +416,7 @@ t_simu	vrbls_mc.f90	/^  double precision      :: t_init, t_simu,/;"	v	module:vrb
 t_toss	vrbls_mc.f90	/^  double precision      :: t_init, t_simu, t_meas, t_toss$/;"	v	module:vrbls_mc
 temp	data_process/collapse_statistics.f90	/^    double precision :: Beta, temp$/;"	v	program:MAIN
 test_subroutine	DiagMC.f90	/^SUBROUTINE test_subroutine$/;"	s
+time	send1.4.py	/^import time$/;"	i
 time	vrbls_mc.f90	/^  character(10)         :: time$/;"	v	module:vrbls_mc
 time_elapse	basic_function.f90	/^SUBROUTINE time_elapse$/;"	s
 title	data_process/collapse.py	/^title = "0.50_2"$/;"	v
@@ -455,7 +462,7 @@ weight_Gam	self_consistent.f90	/^COMPLEX*16 FUNCTION weight_Gam(/;"	f
 weight_Gam0	self_consistent.f90	/^COMPLEX*16 FUNCTION weight_Gam0(/;"	f
 weight_W	self_consistent.f90	/^COMPLEX*16 FUNCTION weight_W(/;"	f
 weight_W0	self_consistent.f90	/^Complex*16 FUNCTION weight_W0(/;"	f
-weight_line	monte_carlo.f90	/^COMPLEX*16 FUNCTION weight_line(/;"	f
+weight_gline	monte_carlo.f90	/^COMPLEX*16 FUNCTION weight_gline(/;"	f
 weight_line	monte_carlo_old.f90	/^DOUBLE PRECISION FUNCTION weight_line(/;"	f
 weight_meas_G	basic_function.f90	/^complex*16 FUNCTION weight_meas_G(/;"	f
 weight_meas_Gam	basic_function.f90	/^complex*16 FUNCTION weight_meas_Gam(/;"	f
@@ -464,6 +471,7 @@ weight_ratio	monte_carlo.f90	/^SUBROUTINE weight_ratio(/;"	s
 weight_ratio	monte_carlo_old.f90	/^SUBROUTINE weight_ratio(/;"	s
 weight_vertex	monte_carlo.f90	/^COMPLEX*16 FUNCTION weight_vertex(/;"	f
 weight_vertex	monte_carlo_old.f90	/^DOUBLE PRECISION FUNCTION weight_vertex(/;"	f
+weight_wline	monte_carlo.f90	/^COMPLEX*16 FUNCTION weight_wline(/;"	f
 weight_worm	basic_function.f90	/^DOUBLE PRECISION FUNCTION weight_worm(/;"	f
 weight_worm_Gam	basic_function.f90	/^complex*16 FUNCTION weight_worm_Gam(/;"	f
 weight_worm_W	basic_function.f90	/^complex*16 FUNCTION weight_worm_W(/;"	f
