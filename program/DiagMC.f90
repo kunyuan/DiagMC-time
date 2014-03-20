@@ -50,13 +50,13 @@ PROGRAM MAIN
   Pupdate( 6)  = 1.d0
   Pupdate( 7)  = 1.d0
   Pupdate( 8)  = 1.d0
-  !Pupdate(11)  = 1.d0
+  Pupdate(11)  = 1.d0
   Pupdate(13)  = 1.d0
   Pupdate(14)  = 1.d0
   Pupdate(15)  = 1.d0
   Pupdate(16)  = 1.d0
-  Pupdate(17)  = 1.d0
-  Pupdate(18)  = 1.d0
+  !Pupdate(17)  = 1.d0
+  !Pupdate(18)  = 1.d0
 
   !===============  Test variables ==================================
   TestData(:)=0.d0

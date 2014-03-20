@@ -218,24 +218,24 @@ SUBROUTINE markov(MaxSamp)
       endif
 
       !========================== REWEIGHTING =========================
-      !if(mod(imc,1.e7)==0) then
-        !write(logstr,*) "Reweighting order of diagrams..."
-        !call write_log
-        !x=sum(GamWormOrder(:))
-        !CoefOfWeight(:)=x/(GamWormOrder(:)+50.d0)
-        !write(logstr,*) "Weight:"
-        !call write_log
-        !do i=0,MCOrder
-          !write(logstr,"('Order ',i2,':',f10.4)") i, CoefOfWeight(i)
-          !call write_log
-        !enddo
-        !write(logstr,*) "Reweighting is done!"
-        !call write_log
-        !if(imc<=2.e7) then
-          !GamWormOrder=0.d0
-          !GamOrder=0.d0
-        !endif
-      !endif
+      if(mod(imc,1.e7)==0) then
+        write(logstr,*) "Reweighting order of diagrams..."
+        call write_log
+        x=sum(GamWormOrder(:))
+        CoefOfWeight(:)=x/(GamWormOrder(:)+50.d0)
+        write(logstr,*) "Weight:"
+        call write_log
+        do i=0,MCOrder
+          write(logstr,"('Order ',i2,':',f10.4)") i, CoefOfWeight(i)
+          call write_log
+        enddo
+        write(logstr,*) "Reweighting is done!"
+        call write_log
+        if(imc<=2.e7) then
+          GamWormOrder=0.d0
+          GamOrder=0.d0
+        endif
+      endif
       !================================================================
 
       if(mod(imc,1.e8)==0) then

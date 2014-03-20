@@ -1138,8 +1138,9 @@ SUBROUTINE write_monte_carlo_test
   write(11, *)
 
   do iorder = 1, MCOrder
-    write(11, *) iorder, "conf(all spin up)/conf(0, all spin up)", TestData(MCOrder+iorder+1)/TestData(MCOrder+1)
+    write(11, *) iorder, iorder-1, TestData(MCOrder+iorder+1)/TestData(MCOrder+iorder)
   enddo
+  write(11, *) 
   close(11)
   return
 END SUBROUTINE
