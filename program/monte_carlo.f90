@@ -2301,13 +2301,12 @@ SUBROUTINE measure
   !endif
 
   !===============  test variables =================================
-  TestData(Order) = TestData(Order)+ 1.d0/factorM
-  sumt = 0
-  do ikey = 1, 1+Order
-    sumt = sumt + TypeLn(WLnKey2Value(ikey))
-  enddo
-  if(sumt==Order+1) TestData(MCOrder+1+Order) = TestData(MCOrder+1+Order) +1.d0/factorM
-
+  !TestData(Order) = TestData(Order)+ 1.d0/factorM
+  !sumt = 0
+  !do ikey = 1, 1+Order
+    !sumt = sumt + TypeLn(WLnKey2Value(ikey))
+  !enddo
+  !if(sumt==Order+1) TestData(MCOrder+1+Order) = TestData(MCOrder+1+Order) +1.d0/factorM
   !================================================================
   
         

@@ -1131,17 +1131,17 @@ END SUBROUTINE output_Quantities
 SUBROUTINE write_monte_carlo_test
   implicit none
   integer :: iorder
-  open(11, access="append", file=trim(title3)//"_test.dat")
-  do iorder = 0, MCOrder
-    write(11, *) iorder, "conf(total)/conf(all spin up)", TestData(iorder)/TestData(MCOrder+iorder+1)
-  enddo
-  write(11, *)
+  !open(11, access="append", file=trim(title3)//"_test.dat")
+  !do iorder = 0, MCOrder
+    !write(11, *) iorder, "conf(total)/conf(all spin up)", TestData(iorder)/TestData(MCOrder+iorder+1)
+  !enddo
+  !write(11, *)
 
-  do iorder = 1, MCOrder
-    write(11, *) iorder, iorder-1, TestData(MCOrder+iorder+1)/TestData(MCOrder+iorder)
-  enddo
-  write(11, *) 
-  close(11)
+  !do iorder = 1, MCOrder
+    !write(11, *) iorder, iorder-1, TestData(MCOrder+iorder+1)/TestData(MCOrder+iorder)
+  !enddo
+  !write(11, *) 
+  !close(11)
   return
 END SUBROUTINE
 
