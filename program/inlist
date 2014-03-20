@@ -1,5 +1,5 @@
 IsForever: .true.
-Sample: 40000
+Sample: 1000000
 Sweep:  10
 Toss:  1000
 IsLoad: 0
