@@ -33,7 +33,6 @@
 804	read_write_data.f90	/^ 804  format (f6.1,x,f6.1,x,' M (G: ',i2,' ------>',i2') C')$/;"	l	subroutine:DRAW	file:
 805	read_write_data.f90	/^ 805  format (f6.1,x,f6.1,x,' M (W: ',i2,' <====>',i2') C')$/;"	l	subroutine:DRAW	file:
 Ave	data_process/collapse_statistics.f90	/^    double precision :: Obs(1:Nobs_b, 12000), Ave(/;"	v	program:MAIN
-Ave	vrbls_mc.f90	/^  double precision , dimension(1:Nobs) :: Quan, Ave,/;"	v	module:vrbls_mc
 Beta	data_process/collapse_statistics.f90	/^    double precision :: Beta,/;"	v	program:MAIN
 Beta	vrbls_mc.f90	/^  double precision ::  Beta /;"	v	module:vrbls_mc
 CheckG	vrbls_mc.f90	/^  logical          ::  CheckG,/;"	v	module:vrbls_mc
@@ -44,12 +43,12 @@ CoefOfSymmetry	vrbls_mc.f90	/^  double precision :: CoefOfSymmetry(/;"	v	module:
 CoefOfWeight	vrbls_mc.f90	/^  double precision :: CoefOfWeight(/;"	v	module:vrbls_mc
 CoefOfWorm	vrbls_mc.f90	/^  double precision :: CoefOfWorm$/;"	v	module:vrbls_mc
 Cor	data_process/collapse_statistics.f90	/^    double precision :: Obs(1:Nobs_b, 12000), Ave(1:Nobs_b), Dev(1:Nobs_b), Cor(/;"	v	program:MAIN
-Cor	vrbls_mc.f90	/^  double precision , dimension(1:Nobs) :: Quan, Ave, Dev, Cor$/;"	v	module:vrbls_mc
 D	vrbls_mc.f90	/^  integer, parameter :: D /;"	v	module:vrbls_mc
 DRAW	read_write_data.f90	/^SUBROUTINE DRAW(/;"	s
 Dev	data_process/collapse_statistics.f90	/^    double precision :: Obs(1:Nobs_b, 12000), Ave(1:Nobs_b), Dev(/;"	v	program:MAIN
-Dev	vrbls_mc.f90	/^  double precision , dimension(1:Nobs) :: Quan, Ave, Dev,/;"	v	module:vrbls_mc
 DirecVertex	vrbls_mc.f90	/^  integer, dimension(MxNVertex) :: DirecVertex /;"	v	module:vrbls_mc
+ERSTAT	monte_carlo.f90	/^subroutine ERSTAT(/;"	s
+Error	vrbls_mc.f90	/^  double precision   :: Error(/;"	v	module:vrbls_mc
 FFT_r	basic_function.f90	/^SUBROUTINE FFT_r(/;"	s
 FFT_tau_double	basic_function.f90	/^SUBROUTINE FFT_tau_double(/;"	s
 FFT_tau_single	basic_function.f90	/^SUBROUTINE FFT_tau_single(/;"	s
@@ -111,6 +110,7 @@ MCOrder	data_process/collapse_data.f90	/^    integer :: MCOrder$/;"	v	program:ma
 MCOrder	data_process/collapse_statistics.f90	/^    integer :: Lx, Ly, MCOrder,/;"	v	program:MAIN
 MCOrder	vrbls_mc.f90	/^  integer          ::  MCOrder /;"	v	module:vrbls_mc
 Masha	vrbls_mc.f90	/^  integer          :: Ira, Masha /;"	v	module:vrbls_mc
+MaxStat	vrbls_mc.f90	/^  integer          :: MaxStat$/;"	v	module:vrbls_mc
 MeasureGam	vrbls_mc.f90	/^  integer          :: MeasureGam /;"	v	module:vrbls_mc
 Mnint	vrbls_mc.f90	/^  integer, parameter          :: Mnint /;"	v	module:vrbls_mc
 Mu	vrbls_mc.f90	/^  double precision ::  Mu(/;"	v	module:vrbls_mc
@@ -130,6 +130,7 @@ MxT	vrbls_mc.f90	/^  integer, parameter :: MxT /;"	v	module:vrbls_mc
 MxVol	vrbls_mc.f90	/^  integer, parameter :: MxVol /;"	v	module:vrbls_mc
 Mxint	vrbls_mc.f90	/^  integer, parameter          :: Mxint /;"	v	module:vrbls_mc
 NGLn	vrbls_mc.f90	/^  integer          :: NGLn,/;"	v	module:vrbls_mc
+NObs	vrbls_mc.f90	/^  integer, parameter :: NObs /;"	v	module:vrbls_mc
 NSamp	vrbls_mc.f90	/^  integer          :: NSamp /;"	v	module:vrbls_mc
 NStep	vrbls_mc.f90	/^  integer          :: NStep /;"	v	module:vrbls_mc
 NToss	vrbls_mc.f90	/^  integer          :: NToss /;"	v	module:vrbls_mc
@@ -144,11 +145,11 @@ NeighLn	vrbls_mc.f90	/^  integer, dimension(2,MxNLn) :: NeighLn /;"	v	module:vrb
 NeighVertex	vrbls_mc.f90	/^  integer, dimension(3,MxNVertex) :: NeighVertex /;"	v	module:vrbls_mc
 NextLn	vrbls_mc.f90	/^  integer, dimension(MxNLn)  :: NextLn$/;"	v	module:vrbls_mc
 NextVertex	vrbls_mc.f90	/^  integer, dimension(MxNVertex):: NextVertex$/;"	v	module:vrbls_mc
-Nobs	vrbls_mc.f90	/^  integer, parameter :: Nobs /;"	v	module:vrbls_mc
 Nobs_b	data_process/collapse_statistics.f90	/^    integer, parameter :: Nobs_b /;"	v	program:MAIN
+Norm	vrbls_mc.f90	/^  double precision   :: Norm(/;"	v	module:vrbls_mc
 Nupdate	vrbls_mc.f90	/^  integer, parameter :: Nupdate /;"	v	module:vrbls_mc
 Obs	data_process/collapse_statistics.f90	/^    double precision :: Obs(/;"	v	program:MAIN
-Obs	vrbls_mc.f90	/^  double precision :: Obs(/;"	v	module:vrbls_mc
+ObsRecord	vrbls_mc.f90	/^  double precision, allocatable :: ObsRecord(/;"	v	module:vrbls_mc
 Order	vrbls_mc.f90	/^  integer          :: Order /;"	v	module:vrbls_mc
 Phase	vrbls_mc.f90	/^  COMPLEX*16       :: Phase /;"	v	module:vrbls_mc
 Pi	vrbls_mc.f90	/^  double precision, parameter :: Pi /;"	v	module:vrbls_mc
@@ -158,7 +159,8 @@ Polar	vrbls_mc.f90	/^  complex(kind=8), allocatable :: Polar(/;"	v	module:vrbls_
 ProbAcc	vrbls_mc.f90	/^  double precision :: ProbAcc(/;"	v	module:vrbls_mc
 ProbProp	vrbls_mc.f90	/^  double precision :: ProbProp(/;"	v	module:vrbls_mc
 Pupdate	vrbls_mc.f90	/^  double precision :: Pupdate(/;"	v	module:vrbls_mc
-Quan	vrbls_mc.f90	/^  double precision , dimension(1:Nobs) :: Quan,/;"	v	module:vrbls_mc
+Quan	vrbls_mc.f90	/^  double precision   :: Quan(/;"	v	module:vrbls_mc
+QuanName	vrbls_mc.f90	/^  character,dimension(10) :: QuanName$/;"	v	module:vrbls_mc
 SFFTEU	basic_function.f90	/^subroutine SFFTEU(/;"	s
 Seed	data_process/collapse_statistics.f90	/^    integer :: Lx, Ly, MCOrder, Seed$/;"	v	program:MAIN
 Seed	vrbls_mc.f90	/^  integer                      :: Seed /;"	v	module:vrbls_mc
@@ -167,6 +169,7 @@ SignFermiLoop	vrbls_mc.f90	/^  integer          :: SignFermiLoop /;"	v	module:vr
 SpInVertex	vrbls_mc.f90	/^  integer, dimension(2,MxNVertex) :: SpInVertex /;"	v	module:vrbls_mc
 SpatialWeight	vrbls_mc.f90	/^  double precision :: SpatialWeight(/;"	v	module:vrbls_mc
 SpinMasha	vrbls_mc.f90	/^  integer          :: SpinMasha /;"	v	module:vrbls_mc
+StatNum	vrbls_mc.f90	/^  integer          :: StatNum$/;"	v	module:vrbls_mc
 StatusLn	vrbls_mc.f90	/^  integer, dimension(MxNLn) :: StatusLn /;"	v	module:vrbls_mc
 StatusVertex	vrbls_mc.f90	/^  integer, dimension(MxNVertex):: StatusVertex /;"	v	module:vrbls_mc
 TVertex	vrbls_mc.f90	/^  double precision, dimension(3, MxNVertex) :: TVertex!/;"	v	module:vrbls_mc
@@ -188,6 +191,8 @@ WeightCurrent	vrbls_mc.f90	/^  double precision :: WeightCurrent /;"	v	module:vr
 WeightLn	vrbls_mc.f90	/^  COMPLEX*16, dimension(MxNLn) :: WeightLn /;"	v	module:vrbls_mc
 WeightVertex	vrbls_mc.f90	/^  COMPLEX*16, dimension(MxNVertex) :: WeightVertex /;"	v	module:vrbls_mc
 WeightWorm	vrbls_mc.f90	/^  double precision :: WeightWorm /;"	v	module:vrbls_mc
+Z_normal	vrbls_mc.f90	/^  double precision :: Z_normal$/;"	v	module:vrbls_mc
+Z_worm	vrbls_mc.f90	/^  double precision :: Z_worm$/;"	v	module:vrbls_mc
 add_Hash4G	basic_function.f90	/^SUBROUTINE add_Hash4G(/;"	s
 add_Hash4G	monte_carlo_old.f90	/^SUBROUTINE add_Hash4G(/;"	s
 add_Hash4W	basic_function.f90	/^SUBROUTINE add_Hash4W(/;"	s
@@ -200,6 +205,8 @@ add_ira_stat	monte_carlo_old.f90	/^INTEGER FUNCTION add_ira_stat(/;"	f
 add_k	basic_function.f90	/^INTEGER FUNCTION add_k(/;"	f
 add_mea_stat	basic_function.f90	/^INTEGER FUNCTION add_mea_stat(/;"	f
 add_mea_stat	monte_carlo_old.f90	/^INTEGER FUNCTION add_mea_stat(/;"	f
+amax	vrbls_mc.f90	/^	DOUBLE PRECISION :: amax,/;"	v	module:vrbls_mc
+amin	vrbls_mc.f90	/^	DOUBLE PRECISION :: amax, tmax, amin,/;"	v	module:vrbls_mc
 calculate_Chi	self_consistent.f90	/^SUBROUTINE calculate_Chi$/;"	s
 calculate_G	self_consistent.f90	/^SUBROUTINE calculate_G$/;"	s
 calculate_GamNormWeight	basic_function.f90	/^SUBROUTINE calculate_GamNormWeight$/;"	s
@@ -402,6 +409,7 @@ shift_wline_in_space	monte_carlo_old.f90	/^SUBROUTINE shift_wline_in_space$/;"	s
 site_num	read_write_data.f90	/^INTEGER FUNCTION site_num(/;"	f
 stat_analy	data_process/collapse_statistics.f90	/^  SUBROUTINE stat_analy$/;"	s	program:MAIN
 stat_analy	statistics.f90	/^  SUBROUTINE stat_analy$/;"	s
+statistics	monte_carlo.f90	/^SUBROUTINE statistics$/;"	s
 str	data_process/collapse_statistics.f90	/^    character*100 :: str,/;"	v	program:MAIN
 submit_jobs	send1.4.py	/^def submit_jobs(para,i,execute,homedir):$/;"	f
 subprocess	send1.4.py	/^import subprocess$/;"	i
@@ -428,6 +436,8 @@ title2	vrbls_mc.f90	/^  character*100 :: title2$/;"	v	module:vrbls_mc
 title3	vrbls_mc.f90	/^  character*100 :: title3$/;"	v	module:vrbls_mc
 title4	vrbls_mc.f90	/^  character*100 :: title4$/;"	v	module:vrbls_mc
 tm32	vrbls_mc.f90	/^  double precision, parameter :: tm32 /;"	v	module:vrbls_mc
+tmax	vrbls_mc.f90	/^	DOUBLE PRECISION :: amax, tmax,/;"	v	module:vrbls_mc
+tmin	vrbls_mc.f90	/^	DOUBLE PRECISION :: amax, tmax, amin, tmin$/;"	v	module:vrbls_mc
 transfer_Chi_r	basic_function.f90	/^SUBROUTINE transfer_Chi_r(/;"	s
 transfer_Chi_t	basic_function.f90	/^SUBROUTINE transfer_Chi_t(/;"	s
 transfer_G0	basic_function.f90	/^SUBROUTINE transfer_G0(/;"	s

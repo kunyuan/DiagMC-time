@@ -8,14 +8,22 @@
 !If you want to log staff when runing markov, log here!
 SUBROUTINE print_status
     implicit none
-    integer :: iorder
+    integer :: iorder,i
 
     open(36, access="append", file=trim(title4)//".log")
+
     write(36,*) "MC steps: ",imc
     call time_elapse
     write(36,251) t_elap
   251 format(' Printing interval:',f16.7,2x,'s')
     write(36,*) "Efficiency: ",imc/t_elap," per second."
+
+    write(36,*) 'Statistics Number =', StatNum
+    do i=1,NObs
+      if(Norm(i)>1e-6) then
+        write(36,"(A,f15.6,'+/-',f15.6)") QuanName(i),Quan(i)/Norm(i),Error(i) 
+      endif
+    enddo
 
     write(36, *) " 1: create worm along wline"
     write(36, *) " 2: delete worm along wline"
@@ -47,7 +55,6 @@ SUBROUTINE print_status
 
     close(36)
 END SUBROUTINE print_status
-
 
 SUBROUTINE write_log
   implicit none
@@ -1229,18 +1236,17 @@ END SUBROUTINE output_Quantities
 SUBROUTINE write_monte_carlo_test
   implicit none
   integer :: iorder
-  open(11, access="append", file=trim(title3)//"_test.dat")
-  do iorder = 0, MCOrder
-    write(11, *) iorder, "conf(total)/conf(all spin up)", TestData(iorder)/TestData(MCOrder+iorder+1)
-  enddo
-  write(11, *)
+  !open(11, access="append", file=trim(title3)//"_test.dat")
+  !do iorder = 0, MCOrder
+    !write(11, *) iorder, "conf(total)/conf(all spin up)", TestData(iorder)/TestData(MCOrder+iorder+1)
+  !enddo
+  !write(11, *)
 
-  do iorder = 1, MCOrder
-    write(11, *) iorder, iorder-1, TestData(MCOrder+iorder+1)/TestData(MCOrder+iorder)
-  enddo
-  write(11, *) 
-  close(11)
-  return
+  !do iorder = 1, MCOrder
+    !write(11, *) iorder, "conf(all spin up)/conf(0, all spin up)", TestData(MCOrder+iorder+1)/TestData(MCOrder+1)
+  !enddo
+  !close(11)
+  !return
 END SUBROUTINE
 
 !!================================================================
