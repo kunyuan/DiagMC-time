@@ -61,7 +61,11 @@ PROGRAM MAIN
   !===============  Test variables ==================================
   TestData(:)=0.d0
   !===================================================================
-
+  !==============   Statistics ======================================
+  Quan(:)=0.d0
+  Norm(:)=0.d0
+  Error(:)=0.d0
+  QuanName(:)="Undefined"
 
   allocate(W(NTypeW, 0:Lx-1, 0:Ly-1, 0:MxT-1))
   allocate(Gam(NTypeGam, 0:Lx-1, 0:Ly-1, 0:MxT-1, 0:MxT-1))
@@ -73,6 +77,9 @@ PROGRAM MAIN
 
   allocate(GamMC(0:MCOrder,0:1,1:NTypeGam/2, 0:Lx-1, 0:Ly-1, 0:MxT-1, 0:MxT-1))
   allocate(GamSqMC(0:MCOrder,0:1,1:NTypeGam/2, 0:Lx-1, 0:Ly-1, 0:MxT-1, 0:MxT-1))
+
+  MaxStat=1024
+  allocate(ObsRecord(1:MaxStat,1:NObs))
 
   call set_time_elapse
   call set_RNG
@@ -281,7 +288,9 @@ SUBROUTINE monte_carlo
 
   !!================ MC SIMULATION FOR GAMMA =============================
   imc = 0.d0
-  imeasure = 0.d0
+  Z_normal=0.0
+  Z_worm=0.0
+  StatNum=0
 
   ProbProp(:,:) = 0.d0
   ProbAcc(:,:) = 0.d0
