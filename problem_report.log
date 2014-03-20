@@ -199,6 +199,71 @@ conf(order1, typ==1)/conf(order0, typ==1) = 0.5
 
 ====================================================
 
+13. mc updates: reconnect
+
+Test example:
+1) initialize: Order1 diagram, IsDeltaGamma(:) = 1; IsDeltaW(:) = 0; Uniform weight
+update: only the topology and tau can change, no change_isdelta, or change_r 
+checkGam = .false.
+
+Result: 
+
+           0 conf(total)/conf(all spin up)   3.93665617993096     
+           1 conf(total)/conf(all spin up)   5.88567885504919     
+           2 conf(total)/conf(all spin up)   10.0659373431263     
+ 
+           1           0  0.502787840755331     
+           2           1   2.93959740577450     
+ 
+           0 conf(total)/conf(all spin up)   3.87749704079975     
+           1 conf(total)/conf(all spin up)   5.91228790481497     
+           2 conf(total)/conf(all spin up)   10.1090060660393     
+           3 conf(total)/conf(all spin up)   16.1762468116384     
+ 
+           1           0  0.496054263494728     
+           2           1   2.99880651711698     
+           3           2   4.11987866497161     
+ 
+           0 conf(total)/conf(all spin up)   4.03443426355379     
+           1 conf(total)/conf(all spin up)   6.17643166929061     
+           2 conf(total)/conf(all spin up)   10.4792996854505     
+           3 conf(total)/conf(all spin up)   16.3426458508416     
+           4 conf(total)/conf(all spin up)   26.6026385295839     
+ 
+           1           0  0.470119743838044     
+           2           1   3.04480615822613     
+           3           2   4.20772297773642     
+           4           3   5.46774714261197     
+
+           0 conf(total)/conf(all spin up)   5.03376661391975     
+           1 conf(total)/conf(all spin up)   6.16897503594512     
+           2 conf(total)/conf(all spin up)   10.9562185133615     
+           3 conf(total)/conf(all spin up)   17.3301752940226     
+           4 conf(total)/conf(all spin up)   26.4286797491488     
+           5 conf(total)/conf(all spin up)   43.0544157463745     
+ 
+           1           0  0.555736326957996     
+           2           1   2.75115758799557     
+           3           2   4.25182812707099     
+           4           3   5.83843804473414     
+           5           4   6.70932515428272     
+ 
+           0 conf(total)/conf(all spin up)   3.92597186231201     
+           1 conf(total)/conf(all spin up)   5.80087748790907     
+           2 conf(total)/conf(all spin up)   10.6875436170634     
+           3 conf(total)/conf(all spin up)   16.7945346569438     
+           4 conf(total)/conf(all spin up)   28.6665930789831     
+           5 conf(total)/conf(all spin up)   39.4727692142975     
+           6 conf(total)/conf(all spin up)   67.0672832210890     
+ 
+           1           0  0.511790618423706     
+           2           1   3.12067661249070     
+           3           2   4.46742557568195     
+           4           3   5.18032469332417     
+           5           4   7.92682895087275     
+           6           5   7.40241993121718     
+====================================================
+
 
 ====================================================
 ========== TEST  BY  KUN ===========================
