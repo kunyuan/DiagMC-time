@@ -372,7 +372,10 @@ SUBROUTINE DRAW()
         write(11,*) '0 0 0 setrgbcolor'
       endif
       write(11,777) x1, y1, scy/30.
-      write(11,801) x1-5., y1+7., i
+      write(11,801) x1-5., y1+7., Vertex1
+      if(Vertex1==MeasureGam) then
+        write(11,*) '0 1 0 setrgbcolor'
+      endif
       write(11,802) 500.0,ini,i,TVertex(3, Vertex1), &
          & GRVertex(1, Vertex1),GRVertex(2, Vertex2)
       ini=ini-seg
@@ -384,7 +387,7 @@ SUBROUTINE DRAW()
       iGLn=GLnKey2Value(i)
       Vertex1=NeighLn(1,iGLn)
       Vertex2=NeighLn(2,iGLn)
-      if(TypeLn(i)==1) then
+      if(TypeLn(iGLn)==1) then
         write(11,*) '1 0 0 setrgbcolor'
       else
         write(11,*) '0 0 1 setrgbcolor'
