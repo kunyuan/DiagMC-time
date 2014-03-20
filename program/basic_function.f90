@@ -2251,12 +2251,12 @@ SUBROUTINE first_order_diagram
   NeighVertex(1,4) = 5;        NeighVertex(2,4) = 2;        NeighVertex(3,4) = 6
 
   ! weights for lines and vertexes
-  WeightLn(1) = weight_line(StatusLn(1),-1, 1,0,0,0.d0,TypeLn(1))
-  WeightLn(2) = weight_line(StatusLn(2),-1, 1,0,0,0.d0,TypeLn(2))
-  WeightLn(3) = weight_line(StatusLn(3), 0, 2,0,0,0.d0,TypeLn(3))
-  WeightLn(4) = weight_line(StatusLn(4),-1, 1,0,0,0.d0,TypeLn(4))
-  WeightLn(5) = weight_line(StatusLn(5),-1, 1,0,0,0.d0,TypeLn(5))
-  WeightLn(6) = weight_line(StatusLn(6), 0, 2,0,0,0.d0,TypeLn(6))
+  WeightLn(1) = weight_gline(StatusLn(1),0.d0,TypeLn(1))
+  WeightLn(2) = weight_gline(StatusLn(2),0.d0,TypeLn(2))
+  WeightLn(3) = weight_wline(StatusLn(3), 0, 0,0,0.d0,TypeLn(3))
+  WeightLn(4) = weight_gline(StatusLn(4),0.d0,TypeLn(4))
+  WeightLn(5) = weight_gline(StatusLn(5),0.d0,TypeLn(5))
+  WeightLn(6) = weight_wline(StatusLn(6), 0, 0,0,0.d0,TypeLn(6))
 
   WeightVertex(1) = weight_vertex(StatusVertex(1), 1, 0, 0, 0.d0, 0.d0, TypeVertex(1))
   WeightVertex(2) = weight_vertex(StatusVertex(2), 1, 0, 0, 0.d0, 0.d0, TypeVertex(2))
@@ -2398,12 +2398,12 @@ SUBROUTINE first_order_diagram_with_bubble
   NeighVertex(1,4) = 2;        NeighVertex(2,4) = 5;        NeighVertex(3,4) = 6
 
   ! weights for lines and vertexes
-  WeightLn(1) = weight_line(StatusLn(1),-1, 1,0,0,0.d0,TypeLn(1))
-  WeightLn(2) = weight_line(StatusLn(2),-1, 1,0,0,0.d0,TypeLn(2))
-  WeightLn(3) = weight_line(StatusLn(3), 0, 2,0,0,0.d0,TypeLn(3))
-  WeightLn(4) = weight_line(StatusLn(4),-1, 1,0,0,0.d0,TypeLn(4))
-  WeightLn(5) = weight_line(StatusLn(5),-1, 1,0,0,0.d0,TypeLn(5))
-  WeightLn(6) = weight_line(StatusLn(6), 0, 2,0,0,0.d0,TypeLn(6))
+  WeightLn(1) = weight_gline(StatusLn(1),0.d0,TypeLn(1))
+  WeightLn(2) = weight_gline(StatusLn(2),0.d0,TypeLn(2))
+  WeightLn(3) = weight_wline(StatusLn(3), 0, 0,0,0.d0,TypeLn(3))
+  WeightLn(4) = weight_gline(StatusLn(4),0.d0,TypeLn(4))
+  WeightLn(5) = weight_gline(StatusLn(5),0.d0,TypeLn(5))
+  WeightLn(6) = weight_wline(StatusLn(6), 0, 0,0,0.d0,TypeLn(6))
 
   WeightVertex(1) = weight_vertex(StatusVertex(1), 1, 0, 0, 0.d0, 0.d0, TypeVertex(1))
   WeightVertex(2) = weight_vertex(StatusVertex(2), 1, 0, 0, 0.d0, 0.d0, TypeVertex(2))
@@ -2563,15 +2563,16 @@ SUBROUTINE second_order_diagram
   NeighVertex(1,6) = 8;        NeighVertex(2,6) = 1;        NeighVertex(3,6) = 9
 
   ! weights for lines and vertexes
-  WeightLn(1) = weight_line(StatusLn(1),-1, 1,0,0,0.d0,TypeLn(1))
-  WeightLn(2) = weight_line(StatusLn(2),-1, 1,0,0,0.d0,TypeLn(2))
-  WeightLn(3) = weight_line(StatusLn(3), 0, 2,0,0,0.d0,TypeLn(3))
-  WeightLn(4) = weight_line(StatusLn(4),-1, 1,0,0,0.d0,TypeLn(4))
-  WeightLn(5) = weight_line(StatusLn(5),-1, 1,0,0,0.d0,TypeLn(5))
-  WeightLn(6) = weight_line(StatusLn(6), 0, 2,0,0,0.d0,TypeLn(6))
-  WeightLn(7) = weight_line(StatusLn(7),-1, 1,0,0,0.d0,TypeLn(7))
-  WeightLn(8) = weight_line(StatusLn(8),-1, 1,0,0,0.d0,TypeLn(8))
-  WeightLn(9) = weight_line(StatusLn(9), 0, 2,0,0,0.d0,TypeLn(9))
+  WeightLn(1) = weight_gline(StatusLn(1),0.d0,TypeLn(1))
+  WeightLn(2) = weight_gline(StatusLn(2),0.d0,TypeLn(2))
+  WeightLn(4) = weight_gline(StatusLn(4),0.d0,TypeLn(4))
+  WeightLn(5) = weight_gline(StatusLn(5),0.d0,TypeLn(5))
+  WeightLn(7) = weight_gline(StatusLn(7),0.d0,TypeLn(7))
+  WeightLn(8) = weight_gline(StatusLn(8),0.d0,TypeLn(8))
+
+  WeightLn(3) = weight_wline(StatusLn(3), 0, 0,0,0.d0,TypeLn(3))
+  WeightLn(6) = weight_wline(StatusLn(6), 0, 0,0,0.d0,TypeLn(6))
+  WeightLn(9) = weight_wline(StatusLn(9), 0, 0,0,0.d0,TypeLn(9))
 
   WeightVertex(1) = weight_vertex(StatusVertex(1), 1, 0, 0, 0.d0, 0.d0, TypeVertex(1))
   WeightVertex(2) = weight_vertex(StatusVertex(2), 1, 0, 0, 0.d0, 0.d0, TypeVertex(2))
