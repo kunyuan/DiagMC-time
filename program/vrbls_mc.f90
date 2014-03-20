@@ -19,7 +19,7 @@ MODULE vrbls_mc
   !integer, parameter :: MxOmegaBasis = 2048         ! the maximum omega used in basis
 
   double precision, parameter :: MxError = 0.25     ! the maximum error for MC
-  integer, parameter          :: MxNblck = 10240    ! the maximum blocks in MC simulations
+  integer, parameter          :: MxNblck = 1000000    ! the maximum memory blocks in MC simulations
 
   integer, parameter :: MxOrder =  10               ! the maximum order of the diagram
   integer, parameter :: MxNLn  = 3*MxOrder+3        ! the maximum number of lines
@@ -204,14 +204,23 @@ MODULE vrbls_mc
   integer, dimension(-MxK:MxK) ::  Hash4G     ! hashtable for k in G
   integer, dimension(0:MxK) ::     Hash4W     ! hashtable for k in W
 
-  !------------ statistics ------------------------------------------------------
-  logical :: prt
-  integer, parameter :: Nobs = 67
-  double precision :: Obs(Nobs, MxNblck)
-  double precision , dimension(1:Nobs) :: Quan, Ave, Dev, Cor
-  
   !=======================================================================
+  !------------ statistics ------------------------------------------------------
+  !-- Observables --------------------------------------------------
+  !! THIS IS PROJECT-DEPENDENT 
+  logical :: prt
+  integer          :: MaxStat
+  integer          :: StatNum
+  integer, parameter :: NObs = 20              ! Total # observables
+  double precision   :: Quan(NObs)                 ! 1st--#quan.  2nd--#block
+  double precision   :: Norm(NObs)
+  double precision   :: Error(NObs)
+  character(len=30),dimension(NObs) :: QuanName
 
+  double precision, allocatable :: ObsRecord(:,:)                 ! 1st--#quan.  2nd--#block
+  double precision :: Z_normal
+  double precision :: Z_worm
+	DOUBLE PRECISION :: amax, tmax, amin, tmin
   !================= Random-number generator =============================
   integer                      :: Seed              ! random-number seed
   integer, parameter           :: mult=32781

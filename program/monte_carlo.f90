@@ -166,109 +166,101 @@ SUBROUTINE markov(MaxSamp)
   do while(isamp<=MaxSamp)
     isamp=isamp+seg
 
-    istep = 0
-    do while(istep < NStep)
-      nr=rn()
-      
-      if(nr<Fupdate(1)) then
-        call create_worm_along_wline          
-      else if(nr<Fupdate(2)) then
-        call delete_worm_along_wline                       
-      else if(nr<Fupdate(3)) then
-        !call create_worm_along_gline  
-      else if(nr<Fupdate(4)) then
-        !call delete_worm_along_gline  
-      else if(nr<Fupdate(5)) then
-        call move_worm_along_wline             
-      else if(nr<Fupdate(6)) then
-        call move_worm_along_gline              
-      else if(nr<Fupdate(7)) then
-        call add_interaction                  
-      else if(nr<Fupdate(8)) then
-        call remove_interaction             
-      else if(nr<Fupdate(9)) then
-        !call add_interaction_cross              
-      else if(nr<Fupdate(10)) then
-        !call remove_interaction_cross                  
-      else if(nr<Fupdate(11)) then
-        call reconnect                      
-      else if(nr<Fupdate(12)) then
-        !call change_gline_space          
-      else if(nr<Fupdate(13)) then
-        call change_wline_space         
-      else if(nr<Fupdate(14)) then
-        call change_Gamma_type     
-      else if(nr<Fupdate(15)) then
-        call move_measuring_index       
-      else if(nr<Fupdate(16)) then
-        call change_Gamma_time        
-      else if(nr<Fupdate(17)) then
-        call change_wline_isdelta       
-      else if(nr<Fupdate(18)) then
-        call change_Gamma_isdelta       
-      endif
+    if(IsWormPresent .and. rn()<0.50) call switch_ira_and_masha
+    nr=rn()
+    if(nr<Fupdate(1)) then
+      call create_worm_along_wline          
+    else if(nr<Fupdate(2)) then
+      call delete_worm_along_wline                       
+    else if(nr<Fupdate(3)) then
+      !call create_worm_along_gline  
+    else if(nr<Fupdate(4)) then
+      !call delete_worm_along_gline  
+    else if(nr<Fupdate(5)) then
+      call move_worm_along_wline             
+    else if(nr<Fupdate(6)) then
+      call move_worm_along_gline              
+    else if(nr<Fupdate(7)) then
+      call add_interaction                  
+    else if(nr<Fupdate(8)) then
+      call remove_interaction             
+    else if(nr<Fupdate(9)) then
+      !call add_interaction_cross              
+    else if(nr<Fupdate(10)) then
+      !call remove_interaction_cross                  
+    else if(nr<Fupdate(11)) then
+      call reconnect                      
+    else if(nr<Fupdate(12)) then
+      !call change_gline_space          
+    else if(nr<Fupdate(13)) then
+      call change_wline_space         
+    else if(nr<Fupdate(14)) then
+      call change_Gamma_type     
+    else if(nr<Fupdate(15)) then
+      call move_measuring_index       
+    else if(nr<Fupdate(16)) then
+      call change_Gamma_time        
+    else if(nr<Fupdate(17)) then
+      call change_wline_isdelta       
+    else if(nr<Fupdate(18)) then
+      call change_Gamma_isdelta       
+    endif
 
-      imc = imc + 1.0
+    imc = imc + 1.0
 
-      if(mod(imc,1.e5)==0) then
-        call print_status
-        call print_config
-        call check_config
-        call write_monte_carlo_test
-      endif
+    if(mod(imc,Nstep*1.d0)==0 .and. .not. IsToss) call measure
 
-      !========================== REWEIGHTING =========================
-      !if(mod(imc,1.e7)==0) then
-        !write(logstr,*) "Reweighting order of diagrams..."
+    if(mod(imc,1.e6)==0) then
+      call statistics
+      call print_status
+      call print_config
+      call check_config
+      call write_monte_carlo_test
+    endif
+
+    !========================== REWEIGHTING =========================
+    !if(mod(imc,1.e7)==0) then
+      !write(logstr,*) "Reweighting order of diagrams..."
+      !call write_log
+      !x=sum(GamWormOrder(:))
+      !CoefOfWeight(:)=x/(GamWormOrder(:)+50.d0)
+      !write(logstr,*) "Weight:"
+      !call write_log
+      !do i=0,MCOrder
+        !write(logstr,"('Order ',i2,':',f10.4)") i, CoefOfWeight(i)
         !call write_log
-        !x=sum(GamWormOrder(:))
-        !CoefOfWeight(:)=x/(GamWormOrder(:)+50.d0)
-        !write(logstr,*) "Weight:"
-        !call write_log
-        !do i=0,MCOrder
-          !write(logstr,"('Order ',i2,':',f10.4)") i, CoefOfWeight(i)
-          !call write_log
-        !enddo
-        !write(logstr,*) "Reweighting is done!"
-        !call write_log
-        !if(imc<=2.e7) then
-          !GamWormOrder=0.d0
-          !GamOrder=0.d0
-        !endif
+      !enddo
+      !write(logstr,*) "Reweighting is done!"
+      !call write_log
+      !if(imc<=2.e7) then
+        !GamWormOrder=0.d0
+        !GamOrder=0.d0
       !endif
-      !================================================================
+    !endif
+    !================================================================
 
-      if(mod(imc,1.e8)==0) then
-        write(logstr,*) "Writing data and configuration..."
-        call write_log
-        call write_monte_carlo_conf
-        call write_monte_carlo_data
-        !call write_monte_carlo_test
-        write(logstr,*) "Writing data and configuration done!"
-        call write_log
-      endif
+    if(mod(imc,1.e8)==0) then
+      write(logstr,*) "Writing data and configuration..."
+      call write_log
+      !call statistics
+      call write_monte_carlo_conf
+      call write_monte_carlo_data
+      !call write_monte_carlo_test
+      write(logstr,*) "Writing data and configuration done!"
+      call write_log
+    endif
 
-        !call output_GamMC
-        !call output_prob_MC
+      !call output_GamMC
+      !call output_prob_MC
 
-        !call read_flag
-        !if(mc_version/=file_version) then
-          !call read_GWGamma
-          !call update_WeightCurrent
-          !mc_version = file_version
-        !endif
+      !call read_flag
+      !if(mc_version/=file_version) then
+        !call read_GWGamma
+        !call update_WeightCurrent
+        !mc_version = file_version
+      !endif
 
-      GamWormOrder(Order) = GamWormOrder(Order) + 1.d0
-      if(IsWormPresent) then
-        if(rn()<=0.5d0) call switch_ira_and_masha
-      else
-        istep = istep + 1
-        GamOrder(Order) = GamOrder(Order) + 1.d0
-      endif
-    enddo
-    if(.not. IsToss) call measure
   enddo
-
 END SUBROUTINE markov
 
 
@@ -2226,92 +2218,194 @@ SUBROUTINE measure
   double precision :: factorM
   double precision :: tau1, tau2, tau3
 
-  imeasure = imeasure + 1
-  factorM = 1.d0
+  GamWormOrder(Order) = GamWormOrder(Order) + 1.d0
+  !===========  Measure in worm space  ==========================
+  if(IsWormPresent) then
+    Z_worm=Z_worm+1.d0
+    !Quan(2)=Quan(2)+Greenfunction/factorM
+    !Norm(2)=Norm(2)+1/factorM
+  endif
+  !=============================================================
+  if(.not. IsWormPresent) then
+    !===========  Measure in normal space  ==========================
+    Z_normal=Z_normal+1.d0
+    GamOrder(Order) = GamOrder(Order) + 1.d0
+    factorM = 1.d0
 
-  !-------- find out the variables for Gamma ----------------
-  MeaGin = NeighVertex(2, MeasureGam)
-  MeaGout = NeighVertex(1, MeasureGam)
-  MeaW = NeighVertex(3, MeasureGam)
+    !-------- find out the variables for Gamma ----------------
+    MeaGin = NeighVertex(2, MeasureGam)
+    MeaGout = NeighVertex(1, MeasureGam)
+    MeaW = NeighVertex(3, MeasureGam)
 
-  dir = DirecVertex(MeasureGam)
+    dir = DirecVertex(MeasureGam)
 
-  !----- find the type for Gamma ----------------------
-  if(dir==1) then
-    if(TypeLn(MeaW)==1 .or. TypeLn(MeaW)==4) then
-      spw = 1
-    else if(TypeLn(MeaW)==2 .or. TypeLn(MeaW)==3) then
-      spw = 2
+    !----- find the type for Gamma ----------------------
+    if(dir==1) then
+      if(TypeLn(MeaW)==1 .or. TypeLn(MeaW)==4) then
+        spw = 1
+      else if(TypeLn(MeaW)==2 .or. TypeLn(MeaW)==3) then
+        spw = 2
+      endif
+    else
+      if(TypeLn(MeaW)==1 .or. TypeLn(MeaW)==3) then
+        spw = 1
+      else if(TypeLn(MeaW)==2 .or. TypeLn(MeaW)==4) then
+        spw = 2
+      endif
     endif
-  else
-    if(TypeLn(MeaW)==1 .or. TypeLn(MeaW)==3) then
-      spw = 1
-    else if(TypeLn(MeaW)==2 .or. TypeLn(MeaW)==4) then
-      spw = 2
+
+    if(TypeVertex(MeasureGam)==5 .or. TypeVertex(MeasureGam)==6) then
+      typ = 11-TypeVertex(MeasureGam)
+    else if(TypeVertex(MeasureGam)==1 .or. TypeVertex(MeasureGam)==3) then
+      typ = TypeSp2Gam(1,1,spw,spw)
+    else if(TypeVertex(MeasureGam)==2 .or. TypeVertex(MeasureGam)==4) then
+      typ = TypeSp2Gam(2,2,spw,spw)
     endif
+    ityp = (typ+1)/2
+
+    nloop = Mod(Floor(SignFermiloop/2.d0+0.5d0), 2)
+
+
+    !----- find the space and time variables for Gamma -------
+    xg = GRVertex(1, MeasureGam)
+    yg = GRVertex(2, MeasureGam)
+    xw = WRVertex(1, NeighLn(3-dir, MeaW))
+    yw = WRVertex(2, NeighLn(3-dir, MeaW))
+    dx = diff_x(xg-xw)
+    dy = diff_y(yg-yw)
+
+    tau1 = TVertex(1, NeighLn(1, MeaGin))
+    tau2 = TVertex(2, NeighLn(2, MeaGout))
+    tau3 = TVertex(3, NeighLn(3-dir, MeaW))
+
+    dt1 = Floor((tau3-tau2)*MxT/Beta)
+    if(dt1<0) then
+      dt1 = dt1 + MxT
+      factorM = factorM * (-1.d0)
+    endif
+
+    dt2 = Floor((tau1-tau3)*MxT/Beta)
+    if(dt2<0) then
+      dt2 = dt2 + MxT
+      factorM = factorM * (-1.d0)
+    endif
+    
+    factorM = factorM *CoefOfSymmetry(dx, dy)* CoefOfWeight(Order)*WeightLn(MeaW) &
+      & *WeightVertex(MeasureGam)* WeightLn(MeaGin)*WeightLn(MeaGout)
+
+    !------------------- accumulation -------------------------------------------------------
+    GamMC(Order, nloop, ityp, dx, dy, dt1, dt2) = GamMC(Order, nloop, ityp, dx, dy, dt1, dt2) &
+      & + Phase/factorM
+    GamSqMC(Order,nloop, ityp, dx, dy, dt1, dt2 ) = GamSqMC(Order,nloop, ityp, dx, dy, dt1, dt2) &
+      & + (Phase/factorM)**2.d0
+
+    !if(Order==0) then
+      !GamNorm = GamNorm + Phase
+    !endif
+    !if(Order==0) then
+      !Quan(1)=Quan(1)+Phase/factorM
+    !else
+      !Quan(Order)=Quan(Order)+Phase/factorM
+    !endif
+    !Norm(1)=Norm(1)+1/factorM
+
+    !===============  test variables =================================
+    TestData(Order) = TestData(Order)+ 1.d0/factorM
+    sumt = 0
+    do ikey = 1, 1+Order
+      sumt = sumt + TypeLn(WLnKey2Value(ikey))
+    enddo
+    if(sumt==Order+1) TestData(MCOrder+1+Order) = TestData(MCOrder+1+Order) +1.d0/factorM
+
+    !================================================================
+    !=============================================================
   endif
-
-  if(TypeVertex(MeasureGam)==5 .or. TypeVertex(MeasureGam)==6) then
-    typ = 11-TypeVertex(MeasureGam)
-  else if(TypeVertex(MeasureGam)==1 .or. TypeVertex(MeasureGam)==3) then
-    typ = TypeSp2Gam(1,1,spw,spw)
-  else if(TypeVertex(MeasureGam)==2 .or. TypeVertex(MeasureGam)==4) then
-    typ = TypeSp2Gam(2,2,spw,spw)
-  endif
-  ityp = (typ+1)/2
-
-  nloop = Mod(Floor(SignFermiloop/2.d0+0.5d0), 2)
-
-
-  !----- find the space and time variables for Gamma -------
-  xg = GRVertex(1, MeasureGam)
-  yg = GRVertex(2, MeasureGam)
-  xw = WRVertex(1, NeighLn(3-dir, MeaW))
-  yw = WRVertex(2, NeighLn(3-dir, MeaW))
-  dx = diff_x(xg-xw)
-  dy = diff_y(yg-yw)
-
-  tau1 = TVertex(1, NeighLn(1, MeaGin))
-  tau2 = TVertex(2, NeighLn(2, MeaGout))
-  tau3 = TVertex(3, NeighLn(3-dir, MeaW))
-
-  dt1 = Floor((tau3-tau2)*MxT/Beta)
-  if(dt1<0) then
-    dt1 = dt1 + MxT
-    factorM = factorM * (-1.d0)
-  endif
-
-  dt2 = Floor((tau1-tau3)*MxT/Beta)
-  if(dt2<0) then
-    dt2 = dt2 + MxT
-    factorM = factorM * (-1.d0)
-  endif
-  
-  factorM = factorM *CoefOfSymmetry(dx, dy)* CoefOfWeight(Order)*WeightLn(MeaW) &
-    & *WeightVertex(MeasureGam)* WeightLn(MeaGin)*WeightLn(MeaGout)
-
-  !------------------- accumulation -------------------------------------------------------
-  GamMC(Order, nloop, ityp, dx, dy, dt1, dt2) = GamMC(Order, nloop, ityp, dx, dy, dt1, dt2) &
-    & + Phase/factorM
-  GamSqMC(Order,nloop, ityp, dx, dy, dt1, dt2 ) = GamSqMC(Order,nloop, ityp, dx, dy, dt1, dt2) &
-    & + (Phase/factorM)**2.d0
-
-  !if(Order==0) then
-    !GamNorm = GamNorm + Phase
-  !endif
-
-  !===============  test variables =================================
-  TestData(Order) = TestData(Order)+ 1.d0/factorM
-  sumt = 0
-  do ikey = 1, 1+Order
-    sumt = sumt + TypeLn(WLnKey2Value(ikey))
-  enddo
-  if(sumt==Order+1) TestData(MCOrder+1+Order) = TestData(MCOrder+1+Order) +1.d0/factorM
-
-  !================================================================
   
         
 END SUBROUTINE measure
+
+!================   statistics =======================================
+
+SUBROUTINE statistics
+    implicit none
+    integer :: i,iorder
+    double precision :: x
+    double precision,allocatable :: temp(:,:)
+    StatNum=StatNum+1
+    if(StatNum>=MaxStat) then
+      allocate(temp(MaxStat,NObs))
+      temp=ObsRecord
+      MaxStat=MaxStat*2
+      if(MaxStat>MxNblck) then
+        write(logstr,*) "Too many memory blocks, even bigger than ",MxNblck
+        call write_log
+        stop
+      endif
+      allocate(ObsRecord(MaxStat,NObs))
+      ObsRecord=0.0
+      ObsRecord(1:MaxStat/2,:)=temp
+      deallocate(temp)
+    endif
+
+    do iorder = 0, MCOrder
+      i=iorder+1
+      QuanName(i)="(total/all spin up)"
+      Quan(i)=TestData(i)/TestData(MCOrder+i+1)
+      Norm(i)=1.d0
+      ObsRecord(StatNum,i)=Quan(i)/Norm(i)
+      call ERSTAT(ObsRecord(:,i),StatNum,amax,tmax,amin,tmin) 
+      Error(i)=(amax-amin)/2.d0;
+    enddo
+    write(11, *)
+
+    do iorder = 1, MCOrder
+      i=McOrder+1+iorder
+      QuanName(i)="(all spin up)/(0,all spin up)"
+      Quan(i)=TestData(i)/TestData(MCOrder+1)
+      Norm(i)=1.d0
+      ObsRecord(StatNum,i)=Quan(i)/Norm(i)
+      call ERSTAT(ObsRecord(:,i),StatNum,amax,tmax,amin,tmin) 
+      Error(i)=(amax-amin)/2.d0;
+    enddo
+
+    !do i=1,NObs;
+      !if(Norm(i)>1e-6) then
+        !x=Quan(i)/Norm(i)
+        !ObsRecord(StatNum,i)=x 
+        !call ERSTAT(ObsRecord(:,i),StatNum,amax,tmax,amin,tmin) 
+        !Error(i)=(amax-amin)/2.d0;
+      !endif
+    !enddo
+end SUBROUTINE
+
+! error bar analysis from 3/4 of the file
+subroutine ERSTAT(a,nre,amax,tmax,amin,tmin)
+!   Analizing 3/4 print-out
+   
+  integer, intent(IN) :: nre
+  integer :: i
+  double precision :: a(nre), amax, tmax, amin, tmin, aa
+
+  amax=-1.d200
+  amin=1.d200
+  DO i=nre/4+1, nre
+     aa=a(i)
+     if (aa > amax) then
+        amax=aa
+        tmax=i
+     end if
+     if (aa < amin) then
+        amin=aa
+        tmin=i
+     end if
+  END DO
+  tmax=tmax/nre
+  tmin=tmin/nre
+end subroutine ERSTAT
+
+!	call ERSTAT(record,prntout,amax,tmax,amin,tmin)
+!      print 704, record(prntout),( amax-amin)/2.
+! 704  format(6x,'record =',g12.5,4x,'+-',g10.3)  
 !!=======================================================================
 !!=======================================================================
 !!=======================================================================
