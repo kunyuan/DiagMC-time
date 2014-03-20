@@ -42,65 +42,36 @@ DOUBLE PRECISION FUNCTION weight_worm(dxg, dyg, dxw, dyw, dtau)
 END FUNCTION weight_worm
 
 
-!--------- worm weight function for W ---------
-complex*16 FUNCTION weight_worm_W(ityp, dx, dy, t1)
-  implicit none
-  integer, intent(in)  :: dx, dy, t1, ityp
-
-  weight_worm_W = weight_W(1, dx, dy, t1)
-  return
-END FUNCTION weight_worm_W
-
-!--------- worm weight function for Gamma ---------
-complex*16 FUNCTION weight_worm_Gam(ityp, dx, dy, t1, t2)
-  implicit none
-  integer, intent(in)  :: dx, dy, t1, t2, ityp
-
-  weight_worm_Gam = weight_Gam0(1, dx, dy)
-  return
-END FUNCTION weight_worm_Gam
-
 !--------- measure weight function for Gamma ---------
-complex*16 FUNCTION weight_meas_G(ityp, t1)
+complex*16 FUNCTION weight_meas_G(t1)
   implicit none
-  integer, intent(in)  :: t1, ityp
-  weight_meas_G = 1.d0
+  integer, intent(in)  :: t1
+  weight_meas_G = (1.d0, 0.d0)
   return
 END FUNCTION weight_meas_G
 
-complex*16 FUNCTION weight_meas_W(ityp, dx, dy, t1)
+complex*16 FUNCTION weight_meas_W(dx, dy, t1)
   implicit none
-  integer, intent(in)  :: dx, dy, t1, ityp
+  integer, intent(in)  :: dx, dy, t1
 
-  weight_meas_W = 1.d0
+  weight_meas_W = (1.d0, 0.d0)
   return
 END FUNCTION weight_meas_W
 
-complex*16 FUNCTION weight_meas_Gam(ityp, dx, dy, t1, t2)
+complex*16 FUNCTION weight_meas_Gam(ityp, dx, dy)
   implicit none
-  integer, intent(in)  :: dx, dy, t1, t2, ityp
+  integer, intent(in)  :: dx, dy, ityp
 
-  weight_meas_Gam = 0.d0
+  weight_meas_Gam = (0.d0, 0.d0)
   if(dx==0 .and. dy==0) then
     if(ityp ==1 .or. ityp == 2) then
-      weight_meas_Gam = 1.d0
-    else if(ityp == 3 .or. ityp == 4) then
-      weight_meas_Gam = 0.d0
+      weight_meas_Gam = (1.d0, 0.d0)
     else if(ityp == 5 .or. ityp == 6) then
-      weight_meas_Gam = 1.d0
+      weight_meas_Gam = (1.d0, 0.d0)
     endif
   endif
-  !================   test ================
-  !=======  r independent ================
-  !weight_meas_Gam=0.d0
-  !if(ityp ==1 .or. ityp == 2) then
-    !weight_meas_Gam = 1.d0
-  !else if(ityp == 3 .or. ityp == 4) then
-    !weight_meas_Gam = 0.d0
-  !else if(ityp == 5 .or. ityp == 6) then
-    !weight_meas_Gam = 1.d0
-  !endif
-  !======================================
+
+  !weight_meas_Gamma = weight_meas_Gam
 
   return
 END FUNCTION weight_meas_Gam

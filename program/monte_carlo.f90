@@ -168,44 +168,44 @@ SUBROUTINE markov(MaxSamp)
 
     if(IsWormPresent .and. rn()<0.50) call switch_ira_and_masha
 
-    !nr=rn()
-    !if(nr<Fupdate(1)) then
-      !call create_worm_along_wline          
-    !else if(nr<Fupdate(2)) then
-      !call delete_worm_along_wline                       
-    !else if(nr<Fupdate(3)) then
-      !!call create_worm_along_gline  
-    !else if(nr<Fupdate(4)) then
-      !!call delete_worm_along_gline  
-    !else if(nr<Fupdate(5)) then
-      !call move_worm_along_wline             
-    !else if(nr<Fupdate(6)) then
-      !call move_worm_along_gline              
-    !else if(nr<Fupdate(7)) then
-      !call add_interaction                  
-    !else if(nr<Fupdate(8)) then
-      !call remove_interaction             
-    !else if(nr<Fupdate(9)) then
-      !!call add_interaction_cross              
-    !else if(nr<Fupdate(10)) then
-      !!call remove_interaction_cross                  
-    !else if(nr<Fupdate(11)) then
-      !call reconnect                      
-    !else if(nr<Fupdate(12)) then
-      !!call change_gline_space          
-    !else if(nr<Fupdate(13)) then
-      !call change_wline_space         
-    !else if(nr<Fupdate(14)) then
-      !call change_Gamma_type     
-    !else if(nr<Fupdate(15)) then
-      !call move_measuring_index       
-    !else if(nr<Fupdate(16)) then
-      !call change_Gamma_time        
-    !else if(nr<Fupdate(17)) then
-      !call change_wline_isdelta       
-    !else if(nr<Fupdate(18)) then
-      !call change_Gamma_isdelta       
-    !endif
+    nr=rn()
+    if(nr<Fupdate(1)) then
+      call create_worm_along_wline          
+    else if(nr<Fupdate(2)) then
+      call delete_worm_along_wline                       
+    else if(nr<Fupdate(3)) then
+      !call create_worm_along_gline  
+    else if(nr<Fupdate(4)) then
+      !call delete_worm_along_gline  
+    else if(nr<Fupdate(5)) then
+      call move_worm_along_wline             
+    else if(nr<Fupdate(6)) then
+      call move_worm_along_gline              
+    else if(nr<Fupdate(7)) then
+      call add_interaction                  
+    else if(nr<Fupdate(8)) then
+      call remove_interaction             
+    else if(nr<Fupdate(9)) then
+      !call add_interaction_cross              
+    else if(nr<Fupdate(10)) then
+      !call remove_interaction_cross                  
+    else if(nr<Fupdate(11)) then
+      call reconnect                      
+    else if(nr<Fupdate(12)) then
+      !call change_gline_space          
+    else if(nr<Fupdate(13)) then
+      call change_wline_space         
+    else if(nr<Fupdate(14)) then
+      call change_Gamma_type     
+    else if(nr<Fupdate(15)) then
+      call move_measuring_index       
+    else if(nr<Fupdate(16)) then
+      call change_Gamma_time        
+    else if(nr<Fupdate(17)) then
+      call change_wline_isdelta       
+    else if(nr<Fupdate(18)) then
+      call change_Gamma_isdelta       
+    endif
 
     imc = imc + 1.0
 
@@ -219,24 +219,24 @@ SUBROUTINE markov(MaxSamp)
     endif
 
     !========================== REWEIGHTING =========================
-    !if(mod(imc,1.e7)==0) then
-      !write(logstr,*) "Reweighting order of diagrams..."
-      !call write_log
-      !x=sum(GamWormOrder(:))
-      !CoefOfWeight(:)=x/(GamWormOrder(:)+50.d0)
-      !write(logstr,*) "Weight:"
-      !call write_log
-      !do i=0,MCOrder
-        !write(logstr,"('Order ',i2,':',f10.4)") i, CoefOfWeight(i)
-        !call write_log
-      !enddo
-      !write(logstr,*) "Reweighting is done!"
-      !call write_log
-      !if(imc<=2.e7) then
-        !GamWormOrder=0.d0
-        !GamOrder=0.d0
-      !endif
-    !endif
+    if(mod(imc,1.e7)==0) then
+      write(logstr,*) "Reweighting order of diagrams..."
+      call write_log
+      x=sum(GamWormOrder(:))
+      CoefOfWeight(:)=x/(GamWormOrder(:)+50.d0)
+      write(logstr,*) "Weight:"
+      call write_log
+      do i=0,MCOrder
+        write(logstr,"('Order ',i2,':',f10.4)") i, CoefOfWeight(i)
+        call write_log
+      enddo
+      write(logstr,*) "Reweighting is done!"
+      call write_log
+      if(imc<=2.e7) then
+        GamWormOrder=0.d0
+        GamOrder=0.d0
+      endif
+    endif
     !================================================================
 
     if(mod(imc,1.e8)==0) then
@@ -2067,7 +2067,7 @@ COMPLEX*16 FUNCTION weight_gline(stat, tau, typ)
     !weight_gline = weight_G(typ, t)
   !else if(stat == 1) then
     !!  Have measuring vertex around
-    !weight_gline = weight_meas_G(typ, t)
+    !weight_gline = weight_meas_G(t)
   !else if(stat == 2) then
     !write(logstr, *) IsWormPresent, iupdate, "gline status == 2 or 3! Error!" 
     !call write_log
@@ -2087,7 +2087,7 @@ COMPLEX*16 FUNCTION weight_gline(stat, tau, typ)
 
   !---------------------- for test --------------------------------------
   if(stat >= 0 .and. stat<=1) then
-    weight_gline = weight_meas_G(1, t)
+    weight_gline = weight_meas_G(t)
   else if(stat==-1) then
     write(logstr, *) IsWormPresent, iupdate, "line status == -1! There is no weight!" 
     call write_log
@@ -2121,14 +2121,14 @@ COMPLEX*16 FUNCTION weight_wline(stat, isdelta, dx0, dy0, tau, typ)
   !if(stat == 0) then
     !if(isdelta==0) weight_wline = weight_W(typ, dx, dy, t)
     !if(isdelta==1) weight_wline = weight_W0(typ, dx, dy)
+  !else if(stat == 2) then
+    !! Have Ira or Masha around 
+    !if(isdelta==0) weight_wline = weight_W(1, dx, dy, t)
+    !if(isdelta==1) weight_wline = weight_W0(1, dx, dy)
   !else if(stat == 1 .or. stat==3) then
     !!  Have measuring vertex around
-    !if(isdelta==0) weight_wline = weight_meas_W(typ, dx, dy, t)
+    !if(isdelta==0) weight_wline = weight_meas_W(dx, dy, t)
     !if(isdelta==1) weight_wline = 0.d0
-  !else if(stat == 2) then
-    !! Have Ira or Masha around (no influence on G)
-    !if(isdelta==0) weight_wline = weight_worm_W(1, dx, dy, t)
-    !if(isdelta==1) weight_wline = weight_W0(1, dx, dy)
   !else if(stat==-1) then
     !write(logstr, *) IsWormPresent, iupdate, "line status == -1! There is no weight!" 
     !call write_log
@@ -2143,8 +2143,8 @@ COMPLEX*16 FUNCTION weight_wline(stat, isdelta, dx0, dy0, tau, typ)
 
   !---------------------- for test --------------------------------------
   if(stat >= 0 .and. stat<=3) then
-    if(isdelta==0) weight_wline = weight_meas_W(1, dx, dy, t)
-    if(isdelta==1) weight_wline = weight_meas_W(1, dx, dy, 0)
+    if(isdelta==0) weight_wline = weight_meas_W(dx, dy, t)
+    if(isdelta==1) weight_wline = weight_meas_W(dx, dy, 0)
   else if(stat==-1) then
     write(logstr, *) IsWormPresent, iupdate, "line status == -1! There is no weight!" 
     call write_log
@@ -2182,9 +2182,15 @@ COMPLEX*16 FUNCTION weight_vertex(stat, isdelta, dx0, dy0, dtau1, dtau2, typ)
       !if(isdelta==1) weight_vertex = weight_Gam0(typ, dx, dy)
       !!------------------------ end ----------------------------------
   !else if(stat==2) then
-    !weight_vertex = weight_worm_Gam(typ, dx, dy, t1, t2)
+    !!if(isdelta==0) weight_vertex = weight_Gam(1, dx, dy, t1, t2)
+    !!if(isdelta==1) weight_vertex = weight_Gam0(1, dx, dy)
+    !!----------------- for bare Gamma ------------------------------
+    !if(isdelta==0) weight_vertex = 0.d0
+    !if(isdelta==1) weight_vertex = weight_Gam0(1, dx, dy)
+    !!------------------------ end ----------------------------------
   !else if(stat==1 .or. stat==3) then
-    !weight_vertex = weight_meas_Gam(typ, dx, dy, t1, t2)
+    !if(isdelta==1) weight_vertex = weight_meas_Gam(typ, dx, dy)
+    !if(isdelta==0) weight_vertex = 0.d0
   !else if(stat==-1) then 
     !write(logstr, *) IsWormPresent, iupdate, "vertex status == -1! There is no weight!" 
     !call write_log
@@ -2197,7 +2203,7 @@ COMPLEX*16 FUNCTION weight_vertex(stat, isdelta, dx0, dy0, dtau1, dtau2, typ)
 
   !---------------------- for test --------------------------------------
   if(stat>=0 .and. stat<=3) then
-    weight_vertex = weight_meas_Gam(1, dx, dy, t1, t2)
+    weight_vertex = weight_meas_Gam(typ, dx, dy)
   else if(stat==-1) then
     write(logstr, *) IsWormPresent, iupdate, "vertex status == -1! There is no weight!" 
     call write_log
@@ -2332,28 +2338,24 @@ SUBROUTINE measure
     GamSqMC(Order,nloop, ityp, dx, dy, dt1, dt2 ) = GamSqMC(Order,nloop, ityp, dx, dy, dt1, dt2) &
       & + (Phase/factorM)**2.d0
 
-    !if(Order==0) then
-      !GamNorm = GamNorm + Phase
-    !endif
+    !===============  test variables =================================
     !if(Order==0) then
       !Quan(1)=Quan(1)+Phase/factorM
-    !else
-      !Quan(Order)=Quan(Order)+Phase/factorM
+      !Norm(1)=Norm(1)+1.d0/factorM
     !endif
-    !Norm(1)=Norm(1)+1/factorM
 
-    !===============  test variables =================================
-    !TestData(Order) = TestData(Order)+ 1.d0/factorM
-    !sumt = 0
-    !do ikey = 1, 1+Order
-      !sumt = sumt + TypeLn(WLnKey2Value(ikey))
-    !enddo
-    !if(sumt==Order+1) TestData(MCOrder+1+Order) = TestData(MCOrder+1+Order) +1.d0/factorM
+    TestData(Order) = TestData(Order)+ 1.d0/factorM
+    sumt = 0
+    do ikey = 1, 1+Order
+      sumt = sumt + TypeLn(WLnKey2Value(ikey))
+    enddo
+    if(sumt==Order+1) TestData(MCOrder+1+Order) = TestData(MCOrder+1+Order) +1.d0/factorM
 
-    Quan(1) = Quan(1) + Floor(rn()*2.d0)
-    Norm(1) = Norm(1) + 1.d0
+    !Quan(1) = Quan(1) + Floor(rn()*2.d0)
+    !Norm(1) = Norm(1) + 1.d0
     !================================================================
     !=============================================================
+
   endif
 END SUBROUTINE measure
 
@@ -2381,30 +2383,30 @@ SUBROUTINE statistics
       deallocate(temp)
     endif
 
-    !do iorder = 0, MCOrder
-      !i=iorder+1
-      !QuanName(i)="(tot/spin-up)"
-      !Quan(i)=TestData(iorder)/TestData(MCOrder+iorder+1)
-      !Norm(i)=1.d0
-      !ObsRecord(StatNum,i)=Quan(i)/Norm(i)
-      !call ERSTAT(ObsRecord(:,i),StatNum,amax,tmax,amin,tmin) 
-      !Error(i)=(amax-amin)/2.d0;
-    !enddo
+    do iorder = 0, MCOrder
+      i=iorder+1
+      QuanName(i)="(tot/spin-up)"
+      Quan(i)=TestData(iorder)/TestData(MCOrder+iorder+1)
+      Norm(i)=1.d0
+      ObsRecord(StatNum,i)=Quan(i)/Norm(i)
+      call ERSTAT(ObsRecord(:,i),StatNum,amax,tmax,amin,tmin) 
+      Error(i)=(amax-amin)/2.d0;
+    enddo
 
-    !do iorder = MCOrder+1, 2*MCOrder
-      !i= iorder+1
-      !QuanName(i)="(sp-up)/(order-1,sp-up)"
-      !Quan(i)=TestData(i)/TestData(i-1)
-      !Norm(i)=1.d0
-      !ObsRecord(StatNum,i)=Quan(i)/Norm(i)
-      !call ERSTAT(ObsRecord(:,i),StatNum,amax,tmax,amin,tmin) 
-      !Error(i)=(amax-amin)/2.d0;
-    !enddo
+    do iorder = MCOrder+1, 2*MCOrder
+      i= iorder+1
+      QuanName(i)="(sp-up)/(order-1,sp-up)"
+      Quan(i)=TestData(i)/TestData(i-1)
+      Norm(i)=1.d0
+      ObsRecord(StatNum,i)=Quan(i)/Norm(i)
+      call ERSTAT(ObsRecord(:,i),StatNum,amax,tmax,amin,tmin) 
+      Error(i)=(amax-amin)/2.d0;
+    enddo
 
-    QuanName(1)="random number"
-    ObsRecord(StatNum,1)= Quan(1)/Norm(1)
-    call ERSTAT(ObsRecord(:,1),StatNum,amax,tmax,amin,tmin) 
-    Error(1)=(amax-amin)/2.d0;
+    !QuanName(1)="random number"
+    !ObsRecord(StatNum,1)= Quan(1)/Norm(1)
+    !call ERSTAT(ObsRecord(:,1),StatNum,amax,tmax,amin,tmin) 
+    !Error(1)=(amax-amin)/2.d0;
 
     !do i=1,NObs;
       !if(Norm(i)>1e-6) then
