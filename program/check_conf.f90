@@ -530,11 +530,11 @@ SUBROUTINE check_weight
     if(StatusLn(i)<0)  cycle
     if(KindLn(i)==1) then
       tau = TVertex(2, NeighLn(2, i))-TVertex(1, NeighLn(1, i))
-      wln(i) = weight_line(StatusLn(i),IsDeltaLn(i),1,0,0, tau, TypeLn(i))
+      wln(i) = weight_gline(StatusLn(i), tau, TypeLn(i))
     else
       Gam1 = NeighLn(1,i);       Gam2 = NeighLn(2,i)
       tau = TVertex(3, NeighLn(2, i))-TVertex(3, NeighLn(1, i))
-      wln(i) = weight_line(StatusLn(i),IsDeltaLn(i),2,WRVertex(1, Gam1)-WRVertex(1, Gam2), &
+      wln(i) = weight_wline(StatusLn(i),IsDeltaLn(i),WRVertex(1, Gam1)-WRVertex(1, Gam2), &
         & WRVertex(2, Gam1)-WRVertex(2, Gam2), tau, TypeLn(i))
     endif
     weight = weight *wln(i)

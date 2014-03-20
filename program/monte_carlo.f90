@@ -334,16 +334,16 @@ SUBROUTINE create_worm_along_wline
 
   !------------ step4 : weight calculation ----------------------
   tau = TVertex(2, NeighLn(2, iGin))- TVertex(1, NeighLn(1, iGin))
-  WiGin  = weight_line(StatusLn(iGin),  IsDeltaLn(iGin), 1, 0, 0, tau, TypeLn(iGin))
+  WiGin  = weight_gline(StatusLn(iGin), tau, TypeLn(iGin))
 
   tau = TVertex(2, NeighLn(2, iGout))- TVertex(1, NeighLn(1, iGout))
-  WiGout = weight_line(StatusLn(iGout), IsDeltaLn(iGin), 1, 0, 0, tau, TypeLn(iGout))
+  WiGout = weight_gline(StatusLn(iGout), tau, TypeLn(iGout))
 
   tau = TVertex(2, NeighLn(2, jGin))- TVertex(1, NeighLn(1, jGin))
-  WjGin  = weight_line(StatusLn(jGin),  IsDeltaLn(iGin), 1, 0, 0, tau, TypeLn(jGin))
+  WjGin  = weight_gline(StatusLn(jGin), tau, TypeLn(jGin))
 
   tau = TVertex(2, NeighLn(2, jGout))- TVertex(1, NeighLn(1, jGout))
-  WjGout = weight_line(StatusLn(jGout), IsDeltaLn(iGin), 1, 0, 0, tau, TypeLn(jGout))
+  WjGout = weight_gline(StatusLn(jGout), tau, TypeLn(jGout))
 
   tau1 = TVertex(3, iGam)- TVertex(2, iGam)
   tau2 = TVertex(1, iGam)- TVertex(3, iGam)
@@ -356,7 +356,7 @@ SUBROUTINE create_worm_along_wline
     & GRVertex(2, jGam)-WRVertex(2, jGam), tau1, tau2, TypeVertex(jGam))
 
   tau = TVertex(3, jGam) - TVertex(3, iGam)
-  WWNew = weight_line(statW, IsDeltaLn(iWLn), 2, WRVertex(1, jGam)-WRVertex(1, iGam), &
+  WWNew = weight_wline(statW, IsDeltaLn(iWLn), WRVertex(1, jGam)-WRVertex(1, iGam), &
     & WRVertex(2, jGam)-WRVertex(2, iGam), tau, TypeLn(iWLn))
 
   tau = TVertex(3, jGam) - TVertex(3, iGam)
@@ -499,16 +499,16 @@ SUBROUTINE delete_worm_along_wline
 
   !------------ step4 : weight calculation ---------------------
   tau = TVertex(2, NeighLn(2, iGin))- TVertex(1, NeighLn(1, iGin))
-  WiGin  = weight_line(StatusLn(iGin),  IsDeltaLn(iGin), 1, 0, 0, tau, TypeLn(iGin))
+  WiGin  = weight_gline(StatusLn(iGin), tau, TypeLn(iGin))
 
   tau = TVertex(2, NeighLn(2, iGout))- TVertex(1, NeighLn(1, iGout))
-  WiGout = weight_line(StatusLn(iGout), IsDeltaLn(iGin), 1, 0, 0, tau, TypeLn(iGout))
+  WiGout = weight_gline(StatusLn(iGout), tau, TypeLn(iGout))
 
   tau = TVertex(2, NeighLn(2, jGin))- TVertex(1, NeighLn(1, jGin))
-  WjGin  = weight_line(StatusLn(jGin),  IsDeltaLn(iGin), 1, 0, 0, tau, TypeLn(jGin))
+  WjGin  = weight_gline(StatusLn(jGin), tau, TypeLn(jGin))
 
   tau = TVertex(2, NeighLn(2, jGout))- TVertex(1, NeighLn(1, jGout))
-  WjGout = weight_line(StatusLn(jGout), IsDeltaLn(iGin), 1, 0, 0, tau, TypeLn(jGout))
+  WjGout = weight_gline(StatusLn(jGout), tau, TypeLn(jGout))
 
   tau1 = TVertex(3, Ira)- TVertex(2, Ira)
   tau2 = TVertex(1, Ira)- TVertex(3, Ira)
@@ -521,7 +521,7 @@ SUBROUTINE delete_worm_along_wline
     & GRVertex(2, Masha)-WRVertex(2, Masha), tau1, tau2, typMasha)
 
   tau = TVertex(3, Masha) - TVertex(3, Ira)
-  WWNew = weight_line(statW, IsDeltaLn(iWLn), 2, WRVertex(1, Masha)-WRVertex(1, Ira), WRVertex(2, Masha)- &
+  WWNew = weight_wline(statW, IsDeltaLn(iWLn),WRVertex(1, Masha)-WRVertex(1, Ira), WRVertex(2, Masha)- &
     & WRVertex(2, Ira), tau, typW)
 
   Anew = Wi *Wj *WWNew *WiGin *WiGout *WjGin *WjGout
@@ -663,7 +663,7 @@ SUBROUTINE move_worm_along_wline
     GRVertex(2, jGam)-WRVertex(2, jGam), tau1, tau2, TypeVertex(jGam))
 
   tau = (-1.d0)**dir *(TVertex(3, iGam)-TVertex(3, jGam))
-  WW = weight_line(statW, IsDeltaLn(WLn), 2, WRVertex(1, iGam)-WRVertex(1, jGam), WRVertex(2, iGam) &
+  WW = weight_wline(statW, IsDeltaLn(WLn), WRVertex(1, iGam)-WRVertex(1, jGam), WRVertex(2, iGam) &
     & -WRVertex(2, jGam), tau, typW)
 
   Anew = WiGam *WjGam *WW 
@@ -843,17 +843,17 @@ SUBROUTINE move_worm_along_gline
   tau = TVertex(3, vertex2) - TVertex(3, vertex1)
   dx  = WRVertex(1, vertex2) - WRVertex(1, vertex1)
   dy  = WRVertex(2, vertex2) - WRVertex(2, vertex1)
-  WiW = weight_line(statiW, IsDeltaLn(iW), 2, dx, dy, tau, typiW)
+  WiW = weight_wline(statiW, IsDeltaLn(iW), dx, dy, tau, typiW)
 
   vertex1 = NeighLn(1, jW)
   vertex2 = NeighLn(2, jW)
   tau = TVertex(3, vertex2) - TVertex(3, vertex1)
   dx  = WRVertex(1, vertex2) - WRVertex(1, vertex1)
   dy  = WRVertex(2, vertex2) - WRVertex(2, vertex1)
-  WjW = weight_line(statjW, IsDeltaLn(jW), 2, dx, dy, tau, TypeLn(jW))
+  WjW = weight_wline(statjW, IsDeltaLn(jW), dx, dy, tau, TypeLn(jW))
 
   tau = TVertex(2, NeighLn(2, GLn)) - TVertex(1, NeighLn(1, GLn))
-  WG = weight_line(StatusLn(GLn), IsDeltaLn(GLn), 1, 0, 0, tau, typG)
+  WG = weight_gline(StatusLn(GLn), tau, typG)
 
   Anew = WiGam *WjGam *WiW *WjW *WG
   Aold = WeightVertex(iGam) *WeightVertex(jGam) *WeightLn(iW) *WeightLn(jW) *WeightLn(GLn)
@@ -1011,13 +1011,13 @@ SUBROUTINE add_interaction
   WB = weight_vertex(statB, 1, 0, 0, 0.d0, 0.d0, typGamB)  
 
   tau = (-1)**dir*(tauA - TVertex(3-dir, Ira))
-  WGIA = weight_line(statIA, -1, 1, 0, 0, tau, TypeLn(GIC))
+  WGIA = weight_gline(statIA, tau, TypeLn(GIC))
 
   tau = (-1)**dir*(tauB - TVertex(3-dir, Masha))
-  WGMB = weight_line(statMB, -1, 1, 0, 0, tau, TypeLn(GMB))
+  WGMB = weight_gline(statMB, tau, TypeLn(GMB))
 
   tau = (-1)**dirW*(tauA-tauB)
-  WWAB = weight_line(0, 0, 2, GRVertex(1, GamC)-GRVertex(1, GamD), &
+  WWAB = weight_wline(0, 0, GRVertex(1, GamC)-GRVertex(1, GamD), &
     & GRVertex(2,GamC)-GRVertex(2,GamD), tau, typAB)
   
   !---  change the topology for the configuration after update --
@@ -1084,9 +1084,9 @@ SUBROUTINE add_interaction
 
   !------------- weight calculation -----------------------------
   tau = (-1)**dir*(TVertex(dir, GamC)-tauA)
-  WGAC = weight_line(statAC, IsDeltaLn(GIC), 1, 0, 0, tau, TypeLn(GIC))
+  WGAC = weight_gline(statAC, tau, TypeLn(GIC))
   tau = (-1)**dir*(TVertex(dir, GamD)-tauB)
-  WGBD = weight_line(statBD, IsDeltaLn(GMD), 1, 0, 0, tau, TypeLn(GMD))
+  WGBD = weight_gline(statBD, tau, TypeLn(GMD))
 
   tau1 = TVertex(3,MeasureGam)-TVertex(2,MeasureGam)
   tau2 = TVertex(1,MeasureGam)-TVertex(3,MeasureGam)
@@ -1254,9 +1254,9 @@ SUBROUTINE remove_interaction
 
   !-------------- step4 : weight calculation --------------------
   tau = (-1)**dir *(TVertex(dir, GamC)-TVertex(3-dir, Ira))
-  WGIC = weight_line(statIC, IsDeltaLn(GAC), 1, 0, 0, tau, TypeLn(GAC))
+  WGIC = weight_gline(statIC, tau, TypeLn(GAC))
   tau = (-1)**dir *(TVertex(dir, GamD)-TVertex(3-dir, Masha))
-  WGMD = weight_line(statMD, IsDeltaLn(GBD), 1, 0, 0, tau, TypeLn(GBD))
+  WGMD = weight_gline(statMD, tau, TypeLn(GBD))
 
   tau1 = TVertex(3,MeasureGam)-TVertex(2,MeasureGam)
   tau2 = TVertex(1,MeasureGam)-TVertex(3,MeasureGam)
@@ -1375,9 +1375,8 @@ SUBROUTINE reconnect
   statMB = gline_stat(StatusVertex(GamB), StatusVertex(Ira))
 
   !-------------- step3 : weight calculation --------------------
-  !COMPLEX*16 FUNCTION weight_line(stat, isdelta, knd, dx0, dy0, tau, typ)
-  WGIA=weight_line(statIA,0,1,0,0,TVertex(3-dir,Masha)-TVertex(dir,GamA),TypeLn(GIA))
-  WGMB=weight_line(statMB,0,1,0,0,TVertex(3-dir,Ira)-TVertex(dir,GamB),TypeLn(GMB))
+  WGIA=weight_gline(statIA,TVertex(3-dir,Masha)-TVertex(dir,GamA),TypeLn(GIA))
+  WGMB=weight_gline(statMB,TVertex(3-dir,Ira)-TVertex(dir,GamB),TypeLn(GMB))
 
   Anew=WGIA*WGMB*(-1.d0)
   Aold=WeightLn(GIA)*WeightLn(GMB)
@@ -1466,7 +1465,7 @@ SUBROUTINE change_wline_space
     WjGam = weight_vertex(StatusVertex(jGam),IsDeltaVertex(jGam),GRVertex(1, jGam)-xwj, &
       & GRVertex(2, jGam)-ywj, T6-T5, T4-T6, TypeVertex(jGam))
 
-    WW = weight_line(StatusLn(iWLn),IsDeltaLn(iWLn),2, xwi-xwj, ywi-ywj,T3-T6,TypeLn(iWLn))
+    WW = weight_wline(StatusLn(iWLn),IsDeltaLn(iWLn),xwi-xwj, ywi-ywj,T3-T6,TypeLn(iWLn))
 
 
     Anew = WiGam*WjGam*WW
@@ -1549,7 +1548,7 @@ SUBROUTINE change_Gamma_type
     & GRVertex(2, iGam)-WRVertex(2, iGam), tau1, tau2, typGam)
 
   tau = TVertex(3, NeighLn(2, iWLn))-TVertex(3, NeighLn(1, iWLn))
-  WW  = weight_line(StatusLn(iWLn), IsDeltaLn(iWLn), 2, WRVertex(1, iGam)-WRVertex(1, jGam), &
+  WW  = weight_wline(StatusLn(iWLn), IsDeltaLn(iWLn), WRVertex(1, iGam)-WRVertex(1, jGam), &
     & WRVertex(2, iGam)-WRVertex(2, jGam), tau, typW) 
 
   Anew = WW *WGam
@@ -1644,14 +1643,14 @@ SUBROUTINE move_measuring_index
     & GRVertex(2, iGam)-WRVertex(2, iGam), tau1, tau2, TypeVertex(iGam))
 
   tau = TVertex(3, NeighLn(2, iW)) - TVertex(3, NeighLn(1, iW))
-  WiW = weight_line(statiW, IsDeltaLn(iW), 2, WRVertex(1, NeighLn(2, iW))-WRVertex(1, NeighLn(1,iW)),&
+  WiW = weight_wline(statiW, IsDeltaLn(iW), WRVertex(1, NeighLn(2, iW))-WRVertex(1, NeighLn(1,iW)),&
     & WRVertex(2, NeighLn(2,iW))-WRVertex(2, NeighLn(1,iW)), tau, TypeLn(iW))
 
   tau = TVertex(2, NeighLn(2, iGin)) - TVertex(1, NeighLn(1, iGin))
-  WiGin = weight_line(statiGin, IsDeltaLn(iGin), 1, 0, 0, tau, TypeLn(iGin))
+  WiGin = weight_gline(statiGin, tau, TypeLn(iGin))
 
   tau = TVertex(2, NeighLn(2, iGout)) - TVertex(1, NeighLn(1, iGout))
-  WiGout = weight_line(statiGout, IsDeltaLn(iGout), 1, 0, 0, tau, TypeLn(iGout))
+  WiGout = weight_gline(statiGout, tau, TypeLn(iGout))
 
   tau1 = TVertex(3, jGam)-TVertex(2, jGam)
   tau2 = TVertex(1, jGam)-TVertex(3, jGam)
@@ -1659,14 +1658,14 @@ SUBROUTINE move_measuring_index
     & WRVertex(2, jGam), tau1, tau2, TypeVertex(jGam))
 
   tau = TVertex(3, NeighLn(2, jW)) - TVertex(3, NeighLn(1, jW))
-  WjW = weight_line(statjW, 0, 2, WRVertex(1, NeighLn(2, jW))-WRVertex(1, NeighLn(1,jW)),&
+  WjW = weight_wline(statjW, 0, WRVertex(1, NeighLn(2, jW))-WRVertex(1, NeighLn(1,jW)),&
     & WRVertex(2, NeighLn(2,jW))-WRVertex(2, NeighLn(1,jW)), tau, TypeLn(jW))
 
   tau = TVertex(2, NeighLn(2, jGin)) - TVertex(1, NeighLn(1, jGin))
-  WjGin = weight_line(statjGin, IsDeltaLn(jGin), 1, 0, 0, tau, TypeLn(jGin))
+  WjGin = weight_gline(statjGin, tau, TypeLn(jGin))
 
   tau = TVertex(2, NeighLn(2, jGout)) - TVertex(1, NeighLn(1, jGout))
-  WjGout = weight_line(statjGout, IsDeltaLn(jGout), 1, 0, 0, tau, TypeLn(jGout))
+  WjGout = weight_gline(statjGout, tau, TypeLn(jGout))
 
   Anew = WjGam *WjW *WjGin *WjGout *WiGam *WiW *WiGin *WiGout
   Aold = WeightVertex(iGam) *WeightLn(iW) *WeightLn(iGin) *WeightLn(iGout) &
@@ -1783,12 +1782,12 @@ SUBROUTINE change_Gamma_time
     if(dir==1 .or. dir==2) then
       jGam = NeighLn(dir, iLn)
       tau = (-1)**dir *(TVertex(dir, jGam) - newtau)
-      WLn = weight_line(StatusLn(iLn),IsDeltaLn(iLn),1,0,0, tau, TypeLn(iLn))
+      WLn = weight_gline(StatusLn(iLn), tau, TypeLn(iLn))
     else if(dir==3) then
       dirGam = DirecVertex(iGam)
       jGam = NeighLn(3-dirGam, iLn)
       tau = (-1)**dirGam*(newtau -TVertex(3, jGam))
-      WLn = weight_line(StatusLn(iLn),IsDeltaLn(iLn),2, WRVertex(1, iGam)-WRVertex(1, jGam), &
+      WLn = weight_wline(StatusLn(iLn),IsDeltaLn(iLn), WRVertex(1, iGam)-WRVertex(1, jGam), &
         & WRVertex(2, iGam)-WRVertex(2, jGam), tau, TypeLn(iLn))
     endif
     Anew = WGam*WLn
@@ -1798,18 +1797,18 @@ SUBROUTINE change_Gamma_time
     iLn1 = NeighVertex(1, iGam)
     jGam = NeighLn(1, iLn1)
     tau = newtau - TVertex(1, jGam)
-    WLn1 = weight_line(StatusLn(iLn1),IsDeltaLn(iLn1),1,0,0, tau, TypeLn(iLn1))
+    WLn1 = weight_gline(StatusLn(iLn1), tau, TypeLn(iLn1))
 
     iLn2 = NeighVertex(2, iGam)
     jGam = NeighLn(2, iLn2)
     tau = TVertex(2, jGam) - newtau
-    WLn2 = weight_line(StatusLn(iLn2),IsDeltaLn(iLn2),1,0,0, tau, TypeLn(iLn2))
+    WLn2 = weight_gline(StatusLn(iLn2), tau, TypeLn(iLn2))
 
     iLn3 = NeighVertex(3, iGam)
     dirGam = DirecVertex(iGam)
     jGam = NeighLn(3-dirGam, iLn3)
     tau = (-1)**dirGam*(newtau -TVertex(3, jGam))
-    WLn3 = weight_line(StatusLn(iLn3),IsDeltaLn(iLn3),2, WRVertex(1, iGam)-WRVertex(1, jGam), &
+    WLn3 = weight_wline(StatusLn(iLn3),IsDeltaLn(iLn3), WRVertex(1, iGam)-WRVertex(1, jGam), &
       & WRVertex(2, iGam)-WRVertex(2, jGam), tau, TypeLn(iLn3))
 
     Anew = WGam *WLn1 *WLn2 *WLn3
@@ -1894,11 +1893,11 @@ SUBROUTINE change_wline_isdelta
   
   !------- step4 : weight calculation -------------------
   if(backforth==0) then
-    WW = weight_line(StatusLn(iWLn), 1, 2, WRVertex(1, jGam)-WRVertex(1, iGam), &
+    WW = weight_wline(StatusLn(iWLn), 1, WRVertex(1, jGam)-WRVertex(1, iGam), &
       & WRVertex(2, jGam)-WRVertex(2, iGam), 0.d0, TypeLn(iWLn)) 
   else
     dtau = t3jGam - t3iGam
-    WW = weight_line(StatusLn(iWLn), 0, 2, WRVertex(1, jGam)-WRVertex(1, iGam), &
+    WW = weight_wline(StatusLn(iWLn), 0, WRVertex(1, jGam)-WRVertex(1, iGam), &
       & WRVertex(2, jGam)-WRVertex(2, iGam), dtau, TypeLn(iWLn)) 
   endif
 
@@ -1908,10 +1907,10 @@ SUBROUTINE change_wline_isdelta
     & GRVertex(2, jGam)-WRVertex(2, jGam), tau1, tau2, TypeVertex(jGam))
 
   dtau = t2jGam-TVertex(1, NeighLn(1, jGin))
-  WjGin = weight_line(StatusLn(jGin), IsDeltaLn(jGin), 1, 0, 0, dtau, TypeLn(jGin)) 
+  WjGin = weight_gline(StatusLn(jGin), dtau, TypeLn(jGin)) 
 
   dtau = TVertex(2, NeighLn(2, jGout))-t1jGam
-  WjGout = weight_line(StatusLn(jGout), IsDeltaLn(jGout), 1, 0, 0, dtau, TypeLn(jGout)) 
+  WjGout = weight_gline(StatusLn(jGout), dtau, TypeLn(jGout)) 
 
   Anew = WjGam *WW *WjGin *WjGout
   Aold = WeightLn(iWLn) *WeightVertex(jGam) *WeightLn(jGin) *WeightLn(jGout)
@@ -2009,10 +2008,10 @@ SUBROUTINE change_gamma_isdelta
     & GRVertex(2, iGam)-WRVertex(2, iGam), tau1, tau2, TypeVertex(iGam))
 
   dtau = t2iGam-TVertex(1, NeighLn(1, iGin))
-  WiGin = weight_line(StatusLn(iGin), IsDeltaLn(iGin), 1, 0, 0, dtau, TypeLn(iGin)) 
+  WiGin = weight_gline(StatusLn(iGin), dtau, TypeLn(iGin)) 
 
   dtau = TVertex(2, NeighLn(2, iGout))-t1iGam
-  WiGout = weight_line(StatusLn(iGout), IsDeltaLn(iGout), 1, 0, 0, dtau, TypeLn(iGout)) 
+  WiGout = weight_gline(StatusLn(iGout), dtau, TypeLn(iGout)) 
 
   Anew = WiGam *WiGin *WiGout
   Aold = WeightVertex(iGam) *WeightLn(iGin) *WeightLn(iGout)
@@ -2072,11 +2071,62 @@ END SUBROUTINE switch_ira_and_masha
 !============================== WEIGHTS =============================
 !====================================================================
 
-!-------- the weight of a line -------------------------
-! dx = x2-x1;  dy = y2- y1; tau = tau2-tau1
-COMPLEX*16 FUNCTION weight_line(stat, isdelta, knd, dx0, dy0, tau, typ)
+!-------- the weight of a gline -------------------------
+! tau = tau2-tau1
+COMPLEX*16 FUNCTION weight_gline(stat, tau, typ)
   implicit none
-  integer :: stat, isdelta, knd, dx, dy, typ
+  integer :: stat, typ
+  double precision :: tau
+  integer :: t
+
+  t = Floor(tau*MxT/Beta)
+
+  !if(stat == 0) then
+    !weight_gline = weight_G(typ, t)
+  !else if(stat == 1) then
+    !!  Have measuring vertex around
+    !weight_gline = weight_meas_G(typ, t)
+  !else if(stat == 2) then
+    !write(logstr, *) IsWormPresent, iupdate, "gline status == 2 or 3! Error!" 
+    !call write_log
+    !call print_config
+    !stop
+  !else if(stat==-1) then
+    !write(logstr, *) IsWormPresent, iupdate, "line status == -1! There is no weight!" 
+    !call write_log
+    !call print_config
+    !stop
+  !else
+    !write(logstr, *) IsWormPresent, iupdate, "line status error!", stat
+    !call write_log
+    !call print_config
+    !stop
+  !endif
+
+  !---------------------- for test --------------------------------------
+  if(stat >= 0 .and. stat<=1) then
+    weight_gline = weight_meas_G(1, t)
+  else if(stat==-1) then
+    write(logstr, *) IsWormPresent, iupdate, "line status == -1! There is no weight!" 
+    call write_log
+    stop
+  else
+    write(logstr, *) IsWormPresent, iupdate, "line status error!", stat
+    call write_log
+    stop
+  endif
+  !------------------------ end -----------------------------------------
+
+  return
+END FUNCTION weight_gline
+
+
+
+!-------- the weight of a wline -------------------------
+! dx = x2-x1;  dy = y2- y1; tau = tau2-tau1
+COMPLEX*16 FUNCTION weight_wline(stat, isdelta, dx0, dy0, tau, typ)
+  implicit none
+  integer :: stat, isdelta, dx, dy, typ
   integer :: dx0, dy0
   double precision :: tau
   integer :: t
@@ -2087,22 +2137,16 @@ COMPLEX*16 FUNCTION weight_line(stat, isdelta, knd, dx0, dy0, tau, typ)
   dy = diff_y(dy0)
 
   !if(stat == 0) then
-    !if(knd==1) weight_line = weight_G(typ, t)
-    !if(knd==2 .and. isdelta==0) weight_line = weight_W(typ, dx, dy, t)
-    !if(knd==2 .and. isdelta==1) weight_line = weight_W0(typ, dx, dy)
+    !if(isdelta==0) weight_wline = weight_W(typ, dx, dy, t)
+    !if(isdelta==1) weight_wline = weight_W0(typ, dx, dy)
   !else if(stat == 1 .or. stat==3) then
     !!  Have measuring vertex around
-    !if(knd==1) weight_line = weight_meas_G(typ, t)
-    !if(knd==2) weight_line = weight_meas_W(typ, dx, dy, t)
+    !if(isdelta==0) weight_wline = weight_meas_W(typ, dx, dy, t)
+    !if(isdelta==1) weight_wline = 0.d0
   !else if(stat == 2) then
     !! Have Ira or Masha around (no influence on G)
-    !if(knd==2) weight_line = weight_worm_W(typ, dx, dy, t)
-    !if(knd==1) then
-      !write(logstr, *) IsWormPresent, iupdate, "gline status == 2 or 3! Error!" 
-      !call write_log
-      !call print_config
-      !stop
-    !endif
+    !if(isdelta==0) weight_wline = weight_worm_W(1, dx, dy, t)
+    !if(isdelta==1) weight_wline = weight_W0(1, dx, dy)
   !else if(stat==-1) then
     !write(logstr, *) IsWormPresent, iupdate, "line status == -1! There is no weight!" 
     !call write_log
@@ -2117,9 +2161,8 @@ COMPLEX*16 FUNCTION weight_line(stat, isdelta, knd, dx0, dy0, tau, typ)
 
   !---------------------- for test --------------------------------------
   if(stat >= 0 .and. stat<=3) then
-    if(knd==1) weight_line = weight_meas_G(1, t)
-    if(knd==2 .and. isdelta==0) weight_line = weight_meas_W(1, dx, dy, t)
-    if(knd==2 .and. isdelta==1) weight_line = weight_meas_W(1, dx, dy, 0)
+    if(isdelta==0) weight_wline = weight_meas_W(1, dx, dy, t)
+    if(isdelta==1) weight_wline = weight_meas_W(1, dx, dy, 0)
   else if(stat==-1) then
     write(logstr, *) IsWormPresent, iupdate, "line status == -1! There is no weight!" 
     call write_log
@@ -2132,7 +2175,7 @@ COMPLEX*16 FUNCTION weight_line(stat, isdelta, knd, dx0, dy0, tau, typ)
   !------------------------ end -----------------------------------------
 
   return
-END FUNCTION weight_line
+END FUNCTION weight_wline
 
 !-------- the weight of a vertex -------------------------
 !dx = xg-xw;  dy = yg-yw; dtau1 = tau3-tau2; dtau2 = tau1-tau3
