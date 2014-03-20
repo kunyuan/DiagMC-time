@@ -9,49 +9,69 @@
 SUBROUTINE print_status
     implicit none
     integer :: iorder,i
+    character*30 :: updatename(Nupdate)
 
     open(36, access="append", file=trim(title4)//".log")
 
+    write(36, *) "================================================"
     write(36,*) "MC steps: ",imc
     call time_elapse
     write(36,251) t_elap
   251 format(' Printing interval:',f16.7,2x,'s')
     write(36,*) "Efficiency: ",imc/t_elap," per second."
+    write(36, *) "------------------------------------------------"
 
     write(36,*) 'Statistics Number =', StatNum
-    do i=1,NObs
-      if(Norm(i)>1e-6) then
-        write(36,"(A,f15.6,'+/-',f15.6)") QuanName(i),Quan(i)/Norm(i),Error(i) 
-      endif
-    enddo
 
-    write(36, *) " 1: create worm along wline"
-    write(36, *) " 2: delete worm along wline"
-    write(36, *) " 3: create worm along gline"
-    write(36, *) " 4: delete worm along gline"
-    write(36, *) " 5: move worm along wline"
-    write(36, *) " 6: move worm along gline"
-    write(36, *) " 7: add interaction"
-    write(36, *) " 8: remove interaction"
-    write(36, *) " 9: add interaction cross"
-    write(36, *) "10: remove interaction cross"
-    write(36, *) "11: reconnect"
-    write(36, *) "12: shift gline in space"
-    write(36, *) "13: shift wline in space"
-    write(36, *) "14: change Gamma type"
-    write(36, *) "15: move measuring index"
-    write(36, *) "16: change Gamma time"
-    write(36, *) "17: change wline isdelta"
-    write(36, *) "18: change Gamma isdelta"
-    do iorder = 0, MCOrder
-      write(36, *) "Order", iorder
-      do i = 1, Nupdate
-        if(ProbProp(iorder, i)/=0.d0) then
-          write(36, '(i3,3f17.5)') i, ProbProp(iorder, i), ProbAcc(iorder, i), ProbAcc(iorder, i)/ProbProp(iorder, i)
-        endif
-      enddo
-      write(36, *)
-    enddo
+    i = 1
+    if(Norm(i)>1e-6) then
+      write(36,"(i2, A,f15.6,'+/-',f15.6)") i,QuanName(i),Quan(i)/Norm(i),Error(i)*sqrt(Norm(i))
+    endif
+
+    !do i=1,MCOrder+1
+      !if(Norm(i)>1e-6) then
+        !write(36,"(i2, A,f15.6,'+/-',f15.6)") i-1,QuanName(i),Quan(i)/Norm(i),Error(i) 
+      !endif
+    !enddo
+
+    !do i=MCOrder+2,2*MCOrder+1
+      !if(Norm(i)>1e-6) then
+        !write(36,"(i2, A,f15.6,'+/-',f15.6)") i-MCOrder-1,QuanName(i),Quan(i)/Norm(i),Error(i) 
+      !endif
+    !enddo
+    !write(36, *) "------------------------------------------------"
+
+    !updatename(1)= " 1: create worm along wline"
+    !updatename(2)= " 2: delete worm along wline"
+    !updatename(3)= " 3: create worm along gline"
+    !updatename(4)= " 4: delete worm along gline"
+    !updatename(5)= " 5: move worm along wline"
+    !updatename(6)= " 6: move worm along gline"
+    !updatename(7)= " 7: add interaction"
+    !updatename(8)= " 8: remove interaction"
+    !updatename(9)= " 9: add interaction cross"
+    !updatename(10)= "10: remove interaction cross"
+    !updatename(11)= "11: reconnect"
+    !updatename(12)= "12: shift gline in space"
+    !updatename(13)= "13: shift wline in space"
+    !updatename(14)= "14: change Gamma type"
+    !updatename(15)= "15: move measuring index"
+    !updatename(16)= "16: change Gamma time"
+    !updatename(17)= "17: change wline isdelta"
+    !updatename(18)= "18: change Gamma isdelta"
+
+    !do iorder = 0, MCOrder
+      !write(36, *) "Order", iorder
+      !do i = 1, Nupdate
+        !if(ProbProp(iorder, i)/=0.d0) then
+          !write(36, '(A,3f17.5)') updatename(i), ProbProp(iorder, i), ProbAcc(iorder, i), &
+            !& ProbAcc(iorder, i)/ProbProp(iorder, i)
+        !endif
+      !enddo
+      !write(36, *)
+    !enddo
+    write(36, *) "================================================"
+    write(36, *)
 
     close(36)
 END SUBROUTINE print_status
@@ -1235,22 +1255,6 @@ END SUBROUTINE output_Quantities
   !close(35)
   !close(36)
 !END SUBROUTINE output_GamMC
-
-SUBROUTINE write_monte_carlo_test
-  implicit none
-  integer :: iorder
-  !open(11, access="append", file=trim(title3)//"_test.dat")
-  !do iorder = 0, MCOrder
-    !write(11, *) iorder, "conf(total)/conf(all spin up)", TestData(iorder)/TestData(MCOrder+iorder+1)
-  !enddo
-  !write(11, *)
-
-  !do iorder = 1, MCOrder
-    !write(11, *) iorder, "conf(all spin up)/conf(0, all spin up)", TestData(MCOrder+iorder+1)/TestData(MCOrder+1)
-  !enddo
-  !close(11)
-  !return
-END SUBROUTINE
 
 !!================================================================
 !!================================================================

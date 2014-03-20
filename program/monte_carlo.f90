@@ -167,44 +167,45 @@ SUBROUTINE markov(MaxSamp)
     isamp=isamp+seg
 
     if(IsWormPresent .and. rn()<0.50) call switch_ira_and_masha
-    nr=rn()
-    if(nr<Fupdate(1)) then
-      call create_worm_along_wline          
-    else if(nr<Fupdate(2)) then
-      call delete_worm_along_wline                       
-    else if(nr<Fupdate(3)) then
-      !call create_worm_along_gline  
-    else if(nr<Fupdate(4)) then
-      !call delete_worm_along_gline  
-    else if(nr<Fupdate(5)) then
-      call move_worm_along_wline             
-    else if(nr<Fupdate(6)) then
-      call move_worm_along_gline              
-    else if(nr<Fupdate(7)) then
-      call add_interaction                  
-    else if(nr<Fupdate(8)) then
-      call remove_interaction             
-    else if(nr<Fupdate(9)) then
-      !call add_interaction_cross              
-    else if(nr<Fupdate(10)) then
-      !call remove_interaction_cross                  
-    else if(nr<Fupdate(11)) then
-      call reconnect                      
-    else if(nr<Fupdate(12)) then
-      !call change_gline_space          
-    else if(nr<Fupdate(13)) then
-      call change_wline_space         
-    else if(nr<Fupdate(14)) then
-      call change_Gamma_type     
-    else if(nr<Fupdate(15)) then
-      call move_measuring_index       
-    else if(nr<Fupdate(16)) then
-      call change_Gamma_time        
-    else if(nr<Fupdate(17)) then
-      call change_wline_isdelta       
-    else if(nr<Fupdate(18)) then
-      call change_Gamma_isdelta       
-    endif
+
+    !nr=rn()
+    !if(nr<Fupdate(1)) then
+      !call create_worm_along_wline          
+    !else if(nr<Fupdate(2)) then
+      !call delete_worm_along_wline                       
+    !else if(nr<Fupdate(3)) then
+      !!call create_worm_along_gline  
+    !else if(nr<Fupdate(4)) then
+      !!call delete_worm_along_gline  
+    !else if(nr<Fupdate(5)) then
+      !call move_worm_along_wline             
+    !else if(nr<Fupdate(6)) then
+      !call move_worm_along_gline              
+    !else if(nr<Fupdate(7)) then
+      !call add_interaction                  
+    !else if(nr<Fupdate(8)) then
+      !call remove_interaction             
+    !else if(nr<Fupdate(9)) then
+      !!call add_interaction_cross              
+    !else if(nr<Fupdate(10)) then
+      !!call remove_interaction_cross                  
+    !else if(nr<Fupdate(11)) then
+      !call reconnect                      
+    !else if(nr<Fupdate(12)) then
+      !!call change_gline_space          
+    !else if(nr<Fupdate(13)) then
+      !call change_wline_space         
+    !else if(nr<Fupdate(14)) then
+      !call change_Gamma_type     
+    !else if(nr<Fupdate(15)) then
+      !call move_measuring_index       
+    !else if(nr<Fupdate(16)) then
+      !call change_Gamma_time        
+    !else if(nr<Fupdate(17)) then
+      !call change_wline_isdelta       
+    !else if(nr<Fupdate(18)) then
+      !call change_Gamma_isdelta       
+    !endif
 
     imc = imc + 1.0
 
@@ -215,28 +216,27 @@ SUBROUTINE markov(MaxSamp)
       call print_status
       call print_config
       call check_config
-      call write_monte_carlo_test
     endif
 
     !========================== REWEIGHTING =========================
-    if(mod(imc,1.e7)==0) then
-      write(logstr,*) "Reweighting order of diagrams..."
-      call write_log
-      x=sum(GamWormOrder(:))
-      CoefOfWeight(:)=x/(GamWormOrder(:)+50.d0)
-      write(logstr,*) "Weight:"
-      call write_log
-      do i=0,MCOrder
-        write(logstr,"('Order ',i2,':',f10.4)") i, CoefOfWeight(i)
-        call write_log
-      enddo
-      write(logstr,*) "Reweighting is done!"
-      call write_log
-      if(imc<=2.e7) then
-        GamWormOrder=0.d0
-        GamOrder=0.d0
-      endif
-    endif
+    !if(mod(imc,1.e7)==0) then
+      !write(logstr,*) "Reweighting order of diagrams..."
+      !call write_log
+      !x=sum(GamWormOrder(:))
+      !CoefOfWeight(:)=x/(GamWormOrder(:)+50.d0)
+      !write(logstr,*) "Weight:"
+      !call write_log
+      !do i=0,MCOrder
+        !write(logstr,"('Order ',i2,':',f10.4)") i, CoefOfWeight(i)
+        !call write_log
+      !enddo
+      !write(logstr,*) "Reweighting is done!"
+      !call write_log
+      !if(imc<=2.e7) then
+        !GamWormOrder=0.d0
+        !GamOrder=0.d0
+      !endif
+    !endif
     !================================================================
 
     if(mod(imc,1.e8)==0) then
@@ -245,7 +245,6 @@ SUBROUTINE markov(MaxSamp)
       !call statistics
       call write_monte_carlo_conf
       call write_monte_carlo_data
-      !call write_monte_carlo_test
       write(logstr,*) "Writing data and configuration done!"
       call write_log
     endif
@@ -290,7 +289,6 @@ SUBROUTINE create_worm_along_wline
 
   !------------ step1 : check if worm is present ------------------
   if(IsWormPresent .eqv. .true.)   return
-  !ProbProp(iupdate) = ProbProp(iupdate) + 1
 
   !------------ step2 : propose the new config ------------------
   iWLn = generate_wline()
@@ -383,7 +381,7 @@ SUBROUTINE create_worm_along_wline
   Pacc = Pacc *Pupdate(2)/Pupdate(1)
 
   !------------ step5 : accept the update -----------------------
-  ProbProp(Order, iupdate) = ProbProp(Order, iupdate) + 1
+  ProbProp(Order, 1) = ProbProp(Order, 1) + 1
 
   if(rn()<=Pacc) then
 
@@ -446,7 +444,6 @@ SUBROUTINE delete_worm_along_wline
 
   !------------ step1 : check if worm is present ------------------
   if(IsWormPresent .eqv. .false.)  return
-  !ProbProp(iupdate) = ProbProp(iupdate) + 1
 
   if(NeighVertex(3, Ira)/= NeighVertex(3, Masha))   return
 
@@ -546,7 +543,7 @@ SUBROUTINE delete_worm_along_wline
   Pacc = Pacc *0.5d0/(CoefOfWorm*WeightWorm*(Order+1.d0)) 
   Pacc = Pacc *Pupdate(1)/Pupdate(2)
 
-  ProbProp(Order, iupdate) = ProbProp(Order, iupdate) + 1
+  ProbProp(Order, 2) = ProbProp(Order, 2) + 1
   !------------ step5 : accept the update -----------------------
   if(rn()<=Pacc) then
 
@@ -666,7 +663,7 @@ SUBROUTINE move_worm_along_wline
   Pacc = Pacc *WWorm/WeightWorm
 
   !------- step5 : accept the update --------------------
-  ProbProp(Order, iupdate) = ProbProp(Order, iupdate) + 1
+  ProbProp(Order, 5) = ProbProp(Order, 5) + 1
   if(rn()<=Pacc) then
 
     !------ update diagram info ---------------
@@ -732,7 +729,6 @@ SUBROUTINE move_worm_along_gline
 
   !------- step1 : check if worm is present -------------
   if(IsWormPresent .eqv. .false.)   return
-  !ProbProp(iupdate) = ProbProp(iupdate) + 1
 
   !------- step2 : propose a new config -----------------
   iGam = Ira;  iW = NeighVertex(3, iGam)
@@ -862,7 +858,7 @@ SUBROUTINE move_worm_along_gline
   Pacc = Pacc *WWorm/WeightWorm
 
   !------- step5 : accept the update --------------------
-  ProbProp(Order, iupdate) = ProbProp(Order, iupdate) + 1
+  ProbProp(Order, 6) = ProbProp(Order, 6) + 1
   if(rn()<=Pacc) then
 
     !----- update the diagram info -------------- 
@@ -1095,7 +1091,7 @@ SUBROUTINE add_interaction
   Pacc = Pacc *Pupdate(8)/Pupdate(7)
 
   !------------ step5 : accept the update -----------------------
-  ProbProp(Order, iupdate) = ProbProp(Order, iupdate) + 1
+  ProbProp(Order-1, 7) = ProbProp(Order-1, 7) + 1
   if(rn()<=Pacc) then
 
     !--------------- update the diagram info --------------------
@@ -1267,7 +1263,7 @@ SUBROUTINE remove_interaction
   Pacc = Pacc *Pupdate(7)/Pupdate(8)
 
   !------------ step5 : accept the update -----------------------
-  ProbProp(Order, iupdate) = ProbProp(Order, iupdate) + 1
+  ProbProp(Order+1, 8) = ProbProp(Order+1, 8) + 1
   if(rn()<=Pacc) then
 
     !--------------- update the diagram info --------------------
@@ -1376,7 +1372,7 @@ SUBROUTINE reconnect
   call weight_ratio(Pacc, sgn, Anew, Aold)
 
   !------- step5 : accept the update --------------------
-  ProbProp(Order, iupdate) = ProbProp(Order, iupdate) + 1
+  ProbProp(Order, 11) = ProbProp(Order, 11) + 1
   if(rn()<=Pacc) then
 
     !--------------- update the diagram info --------------------
@@ -1424,7 +1420,6 @@ SUBROUTINE change_wline_space
 
     !------- step1 : check if worm is present -------------
     if(IsWormPresent .eqv. .true.)    return
-    !ProbProp(iupdate) = ProbProp(iupdate) + 1
 
     !------- step2 : propose a new config -----------------
     iWLn=generate_wline()
@@ -1466,7 +1461,7 @@ SUBROUTINE change_wline_space
     call weight_ratio(Pacc, sgn, Anew, Aold)
 
     !------- step5 : accept the update --------------------
-    ProbProp(Order, iupdate) = ProbProp(Order, iupdate) + 1
+    ProbProp(Order, 13) = ProbProp(Order, 13) + 1
     if(rn()<=Pacc) then
 
       !------ update the diagram info -------------------
@@ -1501,7 +1496,6 @@ SUBROUTINE change_Gamma_type
 
   !------- step1 : check if worm is present -------------
   if(IsWormPresent .eqv. .true.)    return
-  !ProbProp(iupdate) = ProbProp(iupdate) + 1
 
   !------- step2 : propose a new config -----------------
   iGam = generate_vertex()
@@ -1549,7 +1543,7 @@ SUBROUTINE change_Gamma_type
   call weight_ratio(Pacc, sgn, Anew, Aold)
 
   !------- step5 : accept the update --------------------
-  ProbProp(Order, iupdate) = ProbProp(Order, iupdate) + 1
+  ProbProp(Order, 14) = ProbProp(Order, 14) + 1
 
   if(rn()<=Pacc) then
 
@@ -1586,7 +1580,6 @@ SUBROUTINE move_measuring_index
 
   !------- step1 : check if worm is present -------------
   if(IsWormPresent .eqv. .true.)    return
-  !ProbProp(iupdate) = ProbProp(iupdate) + 1
 
   !------- step2 : propose a new config -----------------
   iGam = generate_vertex()
@@ -1683,7 +1676,7 @@ SUBROUTINE move_measuring_index
   call weight_ratio(Pacc, sgn, Anew, Aold)
 
   !------- step5 : accept the update --------------------
-  ProbProp(Order, iupdate) = ProbProp(Order, iupdate) + 1
+  ProbProp(Order, 15) = ProbProp(Order, 15) + 1
 
   if(rn()<=Pacc) then
 
@@ -1732,7 +1725,6 @@ SUBROUTINE change_Gamma_time
 
   !------- step1 : check if worm is present -------------
   if(IsWormPresent .eqv. .true.)    return
-  !ProbProp(iupdate) = ProbProp(iupdate) + 1
 
   !------- step2 : propose a new config -----------------
   iGam=generate_vertex()
@@ -1810,7 +1802,7 @@ SUBROUTINE change_Gamma_time
   call weight_ratio(Pacc, sgn, Anew, Aold)
 
   !------- step5 : accept the update --------------------
-  ProbProp(Order, iupdate) = ProbProp(Order, iupdate) + 1
+  ProbProp(Order, 16) = ProbProp(Order, 16) + 1
 
   if(rn()<=Pacc) then
 
@@ -1848,7 +1840,6 @@ SUBROUTINE change_wline_isdelta
 
   !------- step1 : check if worm is present -------------
   if(IsWormPresent .eqv. .true.)    return
-  !ProbProp(iupdate) = ProbProp(iupdate) + 1
 
   !------- step2 : propose a new config -----------------
   iWLn = generate_wline()
@@ -1915,7 +1906,7 @@ SUBROUTINE change_wline_isdelta
   endif
 
   !------- step5 : accept the update --------------------
-  ProbProp(Order, iupdate) = ProbProp(Order, iupdate) + 1
+  ProbProp(Order, 17) = ProbProp(Order, 17) + 1
 
   if(rn()<=Pacc) then
 
@@ -1956,7 +1947,6 @@ SUBROUTINE change_gamma_isdelta
 
   !------- step1 : check if worm is present -------------
   if(IsWormPresent .eqv. .true.)    return
-  !ProbProp(iupdate) = ProbProp(iupdate) + 1
 
   !------- step2 : propose a new config -----------------
   iGam = generate_vertex()
@@ -2017,7 +2007,7 @@ SUBROUTINE change_gamma_isdelta
   endif
 
   !------- step5 : accept the update --------------------
-  ProbProp(Order, iupdate) = ProbProp(Order, iupdate) + 1
+  ProbProp(Order, 18) = ProbProp(Order, 18) + 1
 
   if(rn()<=Pacc) then
 
@@ -2353,13 +2343,15 @@ SUBROUTINE measure
     !Norm(1)=Norm(1)+1/factorM
 
     !===============  test variables =================================
-    TestData(Order) = TestData(Order)+ 1.d0/factorM
-    sumt = 0
-    do ikey = 1, 1+Order
-      sumt = sumt + TypeLn(WLnKey2Value(ikey))
-    enddo
-    if(sumt==Order+1) TestData(MCOrder+1+Order) = TestData(MCOrder+1+Order) +1.d0/factorM
+    !TestData(Order) = TestData(Order)+ 1.d0/factorM
+    !sumt = 0
+    !do ikey = 1, 1+Order
+      !sumt = sumt + TypeLn(WLnKey2Value(ikey))
+    !enddo
+    !if(sumt==Order+1) TestData(MCOrder+1+Order) = TestData(MCOrder+1+Order) +1.d0/factorM
 
+    Quan(1) = Quan(1) + Floor(rn()*2.d0)
+    Norm(1) = Norm(1) + 1.d0
     !================================================================
     !=============================================================
   endif
@@ -2382,32 +2374,37 @@ SUBROUTINE statistics
         call write_log
         stop
       endif
+      deallocate(ObsRecord)
       allocate(ObsRecord(MaxStat,NObs))
       ObsRecord=0.0
       ObsRecord(1:MaxStat/2,:)=temp
       deallocate(temp)
     endif
 
-    do iorder = 0, MCOrder
-      i=iorder+1
-      QuanName(i)="(total/all spin up)"
-      Quan(i)=TestData(i)/TestData(MCOrder+i+1)
-      Norm(i)=1.d0
-      ObsRecord(StatNum,i)=Quan(i)/Norm(i)
-      call ERSTAT(ObsRecord(:,i),StatNum,amax,tmax,amin,tmin) 
-      Error(i)=(amax-amin)/2.d0;
-    enddo
-    write(11, *)
+    !do iorder = 0, MCOrder
+      !i=iorder+1
+      !QuanName(i)="(tot/spin-up)"
+      !Quan(i)=TestData(iorder)/TestData(MCOrder+iorder+1)
+      !Norm(i)=1.d0
+      !ObsRecord(StatNum,i)=Quan(i)/Norm(i)
+      !call ERSTAT(ObsRecord(:,i),StatNum,amax,tmax,amin,tmin) 
+      !Error(i)=(amax-amin)/2.d0;
+    !enddo
 
-    do iorder = 1, MCOrder
-      i=McOrder+1+iorder
-      QuanName(i)="(all spin up)/(0,all spin up)"
-      Quan(i)=TestData(i)/TestData(MCOrder+1)
-      Norm(i)=1.d0
-      ObsRecord(StatNum,i)=Quan(i)/Norm(i)
-      call ERSTAT(ObsRecord(:,i),StatNum,amax,tmax,amin,tmin) 
-      Error(i)=(amax-amin)/2.d0;
-    enddo
+    !do iorder = MCOrder+1, 2*MCOrder
+      !i= iorder+1
+      !QuanName(i)="(sp-up)/(order-1,sp-up)"
+      !Quan(i)=TestData(i)/TestData(i-1)
+      !Norm(i)=1.d0
+      !ObsRecord(StatNum,i)=Quan(i)/Norm(i)
+      !call ERSTAT(ObsRecord(:,i),StatNum,amax,tmax,amin,tmin) 
+      !Error(i)=(amax-amin)/2.d0;
+    !enddo
+
+    QuanName(1)="random number"
+    ObsRecord(StatNum,1)= Quan(1)/Norm(1)
+    call ERSTAT(ObsRecord(:,1),StatNum,amax,tmax,amin,tmin) 
+    Error(1)=(amax-amin)/2.d0;
 
     !do i=1,NObs;
       !if(Norm(i)>1e-6) then
@@ -2421,7 +2418,7 @@ end SUBROUTINE
 
 ! error bar analysis from 3/4 of the file
 subroutine ERSTAT(a,nre,amax,tmax,amin,tmin)
-!   Analizing 3/4 print-out
+!   Analizing 2/3 print-out
    
   integer, intent(IN) :: nre
   integer :: i
@@ -2429,7 +2426,7 @@ subroutine ERSTAT(a,nre,amax,tmax,amin,tmin)
 
   amax=-1.d200
   amin=1.d200
-  DO i=nre/4+1, nre
+  DO i=nre/3+1, nre
      aa=a(i)
      if (aa > amax) then
         amax=aa
