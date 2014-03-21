@@ -520,38 +520,38 @@ END SUBROUTINE check_irreducibility
 
 SUBROUTINE check_weight
   implicit none
-  integer :: i, Gam1, Gam2, G, G1, G2, W
+  integer :: i, ikey, Gam1, Gam2, G, G1, G2, W
   double precision :: tau1, tau2, tau
   complex*16 :: weight
-  complex*16 :: wln(MxNLn), wgam(MxNVertex)
+  complex*16 :: gln(NGLn), wln(NWLn), gam(NVertex)
 
-  weight = 1.d0
-  do i = 1, MxNLn
-    if(StatusLn(i)<0)  cycle
-    if(KindLn(i)==1) then
-      tau = TVertex(2, NeighLn(2, i))-TVertex(1, NeighLn(1, i))
-      wln(i) = weight_gline(StatusLn(i), tau, TypeLn(i))
-    else
-      Gam1 = NeighLn(1,i);       Gam2 = NeighLn(2,i)
-      tau = TVertex(3, NeighLn(2, i))-TVertex(3, NeighLn(1, i))
-      wln(i) = weight_wline(StatusLn(i),IsDeltaLn(i),WRVertex(1, Gam1)-WRVertex(1, Gam2), &
-        & WRVertex(2, Gam1)-WRVertex(2, Gam2), tau, TypeLn(i))
-    endif
-    weight = weight *wln(i)
+  weight = (1.d0, 0.d0)
+  do ikey = 1, NGLn
+    i = GLnKey2Value(ikey)
+    Gam1 = NeighLn(1,i);       Gam2 = NeighLn(2,i)
+    tau = TVertex(2, Gam2)-TVertex(1,Gam1)
+    gln(ikey) = weight_gline(StatusLn(i),tau,TypeLn(i))
+    weight = weight *gln(ikey)
   enddo
 
-  do i = 1, MxNVertex
-    if(StatusVertex(i)<0)  cycle
-    G1 = NeighVertex(1, i);           G2 = NeighVertex(2, i)
-    W = NeighVertex(3, i)
+  do ikey = 1, NWLn
+    i = WLnKey2Value(ikey)
+    Gam1 = NeighLn(1,i);       Gam2 = NeighLn(2,i)
+    wln(ikey) = weight_wline(StatusLn(i),IsDeltaLn(i), WRVertex(1, Gam1)-WRVertex(1, Gam2), &
+      & WRVertex(2, Gam1)-WRVertex(2, Gam2), TVertex(3, Gam2)-TVertex(3,Gam1), TypeLn(i))
+    weight = weight *wln(ikey)
+  enddo
+
+  do ikey = 1, NVertex
+    i = VertexKey2Value(ikey)
     tau1 = TVertex(3, i)-TVertex(2, i)
     tau2 = TVertex(1, i)-TVertex(3, i)
-    wgam(i) = weight_vertex(StatusVertex(i), IsDeltaVertex(i), GRVertex(1, i)-WRVertex(1, i), &
+    gam(ikey) = weight_vertex(StatusVertex(i), IsDeltaVertex(i), GRVertex(1, i)-WRVertex(1, i), &
       & GRVertex(2, i)-WRVertex(2, i), tau1, tau2, TypeVertex(i))
-    weight = weight *wgam(i)
+    weight = weight *gam(ikey)
   enddo
 
-  weight = weight *(1.d0/Beta)**Order *SignFermiLoop
+  weight = weight*(1.d0/Beta)**Order *SignFermiLoop
 
   if(abs(Phase*WeightCurrent - weight)>1.d-5) then
     write(36, *) "================================================="
@@ -562,14 +562,19 @@ SUBROUTINE check_weight
     write(36, *) "current weight", Phase*WeightCurrent
     write(36, *) Order, Beta
 
-    do i = 1, MxNLn
-      if(StatusLn(i)<0)  cycle
-      write(36, *) i, wln(i), WeightLn(i)
+    do ikey = 1, NGLn
+      i = GLnKey2Value(ikey)
+      write(36, *) i, gln(ikey), WeightLn(i)
     enddo
 
-    do i = 1, MxNVertex
-      if(StatusVertex(i)<0)  cycle
-      write(36, *) i, wgam(i), WeightVertex(i)
+    do ikey = 1, NWLn
+      i = WLnKey2Value(ikey)
+      write(36, *) i, wln(ikey), WeightLn(i)
+    enddo
+
+    do ikey = 1, NVertex
+      i = VertexKey2Value(ikey)
+      write(36, *) i, gam(ikey), WeightVertex(i)
     enddo
     write(36, *) "================================================="
 

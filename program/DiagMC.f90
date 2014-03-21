@@ -76,7 +76,8 @@ PROGRAM MAIN
   allocate(Chi(0:Lx-1, 0:Ly-1, 0:MxT-1))
 
   allocate(GamMC(0:MCOrder,0:1,1:NTypeGam/2, 0:Lx-1, 0:Ly-1, 0:MxT-1, 0:MxT-1))
-  allocate(GamSqMC(0:MCOrder,0:1,1:NTypeGam/2, 0:Lx-1, 0:Ly-1, 0:MxT-1, 0:MxT-1))
+  allocate(ReGamSqMC(0:MCOrder,0:1,1:NTypeGam/2, 0:Lx-1, 0:Ly-1, 0:MxT-1, 0:MxT-1))
+  allocate(ImGamSqMC(0:MCOrder,0:1,1:NTypeGam/2, 0:Lx-1, 0:Ly-1, 0:MxT-1, 0:MxT-1))
 
   MaxStat=1024
   allocate(ObsRecord(1:MaxStat,1:NObs))
@@ -101,9 +102,8 @@ INCLUDE "basic_function.f90"
 INCLUDE "self_consistent.f90"
 INCLUDE "monte_carlo.f90"
 INCLUDE "check_conf.f90"
-!INCLUDE "analytic_integration.f90"
+INCLUDE "analytic_integration.f90"
 INCLUDE "read_write_data.f90"
-!INCLUDE "statistics.f90"
 
 
 
@@ -255,7 +255,7 @@ SUBROUTINE monte_carlo
   double precision :: WR, GamR
 
   call read_GWGamma
-  call calculate_GamNormWeight   ! need to be updated
+  call calculate_GamNormWeight  
   
   call initialize_markov
 
@@ -267,7 +267,6 @@ SUBROUTINE monte_carlo
     !-------- throw away some configurations to thermalize -----------
     IsToss=.true.
     call markov(Ntoss)
-    !call print_config
 
     call time_elapse
     t_simu = t_elap
@@ -298,10 +297,16 @@ SUBROUTINE monte_carlo
   GamOrder(:) = 0.d0
   GamWormOrder(:) = 0.d0
 
-  GamMC(:,:,:,:,:,:,:) = 0.d0
-  GamSqMC(:,:,:,:,:,:,:) = 0.d0
-  GamNorm = 0.d0
+  GamMC(:,:,:,:,:,:,:) = (0.d0, 0.d0)
+  ReGamSqMC(:,:,:,:,:,:,:) = 0.d0
+  ImGamSqMC(:,:,:,:,:,:,:) = 0.d0
+  GamNorm = (0.d0, 0.d0)
   TestData(:)=0.d0
+
+  do i = 1, MCOrder+1
+    QuanName(i)="(total conf)"
+    Norm(i) = 1.d0
+  enddo
 
   mc_version = 0
 
@@ -372,9 +377,17 @@ SUBROUTINE test_subroutine
       !write(11,*) y, histy(y)/N, SpatialWeight(2,y)
     !enddo
     !close(11)
+
     !========  test drawing subroutine =====================
-    call initialize_markov
-    call print_config
+    !call initialize_markov
+    !call print_config
+
+    !======== analytic_integration =========================
+    call read_GWGamma
+    call calculate_Gam1
+    call output_Gam1
+
+    return
 END SUBROUTINE
 
 

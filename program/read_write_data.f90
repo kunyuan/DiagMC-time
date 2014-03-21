@@ -470,48 +470,6 @@ END FUNCTION site_num
 !!================= READ/WRITE CONFIGURATIONS ====================
 !!================================================================
 
-!SUBROUTINE read_first_Gamma
-  !implicit none
-  !integer :: ix, iy, ityp, iomega1, iomega2
-
-  !open(104, status='old', file=trim(title1)//"_first_order_Gamma.dat")
-  !read(104, *)  GamNormWeight
-  !do ix = 0, dLx
-  !do iy = 0, dLy
-    !do ityp = 1, ntypGa
-      !do iomega1 = -MxOmegaDiag, MxOmegaDiag
-        !do iomega2 = 0, MxOmegaDiag
-          !read(104, *) Gam1MR(ix, iy, ityp, iomega1, iomega2) 
-        !enddo
-      !enddo
-    !enddo
-  !enddo
-  !enddo
-  !close(104)
-!END SUBROUTINE read_first_Gamma
-
-
-
-!SUBROUTINE write_first_Gamma
-  !implicit none
-  !integer :: ix, iy, ityp, iomega1, iomega2
-
-  !open(104, status='replace', file=trim(title1)//"_first_order_Gamma.dat")
-  !write(104, *)  GamNormWeight
-  !do ix = 0, dLx
-  !do iy = 0, dLy
-    !do ityp = 1, ntypGa
-      !do iomega1 = -MxOmegaDiag, MxOmegaDiag
-        !do iomega2 = 0, MxOmegaDiag
-          !write(104, *) Gam1MR(ix, iy, ityp, iomega1, iomega2) 
-        !enddo
-      !enddo
-    !enddo
-  !enddo
-  !enddo
-  !close(104)
-!END SUBROUTINE write_first_Gamma
-
 
 SUBROUTINE read_GWGamma
   implicit none
@@ -626,7 +584,8 @@ SUBROUTINE write_monte_carlo_data
             do itopo = 0, 1
               do iorder = 0, MCOrder
                 write(104)  GamMC(iorder, itopo, ityp, ix, iy, it1, it2)
-                write(104)  GamSqMC(iorder, itopo, ityp, ix, iy, it1, it2)
+                write(104)  ReGamSqMC(iorder, itopo, ityp, ix, iy, it1, it2)
+                write(104)  ImGamSqMC(iorder, itopo, ityp, ix, iy, it1, it2)
               enddo
             enddo
           enddo
@@ -656,6 +615,8 @@ SUBROUTINE read_monte_carlo_data
             do itopo = 0, 1
               do iorder = 0, MCOrder
                 read(105)  GamMC(iorder, itopo, ityp, ix, iy, it1, it2)
+                read(105)  ReGamSqMC(iorder, itopo, ityp, ix, iy, it1, it2)
+                read(105)  ImGamSqMC(iorder, itopo, ityp, ix, iy, it1, it2)
               enddo
             enddo
           enddo
@@ -997,264 +958,105 @@ END SUBROUTINE output_Quantities
 
 
 
-!SUBROUTINE output_prob_MC
-  !implicit none
-  !integer :: omega, omega1, omega2, ityp, iorder, iloop
-  !integer :: iconf, i, j, iobs, iomega
-  !double precision :: Ga0R,GaMR1, GaCR1, GaMR2, GaMR3
-  !double precision :: Norm
+SUBROUTINE output_GamMC
+  implicit none
+  integer :: i, j, iorder, it1, it2
+  double precision :: rerr, ierr, rpercenterr, ipercenterr, norm
+  complex*16 :: gam, gamn 
+  double precision :: rgam2, igam2
 
-  !open(33, access="append", file=trim(title3)//"_prob_MC.dat")
-  !!open(34, access="append", file=trim(title3)//"_over_complete_1_2.dat")
-  !!open(35, access="append", file=trim(title3)//"_over_complete_3_4.dat")
-  !!open(36, access="append", file=trim(title3)//"_over_complete_7_8.dat")
-  !!open(37, access="append", file=trim(title3)//"_over_complete_9_10.dat")
+  open(34, access="append", file=trim(title3)//"_Gam_matrix_MC.dat")
+  open(35, access="append", file=trim(title3)//"_Gam_MC.dat")
 
-  !write(33, *) "============================================"
-  !write(33, *) "Beta", Beta, "Lx, Ly", Lx, Ly, "Order", MCOrder, "Seed",Seed
-  !write(33, *) " 1: create worm along wline"
-  !write(33, *) " 2: delete worm along wline"
-  !write(33, *) " 3: create worm along gline"
-  !write(33, *) " 4: delete worm along gline"
-  !write(33, *) " 5: move worm along wline"
-  !write(33, *) " 6: move worm along gline"
-  !write(33, *) " 7: add interaction"
-  !write(33, *) " 8: remove interaction"
-  !write(33, *) " 9: add interaction cross"
-  !write(33, *) "10: remove interaction cross"
-  !write(33, *) "11: reconnect"
-  !write(33, *) "12: shift gline in space"
-  !write(33, *) "13: shift wline in space"
-  !write(33, *) "14: change Gamma type"
-  !write(33, *) "15: move measuring index"
+  write(34, *) "============================================"
+  write(34, *) "Beta", Beta, "Lx, Ly", Lx, Ly, "Order", MCOrder, "Seed",Seed
+  write(34, *) imc, Z_normal, GamNormWeight, GamNorm
 
-  !write(33, *) "MC", imc, "Measure", ime
-  !do iorder = 0, MCOrder
-    !write(33, *) "Order", iorder
-    !do i = 1, Nupdate
-      !if(ProbProp(iorder, i)/=0.d0) then
-        !write(33, *) i, ProbProp(iorder, i), ProbAcc(iorder, i), ProbAcc(iorder, i)/ProbProp(iorder, i)
-      !endif
-    !enddo
-    !write(33, *)
-  !enddo
-  !write(33, *)
+  write(35, *) "============================================"
+  write(35, *) "Beta", Beta, "Lx, Ly", Lx, Ly, "Order", MCOrder, "Seed",Seed
+  write(35, *) imc, Z_normal, GamNormWeight, GamNorm
 
-  !write(33, *)  "Physical configurations for different orders"
-  !do iorder = 0, MCOrder
-    !!if(iorder ==0) then
-      !!write(33, *) iorder, GamOrder(iorder), GamWormOrder(iorder), Gam0Bubble
-    !!else
-      !!write(33, *) iorder, GamOrder(iorder), GamWormOrder(iorder)
-    !!endif
-    !write(33, *) iorder, GamOrder(iorder), GamWormOrder(iorder)
-  !enddo
-  !write(33, *) 
+  norm = GamNormWeight*Z_normal/GamNorm
 
-  !write(33, *)  "Average Weight Ratios"
-  !do iorder = 0, MCOrder
-    !write(33, *) iorder, 2, AveWeightRatio(iorder, 1)/ProbProp(iorder,2)
-    !write(33, *) iorder, 4, AveWeightRatio(iorder, 2)/ProbProp(iorder,4)
-  !enddo
-  !write(33, *) 
+  write(34, *) "Order 1, dx=0, dy=0, real part"
+  do it1 = 0, MxT-1
+    do it2 = 0, MxT-1
+      gam = GamMC(1, 0, 1, 0, 0, it1, it2)/Z_normal
+      gamn = gam*norm
+      write(34, '(f14.8)', advance='no') real(gamn)
+    enddo
+    write(34, *) 
+  enddo
 
-  !!write(33, *)  "Histogram for omega on W"
-  !!do omega = -MxOmega, MxOmega
-    !!if(HistoOmegaW(omega)/=0.d0) then
-      !!write(33, *) omega, HistoOmegaW(omega)
-    !!endif
-  !!enddo
-
-  !!if(ProbAcc(1)/=0.d0 .and. ProbAcc(2)/=0.d0) then
-    !!write(34, *) ime, imc, (ProbAcc(1)-ProbAcc(2))/sqrt(ProbAcc(1)+ProbAcc(2))
-  !!endif
-
-  !!if(ProbAcc(3)/=0.d0 .and. ProbAcc(4)/=0.d0) then
-    !!write(35, *) ime, imc, (ProbAcc(3)-ProbAcc(4))/sqrt(ProbAcc(3)+ProbAcc(4))
-  !!endif
-
-  !!if(ProbAcc(7)/=0.d0 .and. ProbAcc(8)/=0.d0) then
-    !!write(36, *) ime, imc, (ProbAcc(7)-ProbAcc(8))/sqrt(ProbAcc(7)+ProbAcc(8))
-  !!endif
-
-  !!if(ProbAcc(9)/=0.d0 .and. ProbAcc(10)/=0.d0) then
-    !!write(37, *) ime, imc, (ProbAcc(9)-ProbAcc(10))/sqrt(ProbAcc(10)+ProbAcc(9))
-  !!endif
-
-  !close(33)
-  !!close(34)
-  !!close(35)
-  !!close(36)
-  !!close(37)
-!END SUBROUTINE output_prob_MC
+  write(34, *) "Order 1, dx=0, dy=0, imag part"
+  do it1 = 0, MxT-1
+    do it2 = 0, MxT-1
+      gam = GamMC(1, 0, 1, 0, 0, it1, it2)/Z_normal
+      gamn = gam*norm
+      write(34, '(f14.8)', advance='no') dimag(gamn)
+    enddo
+    write(34, *) 
+  enddo
+  write(34, *) 
 
 
-!SUBROUTINE output_GamMC
-  !implicit none
-  !integer :: iconf, i, j, iorder, iomega, iomega2
-  !double precision :: err, percenterr, norm
-  !double precision :: gam1, gam2, gamn
+  do iorder = 1, MCOrder
+    write(35, *) "Order", iorder
+    write(35, *) "dx = 0, dy = 0"
+    do it1 = 0, MxT-1
+      it2 = 0
+      gam = GamMC(iorder, 0, 1, 0, 0, it1, it2)/Z_normal
 
-  !open(34, access="append", file=trim(title3)//"_Gamma_MC_matrix.dat")
-  !open(35, access="append", file=trim(title3)//"_Gamma_MC.dat")
-  !open(36, access="append", file=trim(title3)//"_Gamma_order2_MC.dat")
+      rgam2 = ReGamSqMC(iorder,0, 1, 0, 0, it1, it2)/Z_normal
+      rerr = sqrt(abs(rgam2)-(real(gam))**2.d0)/sqrt(Z_normal-1)
+      if(abs(real(gam))<1.d-30) then
+        rpercenterr = 0.d0
+      else
+        rpercenterr = rerr/abs(real(gam))
+      endif
 
-  !write(34, *) "============================================"
-  !write(34, *) "Beta", Beta, "Lx, Ly", Lx, Ly, "Order", MCOrder, "Seed",Seed
-  !write(34, *) imc, ime, GamNormWeight, GamNorm
+      igam2 = ImGamSqMC(iorder,0, 1, 0, 0, it1, it2)/Z_normal
+      ierr = sqrt(abs(igam2)-(dimag(gam))**2.d0)/sqrt(Z_normal-1)
+      if(abs(dimag(gam))<1.d-30) then
+        ipercenterr = 0.d0
+      else
+        ipercenterr = ierr/abs(dimag(gam))
+      endif
 
-  !write(35, *) "============================================"
-  !write(35, *) "Beta", Beta, "Lx, Ly", Lx, Ly, "Order", MCOrder, "Seed",Seed
-  !write(35, *) imc, ime, GamNormWeight, GamNorm
+      gamn = gam*norm
+      write(35, '(i3,f15.6,"+/-",f10.6,"    +i",f15.6,"+/-",f10.6)') it1, real(gamn),rpercenterr, &
+        & dimag(gamn), ipercenterr
+    enddo
+    write(35, *)
+  enddo
 
-  !write(36, *) "============================================"
-  !write(36, *) "Beta", Beta, "Lx, Ly", Lx, Ly, "Order", MCOrder, "Seed",Seed
-  !write(36, *) imc, ime, GamNormWeight, GamNorm
-
-  !norm = GamNormWeight*ime/GamNorm
-
-  !write(34, *) "Order 1, dx=0, dy=0"
-  !do iomega = -MxOmegaDiag, MxOmegaDiag
-    !do iomega2 = -MxOmegaDiag, MxOmegaDiag
-      !gam1 = GamMC(1,0,1, 0, 0, iomega, iomega2)/ime
-      !gamn = gam1*norm
-      !write(34, '(f14.8)', advance='no') gamn
-    !enddo
-    !write(34, *) 
-  !enddo
-  !write(34, *) 
-
-  !write(34, *) "Order 2, dx=0, dy=0"
-  !do iomega = -MxOmegaDiag, MxOmegaDiag
-    !do iomega2 = -MxOmegaDiag, MxOmegaDiag
-      !gam1 = GamMC(2, 0, 1, 0, 0, iomega, iomega2)/ime
-      !gamn = gam1*norm
-      !write(34, '(f14.8)', advance='no') gamn
-    !enddo
-    !write(34, *) 
-  !enddo
-  !write(34, *) 
-
-  !write(34, *) "Order 2, dx=1, dy=0"
-  !do iomega = -MxOmegaDiag, MxOmegaDiag
-    !do iomega2 = -MxOmegaDiag, MxOmegaDiag
-      !gam1 = GamMC(2, 1, 1, 1, 0, iomega, iomega2)/ime
-      !gamn = gam1*norm
-      !write(34, '(f14.8)', advance='no') gamn
-    !enddo
-    !write(34, *) 
-  !enddo
-  !write(34, *) 
-
-  !write(34, *) "Order 3, dx=0, dy=0"
-  !do iomega = -MxOmegaDiag, MxOmegaDiag
-    !do iomega2 = -MxOmegaDiag, MxOmegaDiag
-      !gam1 = GamMC(3, 0, 1, 0, 0, iomega, iomega2)/ime
-      !gamn = gam1*norm
-      !write(34, '(f14.8)', advance='no') gamn
-    !enddo
-    !write(34, *) 
-  !enddo
-  !write(34, *) 
-
-  !write(34, *) "Order 3, dx=1, dy=0"
-  !do iomega = -MxOmegaDiag, MxOmegaDiag
-    !do iomega2 = -MxOmegaDiag, MxOmegaDiag
-      !gam1 = GamMC(3, 1, 1, 1, 0, iomega, iomega2)/ime
-      !gamn = gam1*norm
-      !write(34, '(f14.8)', advance='no') gamn
-    !enddo
-    !write(34, *) 
-  !enddo
-  !write(34, *) 
-
-  !write(34, *) "total, dx=1, dy=0"
-  !do iomega = -MxOmegaDiag, MxOmegaDiag
-    !do iomega2 = -MxOmegaDiag, MxOmegaDiag
-      !gam1 = SUM(GamMC(0:MCOrder, 1, 1, 1, 0, iomega, iomega2))/ime
-      !gamn = gam1*norm
-      !write(34, '(f14.8)', advance='no') gamn
-    !enddo
-    !write(34, *) 
-  !enddo
-  !write(34, *) 
-
-  !do iorder = 1, MCOrder
-    !write(35, *) "Order", iorder
-    !write(35, *) "dx = 0, dy = 0"
-    !do iomega = -MxOmegaDiag, MxOmegaDiag
-      !gam1 = GamMC(iorder, 0, 1, 0, 0, iomega, iomega)/ime
-      !gam2 = GamSqMC(iorder,0, 1, 0, 0, iomega, iomega)/ime
-      !err = sqrt(gam2-gam1**2.d0)/sqrt(ime-1)
-      !if(abs(gam1)<1.d-30) then
-        !percenterr = 0.d0
-      !else
-        !percenterr = err/abs(gam1)
-      !endif
-      !gamn = gam1*norm
-      !write(35, *) iomega, gamn, percenterr*gamn, percenterr
-    !enddo
-
-    !write(35, *) "dx = 1, dy = 0, omega1=omega2"
-    !do iomega = -MxOmegaDiag, MxOmegaDiag
-      !gam1 = GamMC(iorder, 1, 1, 1, 0, iomega, iomega)/ime
-      !gam2 = GamSqMC(iorder,1, 1, 1, 0, iomega, iomega)/ime
-      !err = sqrt(gam2-gam1**2.d0)/sqrt(ime-1)
-      !if(abs(gam1)<1.d-30) then
-        !percenterr = 0.d0
-      !else
-        !percenterr = err/abs(gam1)
-      !endif
-      !gamn = gam1*norm
-      !write(35, *) iomega, gamn, percenterr*gamn, percenterr
-    !enddo
-
-    !write(35, *) "dx = 1, dy = 0, omega2=-1"
-    !do iomega = -MxOmegaDiag, MxOmegaDiag
-      !gam1 = GamMC(iorder, 1, 1, 1, 0, iomega, -1)/ime
-      !gam2 = GamSqMC(iorder,1, 1, 1, 0, iomega, -1)/ime
-      !err = sqrt(gam2-gam1**2.d0)/sqrt(ime-1)
-      !if(abs(gam1)<1.d-30) then
-        !percenterr = 0.d0
-      !else
-        !percenterr = err/abs(gam1)
-      !endif
-      !gamn = gam1*norm
-      !write(35, *) iomega, gamn, percenterr*gamn, percenterr
-    !enddo
-    !write(35, *) 
-    !write(35, *) 
-  !enddo
-
-  !write(36, *) "topo 1:"
-  !do iomega = -MxOmegaDiag, MxOmegaDiag
-    !gam1 = Gam2Topo(1,iomega)/ime
-    !gamn = gam1*norm
-    !write(36, *) iomega, gamn
-  !enddo
-
-  !write(36, *) "topo 2:"
-  !do iomega = -MxOmegaDiag, MxOmegaDiag
-    !gam1 = Gam2Topo(2,iomega)/ime
-    !gamn = gam1*norm
-    !write(36, *) iomega, gamn
-  !enddo
+  close(34)
+  close(35)
+END SUBROUTINE output_GamMC
 
 
-  !!write(36, *) "Order 2, typ=1, iloop = 2"
-  !!do iomega = -MxOmegaDiag, MxOmegaDiag
-    !!do iomega2 = -MxOmegaDiag, MxOmegaDiag
-      !!gamn = Gam2MR(1, iomega, iomega2)
-      !!write(36, '(f14.8)', advance='no') gamn
-    !!enddo
-    !!write(36, *) 
-  !!enddo
+SUBROUTINE output_Gam1
+  implicit none
+  integer :: ityp, it1, it2
 
+  open(104, status='replace', file=trim(title1)//"_Gam1.dat")
+  write(104, *) "Order 1, dx=0, dy=0, real part"
+  do it2 = 0, MxT-1
+    do it1 = 0, MxT-1
+      write(104, '(f14.8)', advance='no')  real(GamOrder1(1, it1, it2))
+    enddo
+    write(104, *)
+  enddo
 
-  !close(34)
-  !close(35)
-  !close(36)
-!END SUBROUTINE output_GamMC
+  write(104, *) "Order 1, dx=0, dy=0, imag part"
+  do it2 = 0, MxT-1
+    do it1 = 0, MxT-1
+      write(104, '(f14.8)', advance='no')  dimag(GamOrder1(1, it1, it2))
+    enddo
+    write(104, *)
+  enddo
+  close(104)
+END SUBROUTINE output_Gam1
 
 !!================================================================
 !!================================================================

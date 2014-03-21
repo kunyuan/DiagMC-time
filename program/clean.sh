@@ -7,3 +7,4 @@ rm outfile/*
 rm logfile.log
 rm all_input.log
 rm -r graph
+rm *_MC.dat
