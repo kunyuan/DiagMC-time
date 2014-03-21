@@ -264,6 +264,16 @@ Result:
            6           5   7.40241993121718     
 ====================================================
 
+14. real weight
+
+Test example:
+1) Order1 diagram
+IsDeltaGamma(:) = 1; IsDeltaW(:) = 0; real weight from self-consistent loop
+
+Result: 
+====================================================
+
+
 
 ====================================================
 ========== TEST  BY  KUN ===========================
@@ -293,3 +303,8 @@ The delta function in discrete tau domain should be multiplied by (N/Beta)
 
 3. A bug in transfer_Sigma_t (dimension is 1, not Lx*Ly)
 
+4. A bug in add_interaction
+   WGMB = weight_gline(statMB, tau, TypeLn(GMB))
+	 should be WGMB = weight_gline(statMB, tau, TypeLn(GMD))
+
+5. A bug in reconnect in updating topology
