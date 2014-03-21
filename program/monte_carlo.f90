@@ -227,8 +227,6 @@ SUBROUTINE markov(MaxSamp)
     endif
 
     imc = imc + 1.0
-    call check_config
-    if(imc==3644) call print_config
 
     if(mod(imc,Nstep*1.d0)==0 .and. .not. IsToss) call measure
 
@@ -1022,7 +1020,7 @@ SUBROUTINE add_interaction
   WGIA = weight_gline(statIA, tau, TypeLn(GIC))
 
   tau = (-1)**dir*(tauB - TVertex(3-dir, Masha))
-  WGMB = weight_gline(statMB, tau, TypeLn(GMB))
+  WGMB = weight_gline(statMB, tau, TypeLn(GMD))
 
   tau = (-1)**dirW*(tauA-tauB)
   WWAB = weight_wline(0, 0, GRVertex(1, GamC)-GRVertex(1, GamD), &
@@ -1093,6 +1091,7 @@ SUBROUTINE add_interaction
   !------------- weight calculation -----------------------------
   tau = (-1)**dir*(TVertex(dir, GamC)-tauA)
   WGAC = weight_gline(statAC, tau, TypeLn(GIC))
+
   tau = (-1)**dir*(TVertex(dir, GamD)-tauB)
   WGBD = weight_gline(statBD, tau, TypeLn(GMD))
 
