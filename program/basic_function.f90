@@ -8,22 +8,23 @@
 
 SUBROUTINE calculate_GamNormWeight
   implicit none
-  integer :: omega1, omegaW, omega2, ityp
-  double precision :: Gam0
+  integer :: t, t1, t2, t3, ityp
+  complex*16 :: Gam0
 
-  GamNormWeight = 1.d0
-  !do omega1 = -MxOmegaDiag, MxOmegaDiag
-    !do omega2 = -MxOmegaDiag, MxOmegaDiag
-      !omegaW = omega1-omega2
-      !do ityp = 1, 6
-        !if(ityp==3 .or. ityp==4) cycle
-        !Gam0 = weight_meas_W(0,0,omegaW,ityp)
-        !Gam0 = Gam0 *weight_meas_Gamma(0,0,0,omega1,omega2,1)
-        !Gam0 = Gam0 *weight_Gamma0(0,0,omega1,omega2,1)
-        !GamNormWeight = GamNormWeight + Gam0
-      !enddo
-    !enddo
-  !enddo
+  GamNormWeight = (1.d0, 0.d0)
+
+  !--------- bare Gamma --------------------
+  do t = 0, MxT-1
+    do t1 = 0, MxT-1
+      do ityp = 1, 6
+        Gam0 = weight_meas_W(0, 0, t1-t)
+        Gam0 = Gam0 *weight_meas_Gam(ityp, 0, 0)
+        Gam0 = Gam0 *weight_Gam0(ityp, 0, 0)
+        GamNormWeight = GamNormWeight + Gam0*Beta/MxT
+      enddo
+    enddo
+  enddo
+
   return
 END SUBROUTINE calculate_GamNormWeight
 
@@ -34,9 +35,9 @@ DOUBLE PRECISION FUNCTION weight_worm(dxg, dyg, dxw, dyw, dtau)
   double precision, intent(in) :: dtau
 
   weight_worm = 1.d0
-  !weight_worm = 1.d0/(1.d0+abs(domega)**2.d0)
-  !weight_worm = weight_worm*exp(-0.5d0*(abs(dxg)+abs(dyg)))
-  !weight_worm = weight_worm*exp(-0.5d0*(abs(dxw)+abs(dyw)))
+  weight_worm = weight_worm*dexp(-dtau)
+  weight_worm = weight_worm*dexp(-0.5d0*(abs(dxg)+abs(dyg)))
+  weight_worm = weight_worm*dexp(-0.5d0*(abs(dxw)+abs(dyw)))
 
   return
 END FUNCTION weight_worm
@@ -52,7 +53,8 @@ END FUNCTION weight_meas_G
 
 complex*16 FUNCTION weight_meas_W(dx, dy, t1)
   implicit none
-  integer, intent(in)  :: dx, dy, t1
+  integer, intent(in)  :: dx, dy
+  integer, intent(in) :: t1
 
   weight_meas_W = (1.d0, 0.d0)
   return
@@ -70,9 +72,6 @@ complex*16 FUNCTION weight_meas_Gam(ityp, dx, dy)
       weight_meas_Gam = (1.d0, 0.d0)
     endif
   endif
-
-  !weight_meas_Gamma = weight_meas_Gam
-
   return
 END FUNCTION weight_meas_Gam
 
@@ -99,41 +98,50 @@ SUBROUTINE def_symmetry
   return
 END SUBROUTINE def_symmetry
 
-!SUBROUTINE update_WeightCurrent
-  !implicit none
-  !integer :: i, Gam1, Gam2, G, W
-  !double precision :: weight
-  !double precision :: wln(MxNLn), wgam(MxNVertex)
+SUBROUTINE update_WeightCurrent
+  implicit none
+  integer :: i, ikey, Gam1, Gam2 
+  double precision :: tau, tau1, tau2
+  Complex*16 :: weight
+  Complex*16 :: wln, wgam
 
-  !weight = 1.d0
-  !do i = 1, MxNLn
-    !if(StatusLn(i)<0)  cycle
-    !if(KindLn(i)==1) then
-      !wln(i) = weight_line(StatusLn(i),1,0,0,OmegaLn(i),TypeLn(i))
-    !else
-      !Gam1 = NeighLn(1,i);       Gam2 = NeighLn(2,i)
-      !wln(i) = weight_line(StatusLn(i),2,WRVertex(1, Gam1)-WRVertex(1, Gam2), &
-        !& WRVertex(2, Gam1)-WRVertex(2, Gam2), OmegaLn(i), TypeLn(i))
-    !endif
-    !WeightLn(i) = wln(i)
-    !weight = weight *wln(i)
-  !enddo
+  weight = (1.d0, 0.d0)
+  do ikey = 1, NGLn
+    i = GLnKey2Value(ikey)
+    Gam1 = NeighLn(1,i);       Gam2 = NeighLn(2,i)
+    tau = TVertex(2, Gam2)-TVertex(1,Gam1)
+    wln = weight_gline(StatusLn(i),tau,TypeLn(i))
+    WeightLn(i) = wln
+    weight = weight *wln
+  enddo
 
-  !do i = 1, MxNVertex
-    !if(StatusVertex(i)<0)  cycle
-    !G = NeighVertex(1, i);           W = NeighVertex(3, i)
-    !wgam(i) = weight_vertex(Order, StatusVertex(i),GRVertex(1, i)-WRVertex(1, i), &
-      !& GRVertex(2, i)-WRVertex(2, i), OmegaLn(G), OmegaLn(W), TypeVertex(i))
-    !WeightVertex(i) = wgam(i)
-    !weight = weight *wgam(i)
-  !enddo
+  do ikey = 1, NWLn
+    i = WLnKey2Value(ikey)
+    Gam1 = NeighLn(1,i);       Gam2 = NeighLn(2,i)
+    wln = weight_wline(StatusLn(i),IsDeltaLn(i), WRVertex(1, Gam1)-WRVertex(1, Gam2), &
+      & WRVertex(2, Gam1)-WRVertex(2, Gam2), TVertex(3, Gam2)-TVertex(3,Gam1), TypeLn(i))
+    WeightLn(i) = wln
+    weight = weight *wln
+  enddo
 
-  !weight = weight*CoefOfWeight(Order)*(1.d0/Beta)**Order *(-1.d0)**NFermiLoop
 
-  !WeightCurrent = weight
+  do ikey = 1, NVertex
+    i = VertexKey2Value(ikey)
+    tau1 = TVertex(3, i)-TVertex(2, i)
+    tau2 = TVertex(1, i)-TVertex(3, i)
+    wgam = weight_vertex(StatusVertex(i), IsDeltaVertex(i), GRVertex(1, i)-WRVertex(1, i), &
+      & GRVertex(2, i)-WRVertex(2, i), tau1, tau2, TypeVertex(i))
+    WeightVertex(i) = wgam
+    weight = weight *wgam
+  enddo
 
-  !return
-!END SUBROUTINE update_WeightCurrent
+  weight = weight*(1.d0/Beta)**Order *SignFermiLoop
+
+  WeightCurrent = abs(weight)
+  Phase = weight/WeightCurrent
+
+  return
+END SUBROUTINE update_WeightCurrent
 
 
 
@@ -2222,12 +2230,13 @@ SUBROUTINE first_order_diagram
   NeighVertex(1,4) = 5;        NeighVertex(2,4) = 2;        NeighVertex(3,4) = 6
 
   ! weights for lines and vertexes
-  WeightLn(1) = weight_gline(StatusLn(1),0.d0,TypeLn(1))
-  WeightLn(2) = weight_gline(StatusLn(2),0.d0,TypeLn(2))
-  WeightLn(3) = weight_wline(StatusLn(3), 0, 0,0,0.d0,TypeLn(3))
-  WeightLn(4) = weight_gline(StatusLn(4),0.d0,TypeLn(4))
-  WeightLn(5) = weight_gline(StatusLn(5),0.d0,TypeLn(5))
-  WeightLn(6) = weight_wline(StatusLn(6), 0, 0,0,0.d0,TypeLn(6))
+  WeightLn(1) = weight_gline(StatusLn(1),TVertex(2,NeighLn(2,1))-TVertex(1,NeighLn(1,1)),TypeLn(1))
+  WeightLn(2) = weight_gline(StatusLn(2),TVertex(2,NeighLn(2,2))-TVertex(1,NeighLn(1,2)),TypeLn(2))
+  WeightLn(4) = weight_gline(StatusLn(4),TVertex(2,NeighLn(2,4))-TVertex(1,NeighLn(1,4)),TypeLn(4))
+  WeightLn(5) = weight_gline(StatusLn(5),TVertex(2,NeighLn(2,5))-TVertex(1,NeighLn(1,5)),TypeLn(5))
+
+  WeightLn(3) = weight_wline(StatusLn(3),0,0,0,TVertex(3,NeighLn(2,3))-TVertex(3,NeighLn(1,3)),TypeLn(3))
+  WeightLn(6) = weight_wline(StatusLn(6),0,0,0,TVertex(3,NeighLn(2,6))-TVertex(3,NeighLn(1,6)),TypeLn(6))
 
   WeightVertex(1) = weight_vertex(StatusVertex(1), 1, 0, 0, 0.d0, 0.d0, TypeVertex(1))
   WeightVertex(2) = weight_vertex(StatusVertex(2), 1, 0, 0, 0.d0, 0.d0, TypeVertex(2))
@@ -2369,12 +2378,13 @@ SUBROUTINE first_order_diagram_with_bubble
   NeighVertex(1,4) = 2;        NeighVertex(2,4) = 5;        NeighVertex(3,4) = 6
 
   ! weights for lines and vertexes
-  WeightLn(1) = weight_gline(StatusLn(1),0.d0,TypeLn(1))
-  WeightLn(2) = weight_gline(StatusLn(2),0.d0,TypeLn(2))
-  WeightLn(3) = weight_wline(StatusLn(3), 0, 0,0,0.d0,TypeLn(3))
-  WeightLn(4) = weight_gline(StatusLn(4),0.d0,TypeLn(4))
-  WeightLn(5) = weight_gline(StatusLn(5),0.d0,TypeLn(5))
-  WeightLn(6) = weight_wline(StatusLn(6), 0, 0,0,0.d0,TypeLn(6))
+  WeightLn(1) = weight_gline(StatusLn(1),TVertex(2,NeighLn(2,1))-TVertex(1,NeighLn(1,1)),TypeLn(1))
+  WeightLn(2) = weight_gline(StatusLn(2),TVertex(2,NeighLn(2,2))-TVertex(1,NeighLn(1,2)),TypeLn(2))
+  WeightLn(4) = weight_gline(StatusLn(4),TVertex(2,NeighLn(2,4))-TVertex(1,NeighLn(1,4)),TypeLn(4))
+  WeightLn(5) = weight_gline(StatusLn(5),TVertex(2,NeighLn(2,5))-TVertex(1,NeighLn(1,5)),TypeLn(5))
+
+  WeightLn(3) = weight_wline(StatusLn(3),0,0,0,TVertex(3,NeighLn(2,3))-TVertex(3,NeighLn(1,3)),TypeLn(3))
+  WeightLn(6) = weight_wline(StatusLn(6),0,0,0,TVertex(3,NeighLn(2,6))-TVertex(3,NeighLn(1,6)),TypeLn(6))
 
   WeightVertex(1) = weight_vertex(StatusVertex(1), 1, 0, 0, 0.d0, 0.d0, TypeVertex(1))
   WeightVertex(2) = weight_vertex(StatusVertex(2), 1, 0, 0, 0.d0, 0.d0, TypeVertex(2))
@@ -2534,16 +2544,16 @@ SUBROUTINE second_order_diagram
   NeighVertex(1,6) = 8;        NeighVertex(2,6) = 1;        NeighVertex(3,6) = 9
 
   ! weights for lines and vertexes
-  WeightLn(1) = weight_gline(StatusLn(1),0.d0,TypeLn(1))
-  WeightLn(2) = weight_gline(StatusLn(2),0.d0,TypeLn(2))
-  WeightLn(4) = weight_gline(StatusLn(4),0.d0,TypeLn(4))
-  WeightLn(5) = weight_gline(StatusLn(5),0.d0,TypeLn(5))
-  WeightLn(7) = weight_gline(StatusLn(7),0.d0,TypeLn(7))
-  WeightLn(8) = weight_gline(StatusLn(8),0.d0,TypeLn(8))
+  WeightLn(1) = weight_gline(StatusLn(1),TVertex(2,NeighLn(2,1))-TVertex(1,NeighLn(1,1)),TypeLn(1))
+  WeightLn(2) = weight_gline(StatusLn(2),TVertex(2,NeighLn(2,2))-TVertex(1,NeighLn(1,2)),TypeLn(2))
+  WeightLn(4) = weight_gline(StatusLn(4),TVertex(2,NeighLn(2,4))-TVertex(1,NeighLn(1,4)),TypeLn(4))
+  WeightLn(5) = weight_gline(StatusLn(5),TVertex(2,NeighLn(2,5))-TVertex(1,NeighLn(1,5)),TypeLn(5))
+  WeightLn(7) = weight_gline(StatusLn(7),TVertex(2,NeighLn(2,7))-TVertex(1,NeighLn(1,7)),TypeLn(7))
+  WeightLn(8) = weight_gline(StatusLn(8),TVertex(2,NeighLn(2,8))-TVertex(1,NeighLn(1,8)),TypeLn(8))
 
-  WeightLn(3) = weight_wline(StatusLn(3), 0, 0,0,0.d0,TypeLn(3))
-  WeightLn(6) = weight_wline(StatusLn(6), 0, 0,0,0.d0,TypeLn(6))
-  WeightLn(9) = weight_wline(StatusLn(9), 0, 0,0,0.d0,TypeLn(9))
+  WeightLn(3) = weight_wline(StatusLn(3),0,0,0,TVertex(3,NeighLn(2,3))-TVertex(3,NeighLn(1,3)),TypeLn(3))
+  WeightLn(6) = weight_wline(StatusLn(6),0,0,0,TVertex(3,NeighLn(2,6))-TVertex(3,NeighLn(1,6)),TypeLn(6))
+  WeightLn(9) = weight_wline(StatusLn(9),0,0,0,TVertex(3,NeighLn(2,9))-TVertex(3,NeighLn(1,9)),TypeLn(9))
 
   WeightVertex(1) = weight_vertex(StatusVertex(1), 1, 0, 0, 0.d0, 0.d0, TypeVertex(1))
   WeightVertex(2) = weight_vertex(StatusVertex(2), 1, 0, 0, 0.d0, 0.d0, TypeVertex(2))

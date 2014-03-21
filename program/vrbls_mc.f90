@@ -116,10 +116,14 @@ MODULE vrbls_mc
   complex(kind=8), allocatable :: Chi(:,:,:)
   !=======================================================================
 
+  !======================== analytic integration =========================
+  complex(kind=8) :: GamOrder1(NTypeGam, 0:MxT-1, 0:MxT-1) 
+
   !====================== MC Simulation ==================================
-  double precision :: GamNorm, GamNormWeight           ! the weight of the normalization diagram
-  double precision, allocatable :: GamMC(:,:,:,:,:,:,:)      ! the measurement of Gamma in MC
-  double precision, allocatable :: GamSqMC(:,:,:,:,:,:,:)      ! the measurement of Gamma in MC
+  complex*16 :: GamNorm, GamNormWeight           ! the weight of the normalization diagram
+  complex*16, allocatable :: GamMC(:,:,:,:,:,:,:)      ! the measurement of Gamma in MC
+  double precision, allocatable :: ReGamSqMC(:,:,:,:,:,:,:)      ! the measurement of Gamma in MC
+  double precision, allocatable :: ImGamSqMC(:,:,:,:,:,:,:)      ! the measurement of Gamma in MC
 
   double precision :: GamOrder(0:MxOrder)              ! the configuration number of different orders
   double precision :: GamWormOrder(0:MxOrder)          ! the configuration number in whole section
