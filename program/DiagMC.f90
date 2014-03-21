@@ -27,6 +27,8 @@ PROGRAM MAIN
   title4 = trim(adjustl(title4))//'_'//trim(adjustl(title3))
   title3 = title4
 
+  write(logstr,*) "Initializing..."
+  call write_log
   !!================= INITIALIZATION =======================================
   Mu(1)  = 1.d0
   Mu(2)  = 1.d0
@@ -82,10 +84,15 @@ PROGRAM MAIN
   MaxStat=1024
   allocate(ObsRecord(1:MaxStat,1:NObs))
 
+  write(logstr,*) "Initializing more..."
+  call write_log
+
   call set_time_elapse
   call set_RNG
   call initialize_self_consistent
   call def_symmetry
+  write(logstr,*) "Initializing done!" 
+  call write_log
 
   !!=====================================================================
 
@@ -254,12 +261,21 @@ SUBROUTINE monte_carlo
   integer :: isamp, iblck, mc_version
   double precision :: WR, GamR
 
+  write(logstr,*) "Initializing monte carlo..."
+  call write_log
+
   call read_GWGamma
   call calculate_GamNormWeight  
   
   call initialize_markov
 
+  write(logstr,*) "Initializing monte carlo done!"
+  call write_log
+
   if(InpMC==0) then
+
+    write(logstr,*) "Start Thermalization..."
+    call write_log
 
     ProbProp(:,:) = 0.d0
     ProbAcc(:,:) = 0.d0
@@ -267,6 +283,9 @@ SUBROUTINE monte_carlo
     !-------- throw away some configurations to thermalize -----------
     IsToss=.true.
     call markov(Ntoss)
+
+    write(logstr,*) "Thermalization done!"
+    call write_log
 
     call time_elapse
     t_simu = t_elap

@@ -78,9 +78,9 @@ END SUBROUTINE print_status
 
 SUBROUTINE write_log
   implicit none
-  open(36, access="append", file=trim(title4)//".log")
-  write(36,'(A)', advance='no') trim(logstr)
-  close(36)
+  open(37, access="append", file=trim(title4)//".log")
+  write(37,'(A)', advance='no') trim(logstr)
+  close(37)
 end SUBROUTINE
 
 !====================================================================
