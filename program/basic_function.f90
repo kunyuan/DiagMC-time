@@ -6,28 +6,6 @@
 !=====================================================================
 
 
-SUBROUTINE calculate_GamNormWeight
-  implicit none
-  integer :: t, t1, t2, t3, ityp
-  complex*16 :: Gam0
-
-  GamNormWeight = (1.d0, 0.d0)
-
-  !--------- bare Gamma --------------------
-  do t = 0, MxT-1
-    do t1 = 0, MxT-1
-      do ityp = 1, 6
-        Gam0 = weight_meas_W(0, 0, t1-t)
-        Gam0 = Gam0 *weight_meas_Gam(ityp, 0, 0)
-        Gam0 = Gam0 *weight_Gam0(ityp, 0, 0)
-        GamNormWeight = GamNormWeight + Gam0*Beta/MxT
-      enddo
-    enddo
-  enddo
-
-  return
-END SUBROUTINE calculate_GamNormWeight
-
 !--------- worm weight function  ---------
 DOUBLE PRECISION FUNCTION weight_worm(dxg, dyg, dxw, dyw, dtau)
   implicit none
