@@ -1,7 +1,37 @@
 
+!=============== Notice ======================
+! in tau discrete integral
+!t1-t2 should be represented as t1-t2-1
+!-t should be -t-1
+!=============================================
+
+!====================== the order-0 of Gamma ======================
+
+SUBROUTINE calculate_GamNormWeight
+  implicit none
+  integer :: t, t1, t2, t3, ityp
+  complex*16 :: Gam0
+
+  GamNormWeight = (0.d0, 0.d0)
+
+  !--------- bare Gamma --------------------
+  do t = 0, MxT-1
+    do t1 = 0, MxT-1
+      do ityp = 1, 6
+        Gam0 = weight_meas_W(0, 0, t1-t-1)
+        Gam0 = Gam0 *weight_meas_Gam(ityp, 0, 0)
+        Gam0 = Gam0 *weight_Gam0(ityp, 0, 0)
+        GamNormWeight = GamNormWeight + Gam0*(Beta/MxT)**2.d0
+      enddo
+    enddo
+  enddo
+  write(logstr, *) "Norm weight", GamNormWeight
+  call write_log
+
+  return
+END SUBROUTINE calculate_GamNormWeight
 
 !====================== the 1st order of Gamma ======================
-!===================== need to change the type of Gamma =============
 SUBROUTINE calculate_Gam1
   implicit none
   integer :: dx, dy, t1, t2, dir, ityp
@@ -32,16 +62,16 @@ SUBROUTINE calculate_Gam1
     do t1 = 0, MxT-1
       do ityp = 1, 3
 
-        Gin = weight_G(gintyp(ityp), -t1)
+        Gin = weight_G(gintyp(ityp), -t1-1)
         Gout = weight_G(gouttyp(ityp), t2)
         Gam1 = weight_Gam0(ga1typ(ityp), 0, 0)
         Gam2 = weight_Gam0(ga2typ(ityp), 0, 0) 
         Gam3 = weight_Gam0(ga3typ(ityp), 0, 0) 
-        iW = weight_W(wtyp(ityp), 0, 0, t2-t1)
+        iW = weight_W(wtyp(ityp), 0, 0, t2-t1-1)
 
         weight = Gin *Gout *iW *Gam1 *Gam2 *Gam3
 
-        GamOrder1(typ(ityp),t1,t2) = d_times_cd(Beta/(dble(MxT)**2.d0), weight)
+        GamOrder1(typ(ityp),t1,t2) = d_times_cd(Beta/(real(MxT))**2.d0, weight)
         GamOrder1(typ(ityp)+1,t1,t2) = GamOrder1(typ(ityp), t1, t2)
       enddo
     enddo

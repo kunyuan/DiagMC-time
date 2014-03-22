@@ -553,7 +553,34 @@ SUBROUTINE check_weight
 
   weight = weight*(1.d0/Beta)**Order *SignFermiLoop
 
-  if(abs(Phase*WeightCurrent - weight)>1.d-5) then
+  if(real(Phase*WeightCurrent - weight)>1.d-10) then
+    write(36, *) "================================================="
+    write(36, *) "Oops, check_weight found a bug!"
+    write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
+
+    write(36, *) "real weight", weight
+    write(36, *) "current weight", Phase*WeightCurrent
+    write(36, *) Order, Beta
+
+    do ikey = 1, NGLn
+      i = GLnKey2Value(ikey)
+      write(36, *) i, gln(ikey), WeightLn(i)
+    enddo
+
+    do ikey = 1, NWLn
+      i = WLnKey2Value(ikey)
+      write(36, *) i, wln(ikey), WeightLn(i)
+    enddo
+
+    do ikey = 1, NVertex
+      i = VertexKey2Value(ikey)
+      write(36, *) i, gam(ikey), WeightVertex(i)
+    enddo
+    write(36, *) "================================================="
+
+    call print_config
+    stop
+  else if(dimag(Phase*WeightCurrent - weight)>1.d-10) then
     write(36, *) "================================================="
     write(36, *) "Oops, check_weight found a bug!"
     write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
