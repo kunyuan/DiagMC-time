@@ -166,61 +166,54 @@ DOUBLE PRECISION FUNCTION prob_tau(tau)
 END FUNCTION prob_tau
 
 !---------- int x y -------------------------
-SUBROUTINE generate_x(CurrentX,NewX,Weight)
+SUBROUTINE generate_xy(CurrentX,CurrentY,NewX,NewY,Weight)
   implicit none
   integer :: NewX,CurrentX,dX
+  integer :: NewY,CurrentY,dY
   double precision :: Weight,rand
   rand=rn()
   dX=0.5d0*dexp(rand*logLx)
-  Weight=SpatialWeight(1,dX)
   IF(rn()>0.5d0) dX=Lx-1-dX
+  Weight=SpatialWeight(1,dX)
 
   NewX = CurrentX + dX
   if(NewX>=Lx) then
     NewX = NewX - Lx
   endif
-  return
-END SUBROUTINE generate_x
 
-SUBROUTINE generate_y(CurrentY,NewY,Weight)
-  implicit none
-  integer :: NewY,CurrentY,dY
-  double precision :: Weight,rand
   rand=rn()
   dY=0.5d0*dexp(rand*logLy)
-  Weight=SpatialWeight(2,dY)
   IF(rn()>0.5d0) dY=Ly-1-dY
+  Weight=Weight*SpatialWeight(2,dY)
 
   NewY = CurrentY + dY
   if(NewY>=Ly) then
     NewY = NewY - Ly
   endif
+  Weight=Weight/SpatialWeight(1,Lx-dX)/SpatialWeight(2,Ly-dY)
+  if(dabs(Weight-1.d0)>1.e-6) then
+    write(logstr,*) "Asymmetric hopping x,y probablity!" 
+    call write_log
+  endif
   return
-END SUBROUTINE generate_y
+END SUBROUTINE generate_xy
 
-DOUBLE PRECISION FUNCTION prob_dx(x)
+DOUBLE PRECISION FUNCTION prob_dxy(x,y)
   implicit none 
-  integer :: dx,x
+  integer :: dx,x,dy,y
   if(dx<0)then 
     dx=x+Lx
   else 
     dx=x
   endif
-  prob_dx = SpatialWeight(1,dx)
-  return
-END FUNCTION prob_dx
-
-DOUBLE PRECISION FUNCTION prob_dy(y)
-  implicit none 
-  integer :: dy,y
   if(dy<0)then
     dy=y+Ly;
   else
     dy=y
   endif
-  prob_dy = SpatialWeight(2,dy)
+  prob_dxy = SpatialWeight(1,dx)*SpatialWeight(2,dy)
   return
-END FUNCTION prob_dy
+END FUNCTION prob_dxy
 
 INTEGER FUNCTION diff_x(dx)
   implicit none
