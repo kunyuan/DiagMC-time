@@ -166,54 +166,35 @@ DOUBLE PRECISION FUNCTION prob_tau(tau)
 END FUNCTION prob_tau
 
 !---------- int x y -------------------------
-SUBROUTINE generate_xy(CurrentX,CurrentY,NewX,NewY,Weight)
+SUBROUTINE generate_xy(CurrentR,NewR,dR,Weight,Flag)
+!Flag=.true.: generate new X,Y and new dX,dY
+!Flag=.false.: generate new X,Y according to input dX,dY
   implicit none
-  integer :: NewX,CurrentX,dX
-  integer :: NewY,CurrentY,dY
+  logical :: Flag
+  integer :: NewR(2),CurrentR(2),dR(2),i
   double precision :: Weight,rand
-  rand=rn()
-  dX=0.5d0*dexp(rand*logLx)
-  IF(rn()>0.5d0) dX=Lx-1-dX
-  Weight=SpatialWeight(1,dX)
 
-  NewX = CurrentX + dX
-  if(NewX>=Lx) then
-    NewX = NewX - Lx
-  endif
+  do i=1,2
+    if(Flag) then
+      rand=rn()
+      dR(i)=0.5d0*dexp(rand*logL(i))
+      IF(rn()>0.5d0) dR(i)=L(i)-1-dR(i)
+    endif
+    Weight=Weight*SpatialWeight(i,dR(i))
+    Weight=Weight/SpatialWeight(i,L(i)-dR(i))
 
-  rand=rn()
-  dY=0.5d0*dexp(rand*logLy)
-  IF(rn()>0.5d0) dY=Ly-1-dY
-  Weight=Weight*SpatialWeight(2,dY)
+    NewR(i) = CurrentR(i) + dR(i)
+    if(NewR(i)>=L(i)) then
+      NewR(i) = NewR(i) - L(i)
+    endif
+  enddo
 
-  NewY = CurrentY + dY
-  if(NewY>=Ly) then
-    NewY = NewY - Ly
-  endif
-  Weight=Weight/SpatialWeight(1,Lx-dX)/SpatialWeight(2,Ly-dY)
   if(dabs(Weight-1.d0)>1.e-6) then
     write(logstr,*) "Asymmetric hopping x,y probablity!" 
     call write_log
   endif
   return
 END SUBROUTINE generate_xy
-
-DOUBLE PRECISION FUNCTION prob_dxy(x,y)
-  implicit none 
-  integer :: dx,x,dy,y
-  if(dx<0)then 
-    dx=x+Lx
-  else 
-    dx=x
-  endif
-  if(dy<0)then
-    dy=y+Ly;
-  else
-    dy=y
-  endif
-  prob_dxy = SpatialWeight(1,dx)*SpatialWeight(2,dy)
-  return
-END FUNCTION prob_dxy
 
 INTEGER FUNCTION diff_x(dx)
   implicit none
@@ -229,33 +210,33 @@ INTEGER FUNCTION diff_y(dy)
   if(diff_y<0)     diff_y = Ly+diff_y
 END FUNCTION diff_y
 
-LOGICAL FUNCTION Is_x_valid(x1, x2)
-  implicit none
-  integer, intent(in) :: x1, x2
-  integer :: dx
-  dx = x1 - x2
-  if(dx<0)     dx = Lx+dx
-  if(dx>dLx)   dx = Lx-dx
-  if(abs(dx)<=1) then
-    Is_x_valid = .true.
-  else
-    Is_x_valid = .false.
-  endif
-END FUNCTION Is_x_valid
+!LOGICAL FUNCTION Is_x_valid(x1, x2)
+  !implicit none
+  !integer, intent(in) :: x1, x2
+  !integer :: dx
+  !dx = x1 - x2
+  !if(dx<0)     dx = Lx+dx
+  !if(dx>dLx)   dx = Lx-dx
+  !if(abs(dx)<=1) then
+    !Is_x_valid = .true.
+  !else
+    !Is_x_valid = .false.
+  !endif
+!END FUNCTION Is_x_valid
 
-LOGICAL FUNCTION Is_y_valid(y1, y2)
-  implicit none
-  integer, intent(in) :: y1, y2
-  integer :: dy
-  dy = y1 - y2
-  if(dy<0)     dy = Ly+dy
-  if(dy>dLy)   dy = Ly-dy
-  if(abs(dy)<=1) then
-    Is_y_valid = .true.
-  else
-    Is_y_valid = .false.
-  endif
-END FUNCTION Is_y_valid
+!LOGICAL FUNCTION Is_y_valid(y1, y2)
+  !implicit none
+  !integer, intent(in) :: y1, y2
+  !integer :: dy
+  !dy = y1 - y2
+  !if(dy<0)     dy = Ly+dy
+  !if(dy>dLy)   dy = Ly-dy
+  !if(abs(dy)<=1) then
+    !Is_y_valid = .true.
+  !else
+    !Is_y_valid = .false.
+  !endif
+!END FUNCTION Is_y_valid
 
 
 !!---------- int k -------------------------

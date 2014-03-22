@@ -7,6 +7,7 @@ MODULE vrbls_mc
   double precision, parameter :: Pi2   = 6.2831853071795865d0
   double precision, parameter :: Pi4   = 2.0d0*Pi2
   double precision, parameter :: tm32  = 1.d0/(2.d0**32)
+  double precision, parameter :: macheps = epsilon(0d0)
   integer, parameter          :: Mxint = 2147483647
   integer, parameter          :: Mnint =-2147483647
 
@@ -39,8 +40,8 @@ MODULE vrbls_mc
   integer:: file_version
 
   !======================== Input parameter ==============================
-  integer          ::  Lx, Ly, Vol                ! System size
-  double precision  ::  logLx,logLy
+  integer          ::  Lx, Ly, L(2), Vol                ! System size
+  double precision  ::  logL(2)
   integer          ::  dLx, dLy
   double precision ::  Jcp                        ! interaction
   double precision ::  Mu(2)                      ! Chem. potential for spin down & up

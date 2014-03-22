@@ -7,8 +7,9 @@ PROGRAM MAIN
   print *, 'Lx, Ly, Ntoss, Nsamp, IsForever, NStep, Jcp, beta, MCOrder, Seed, ISub, InpMC, ID, title'
   read  *,  Lx, Ly, Ntoss, Nsamp, IsForever, NStep, Jcp, beta, MCOrder, Seed, ISub, InpMC, ID, title
 
-  logLx=dlog(Lx*1.d0)
-  logLy=dlog(Ly*1.d0)
+  L(1)=Lx
+  L(2)=Ly
+  logL(:)=dlog(L(:)*1.d0)
   SpatialWeight(:,:)=0.d0
 
   CoefOfWeight(0) = 1.d0
