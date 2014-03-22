@@ -1438,7 +1438,7 @@ END SUBROUTINE
 SUBROUTINE change_wline_space
     implicit none
     integer :: iGam, iWLn, jGam, dxw, dyw, xwi, ywi, xwj, ywj, dir
-    double precision :: Pacc,T1,T2,T3,T4,T5,T6,WeightIX,WeightIY,WeightJX,WeightJY
+    double precision :: Pacc,T1,T2,T3,T4,T5,T6,WeightI,WeightJ
     complex*16  ::  WiGam,WjGam, WW, Anew, Aold, sgn
 
     !------- step1 : check if worm is present -------------
@@ -1449,15 +1449,14 @@ SUBROUTINE change_wline_space
     iGam = NeighLn(1, iWLn)
     jGam = NeighLn(2, iWLn)
 
-    call generate_x(WRVertex(1, iGam),xwi,WeightIX);
-    call generate_y(WRVertex(2, iGam),ywi,WeightIY)
+    call generate_xy(WRVertex(1, iGam),xwi,WRVertex(2,iGam),ywi,WeightI);
 
     if(IsDeltaLn(iWLn)==0) then
-      call generate_x(WRVertex(1, jGam),xwj,WeightJX);
-      call generate_y(WRVertex(2, jGam),ywj,WeightJY)
+      call generate_xy(WRVertex(1, jGam),xwj,WRVertex(2,jGam),ywj,WeightJ);
     else
       xwj=xwi
       ywj=ywi
+      WeightJ=1.d0
     endif
 
     !------- step3 : configuration check ------------------
@@ -1479,7 +1478,7 @@ SUBROUTINE change_wline_space
 
 
     Anew = WiGam*WjGam*WW
-    Aold = WeightLn(iWLn)*WeightVertex(iGam)*WeightVertex(jGam)
+    Aold = WeightLn(iWLn)*WeightVertex(iGam)*WeightVertex(jGam)*WeightI*WeightJ
 
     call weight_ratio(Pacc, sgn, Anew, Aold)
 
