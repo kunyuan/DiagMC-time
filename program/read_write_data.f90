@@ -961,22 +961,23 @@ END SUBROUTINE output_Quantities
 SUBROUTINE output_GamMC
   implicit none
   integer :: i, j, iorder, it1, it2
-  double precision :: rerr, ierr, rpercenterr, ipercenterr, norm
-  complex*16 :: gam, gamn 
+  double precision :: rerr, ierr, rpercenterr, ipercenterr
+  complex*16 :: gam, gamn, norm
   double precision :: rgam2, igam2
 
   open(34, access="append", file=trim(title3)//"_Gam_matrix_MC.dat")
   open(35, access="append", file=trim(title3)//"_Gam_MC.dat")
 
+  !norm = GamNormWeight*Z_normal/GamNorm
+  norm = GamOrder1(1, 0, 0)*Z_normal/GamMC(1,0,1,0,0,0,0)
+
   write(34, *) "============================================"
   write(34, *) "Beta", Beta, "Lx, Ly", Lx, Ly, "Order", MCOrder, "Seed",Seed
-  write(34, *) imc, Z_normal, GamNormWeight, GamNorm
+  write(34, *) imc, Phase, Z_normal, GamNormWeight, GamNorm, norm
 
   write(35, *) "============================================"
   write(35, *) "Beta", Beta, "Lx, Ly", Lx, Ly, "Order", MCOrder, "Seed",Seed
-  write(35, *) imc, Z_normal, GamNormWeight, GamNorm
-
-  norm = GamNormWeight*Z_normal/GamNorm
+  write(35, *) imc, Phase, Z_normal, GamNormWeight, GamNorm, norm
 
   write(34, *) "Order 1, dx=0, dy=0, real part"
   do it1 = 0, MxT-1
@@ -1004,7 +1005,7 @@ SUBROUTINE output_GamMC
     write(35, *) "Order", iorder
     write(35, *) "dx = 0, dy = 0"
     do it1 = 0, MxT-1
-      it2 = 0
+      it2 = it1
       gam = GamMC(iorder, 0, 1, 0, 0, it1, it2)/Z_normal
 
       rgam2 = ReGamSqMC(iorder,0, 1, 0, 0, it1, it2)/Z_normal
@@ -1024,7 +1025,7 @@ SUBROUTINE output_GamMC
       endif
 
       gamn = gam*norm
-      write(35, '(i3,f15.6,"+/-",f10.6,"    +i",f15.6,"+/-",f10.6)') it1, real(gamn),rpercenterr, &
+      write(35, '(i3,E20.10E3,"+/-",f10.6,"%    +i",E20.10E3,"+/-",f10.6,"%")') it1, real(gamn),rpercenterr, &
         & dimag(gamn), ipercenterr
     enddo
     write(35, *)
@@ -1038,8 +1039,11 @@ END SUBROUTINE output_GamMC
 SUBROUTINE output_Gam1
   implicit none
   integer :: ityp, it1, it2
+  complex*16 :: gam
 
-  open(104, status='replace', file=trim(title1)//"_Gam1.dat")
+  open(104, status='replace', file=trim(title1)//"_Gam1_matrix.dat")
+  open(105, status='replace', file=trim(title1)//"_Gam1.dat")
+
   write(104, *) "Order 1, dx=0, dy=0, real part"
   do it2 = 0, MxT-1
     do it1 = 0, MxT-1
@@ -1055,7 +1059,17 @@ SUBROUTINE output_Gam1
     enddo
     write(104, *)
   enddo
+
+  write(105, *) "Order", 1, "dx = 0, dy = 0"
+  do it1 = 0, MxT-1
+    it2 = it1 
+    gam = GamOrder1(1, it1, it2)
+    write(105, '(i3,E20.10E3,"    +i",E20.10E3)') it1, real(gam), dimag(gam)
+  enddo
+  write(105, *)
+
   close(104)
+  close(105)
 END SUBROUTINE output_Gam1
 
 !!================================================================

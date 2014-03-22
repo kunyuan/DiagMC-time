@@ -224,12 +224,14 @@ SUBROUTINE markov(MaxSamp)
 
     if(mod(imc,Nstep*1.d0)==0 .and. .not. IsToss) call measure
 
+    !call check_weight
+
     if(mod(imc,1.e7)==0) then
       call statistics
+      call output_GamMC
       call print_status
       call print_config
       call check_config
-      call output_GamMC
     endif
 
     !========================== REWEIGHTING =========================
@@ -1879,6 +1881,7 @@ SUBROUTINE change_Gamma_time
 
     !------ update the diagram info -------------------
     Phase = Phase *sgn
+    call update_weight(Anew, Aold)
 
     !------ update the time of elements --------------
     !------ update the weight of elements ------------
@@ -1893,8 +1896,6 @@ SUBROUTINE change_Gamma_time
     endif
 
     WeightVertex(iGam) = WGam
-
-    call update_weight(Anew, Aold)
 
     ProbAcc(Order, 16) = ProbAcc(Order, 16) + 1
   endif
@@ -2303,7 +2304,12 @@ SUBROUTINE weight_ratio(Pacc, sgn, Anew, Aold)
   double precision,intent(out) :: Pacc
   complex*16, intent(out) :: sgn
   Pacc = abs(Anew/Aold)
-  sgn = (Anew/Aold)/Pacc
+  if(Pacc>=1.e-15) then
+    sgn = (Anew/Aold)/Pacc
+  else
+    Pacc = 0.d0
+    sgn = (1.d0, 0.d0)
+  endif
   return
 END SUBROUTINE weight_ratio
 
@@ -2331,7 +2337,7 @@ SUBROUTINE measure
   integer :: MeaGin, MeaGout, MeaW, xg, yg, xw, yw, dir, typ
   integer :: dx, dy, dt1, dt2
   integer :: ikey, sumt
-  double precision :: factorM
+  double precision  :: factorM
   double precision :: tau1, tau2, tau3
 
   GamWormOrder(Order) = GamWormOrder(Order) + 1.d0
@@ -2346,7 +2352,6 @@ SUBROUTINE measure
     !===========  Measure in normal space  ==========================
     Z_normal=Z_normal+1.d0
     GamOrder(Order) = GamOrder(Order) + 1.d0
-    factorM = 1.d0
 
     !-------- find out the variables for Gamma ----------------
     MeaGin = NeighVertex(2, MeasureGam)
@@ -2400,10 +2405,11 @@ SUBROUTINE measure
     dx = diff_x(xg-xw)
     dy = diff_y(yg-yw)
 
-    tau1 = TVertex(1, NeighLn(1, MeaGin))
-    tau2 = TVertex(2, NeighLn(2, MeaGout))
+    tau1 = TVertex(2, NeighLn(2, MeaGin))
+    tau2 = TVertex(1, NeighLn(1, MeaGout))
     tau3 = TVertex(3, NeighLn(3-dir, MeaW))
 
+    factorM = 1.d0
     dt1 = Floor((tau3-tau2)*MxT/Beta)
     if(dt1<0) then
       dt1 = dt1 + MxT
@@ -2415,9 +2421,8 @@ SUBROUTINE measure
       dt2 = dt2 + MxT
       factorM = factorM * (-1.d0)
     endif
-    
-    factorM = factorM *CoefOfSymmetry(dx, dy)* CoefOfWeight(Order)*WeightLn(MeaW) &
-      & *WeightVertex(MeasureGam)* WeightLn(MeaGin)*WeightLn(MeaGout)
+
+    factorM = factorM *CoefOfSymmetry(dx, dy)* CoefOfWeight(Order) *abs(WeightVertex(MeasureGam))
 
     !------------------- accumulation -------------------------------------------------------
 
@@ -2436,7 +2441,8 @@ SUBROUTINE measure
     !Quan(1) = GamNorm
     !Norm(1) = Norm(1) + 1.d0/factorM
 
-    Quan(Order+1) = Quan(Order+1)+ 1.d0/factorM
+    Quan(Order+1) = Quan(Order+1)+ abs(1.d0/factorM)
+
     !sumt = 0
     !do ikey = 1, 1+Order
       !sumt = sumt + TypeLn(WLnKey2Value(ikey))
