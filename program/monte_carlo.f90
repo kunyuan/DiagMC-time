@@ -224,8 +224,6 @@ SUBROUTINE markov(MaxSamp)
 
     if(mod(imc,Nstep*1.d0)==0 .and. .not. IsToss) call measure
 
-    !call check_weight
-
     if(mod(imc,1.e7)==0) then
       call statistics
       call output_GamMC
@@ -953,7 +951,7 @@ END SUBROUTINE move_worm_along_gline
 !-----------------------------------------------------------------
 SUBROUTINE add_interaction
   implicit none
-  integer :: dir, dirW, flag, kIA, kMB, kM, q
+  integer :: isdelta, dir, dirW, flag, kIA, kMB, kM, q
   integer :: GIC, GMD, GamC, GamD
   integer :: WAB, GIA, GMB, GamA, GamB
   integer :: typGamA, typGamB, typAB
@@ -973,6 +971,8 @@ SUBROUTINE add_interaction
   GMD = NeighVertex(dir, Masha);    GamD = NeighLn(dir, GMD)
 
   dirW = Floor(rn()*2.d0) + 1
+  !isdelta = Floor(rn()*2.d0)
+  isdelta = 0
 
   q = generate_k()
   kM = add_k(kMasha, -(-1)**dirW*q)
@@ -986,7 +986,11 @@ SUBROUTINE add_interaction
 
   !-------- the new time, spin, type and status for the new config ----
   tauA = generate_tau()
-  tauB = generate_tau()
+  if(isdelta==0) then
+    tauB = generate_tau()
+  else 
+    tauB = tauA
+  endif
 
   typGamA = TypeSp2Gam(TypeLn(GIC), TypeLn(GIC), TypeLn(GIC), TypeLn(GIC))
   typGamB = TypeSp2Gam(TypeLn(GMD), TypeLn(GMD), TypeLn(GMD), TypeLn(GMD))
@@ -1019,7 +1023,7 @@ SUBROUTINE add_interaction
   WGMB = weight_gline(statMB, tau, TypeLn(GMD))
 
   tau = (-1)**dirW*(tauA-tauB)
-  WWAB = weight_wline(0, 0, GRVertex(1, GamC)-GRVertex(1, GamD), &
+  WWAB = weight_wline(0, isdelta, GRVertex(1, GamC)-GRVertex(1, GamD), &
     & GRVertex(2,GamC)-GRVertex(2,GamD), tau, typAB)
   
   !---  change the topology for the configuration after update --
@@ -1031,7 +1035,7 @@ SUBROUTINE add_interaction
 
   call insert_line(GIA, -1, kIA, 1, TypeLn(GIC), statIA, WGIA)
   call insert_line(GMB, -1, kMB, 1, TypeLn(GMD), statMB, WGMB)
-  call insert_line(WAB,  0,   q, 2,       typAB,      0, WWAB) 
+  call insert_line(WAB,  isdelta,q, 2,       typAB,      0, WWAB) 
   
   !------------ update the topology -----------------------------
   NeighLn(3-dir, GIC) = GamA;        NeighLn(3-dir, GMD) = GamB
@@ -1098,11 +1102,11 @@ SUBROUTINE add_interaction
     & (2,MeasureGam), tau1, tau2, TypeVertex(MeasureGam))
 
   Anew = WA *WB *WGIA *WGMB *WWAB *WGAC *WGBD *WMeasureGam
-  Anew = d_times_cd((1.d0)/Beta, Anew)
 
   Aold = WeightLn(GIC) *WeightLn(GMD) *WeightVertex(MeasureGam)
 
   call weight_ratio(Pacc, sgn, Anew, Aold)
+  !Pacc = Pacc *CoefOfWeight(Order)/(0.5d0*prob_tau(tauA)*prob_tau(tauB)*CoefOfWeight(Order-1))
   Pacc = Pacc *CoefOfWeight(Order)/(prob_tau(tauA)*prob_tau(tauB)*CoefOfWeight(Order-1))
   Pacc = Pacc *Pupdate(8)/Pupdate(7)
 
@@ -1203,12 +1207,13 @@ SUBROUTINE remove_interaction
 
   if(NeighVertex(3, GamA)/=NeighVertex(3, GamB))  return
   if(StatusVertex(GamA)/=0 .or. StatusVertex(GamB)/=0) return
-  if(IsDeltaVertex(GamA)/=1 .or. IsDeltaVertex(GamB)/=1) return
   if(TypeVertex(GamA)>2 .or. TypeVertex(GamB)>2) return
+  if(IsDeltaVertex(GamA)==0 .or. IsDeltaVertex(GamB)==0)  return
   if(GRVertex(1,GamA)/=WRVertex(1,GamA) .or. GRVertex(2,GamA)/=WRVertex(2,GamA)) return
   if(GRVertex(1,GamB)/=WRVertex(1,GamB) .or. GRVertex(2,GamB)/=WRVertex(2,GamB)) return
 
   WAB = NeighVertex(3, GamA)
+  if(IsDeltaLn(WAB)==1)  return
   GAC = NeighVertex(dir, GamA);         GBD = NeighVertex(dir, GamB)
   GamC = NeighLn(dir, GAC);             GamD = NeighLn(dir, GBD)
 
@@ -1269,11 +1274,13 @@ SUBROUTINE remove_interaction
     & tau1, tau2, TypeVertex(MeasureGam))
 
   Anew = WGIC *WGMD *WMeasureGam
-  Aold = (1.d0/Beta)*WeightVertex(GamA)*WeightVertex(GamB)*WeightLn(GIA)*WeightLn(GMB)*WeightLn(WAB)* &
+  Aold = WeightVertex(GamA)*WeightVertex(GamB)*WeightLn(GIA)*WeightLn(GMB)*WeightLn(WAB)* &
     & WeightLn(GAC) *WeightLn(GBD) *WeightVertex(MeasureGam)
 
   call weight_ratio(Pacc, sgn, Anew, Aold)
 
+  !Pacc = Pacc *CoefOfWeight(Order)*0.5d0*prob_tau(TVertex(1,GamA))*prob_tau(TVertex(1,GamB))/ &
+    !& CoefOfWeight(Order+1)
   Pacc = Pacc *CoefOfWeight(Order)*prob_tau(TVertex(1,GamA))*prob_tau(TVertex(1,GamB))/ &
     & CoefOfWeight(Order+1)
   Pacc = Pacc *Pupdate(7)/Pupdate(8)
@@ -1818,11 +1825,11 @@ SUBROUTINE change_Gamma_time
   !------- step3 : weight calculation -------------------
   if(isdelta==0) then
     if(dir==1) then
-      tau1 = TVertex(3, iGam) - TVertex(2, iGam)
-      tau2 = newtau - TVertex(3, iGam)
-    else if(dir==2) then
       tau1 = TVertex(3, iGam) - newtau
       tau2 = TVertex(1, iGam) - TVertex(3, iGam)
+    else if(dir==2) then
+      tau1 = TVertex(3, iGam) - TVertex(2, iGam)
+      tau2 = newtau - TVertex(3, iGam)
     else if(dir==3) then
       tau1 = newtau - TVertex(2, iGam)
       tau2 = TVertex(1, iGam) - newtau
@@ -1879,12 +1886,11 @@ SUBROUTINE change_Gamma_time
 
   if(rn()<=Pacc) then
 
-    !------ update the diagram info -------------------
+    !------ update the diagram info ---------------------
     Phase = Phase *sgn
     call update_weight(Anew, Aold)
 
-    !------ update the time of elements --------------
-    !------ update the weight of elements ------------
+    !------ update the time and weight of elements ------
     if(isdelta==0) then
       TVertex(dir, iGam) = newtau
       WeightLn(iLn) = WLn
@@ -1901,6 +1907,9 @@ SUBROUTINE change_Gamma_time
   endif
   return
 END SUBROUTINE change_Gamma_time
+
+
+
 
 !------------ change wline isdelta: Pupdate(17) ------------
 SUBROUTINE change_wline_isdelta
@@ -2405,8 +2414,8 @@ SUBROUTINE measure
     dx = diff_x(xg-xw)
     dy = diff_y(yg-yw)
 
-    tau1 = TVertex(2, NeighLn(2, MeaGin))
-    tau2 = TVertex(1, NeighLn(1, MeaGout))
+    tau1 = TVertex(1, NeighLn(1, MeaGout))
+    tau2 = TVertex(2, NeighLn(2, MeaGin))
     tau3 = TVertex(3, NeighLn(3-dir, MeaW))
 
     factorM = 1.d0
@@ -2423,7 +2432,6 @@ SUBROUTINE measure
     endif
 
     factorM = factorM *CoefOfSymmetry(dx, dy)* CoefOfWeight(Order) *abs(WeightVertex(MeasureGam))
-
     !------------------- accumulation -------------------------------------------------------
 
     GamMC(Order, nloop, ityp, dx, dy, dt1, dt2) = GamMC(Order, nloop, ityp, dx, dy, dt1, dt2) &
@@ -2434,6 +2442,7 @@ SUBROUTINE measure
       & + (dimag(Phase)/factorM)**2.d0
 
     if(Order==0) then
+      factorM = CoefOfWeight(Order)
       GamNorm = GamNorm + Phase/factorM
     endif
 

@@ -2170,9 +2170,9 @@ SUBROUTINE first_order_diagram
 
   ! the time variables of Gamma 1, 2, 3 and 4
   TVertex(1, 1)=0.d0; TVertex(2, 1)=0.d0; TVertex(3, 1)=0.d0
-  TVertex(1, 2)=0.1; TVertex(2, 2)=0.1; TVertex(3, 2)=0.1
-  TVertex(1, 3)=0.2; TVertex(2, 3)=0.2; TVertex(3, 3)=0.2
-  TVertex(1, 4)=0.3; TVertex(2, 4)=0.3; TVertex(3, 4)=0.3
+  TVertex(1, 2)=0.d0; TVertex(2, 2)=0.d0; TVertex(3, 2)=0.d0
+  TVertex(1, 3)=0.2d0; TVertex(2, 3)=0.2d0; TVertex(3, 3)=0.2d0
+  TVertex(1, 4)=0.3d0; TVertex(2, 4)=0.3d0; TVertex(3, 4)=0.3d0
 
   ! Direction of Gamma: 1: left of W;  2: right of W
   DirecVertex(1) = 1;                DirecVertex(2) = 2
@@ -2199,7 +2199,8 @@ SUBROUTINE first_order_diagram
   WeightVertex(4) = weight_vertex(StatusVertex(4), 1, 0, 0, 0.d0, 0.d0, TypeVertex(4))
 
 
-  ratio = (1.d0/Beta)**Order *SignFermiLoop
+  !ratio = (1.d0/Beta)**Order *SignFermiLoop
+  ratio = SignFermiLoop
   Anew = d_times_cd(ratio, WeightLn(1)*WeightLn(2)*WeightLn(3)*WeightLn(4)* &
     & WeightLn(5)*WeightLn(6)*WeightVertex(1)*WeightVertex(2)*WeightVertex(3)* &
     & WeightVertex(4))
@@ -2347,7 +2348,8 @@ SUBROUTINE first_order_diagram_with_bubble
   WeightVertex(4) = weight_vertex(StatusVertex(4), 1, 0, 0, 0.d0, 0.d0, TypeVertex(4))
 
 
-  ratio = (1.d0/Beta)**Order *SignFermiLoop
+  !ratio = (1.d0/Beta)**Order *SignFermiLoop
+  ratio = SignFermiLoop
   Anew = d_times_cd(ratio, WeightLn(1)*WeightLn(2)*WeightLn(3)*WeightLn(4)* &
     & WeightLn(5)*WeightLn(6)*WeightVertex(1)*WeightVertex(2)*WeightVertex(3)* &
     & WeightVertex(4))
@@ -2518,7 +2520,8 @@ SUBROUTINE second_order_diagram
   WeightVertex(6) = weight_vertex(StatusVertex(6), 1, 0, 0, 0.d0, 0.d0, TypeVertex(6))
 
 
-  ratio = (1.d0/Beta)**Order *SignFermiLoop
+  !ratio = (1.d0/Beta)**Order *SignFermiLoop
+  ratio = SignFermiLoop
   Anew = d_times_cd(ratio, WeightLn(1)*WeightLn(2)*WeightLn(3)*WeightLn(4)* &
     & WeightLn(5)*WeightLn(6)*WeightLn(7) *WeightLn(8) *WeightLn(9) *WeightVertex(1) &
     & *WeightVertex(2)*WeightVertex(3)*WeightVertex(4)*WeightVertex(5)*WeightVertex(6))

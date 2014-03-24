@@ -93,6 +93,7 @@ SUBROUTINE print_config
   integer :: i, iln, iv
   
   open(8, access='append', file=trim(title1)//"_mc.conf")
+  !open(8, access="append", file=trim(title4)//".log")
   
   write(8, *) "============================================================"
   write(8, *) imc, IsWormPresent, iupdate
@@ -968,16 +969,16 @@ SUBROUTINE output_GamMC
   open(34, access="append", file=trim(title3)//"_Gam_matrix_MC.dat")
   open(35, access="append", file=trim(title3)//"_Gam_MC.dat")
 
-  !norm = GamNormWeight*Z_normal/GamNorm
-  norm = GamOrder1(1, 0, 0)*Z_normal/GamMC(1,0,1,0,0,0,0)
+  norm = GamNormWeight*Z_normal/GamNorm
+  !norm = GamOrder1(1, 0, 0)*Z_normal/GamMC(1,0,1,0,0,0,0)
 
   write(34, *) "============================================"
   write(34, *) "Beta", Beta, "Lx, Ly", Lx, Ly, "Order", MCOrder, "Seed",Seed
-  write(34, *) imc, Phase, Z_normal, GamNormWeight, GamNorm, norm
+  write(34, *) imc, Z_normal, GamNormWeight, GamNorm, norm
 
   write(35, *) "============================================"
   write(35, *) "Beta", Beta, "Lx, Ly", Lx, Ly, "Order", MCOrder, "Seed",Seed
-  write(35, *) imc, Phase, Z_normal, GamNormWeight, GamNorm, norm
+  write(35, *) imc, Z_normal, GamNormWeight, GamNorm, norm
 
   write(34, *) "Order 1, dx=0, dy=0, real part"
   do it1 = 0, MxT-1
@@ -1005,8 +1006,9 @@ SUBROUTINE output_GamMC
     write(35, *) "Order", iorder
     write(35, *) "dx = 0, dy = 0"
     do it1 = 0, MxT-1
-      it2 = it1
+      it2 = 0
       gam = GamMC(iorder, 0, 1, 0, 0, it1, it2)/Z_normal
+      gamn = gam*norm
 
       rgam2 = ReGamSqMC(iorder,0, 1, 0, 0, it1, it2)/Z_normal
       rerr = sqrt(abs(rgam2)-(real(gam))**2.d0)/sqrt(Z_normal-1)
@@ -1024,9 +1026,8 @@ SUBROUTINE output_GamMC
         ipercenterr = ierr/abs(dimag(gam))
       endif
 
-      gamn = gam*norm
-      write(35, '(i3,E20.10E3,"+/-",f10.6,"%    +i",E20.10E3,"+/-",f10.6,"%")') it1, real(gamn),rpercenterr, &
-        & dimag(gamn), ipercenterr
+      write(35, '(i3,2x,i3,E20.10E3,"+/-",f10.6,"%    +i",E20.10E3,"+/-",f10.6,"%")') it1, it2, &
+        & real(gamn),rpercenterr, dimag(gamn), ipercenterr
     enddo
     write(35, *)
   enddo
@@ -1062,7 +1063,7 @@ SUBROUTINE output_Gam1
 
   write(105, *) "Order", 1, "dx = 0, dy = 0"
   do it1 = 0, MxT-1
-    it2 = it1 
+    it2 =  0
     gam = GamOrder1(1, it1, it2)
     write(105, '(i3,E20.10E3,"    +i",E20.10E3)') it1, real(gam), dimag(gam)
   enddo
