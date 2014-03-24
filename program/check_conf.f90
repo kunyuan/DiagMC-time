@@ -551,9 +551,10 @@ SUBROUTINE check_weight
     weight = weight *gam(ikey)
   enddo
 
-  weight = weight*(1.d0/Beta)**Order *SignFermiLoop
+  !weight = weight*(1.d0/Beta)**Order *SignFermiLoop
+  weight = weight *SignFermiLoop
 
-  if(real(Phase*WeightCurrent - weight)>1.d-10) then
+  if(real(Phase*WeightCurrent - weight)>1.d-8) then
     write(36, *) "================================================="
     write(36, *) "Oops, check_weight found a bug!"
     write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
@@ -580,7 +581,7 @@ SUBROUTINE check_weight
 
     call print_config
     stop
-  else if(dimag(Phase*WeightCurrent - weight)>1.d-10) then
+  else if(dimag(Phase*WeightCurrent - weight)>1.d-8) then
     write(36, *) "================================================="
     write(36, *) "Oops, check_weight found a bug!"
     write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate

@@ -47,18 +47,18 @@ PROGRAM MAIN
 
   !================ updates frequency   ================================
   Pupdate( :)  = 0.d0
-  !Pupdate( 1)  = 1.d0
-  !Pupdate( 2)  = 1.d0
-  !Pupdate( 5)  = 1.d0
-  !Pupdate( 6)  = 1.d0
-  !Pupdate( 7)  = 1.d0
-  !Pupdate( 8)  = 1.d0
-  !Pupdate(11)  = 1.d0
-  !Pupdate(13)  = 1.d0
-  !Pupdate(14)  = 1.d0
-  !Pupdate(15)  = 1.d0
+  Pupdate( 1)  = 1.d0
+  Pupdate( 2)  = 1.d0
+  Pupdate( 5)  = 1.d0
+  Pupdate( 6)  = 1.d0
+  Pupdate( 7)  = 1.d0
+  Pupdate( 8)  = 1.d0
+  Pupdate(11)  = 1.d0
+  Pupdate(13)  = 1.d0
+  Pupdate(14)  = 1.d0
+  Pupdate(15)  = 1.d0
   Pupdate(16)  = 1.d0
-  !Pupdate(17)  = 1.d0
+  Pupdate(17)  = 1.d0
   !Pupdate(18)  = 1.d0
 
   !===============  Test variables ==================================
@@ -266,9 +266,13 @@ SUBROUTINE monte_carlo
   call write_log
 
   call read_GWGamma
+  call calculate_GamNormWeight  
+
   call calculate_Gam1
   call output_Gam1
-  !call calculate_GamNormWeight  
+
+  write(logstr, *) "exp(i)", cdexp(-dcmplx(0.d0, real(MxT)-1.d0))
+  call write_log
   
   call initialize_markov
 
