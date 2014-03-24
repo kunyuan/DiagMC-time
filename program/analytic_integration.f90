@@ -62,16 +62,16 @@ SUBROUTINE calculate_Gam1
     do t1 = 0, MxT-1
       do ityp = 1, 3
 
-        Gin = weight_G(gintyp(ityp), -t1-1)
+        Gin = weight_G(gintyp(ityp), t1)
         Gout = weight_G(gouttyp(ityp), t2)
         Gam1 = weight_Gam0(ga1typ(ityp), 0, 0)
         Gam2 = weight_Gam0(ga2typ(ityp), 0, 0) 
         Gam3 = weight_Gam0(ga3typ(ityp), 0, 0) 
-        iW = weight_W(wtyp(ityp), 0, 0, t2-t1-1)
+        iW = weight_W(wtyp(ityp), 0, 0, t2)
 
         weight = Gin *Gout *iW *Gam1 *Gam2 *Gam3
 
-        GamOrder1(typ(ityp),t1,t2) = d_times_cd(Beta/(real(MxT))**2.d0, weight)
+        GamOrder1(typ(ityp),t1,t2) = d_times_cd((Beta/real(MxT))**2.d0, weight)
         GamOrder1(typ(ityp)+1,t1,t2) = GamOrder1(typ(ityp), t1, t2)
       enddo
     enddo

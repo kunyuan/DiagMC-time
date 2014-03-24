@@ -370,7 +370,6 @@ COMPLEX*16 FUNCTION weight_W(typ1, dx1, dy1, t1)
   else
     weight_W = W(typ1, dx1, dy1, t1+MxT)
   endif
-
 END FUNCTION weight_W
 
 !!--------- extract weight for Gamma ---------
@@ -397,23 +396,32 @@ END FUNCTION weight_Gam
 
 !SUBROUTINE Gamma_mc2matrix_mc
   !implicit none
-  !integer :: iorder, dx, dy, ityp, omega1, omega2, ib, jb
-  !double precision :: gam1, gam2, perr, norm, nmc
-  !double precision :: Ga0R, GaR1
-  !double precision :: tempGamMC(-MxOmegaGamG2:MxOmegaGamG2, -MxOmegaGamG2:MxOmegaGamG2)
+  !integer :: iorder, dx, dy, ityp, iloop, t1, t2, typ
 
   !call initialize_Gamma
-  !tempGamMC(:, :) = 0.d0
 
-  !norm = GamNormWeight*ime/GamNorm
+  !norm = GamNormWeight/GamNorm
 
-  !do ityp = 1, ntypGa
-    !do dx = 0, dLx
-      !do dy = 0, dLy
-
+  !do t2 = 0, MxT-1
+    !do t1 = 0, MxT-1
+      !do dy = 0, Ly-1
+        !do dx = 0, Lx-1
+          !do ityp = 1, NTypeGam/2
+            !do iloop = 1, 2
+              !do iorder = 1, MCOrder
+              !typ = 2*(ityp-1)+1
+              !Gam(typ, dx, dy, t1, t2)=Gam(typ, dx, dy, t1, t2)+GamMC(iorder,iloop,ityp,dx,dy,t1,t2)*norm
+              !enddo
+            !enddo
+          !enddo
+        !enddo
       !enddo
     !enddo
   !enddo
+
+  !Gam(2,:,:,:,:) = Gam(1,:,:,:,:)
+  !Gam(4,:,:,:,:) = Gam(3,:,:,:,:)
+  !Gam(6,:,:,:,:) = Gam(5,:,:,:,:)
 
 !END SUBROUTINE Gamma_mc2matrix_mc
  

@@ -131,7 +131,7 @@ MODULE vrbls_mc
   double precision :: WeightCurrent            ! the current weight of the configuration
   double precision :: CoefOfWorm
   double precision :: CoefOfWeight(0:MxOrder)  ! the coeffecients for different orders and worm section
-  double precision :: CoefOfSymmetry(MxLx, MxLy)
+  double precision :: CoefOfSymmetry(0:MxLx, 0:MxLy)
   double precision :: SpatialWeight(1:2,0:MxLx-1)  ! 1, fox x direction 2, for y direction;
 
   !------------- MC steps -----------------------------------
