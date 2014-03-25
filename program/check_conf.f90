@@ -552,7 +552,7 @@ SUBROUTINE check_weight
   enddo
 
   !weight = weight*(1.d0/Beta)**Order *SignFermiLoop
-  weight = weight *SignFermiLoop
+  weight = weight *(-1.d0)**Order*SignFermiLoop
 
   if(real(Phase*WeightCurrent - weight)>1.d-8) then
     write(36, *) "================================================="

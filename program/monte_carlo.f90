@@ -221,6 +221,7 @@ SUBROUTINE markov(MaxSamp)
     endif
 
     imc = imc + 1.0
+    if(imc>=2560000000)  call check_config
 
     if(mod(imc,Nstep*1.d0)==0 .and. .not. IsToss) call measure
 
@@ -520,7 +521,7 @@ SUBROUTINE delete_worm_along_wline
   Wj = weight_vertex(statMasha, IsDeltaVertex(Masha), GRVertex(1, Masha)-WRVertex(1, Masha),  &
     & GRVertex(2, Masha)-WRVertex(2, Masha), tau1, tau2, typMasha)
 
-  tau = TVertex(3, Masha) - TVertex(3, Ira)
+  tau = (-1)**dir*(TVertex(3, Ira) - TVertex(3, Masha))
   WWNew = weight_wline(statW, IsDeltaLn(iWLn),WRVertex(1, Masha)-WRVertex(1, Ira), WRVertex(2, Masha)- &
     & WRVertex(2, Ira), tau, typW)
 
@@ -1102,6 +1103,7 @@ SUBROUTINE add_interaction
     & (2,MeasureGam), tau1, tau2, TypeVertex(MeasureGam))
 
   Anew = WA *WB *WGIA *WGMB *WWAB *WGAC *WGBD *WMeasureGam
+  Anew = -1.d0*Anew
 
   Aold = WeightLn(GIC) *WeightLn(GMD) *WeightVertex(MeasureGam)
 
@@ -1276,6 +1278,7 @@ SUBROUTINE remove_interaction
   Anew = WGIC *WGMD *WMeasureGam
   Aold = WeightVertex(GamA)*WeightVertex(GamB)*WeightLn(GIA)*WeightLn(GMB)*WeightLn(WAB)* &
     & WeightLn(GAC) *WeightLn(GBD) *WeightVertex(MeasureGam)
+  Aold = (-1.d0)*Aold
 
   call weight_ratio(Pacc, sgn, Anew, Aold)
 
@@ -1515,8 +1518,8 @@ SUBROUTINE change_wline_space
 
     if(IsDeltaLn(iWLn)==0) then
       call generate_xy(WRVertex(:, jGam),rwj,dr,WeightR,.true.);
-    else
-      rwj(:)=rwi(:)
+    !else
+      !rwj(:)=rwi(:)
     endif
 
     !------- step3 : configuration check ------------------
@@ -1534,7 +1537,7 @@ SUBROUTINE change_wline_space
     WjGam = weight_vertex(StatusVertex(jGam),IsDeltaVertex(jGam),GRVertex(1, jGam)-rwj(1), &
       & GRVertex(2, jGam)-rwj(2), T6-T5, T4-T6, TypeVertex(jGam))
 
-    WW = weight_wline(StatusLn(iWLn),IsDeltaLn(iWLn),rwi(1)-rwj(1), rwi(2)-rwj(2),T3-T6,TypeLn(iWLn))
+    WW = weight_wline(StatusLn(iWLn),IsDeltaLn(iWLn),rwi(1)-rwj(1), rwi(2)-rwj(2),T6-T3,TypeLn(iWLn))
 
 
     Anew = WiGam*WjGam*WW
@@ -1551,8 +1554,8 @@ SUBROUTINE change_wline_space
 
       !------ update the site of elements --------------
       WRVertex(:, iGam) = rwi(:)
-
       WRVertex(:, jGam) = rwj(:)
+
       !------ update the weight of elements ------------
       WeightLn(iWLn) = WW
       WeightVertex(iGam) = WiGam
