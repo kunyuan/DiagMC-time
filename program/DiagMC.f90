@@ -136,27 +136,22 @@ SUBROUTINE self_consistent
     call write_GWGamma
     !!!======================================================================
   else if(InpMC==1) then
-    call read_GWGamma
-    call calculate_Gam1
 
-    !call read_monte_carlo_data
-    !call output_GamMC
+    call read_GWGamma
 
     !!-------- update the Gamma matrix with MC data -------
+    !call read_monte_carlo_data
     !call Gam_mc2matrix_mc
 
-    !flag = self_consistent_GW(1.d-8)
-    !call write_GWGamma
+    do iloop = 1, 10
+      call calculate_Gam1
+      flag = self_consistent_GW(1.d-8)
+    enddo
 
-    !call transfer_Sigma_t(-1)
-    !call output_Quantities
+    call write_GWGamma
 
-    !if(self_consistent_GW(1.d-7)) then
-
-      !!--- calculation of Pi and Chi -------------------------
-
-      !!----- update the G, W -------------------------------
-    !endif
+    call transfer_Sigma_t(-1)
+    call output_Quantities
   endif
   return
 END SUBROUTINE self_consistent
