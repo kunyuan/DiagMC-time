@@ -2450,7 +2450,7 @@ SUBROUTINE measure
     !Quan(1) = GamNorm
     !Norm(1) = Norm(1) + 1.d0/factorM
 
-    Quan(Order+1) = Quan(Order+1)+ abs(1.d0/factorM)
+    !Quan(Order+1) = Quan(Order+1)+ abs(1.d0/factorM)
 
     !sumt = 0
     !do ikey = 1, 1+Order

@@ -71,11 +71,14 @@ SUBROUTINE calculate_Gam1
 
         weight = Gin *Gout *iW *Gam1 *Gam2 *Gam3
 
-        GamOrder1(typ(ityp),t1,t2) = d_times_cd((Beta/real(MxT))**2.d0, weight)
+        !GamOrder1(typ(ityp),t1,t2) = d_times_cd((Beta/real(MxT))**2.d0, weight)
+        GamOrder1(typ(ityp),t1,t2) = weight
         GamOrder1(typ(ityp)+1,t1,t2) = GamOrder1(typ(ityp), t1, t2)
       enddo
     enddo
   enddo
+
+  Gam(:,0,0,:,:) = GamOrder1(:,:,:)
 
 
 END SUBROUTINE calculate_Gam1

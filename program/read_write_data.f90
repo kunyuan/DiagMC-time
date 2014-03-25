@@ -839,8 +839,8 @@ SUBROUTINE output_Quantities
   double precision :: GaR1, GaR2, GaR3
   double precision :: WWR1, WWR2, WWR3, WWR4
 
-  open(15, file=trim(title1)//"_Chi.dat")
-  !open(16, file=trim(title1)//"_Sigma.dat")
+  open(15, access="append", file=trim(title1)//"_Chi.dat")
+  open(16, access="append", file=trim(title1)//"_Sigma.dat")
 
   !open(11, access="append", file=trim(title1)//"_G.dat")
   !open(12, access="append", file=trim(title1)//"_G_omega_0.dat")
@@ -863,14 +863,12 @@ SUBROUTINE output_Quantities
       enddo
     enddo
   enddo
-
   close(15)
 
-  !do it = 0, MxT-1
-    !write(16, *) it, real(Sigma(it)), dimag(Sigma(it))
-  !enddo
-
-  !close(16)
+  do it = 0, MxT-1
+    write(16, *) it, Lx*Ly*(MxT/Beta)**2.d0*real(Sigma(it)), Lx*Ly*(MxT/Beta)**2.d0*dimag(Sigma(it))
+  enddo
+  close(16)
 
   !do ifile = 11, 22
     !write(ifile, *) "=============================================================="
