@@ -1,8 +1,8 @@
 
 !=============== Notice ======================
 ! in tau discrete integral
-!t1-t2 should be represented as t1-t2-1
-!-t should be -t-1
+! t1-t2 should be represented as t1-t2-1
+! -t should be -t-1
 !=============================================
 
 !====================== the order-0 of Gamma ======================
@@ -21,10 +21,11 @@ SUBROUTINE calculate_GamNormWeight
         Gam0 = weight_meas_W(0, 0, t1-t-1)
         Gam0 = Gam0 *weight_meas_Gam(ityp, 0, 0)
         Gam0 = Gam0 *weight_Gam0(ityp, 0, 0)
-        GamNormWeight = GamNormWeight + Gam0*(Beta/MxT)**2.d0
+        GamNormWeight = GamNormWeight + Gam0
       enddo
     enddo
   enddo
+
   write(logstr, *) "Norm weight", GamNormWeight
   call write_log
 
@@ -71,14 +72,14 @@ SUBROUTINE calculate_Gam1
 
         weight = Gin *Gout *iW *Gam1 *Gam2 *Gam3
 
-        !GamOrder1(typ(ityp),t1,t2) = d_times_cd((Beta/real(MxT))**2.d0, weight)
-        GamOrder1(typ(ityp),t1,t2) = weight
+        GamOrder1(typ(ityp),t1,t2) = -1.d0*weight
         GamOrder1(typ(ityp)+1,t1,t2) = GamOrder1(typ(ityp), t1, t2)
       enddo
     enddo
   enddo
 
-  Gam(:,0,0,:,:) = GamOrder1(:,:,:)
+  Gam(:,:,:,:,:) = (0.d0, 0.d0)
+  !Gam(:,0,0,:,:) = GamOrder1(:,:,:)
 
 
 END SUBROUTINE calculate_Gam1

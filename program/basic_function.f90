@@ -13,9 +13,9 @@ DOUBLE PRECISION FUNCTION weight_worm(dxg, dyg, dxw, dyw, dtau)
   double precision, intent(in) :: dtau
 
   weight_worm = 1.d0
-  weight_worm = weight_worm*dexp(-dtau)
-  weight_worm = weight_worm*dexp(-0.5d0*(abs(dxg)+abs(dyg)))
-  weight_worm = weight_worm*dexp(-0.5d0*(abs(dxw)+abs(dyw)))
+  !weight_worm = weight_worm*dexp(-dtau)
+  !weight_worm = weight_worm*dexp(-0.5d0*(abs(dxg)+abs(dyg)))
+  !weight_worm = weight_worm*dexp(-0.5d0*(abs(dxw)+abs(dyw)))
 
   return
 END FUNCTION weight_worm
@@ -2219,7 +2219,7 @@ SUBROUTINE first_order_diagram
 
 
   !ratio = (1.d0/Beta)**Order *SignFermiLoop
-  ratio = SignFermiLoop
+  ratio = (-1.d0)**Order *SignFermiLoop
   Anew = d_times_cd(ratio, WeightLn(1)*WeightLn(2)*WeightLn(3)*WeightLn(4)* &
     & WeightLn(5)*WeightLn(6)*WeightVertex(1)*WeightVertex(2)*WeightVertex(3)* &
     & WeightVertex(4))
@@ -2368,7 +2368,7 @@ SUBROUTINE first_order_diagram_with_bubble
 
 
   !ratio = (1.d0/Beta)**Order *SignFermiLoop
-  ratio = SignFermiLoop
+  ratio = (-1.d0)**Order *SignFermiLoop
   Anew = d_times_cd(ratio, WeightLn(1)*WeightLn(2)*WeightLn(3)*WeightLn(4)* &
     & WeightLn(5)*WeightLn(6)*WeightVertex(1)*WeightVertex(2)*WeightVertex(3)* &
     & WeightVertex(4))
@@ -2540,7 +2540,7 @@ SUBROUTINE second_order_diagram
 
 
   !ratio = (1.d0/Beta)**Order *SignFermiLoop
-  ratio = SignFermiLoop
+  ratio = (-1.d0)**Order *SignFermiLoop
   Anew = d_times_cd(ratio, WeightLn(1)*WeightLn(2)*WeightLn(3)*WeightLn(4)* &
     & WeightLn(5)*WeightLn(6)*WeightLn(7) *WeightLn(8) *WeightLn(9) *WeightVertex(1) &
     & *WeightVertex(2)*WeightVertex(3)*WeightVertex(4)*WeightVertex(5)*WeightVertex(6))
