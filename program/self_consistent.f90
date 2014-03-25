@@ -394,36 +394,29 @@ END FUNCTION weight_Gam
 
 
 
-!SUBROUTINE Gamma_mc2matrix_mc
-  !implicit none
-  !integer :: iorder, dx, dy, ityp, iloop, t1, t2, typ
+SUBROUTINE Gam_mc2matrix_mc
+  implicit none
+  integer :: iorder, dx, dy, ityp, iloop, t1, t2, typ
+  complex*16 :: norm
 
-  !call initialize_Gamma
+  call initialize_Gam
 
-  !norm = GamNormWeight/GamNorm
+  norm = GamNormWeight/GamNorm
 
-  !do t2 = 0, MxT-1
-    !do t1 = 0, MxT-1
-      !do dy = 0, Ly-1
-        !do dx = 0, Lx-1
-          !do ityp = 1, NTypeGam/2
-            !do iloop = 1, 2
-              !do iorder = 1, MCOrder
-              !typ = 2*(ityp-1)+1
-              !Gam(typ, dx, dy, t1, t2)=Gam(typ, dx, dy, t1, t2)+GamMC(iorder,iloop,ityp,dx,dy,t1,t2)*norm
-              !enddo
-            !enddo
-          !enddo
-        !enddo
-      !enddo
-    !enddo
-  !enddo
+  do ityp = 1, NTypeGam/2
+    do iloop = 1, 2
+      do iorder = 1, MCOrder
+      typ = 2*(ityp-1)+1
+      Gam(typ, :, :, :, :)=Gam(typ, :, :, :, :)+GamMC(iorder,iloop,ityp,:,:,:,:)*norm
+      enddo
+    enddo
+  enddo
 
-  !Gam(2,:,:,:,:) = Gam(1,:,:,:,:)
-  !Gam(4,:,:,:,:) = Gam(3,:,:,:,:)
-  !Gam(6,:,:,:,:) = Gam(5,:,:,:,:)
+  Gam(2,:,:,:,:) = Gam(1,:,:,:,:)
+  Gam(4,:,:,:,:) = Gam(3,:,:,:,:)
+  Gam(6,:,:,:,:) = Gam(5,:,:,:,:)
 
-!END SUBROUTINE Gamma_mc2matrix_mc
+END SUBROUTINE Gam_mc2matrix_mc
  
 
 
