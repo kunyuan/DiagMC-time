@@ -129,11 +129,11 @@ SUBROUTINE self_consistent
     call transfer_Chi_r(-1)
     call transfer_Chi_t(-1)
 
+    call transfer_Sigma_t(-1)
+
     call output_Quantities
 
     call write_GWGamma
-
-
     !!!======================================================================
   else if(InpMC==1) then
     call read_GWGamma
@@ -145,25 +145,11 @@ SUBROUTINE self_consistent
     !!-------- update the Gamma matrix with MC data -------
     !call Gam_mc2matrix_mc
 
-    call transfer_r(1)
-    call transfer_t(1)
+    !flag = self_consistent_GW(1.d-8)
+    !call write_GWGamma
 
-    call plus_minus_W0(1)
-    call plus_minus_Gam0(1)
-
-
-    call calculate_Sigma
-    call transfer_Sigma_t(-1)
-
-
-    call plus_minus_W0(-1)
-    call plus_minus_Gam0(-1)
-
-    call transfer_r(-1)
-    call transfer_t(-1)
-
-    call output_Quantities
-
+    !call transfer_Sigma_t(-1)
+    !call output_Quantities
 
     !if(self_consistent_GW(1.d-7)) then
 
@@ -172,8 +158,6 @@ SUBROUTINE self_consistent
       !!----- update the G, W -------------------------------
     !endif
   endif
-
-
   return
 END SUBROUTINE self_consistent
 
@@ -195,39 +179,28 @@ LOGICAL FUNCTION self_consistent_GW(err)
   WNow = weight_W(1, 0, 0, 0)
   self_consistent_GW = .true.
 
-  if(InpMC==0) then
-    iloop = 0
+  iloop = 0
 
+  call calculate_Polar
+  call calculate_W
+
+  do while(abs(real(WNow)-real(WOld))>err) 
+    WOld = WNow
+    iloop = iloop + 1
+
+    call calculate_Sigma
     call calculate_Polar
+
+    call calculate_G
     call calculate_W
 
-    do while(abs(real(WNow)-real(WOld))>err) 
-      WOld = WNow
-      iloop = iloop + 1
+    WNow = weight_W(1, 0, 0, 0)
 
-      call calculate_Sigma
-      call calculate_Polar
-
-      call calculate_G
-      call calculate_W
-
-      WNow = weight_W(1, 0, 0, 0)
-
-      write(logstr, *) "G-W loop:", iloop, real(WOld), real(WNow)
-      call write_log
-    enddo
-  !else
-    !do iloop = 1, 10 
-      !WOldR = WWR
-
-      !call calculate_G
-      !call calculate_W
-      !WWR = weight_W(0, 0, 1, 1)
-
-      !write(logstr, *) "G-W loop:", iloop, WOldR, WWR
-      !write_log
-    !enddo
-  endif
+    write(logstr, *) "G-W loop:", iloop, real(WOld), real(WNow)
+    call write_log
+  enddo
+  call calculate_Sigma
+  call calculate_Polar
 
   !!-------------------------------------------------------
   call plus_minus_W0(-1)

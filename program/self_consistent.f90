@@ -284,7 +284,7 @@ Complex*16 FUNCTION weight_G0(typ, t)
   complex(kind=8)      :: muc  
 
   muc = dcmplx(0.d0, Mu(1)*pi/(2.d0*Beta))
-  tau = (t+0.5d0)*Beta/MxT
+  tau = real(t)*Beta/MxT
   if(tau>=0) then
     weight_G0 = cdexp(muc*tau)/(1.d0, 1.d0) 
   else

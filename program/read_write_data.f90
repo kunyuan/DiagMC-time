@@ -866,7 +866,7 @@ SUBROUTINE output_Quantities
   close(15)
 
   do it = 0, MxT-1
-    write(16, *) it, Lx*Ly*(MxT/Beta)**2.d0*real(Sigma(it)), Lx*Ly*(MxT/Beta)**2.d0*dimag(Sigma(it))
+    write(16, *) (it+0.5d0)*Beta/MxT, Lx*Ly*(MxT/Beta)**2.d0*real(Sigma(it)), Lx*Ly*(MxT/Beta)**2.d0*dimag(Sigma(it))
   enddo
   close(16)
 
