@@ -133,62 +133,43 @@ SUBROUTINE self_consistent
 
     call write_GWGamma
 
-    !!===== G, W with 1-order Gamma =============================
-    !call calculate_Gamma1   
-
-    !call calculate_Pi
-    !call calculate_Chi
-    !call calculate_Sigma
-    !call output_Quantities
-
-    !!===== G, W with 2-order Gamma =============================
-    !call calculate_Gamma2   
-    !call output_GamMC
-
-    !!!======= self_consistent loop of G, W, Gamma up to 1st order =======
-    !WOldR = 10.d0
-    !WWR = weight_W(1, 0, 0, 1)
-    !iloop = 0
-
-    !do while(abs(WWR-WOldR)>1.d-7) 
-      !WOldR = WWR
-      !iloop = iloop + 1 
-      !call calculate_Gamma1   
-      !flag = self_consistent_GW(1.d-7)
-      !WWR = weight_W(1, 0, 0, 1)
-      !write(logstr, *) "first order self-consistent loop:", iloop, WOldR, WWR
-      !call write_log
-    !enddo
-
-    !call calculate_Gamma1
-
-    !call calculate_Pi
-    !call calculate_Chi
-    !call calculate_Sigma
-    !call output_Quantities
-
 
     !!!======================================================================
-  !else if(InpMC==1) then
-    !call read_GWGamma
+  else if(InpMC==1) then
+    call read_GWGamma
+    call calculate_Gam1
+
     !call read_monte_carlo_data
     !call output_GamMC
 
     !!-------- update the Gamma matrix with MC data -------
-    !call Gamma_mc2matrix_mc
+    !call Gam_mc2matrix_mc
+
+    call transfer_r(1)
+    call transfer_t(1)
+
+    call plus_minus_W0(1)
+    call plus_minus_Gam0(1)
+
+
+    call calculate_Sigma
+    call transfer_Sigma_t(-1)
+
+
+    call plus_minus_W0(-1)
+    call plus_minus_Gam0(-1)
+
+    call transfer_r(-1)
+    call transfer_t(-1)
+
+    call output_Quantities
+
 
     !if(self_consistent_GW(1.d-7)) then
 
       !!--- calculation of Pi and Chi -------------------------
-      !call calculate_Pi
-      !call calculate_Chi
-      !call calculate_Sigma
-      !call output_Quantities
 
       !!----- update the G, W -------------------------------
-      !call write_GWGamma
-      !call update_flag
-
     !endif
   endif
 

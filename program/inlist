@@ -2,8 +2,8 @@ IsForever: .true.
 Sample: 1000000
 Sweep:  10
 Toss:  1000
-IsLoad: 0
-Type: 2
+IsLoad: 1
+Type: 1
 #1: self consist loop; 2: monte carlo; 3: test
 
 Lx:   4
