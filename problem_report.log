@@ -276,6 +276,20 @@ the integration result can be plugged in to self-consistent loop and get the sam
 answer with Nikolay's Sigma_full.dat
 ====================================================
 
+15. change_gline_space
+
+Test example:
+1) Order1 diagram
+IsDeltaGamma(:) = 1; IsDeltaW(:) = 0; real weight from self-consistent loop
+
+Result: 
+find a few bugs in change_gline_space:
+1) iGam = generate_wline
+2) TVertex(3, iGam)-TVertex(3, jGam) should be multiplied with (-1)**DirecVertex(iGam)
+3) should consider the case that Wline are connected by the two Gammas that in the same loop
+
+====================================================
+
 
 
 ====================================================
