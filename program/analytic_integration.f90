@@ -15,15 +15,10 @@ SUBROUTINE calculate_GamNormWeight
   GamNormWeight = (0.d0, 0.d0)
 
   !--------- bare Gamma --------------------
-  do t = 0, MxT-1
-    do t1 = 0, MxT-1
-      do ityp = 1, 6
-        Gam0 = weight_meas_W(0, 0, t1-t-1)
-        Gam0 = Gam0 *weight_meas_Gam(ityp, 0, 0)
-        Gam0 = Gam0 *weight_Gam0(ityp, 0, 0)
-        GamNormWeight = GamNormWeight + Gam0
-      enddo
-    enddo
+  do ityp = 1, 6
+    Gam0 = weight_meas_Gam(ityp, 0, 0)
+    Gam0 = Gam0 *weight_Gam0(ityp, 0, 0)
+    GamNormWeight = GamNormWeight + Gam0*(real(MxT)/Beta)**2.d0
   enddo
 
   write(logstr, *) "Norm weight", GamNormWeight
