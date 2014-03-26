@@ -978,8 +978,6 @@ SUBROUTINE output_GamMC
   write(35, *) "Beta", Beta, "Lx, Ly", Lx, Ly, "Order", MCOrder, "Seed",Seed
   write(35, *) imc, Z_normal, GamNormWeight, GamNorm, norm
 
-  norm = norm*Z_normal
-
   write(34, *) "Order 1, dx=0, dy=0, real part"
   do it1 = 0, MxT-1
     do it2 = 0, MxT-1
