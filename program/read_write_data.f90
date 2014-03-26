@@ -137,11 +137,11 @@ SUBROUTINE print_config
     & 'direction:', i2,2x, 'stat:',i2, 2x,'neigh:', i6,i6,i6)
 
   close(8)
-  call DRAW()
+  call DRAW
 END SUBROUTINE print_config
 
 !=================== VISUALIZATION  ==================================
-SUBROUTINE DRAW()
+SUBROUTINE DRAW
     IMPLICIT NONE
     DOUBLE PRECISION :: x1,y1, x2,y2, y3, scx, scy, sgn   
     DOUBLE PRECISION :: scydash, ca1,ca2,ra,a1,a2, radian

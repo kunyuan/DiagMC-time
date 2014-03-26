@@ -320,7 +320,7 @@ Complex*16 FUNCTION weight_W0(typ, dx, dy)
       endif
     endif
   else
-    write(*, *) dx1, dy1, "dx, dy bigger than system size!"
+    write(*, *) "Weight_W",dx1, dy1, "dx, dy bigger than system size!"
     stop
   endif
 END FUNCTION weight_W0
@@ -343,7 +343,7 @@ COMPLEX*16 FUNCTION weight_Gam0(typ, dx, dy)
       weight_Gam0 = (0.d0, 0.d0)
     endif
   else
-    write(*, *) dx, dy, "dx, dy bigger than system size!"
+    write(*, *) "Weight_Gam",dx, dy, "dx, dy bigger than system size!"
     stop
   endif
 END FUNCTION weight_Gam0

@@ -7,11 +7,12 @@ MODULE vrbls_mc
   double precision, parameter :: Pi2   = 6.2831853071795865d0
   double precision, parameter :: Pi4   = 2.0d0*Pi2
   double precision, parameter :: tm32  = 1.d0/(2.d0**32)
+  double precision, parameter :: macheps = epsilon(0d0)
   integer, parameter          :: Mxint = 2147483647
   integer, parameter          :: Mnint =-2147483647
 
   integer, parameter :: D = 2                       ! 2-dimensional system
-  integer, parameter :: MxLx  = 16, MxLy = 16       ! the largest system
+  integer, parameter :: MxLx  = 8, MxLy = 8       ! the largest system
   !                                                   size,MxLx>MxLy
   integer, parameter :: MxVol = MxLx**D             ! the maximum system volume
   integer, parameter :: MxT   = 128                  ! the maximum number of time segments
@@ -39,8 +40,8 @@ MODULE vrbls_mc
   integer:: file_version
 
   !======================== Input parameter ==============================
-  integer          ::  Lx, Ly, Vol                ! System size
-  double precision  ::  logLx,logLy
+  integer          ::  Lx, Ly, L(2), Vol                ! System size
+  double precision  ::  logL(2)
   integer          ::  dLx, dLy
   double precision ::  Jcp                        ! interaction
   double precision ::  Mu(2)                      ! Chem. potential for spin down & up
@@ -133,6 +134,7 @@ MODULE vrbls_mc
   double precision :: CoefOfWeight(0:MxOrder)  ! the coeffecients for different orders and worm section
   double precision :: CoefOfSymmetry(MxLx, MxLy)
   double precision :: SpatialWeight(1:2,0:MxLx-1)  ! 1, fox x direction 2, for y direction;
+                                                 !!! attention: dx,dy=0~L!!!!
 
   !------------- MC steps -----------------------------------
   integer          :: iupdate           ! the update number
