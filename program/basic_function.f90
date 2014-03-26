@@ -82,11 +82,7 @@ SUBROUTINE def_symmetry
   implicit none
   integer :: i, j, omega
 
-  do j = 0, Lx-1
-    do i = 0, Lx-1
-      CoefOfSymmetry(i,j) = 2.d0   !typ 1,2; 3,4; 5,6
-    enddo
-  enddo
+  CoefOfSymmetry(:,:) = 2.d0   !typ 1,2; 3,4; 5,6
 
   !do i = 1, Lx-1
     !CoefOfSymmetry(i, :) = 2.d0* CoefOfSymmetry(i, :)
@@ -167,12 +163,17 @@ END FUNCTION prob_tau
 
 !---------- int x y -------------------------
 SUBROUTINE generate_xy(CurrentR,NewR,dR,Weight,Flag)
+!Please make sure Weight is already initialized before calling!
 !Flag=.true.: generate new X,Y and new dX,dY
 !Flag=.false.: generate new X,Y according to input dX,dY
   implicit none
   logical :: Flag
   integer :: NewR(2),CurrentR(2),dR(2),i
   double precision :: Weight,rand
+  !dR: CurrentR --> NewR;   dR': CurrentR <-- NewR
+  !CurrentR==NewR, dR=0, dR'=0
+  !CurrentR>NewR, dR=NewR-CurrentR, dR'=CurrentR-NewR+L
+  !CurrentR<NewR, dR=NewR-CurrentR+L, dR'=CurrentR-NewR
 
   do i=1,2
     if(Flag) then
@@ -180,8 +181,10 @@ SUBROUTINE generate_xy(CurrentR,NewR,dR,Weight,Flag)
       dR(i)=0.5d0*dexp(rand*logL(i))
       IF(rn()>0.5d0) dR(i)=L(i)-1-dR(i)
     endif
-    Weight=Weight*SpatialWeight(i,dR(i))
-    Weight=Weight/SpatialWeight(i,L(i)-dR(i))
+    if(dR(i)/=0) then
+      Weight=Weight*SpatialWeight(i,dR(i))
+      Weight=Weight/SpatialWeight(i,L(i)-dR(i))
+    endif
 
     NewR(i) = CurrentR(i) + dR(i)
     if(NewR(i)>=L(i)) then
@@ -189,10 +192,10 @@ SUBROUTINE generate_xy(CurrentR,NewR,dR,Weight,Flag)
     endif
   enddo
 
-  if(dabs(Weight-1.d0)>1.e-6) then
-    write(logstr,*) "Asymmetric hopping x,y probablity!" 
-    call write_log
-  endif
+  !if(dabs(Weight-1.d0)>1.e-6) then
+    !write(logstr,*) "Asymmetric hopping x,y probablity!" 
+    !call write_log
+  !endif
   return
 END SUBROUTINE generate_xy
 

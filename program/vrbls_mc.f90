@@ -12,7 +12,7 @@ MODULE vrbls_mc
   integer, parameter          :: Mnint =-2147483647
 
   integer, parameter :: D = 2                       ! 2-dimensional system
-  integer, parameter :: MxLx  = 16, MxLy = 16       ! the largest system
+  integer, parameter :: MxLx  = 8, MxLy = 8       ! the largest system
   !                                                   size,MxLx>MxLy
   integer, parameter :: MxVol = MxLx**D             ! the maximum system volume
   integer, parameter :: MxT   = 128                  ! the maximum number of time segments
@@ -134,6 +134,7 @@ MODULE vrbls_mc
   double precision :: CoefOfWeight(0:MxOrder)  ! the coeffecients for different orders and worm section
   double precision :: CoefOfSymmetry(MxLx, MxLy)
   double precision :: SpatialWeight(1:2,0:MxLx-1)  ! 1, fox x direction 2, for y direction;
+                                                 !!! attention: dx,dy=0~L!!!!
 
   !------------- MC steps -----------------------------------
   integer          :: iupdate           ! the update number
