@@ -221,7 +221,6 @@ SUBROUTINE markov(MaxSamp)
     endif
 
     imc = imc + 1.0
-    if(imc>=2560000000)  call check_config
 
     if(mod(imc,Nstep*1.d0)==0 .and. .not. IsToss) call measure
 
@@ -1433,45 +1432,66 @@ SUBROUTINE reconnect
 
 END SUBROUTINE reconnect
 
+
+
+
 !------------ change gline space: Pupdate(12) ------------
 SUBROUTINE change_gline_space
   implicit none
   integer :: Num,InitialGam,iGam,jGam,iWLn,NewRG(2),dR(2)
   integer :: GamList(MxNVertex),NewRW(2,MxNVertex),i
-  double precision :: Pacc, WeightR
+  integer :: flagW(MxNWLn)
+  double precision :: Pacc, WeightR, tau
   complex*16  ::  Anew, Aold, sgn, WeightW(MxNVertex)
+
   !------- step1 : check if worm is present -------------
   if(IsWormPresent .eqv. .true.)    return
+
   !------- step2 : propose a new config -----------------
-  !------- step4 : weight calculation -------------------
-  iGam=generate_wline()
+  iGam=generate_vertex()
   InitialGam=iGam
+
   WeightR=1.d0
-  AOld=1.0
-  ANew=1.0
+  AOld=(1.d0, 0.d0)
+  ANew=(1.d0, 0.d0)
+
   call generate_xy(GRVertex(:,iGam),NewRG,dR,WeightR,.true.)
+
+  flagW(:) = 0
   Num=0
   do while(.true.)
     Num=Num+1
     iWLn=NeighVertex(3,iGam)
-    jGam=NeighLn(3-DirecVertex(iGam),iWLn)
-    call generate_xy(WRVertex(:,iGam),NewRW(:,Num),dR,WeightR,.false.)
 
-    WeightW(Num)=weight_wline(StatusLn(iWLn),IsDeltaLn(iWLn),&
-        & NewRW(1,Num)-WRVertex(1,jGam),NewRW(2,Num)-WRVertex(2,jGam),&
-        TVertex(3,iGam)-TVertex(3,jGam),TypeLn(iWLn))
-    Anew=Anew*WeightW(Num)
-    Aold=Aold*WeightLn(iWLn)
-    if(abs(Anew)<macheps*abs(Aold)) return
-!COMPLEX*16 FUNCTION weight_wline(stat, isdelta, dx0, dy0, tau, typ)
+    flagW(iWLn) = flagW(iWLn) + 1
+
     GamList(Num)=iGam
     iGam=NeighLn(2,NeighVertex(2,iGam))
     if(InitialGam==iGam) exit
   enddo
 
-  Aold=Aold*WeightR
+  do i = 1, Num
+    iGam = GamList(i)
+    iWLn=NeighVertex(3,iGam)
+    call generate_xy(WRVertex(:,iGam),NewRW(:,Num),dR,WeightR,.false.)
+
+    if(flagW(iWLn)==1) then
+      tau = (-1)**DirecVertex(iGam)*(TVertex(3, iGam)-TVertex(3, jGam))
+      jGam=NeighLn(3-DirecVertex(iGam),iWLn)
+      WeightW(Num)=weight_wline(StatusLn(iWLn),IsDeltaLn(iWLn),&
+          & NewRW(1,Num)-WRVertex(1,jGam),NewRW(2,Num)-WRVertex(2,jGam),&
+          tau,TypeLn(iWLn))
+
+      Anew=Anew*WeightW(Num)
+      Aold=Aold*WeightLn(iWLn)
+      if(abs(Anew)<macheps*abs(Aold)) return
+    endif
+  enddo
 
   call weight_ratio(Pacc, sgn, Anew, Aold)
+
+  Pacc=Pacc/WeightR
+
   !------- step5 : accept the update --------------------
   ProbProp(Order, 12) = ProbProp(Order, 12) + 1
   if(rn()<=Pacc) then
@@ -1482,15 +1502,18 @@ SUBROUTINE change_gline_space
     do i = 1, Num
       iGam=GamList(i)
       iWLn=NeighVertex(3,iGam)
+
       !------ update the site of elements -------------
       GRVertex(:,iGam) = NewRG(:)
       WRVertex(:,iGam) = NewRW(:,Num)
+
       !------ update the weight of elements -------------
-      WeightLn(iWLn)  = WeightW(i)
+      if(flagW(iWLn)==1) then
+        WeightLn(iWLn)  = WeightW(i)
+      endif
     enddo
 
     call update_weight(Anew, Aold)
-
     ProbAcc(Order, 12) = ProbAcc(Order, 12) + 1
   endif
   return
@@ -1539,11 +1562,11 @@ SUBROUTINE change_wline_space
 
     WW = weight_wline(StatusLn(iWLn),IsDeltaLn(iWLn),rwi(1)-rwj(1), rwi(2)-rwj(2),T6-T3,TypeLn(iWLn))
 
-
     Anew = WiGam*WjGam*WW
-    Aold = WeightLn(iWLn)*WeightVertex(iGam)*WeightVertex(jGam)*WeightR
+    Aold = WeightLn(iWLn)*WeightVertex(iGam)*WeightVertex(jGam)
 
     call weight_ratio(Pacc, sgn, Anew, Aold)
+    Pacc = Pacc/WeightR
 
     !------- step5 : accept the update --------------------
     ProbProp(Order, 13) = ProbProp(Order, 13) + 1
