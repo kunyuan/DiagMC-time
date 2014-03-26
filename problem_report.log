@@ -271,6 +271,9 @@ Test example:
 IsDeltaGamma(:) = 1; IsDeltaW(:) = 0; real weight from self-consistent loop
 
 Result: 
+1-order Gamma is consistent with integration;
+the integration result can be plugged in to self-consistent loop and get the same
+answer with Nikolay's Sigma_full.dat
 ====================================================
 
 
