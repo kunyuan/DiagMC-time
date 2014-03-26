@@ -1,0 +1,6 @@
+v1.0: 
+complete the self-consistent loop part and get the correct W compared with directly integration in t
+
+v2.0:
+complete the MC updates(complete, but not over-complete);
+0-order and 1-order simulations are correct, compared with Nikolay's Sigma_full.dat
