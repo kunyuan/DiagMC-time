@@ -25,6 +25,10 @@ PROGRAM MAIN
   title1 = trim(adjustl(title_loop))//'_'//trim(adjustl(title1))
   title_mc = trim(adjustl(title2))//'_'//trim(adjustl(title1))
 
+  open(10,file="read_list.dat")
+  write(10, *) trim(adjustl(title_mc))//"_monte_carlo_data.bin.dat"
+  close(10)
+
   write(logstr,*) "Initializing..."
   call write_log
   !!================= INITIALIZATION =======================================

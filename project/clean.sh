@@ -8,3 +8,4 @@ rm logfile.log
 rm all_input.log
 rm -r graph
 rm *_MC.dat
+rm read_list.dat

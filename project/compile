@@ -1,10 +1,10 @@
 #!/bin/bash
 echo "Compiling..."
 compilor="ifort"
-sourcecode1="DiagMC.f90"
+sourcecode1="program/DiagMC.f90"
 target1="gamma3.exe"
-sourcecode2="data_process/collapse_data.f90"
-target2="data_process/collapse_data.exe"
+sourcecode2="collapse_data.f90"
+target2="collapse_data.exe"
 
 if [ -n "$1" ]
 then
