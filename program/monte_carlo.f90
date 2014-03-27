@@ -223,6 +223,7 @@ SUBROUTINE markov(MaxSamp)
     endif
 
     imc = imc + 1.0
+    !call check_config
 
     if(mod(imc,Nstep*1.d0)==0 .and. .not. IsToss) call measure
 
@@ -1450,7 +1451,7 @@ SUBROUTINE change_gline_space
   implicit none
   integer :: Num,InitialGam,iGam,jGam,iWLn,NewRG(2),dR(2)
   integer :: GamList(MxNVertex),NewRW(2,MxNVertex),i
-  integer :: flagW(MxNWLn)
+  integer :: flagW(MxNLn)
   double precision :: Pacc, WeightR, tau
   complex*16  ::  Anew, Aold, sgn, WeightW(MxNVertex)
 
@@ -1462,9 +1463,6 @@ SUBROUTINE change_gline_space
   InitialGam=iGam
 
   WeightR=1.d0
-  AOld=(1.d0, 0.d0)
-  ANew=(1.d0, 0.d0)
-
   call generate_xy(GRVertex(:,iGam),NewRG,dR,WeightR,.true.)
 
   flagW(:) = 0
@@ -1480,6 +1478,8 @@ SUBROUTINE change_gline_space
     if(InitialGam==iGam) exit
   enddo
 
+  AOld=(1.d0, 0.d0)
+  ANew=(1.d0, 0.d0)
   do i = 1, Num
     iGam = GamList(i)
     iWLn=NeighVertex(3,iGam)
@@ -1495,6 +1495,10 @@ SUBROUTINE change_gline_space
       Anew=Anew*WeightW(i)
       Aold=Aold*WeightLn(iWLn)
       if(abs(Anew)<macheps*abs(Aold)) return
+    else if(flagW(iWLn)==0) then
+      write(logstr, *) "there is a bug in change_gline_space!", iWLn, flagW(iWLn)
+      call write_log
+      stop
     endif
   enddo
 
