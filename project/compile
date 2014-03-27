@@ -1,0 +1,26 @@
+#!/bin/bash
+echo "Compiling..."
+compilor="ifort"
+sourcecode1="program/DiagMC.f90"
+target1="gamma3.exe"
+sourcecode2="collapse_data.f90"
+target2="collapse_data.exe"
+
+if [ -n "$1" ]
+then
+  if [ $1 = "-g" ] || [ $1 = "g" ]; then
+      $compilor $sourcecode1 -o $target1 -g -no_pie
+      $compilor $sourcecode2 -o $target2 -g -no_pie
+      echo "Debug version done!"
+  #elif []
+  else
+      $compilor $sourcecode1 -O3 -o $target1
+      $compilor $sourcecode2 -O3 -o $target2
+      echo "Done!"
+  fi
+else
+  $compilor $sourcecode1 -O3 -o $target1
+  $compilor $sourcecode2 -O3 -o $target2
+  echo "Done!"
+fi
+

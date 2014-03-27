@@ -7,6 +7,7 @@ import subprocess
 
 #IsCluster=True
 IsCluster=False
+TurnOnSelfConsist=True
 cpu=4
 #sourcedir="."
 #execute="./test"
@@ -51,7 +52,7 @@ def submit_jobs(para,i,execute,homedir):
         os.system("mkdir "+infilepath)
     if(os.path.exists(outfilepath)!=True):
         os.system("mkdir "+outfilepath)
-    filelist=[int(elem.split('_')[-1]) for elem in os.listdir(infilepath)]
+    filelist=[int(elem.split('_')[-1]) for elem in os.listdir(infilepath) if elem!='_in_selfconsist']
     filelist.sort()
     if(len(filelist)!=0):
         lastnum=filelist[-1]
@@ -61,29 +62,30 @@ def submit_jobs(para,i,execute,homedir):
     #if you want to iterate some parameter, add more "for" here
     for belem in para["Beta"]:
         for jelem in para["Jcp"]:
-            #if IsCluster:
-            infile="_in_selfconsist"
-            item=[]
-            item.append(para["Lx"][0])
-            item.append(para["Ly"][0])
-            item.append(para["Toss"][0])
-            item.append(para["Sample"][0])
-            item.append(para["IsForever"][0])
-            item.append(para["Sweep"][0])
-            item.append(jelem)  #jcp
-            item.append(belem)  #beta
-            item.append(para["Order"][0])
-            item.append(str(-1))   #Seed
-            item.append(str(2))
-            item.append(str(1))
-            item.append(para["ReadFile"][0])
-            stri=" ".join(item)
-            for eve in para["Reweight"]:
-                stri=stri+"\n"+eve
-            stri=stri+"\n"+para["Worm/Norm"][0]+"\n\n"
-            f=open(infilepath+"/"+infile,"w")
-            f.write(stri)
-            f.close()
+            if TurnOnSelfConsist:
+                infile="_in_selfconsist"
+                item=[]
+                item.append(para["Lx"][0])
+                item.append(para["Ly"][0])
+                item.append(para["Toss"][0])
+                item.append(para["Sample"][0])
+                item.append(para["IsForever"][0])
+                item.append(para["Sweep"][0])
+                item.append(jelem)  #jcp
+                item.append(belem)  #beta
+                item.append(para["Order"][0])
+                item.append(str(-1))   #Seed
+                item.append(str(1))
+                item.append(str(1))
+                item.append(str(0))
+                item.append(para["ReadFile"][0])
+                stri=" ".join(item)
+                for eve in para["Reweight"]:
+                    stri=stri+"\n"+eve
+                stri=stri+"\n"+para["Worm/Norm"][0]+"\n\n"
+                f=open(infilepath+"/"+infile,"w")
+                f.write(stri)
+                f.close()
 
             for j in range(0,int(para["Duplicate"][0])):
                 lastnum+=1
