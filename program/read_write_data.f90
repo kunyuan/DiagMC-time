@@ -11,7 +11,7 @@ SUBROUTINE print_status
     integer :: iorder,i
     character*30 :: updatename(Nupdate)
 
-    open(36, access="append", file=trim(title4)//".log")
+    open(36, access="append", file=trim(title_mc)//".log")
 
     write(36, *) "================================================"
     write(36,*) "MC steps: ",imc
@@ -78,7 +78,7 @@ END SUBROUTINE print_status
 
 SUBROUTINE write_log
   implicit none
-  open(37, access="append", file=trim(title4)//".log")
+  open(37, access="append", file=trim(title_mc)//".log")
   write(37,'(A)', advance='no') trim(logstr)
   !write(*,'(A)', advance='no') trim(logstr)
   close(37)
@@ -93,8 +93,8 @@ SUBROUTINE print_config
   implicit none
   integer :: i, iln, iv
   
-  open(8, access='append', file=trim(title1)//"_mc.conf")
-  !open(8, access="append", file=trim(title4)//".log")
+  open(8, access='append', file=trim(title_mc)//"_mc.conf")
+  !open(8, access="append", file=trim(title_mc)//".log")
   
   write(8, *) "============================================================"
   write(8, *) imc, IsWormPresent, iupdate
@@ -477,9 +477,9 @@ SUBROUTINE read_GWGamma
   implicit none
   integer :: ix, iy, ityp, it1, it2, ios
 
-  open(100, status="old", file=trim(title1)//"_G_file.dat",iostat=ios)
-  open(101, status="old", file=trim(title1)//"_W_file.dat",iostat=ios)
-  open(102, status="old", file=trim(title1)//"_Gamma_file.dat",iostat=ios)
+  open(100, status="old", file=trim(title_loop)//"_G_file.dat",iostat=ios)
+  open(101, status="old", file=trim(title_loop)//"_W_file.dat",iostat=ios)
+  open(102, status="old", file=trim(title_loop)//"_Gamma_file.dat",iostat=ios)
 
   if(.not. (ios==0)) then
     write(*,*) "You have to run self consistent loop first!"
@@ -528,9 +528,9 @@ SUBROUTINE write_GWGamma
   integer :: it1, it2
   character*26 ich
 
-  open(100, status="replace", file=trim(title1)//"_G_file.dat")
-  open(101, status="replace", file=trim(title1)//"_W_file.dat")
-  open(102, status="replace", file=trim(title1)//"_Gamma_file.dat")
+  open(100, status="replace", file=trim(title_loop)//"_G_file.dat")
+  open(101, status="replace", file=trim(title_loop)//"_W_file.dat")
+  open(102, status="replace", file=trim(title_loop)//"_Gamma_file.dat")
 
   do it1 = 0, MxT-1
     do ityp = 1, NTypeG
@@ -575,7 +575,7 @@ SUBROUTINE write_monte_carlo_data
 
   !=========== write into files =========================================
   open(104, status="replace", &
-    & file=trim(title3)//"_monte_carlo_data.bin.dat",form="binary")
+    & file=trim(title_mc)//"_monte_carlo_data.bin.dat",form="binary")
 
   write(104) imc, GamNorm, GamNormWeight
   do it2 = 0, MxT-1
@@ -632,7 +632,7 @@ SUBROUTINE write_monte_carlo_conf
   integer :: i
 
   open(103, status="replace", &
-   & file=trim(title3)//"_monte_carlo_conf.bin.dat",form="binary")
+   & file=trim(title_mc)//"_monte_carlo_conf.bin.dat",form="binary")
 
   write(103)  mc_version, Z_normal, Z_worm, StatNum
   write(103)  ProbProp(:,:), ProbAcc(:,:)
@@ -846,22 +846,22 @@ SUBROUTINE output_Quantities
   double precision :: GaR1, GaR2, GaR3
   double precision :: WWR1, WWR2, WWR3, WWR4
 
-  open(15, access="append", file=trim(title1)//"_Chi.dat")
-  open(16, access="append", file=trim(title1)//"_Sigma.dat")
+  open(15, access="append", file=trim(title_loop)//"_Chi.dat")
+  open(16, access="append", file=trim(title_loop)//"_Sigma.dat")
 
-  !open(11, access="append", file=trim(title1)//"_G.dat")
-  !open(12, access="append", file=trim(title1)//"_G_omega_0.dat")
-  !open(13, access="append", file=trim(title1)//"_W.dat")
-  !open(14, access="append", file=trim(title1)//"_W_omega_0.dat")
-  !open(15, access="append", file=trim(title1)//"_Chi.dat")
-  !open(16, access="append", file=trim(title1)//"_Chi_omega_0.dat")
-  !open(17, access="append", file=trim(title1)//"_Gamma.dat")
-  !open(18, access="append", file=trim(title1)//"_Gamma_omega_0.dat")
-  !open(19, access="append", file=trim(title1)//"_Sigma.dat")
-  !open(20, access="append", file=trim(title1)//"_Sigma_omega_0.dat")
-  !open(21, access="append", file=trim(title1)//"_Pi.dat")
-  !open(22, access="append", file=trim(title1)//"_Pi_omega_0.dat")
-  !open(23, access="append", file=trim(title1)//"_Gamma_matrix.dat")
+  !open(11, access="append", file=trim(title_loop)//"_G.dat")
+  !open(12, access="append", file=trim(title_loop)//"_G_omega_0.dat")
+  !open(13, access="append", file=trim(title_loop)//"_W.dat")
+  !open(14, access="append", file=trim(title_loop)//"_W_omega_0.dat")
+  !open(15, access="append", file=trim(title_loop)//"_Chi.dat")
+  !open(16, access="append", file=trim(title_loop)//"_Chi_omega_0.dat")
+  !open(17, access="append", file=trim(title_loop)//"_Gamma.dat")
+  !open(18, access="append", file=trim(title_loop)//"_Gamma_omega_0.dat")
+  !open(19, access="append", file=trim(title_loop)//"_Sigma.dat")
+  !open(20, access="append", file=trim(title_loop)//"_Sigma_omega_0.dat")
+  !open(21, access="append", file=trim(title_loop)//"_Pi.dat")
+  !open(22, access="append", file=trim(title_loop)//"_Pi_omega_0.dat")
+  !open(23, access="append", file=trim(title_loop)//"_Gamma_matrix.dat")
 
   do it = 0, MxT-1
     do dy = 0, dLy
@@ -971,8 +971,8 @@ SUBROUTINE output_GamMC
   complex*16 :: gam, gamn, norm
   double precision :: rgam2, igam2
 
-  !open(34, access="append", file=trim(title3)//"_Gam_matrix_MC.dat")
-  open(35, access="append", file=trim(title3)//"_Gam_MC.dat")
+  !open(34, access="append", file=trim(title_mc)//"_Gam_matrix_MC.dat")
+  open(35, access="append", file=trim(title_mc)//"_Gam_MC.dat")
 
   norm = GamNormWeight*Z_normal/GamNorm
   !norm = GamOrder1(1, 0, 0)*Z_normal/GamMC(1,1,0,0,0,0)
@@ -1047,8 +1047,8 @@ SUBROUTINE output_Gam1
   integer :: ityp, it1, it2
   complex*16 :: gam
 
-  open(104, status='replace', file=trim(title1)//"_Gam1_matrix.dat")
-  open(105, status='replace', file=trim(title1)//"_Gam1.dat")
+  open(104, status='replace', file=trim(title_loop)//"_Gam1_matrix.dat")
+  open(105, status='replace', file=trim(title_loop)//"_Gam1.dat")
 
   write(104, *) "Order 1, dx=0, dy=0, real part"
   do it2 = 0, MxT-1
@@ -1084,8 +1084,8 @@ SUBROUTINE output_Gam
   integer :: ityp, it1, it2
   complex*16 :: gam1
 
-  !open(104, status='replace', file=trim(title3)//"_Gam_matrix.dat")
-  open(105, status='replace', file=trim(title3)//"_Gam.dat")
+  !open(104, status='replace', file=trim(title_mc)//"_Gam_matrix.dat")
+  open(105, status='replace', file=trim(title_mc)//"_Gam.dat")
 
   !write(104, *) "Order 1, dx=0, dy=0, real part"
   !do it2 = 0, MxT-1

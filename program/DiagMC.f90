@@ -18,15 +18,12 @@ PROGRAM MAIN
   enddo
   read *, CoefOfWorm
 
-  write(title1, '(f5.2)') beta
-  write(title2, '(i2)')  MCOrder
-  write(title3, '(i14)') Seed
-  write(title4,'(i4)') ID
+  write(title_loop, '(f5.2)') beta
+  write(title1, '(i2)')  MCOrder
+  write(title2,'(i4)') ID
 
-  title2 = trim(adjustl(title1))//'_'//trim(adjustl(title2))
-  title3 = trim(adjustl(title2))//'_'//trim(adjustl(title3))
-  title4 = trim(adjustl(title4))//'_'//trim(adjustl(title3))
-  title3 = title4
+  title1 = trim(adjustl(title_loop))//'_'//trim(adjustl(title1))
+  title_mc = trim(adjustl(title2))//'_'//trim(adjustl(title1))
 
   write(logstr,*) "Initializing..."
   call write_log
