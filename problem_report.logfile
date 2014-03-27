@@ -264,7 +264,7 @@ Result:
            6           5   7.40241993121718     
 ====================================================
 
-14. real weight
+14. real weight up to order 1
 
 Test example:
 1) Order1 diagram
@@ -287,6 +287,16 @@ find a few bugs in change_gline_space:
 1) iGam = generate_wline
 2) TVertex(3, iGam)-TVertex(3, jGam) should be multiplied with (-1)**DirecVertex(iGam)
 3) should consider the case that Wline are connected by the two Gammas that in the same loop
+
+====================================================
+
+16. real weight up to order 2
+
+Test example: Order 0, 1, 2
+IsDeltaGamma(:) = 1; IsDeltaW(:) = 0; real weight from self-consistent loop
+
+result: 
+Sigma_full consistent with nikolay's result
 
 ====================================================
 
