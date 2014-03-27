@@ -123,9 +123,9 @@ MODULE vrbls_mc
 
   !====================== MC Simulation ==================================
   complex*16 :: GamNorm, GamNormWeight           ! the weight of the normalization diagram
-  complex*16, allocatable :: GamMC(:,:,:,:,:,:,:)      ! the measurement of Gamma in MC
-  double precision, allocatable :: ReGamSqMC(:,:,:,:,:,:,:)      ! the measurement of Gamma in MC
-  double precision, allocatable :: ImGamSqMC(:,:,:,:,:,:,:)      ! the measurement of Gamma in MC
+  complex*16, allocatable :: GamMC(:,:,:,:,:,:)      ! the measurement of Gamma in MC
+  double precision, allocatable :: ReGamSqMC(:,:,:,:,:,:)      ! the measurement of Gamma in MC
+  double precision, allocatable :: ImGamSqMC(:,:,:,:,:,:)      ! the measurement of Gamma in MC
 
   double precision :: GamOrder(0:MxOrder)              ! the configuration number of different orders
   double precision :: GamWormOrder(0:MxOrder)          ! the configuration number in whole section
