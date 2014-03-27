@@ -2,18 +2,18 @@ IsForever: .true.
 Sample: 1000000
 Sweep:  10
 Toss:  1000
-IsLoad: 1
-Type: 1
+IsLoad: 0
+Type: 2
 #1: self consist loop; 2: monte carlo; 3: test
 
 Lx:   4
 Ly:   4
 Jcp:   1.0
 Beta:  0.5
-Order:  3
-Reweight: 1, 1, 1
+Order:  2
+Reweight: 1, 1
 Worm/Norm: 0.1 
-ReadFile: 1_0.50_3
+ReadFile: 0.50_2_coll
 
-Duplicate: 1 
+Duplicate:  1
 %%%%%%%%%%%%%%%%%%%%%%%%%%
