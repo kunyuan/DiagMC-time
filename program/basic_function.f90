@@ -109,7 +109,7 @@ SUBROUTINE update_WeightCurrent
     weight = weight *wgam
   enddo
 
-  weight = weight*(1.d0/Beta)**Order *SignFermiLoop
+  weight = weight*(-1.d0)**Order *SignFermiLoop
 
   WeightCurrent = abs(weight)
   Phase = weight/WeightCurrent
