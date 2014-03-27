@@ -233,6 +233,19 @@ SUBROUTINE markov(MaxSamp)
       call print_status
       call print_config
       call check_config
+
+      write(logstr,*) "Check if there is a new G,W data..."
+      call write_log
+
+      call read_flag
+      if(mc_version/=file_version) then
+        write(logstr,*) "Updating G, W..."
+        call write_log
+
+        call read_GWGamma
+        call update_WeightCurrent
+        mc_version = file_version
+      endif
     endif
 
     !========================== REWEIGHTING =========================
@@ -252,19 +265,6 @@ SUBROUTINE markov(MaxSamp)
       if(imc<=2.e8) then
         GamWormOrder=0.d0
         GamOrder=0.d0
-      endif
-
-      write(logstr,*) "Check if there is a new G,W data..."
-      call write_log
-
-      call read_flag
-      if(mc_version/=file_version) then
-        write(logstr,*) "Updating G, W..."
-        call write_log
-
-        call read_GWGamma
-        call update_WeightCurrent
-        mc_version = file_version
       endif
     endif
     !================================================================
