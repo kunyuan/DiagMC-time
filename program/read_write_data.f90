@@ -577,6 +577,7 @@ SUBROUTINE write_monte_carlo_data
   open(104, status="replace", &
     & file=trim(title_mc)//"_monte_carlo_data.bin.dat",form="binary")
 
+  write(104) Lx, Ly
   write(104) imc, GamNorm, GamNormWeight
   do it2 = 0, MxT-1
     do it1 = 0, MxT-1
@@ -606,6 +607,7 @@ SUBROUTINE read_monte_carlo_data
 
   open(105, status="old", file=trim(title)//"_monte_carlo_data.bin.dat",form="binary")
 
+  read(105) Lx, Ly
   read(105) imc, GamNorm, GamNormWeight
   do it2 = 0, MxT-1
     do it1 = 0, MxT-1
