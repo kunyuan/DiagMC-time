@@ -52,7 +52,7 @@ def submit_jobs(para,i,execute,homedir):
         os.system("mkdir "+infilepath)
     if(os.path.exists(outfilepath)!=True):
         os.system("mkdir "+outfilepath)
-    filelist=[int(elem.split('_')[-1]) for elem in os.listdir(infilepath)]
+    filelist=[int(elem.split('_')[-1]) for elem in os.listdir(infilepath) if elem!='_in_selfconsist']
     filelist.sort()
     if(len(filelist)!=0):
         lastnum=filelist[-1]
@@ -75,8 +75,9 @@ def submit_jobs(para,i,execute,homedir):
                 item.append(belem)  #beta
                 item.append(para["Order"][0])
                 item.append(str(-1))   #Seed
-                item.append(str(2))
                 item.append(str(1))
+                item.append(str(1))
+                item.append(str(0))
                 item.append(para["ReadFile"][0])
                 stri=" ".join(item)
                 for eve in para["Reweight"]:
