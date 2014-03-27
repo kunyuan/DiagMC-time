@@ -609,6 +609,7 @@ SUBROUTINE read_monte_carlo_data
 
   read(105) Lx, Ly
   read(105) imc, GamNorm, GamNormWeight
+
   do it2 = 0, MxT-1
     do it1 = 0, MxT-1
       do iy = 0, Ly-1

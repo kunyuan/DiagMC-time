@@ -25,12 +25,10 @@ PROGRAM MAIN
   title1 = trim(adjustl(title_loop))//'_'//trim(adjustl(title1))
   title_mc = trim(adjustl(title2))//'_'//trim(adjustl(title1))
 
-  open(10,file="read_list.dat")
-  write(10, *) trim(adjustl(title_mc))//"_monte_carlo_data.bin.dat"
-  close(10)
 
   write(logstr,*) "Initializing..."
   call write_log
+
   !!================= INITIALIZATION =======================================
   Mu(1)  = 1.d0
   Mu(2)  = 1.d0
@@ -102,6 +100,10 @@ PROGRAM MAIN
   if(ISub==1) then
     call self_consistent
   else if(ISub==2) then
+    open(10,access="append", file="read_list.dat")
+    write(10, *) trim(adjustl(title_mc))//"_monte_carlo_data.bin.dat"
+    close(10)
+
     call monte_carlo
   else if(ISub==3) then
     call test_subroutine
@@ -139,9 +141,18 @@ SUBROUTINE self_consistent
     !!!======================================================================
   else if(InpMC==1) then
 
+    write(logstr, *) "Reading G,W, Gamma..."
+    call write_log
     call read_GWGamma
 
+    write(logstr, *) "Reading monte carlo data..."
+    call write_log
+
     call read_monte_carlo_data
+
+    write(logstr, *) "Read done!"
+    call write_log
+
     !!-------- update the Gamma matrix with MC data -------
     call Gam_mc2matrix_mc
 

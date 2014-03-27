@@ -93,6 +93,7 @@ PROGRAM MAIN
     open(104, status="replace", &
       & file=trim(title_mc)//"_monte_carlo_data.bin.dat",form="binary")
 
+    write(104) Lx, Ly
     write(104) imc, GamNorm, GamNormWeight
     do it2 = 0, MxT-1
       do it1 = 0, MxT-1
