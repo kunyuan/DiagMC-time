@@ -4,3 +4,8 @@ complete the self-consistent loop part and get the correct W compared with direc
 v2.0:
 complete the MC updates(complete, but not over-complete);
 0-order and 1-order simulations are correct, compared with Nikolay's Sigma_full.dat
+
+v2.1:
+MC updates(complete, but not over-complete);
+0, 1, and 2-order simulations are all correct, compared with Nikolay's Sigma_full.dat
+
