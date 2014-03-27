@@ -225,7 +225,6 @@ SUBROUTINE markov(MaxSamp)
     imc = imc + 1.0
 
     if(mod(imc,Nstep*1.d0)==0 .and. .not. IsToss) call measure
-    if(imc>=320000000)   call check_config
 
     if(mod(imc,1.e7)==0) then
       call statistics
