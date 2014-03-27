@@ -268,7 +268,7 @@ SUBROUTINE markov(MaxSamp)
     endif
     !================================================================
 
-    if(mod(imc,1.e9)==0) then
+    if(mod(imc,5.e8)==0) then
       write(logstr,*) "Writing data and configuration..."
       call write_log
       !call statistics
