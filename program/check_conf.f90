@@ -10,6 +10,7 @@ SUBROUTINE check_config
   call check_topo
   call check_stat
   call check_irreducibility
+  call check_isdelta
   call check_k_conserve
   call check_type
   call check_time
@@ -20,6 +21,30 @@ SUBROUTINE check_config
   return
 END SUBROUTINE check_config
 
+
+SUBROUTINE check_isdelta
+  implicit none
+  
+  if(IsDeltaVertex(MeasureGam)/=1) then
+    write(36, *) "================================================="
+    write(36, *) "Oops, check_isdelta found a bug!"
+    write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
+    write(36, *) "Diagram order", Order, "MeasureGam", MeasureGam
+    write(36, *) "================================================="
+    call print_config
+    stop
+  endif
+
+  if(IsDeltaLn(NeighVertex(3, MeasureGam))/=0) then
+    write(36, *) "================================================="
+    write(36, *) "Oops, check_isdelta found a bug!"
+    write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
+    write(36, *) "Diagram order", Order, "MeasureW", NeighVertex(3,MeasureGam)
+    write(36, *) "================================================="
+    call print_config
+    stop
+  endif
+END SUBROUTINE
 
 
 SUBROUTINE check_topo
