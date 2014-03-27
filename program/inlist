@@ -10,8 +10,8 @@ Lx:   4
 Ly:   4
 Jcp:   1.0
 Beta:  0.5
-Order:  2
-Reweight: 1, 1
+Order:  3
+Reweight: 1, 1, 1
 Worm/Norm: 0.1 
 ReadFile: 1_0.50_2_-43471734
 
