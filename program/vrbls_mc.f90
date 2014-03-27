@@ -32,8 +32,8 @@ MODULE vrbls_mc
 
   character*100 :: title1
   character*100 :: title2
-  character*100 :: title3
-  character*100 :: title4
+  character*100 :: title_loop
+  character*100 :: title_mc
   character*100 :: title
   character*100 :: logstr
 
