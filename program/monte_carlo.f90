@@ -1482,16 +1482,16 @@ SUBROUTINE change_gline_space
   do i = 1, Num
     iGam = GamList(i)
     iWLn=NeighVertex(3,iGam)
-    call generate_xy(WRVertex(:,iGam),NewRW(:,Num),dR,WeightR,.false.)
+    call generate_xy(WRVertex(:,iGam),NewRW(:,i),dR,WeightR,.false.)
 
     if(flagW(iWLn)==1) then
-      tau = (-1)**DirecVertex(iGam)*(TVertex(3, iGam)-TVertex(3, jGam))
       jGam=NeighLn(3-DirecVertex(iGam),iWLn)
-      WeightW(Num)=weight_wline(StatusLn(iWLn),IsDeltaLn(iWLn),&
-          & NewRW(1,Num)-WRVertex(1,jGam),NewRW(2,Num)-WRVertex(2,jGam),&
+      tau = (-1)**DirecVertex(iGam)*(TVertex(3, iGam)-TVertex(3, jGam))
+      WeightW(i)=weight_wline(StatusLn(iWLn),IsDeltaLn(iWLn),&
+          & NewRW(1,i)-WRVertex(1,jGam),NewRW(2,i)-WRVertex(2,jGam),&
           tau,TypeLn(iWLn))
 
-      Anew=Anew*WeightW(Num)
+      Anew=Anew*WeightW(i)
       Aold=Aold*WeightLn(iWLn)
       if(abs(Anew)<macheps*abs(Aold)) return
     endif
@@ -1514,7 +1514,7 @@ SUBROUTINE change_gline_space
 
       !------ update the site of elements -------------
       GRVertex(:,iGam) = NewRG(:)
-      WRVertex(:,iGam) = NewRW(:,Num)
+      WRVertex(:,iGam) = NewRW(:,i)
 
       !------ update the weight of elements -------------
       if(flagW(iWLn)==1) then
@@ -1754,11 +1754,11 @@ SUBROUTINE move_measuring_index
 
   tau1 = TVertex(3, jGam)-TVertex(2, jGam)
   tau2 = TVertex(1, jGam)-TVertex(3, jGam)
-  WjGam = weight_vertex(statjGam, 1, GRVertex(1, jGam)-WRVertex(1, jGam), GRVertex(2, jGam)-&
-    & WRVertex(2, jGam), tau1, tau2, TypeVertex(jGam))
+  WjGam = weight_vertex(statjGam, IsDeltaVertex(jGam), GRVertex(1, jGam)-WRVertex(1, jGam),  &
+    & GRVertex(2, jGam)-WRVertex(2, jGam), tau1, tau2, TypeVertex(jGam))
 
   tau = TVertex(3, NeighLn(2, jW)) - TVertex(3, NeighLn(1, jW))
-  WjW = weight_wline(statjW, 0, WRVertex(1, NeighLn(2, jW))-WRVertex(1, NeighLn(1,jW)),&
+  WjW = weight_wline(statjW, IsDeltaLn(jW), WRVertex(1, NeighLn(2, jW))-WRVertex(1, NeighLn(1,jW)),&
     & WRVertex(2, NeighLn(2,jW))-WRVertex(2, NeighLn(1,jW)), tau, TypeLn(jW))
 
   tau = TVertex(2, NeighLn(2, jGin)) - TVertex(1, NeighLn(1, jGin))
