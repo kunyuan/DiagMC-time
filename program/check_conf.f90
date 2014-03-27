@@ -324,8 +324,8 @@ SUBROUTINE check_k_conserve
       k = add_k(add_k(kLn(NeighVertex(1,i)), -kLn(NeighVertex(2,i))), kLn(NeighVertex(3,i)))
     endif
     if(IsWormPresent .eqv. .true.) then
-      if(i==Ira)   k = k + kMasha
-      if(i==Masha) k = k - kMasha
+      if(i==Ira)   k = add_k(k, kMasha)
+      if(i==Masha) k = add_k(k, -kMasha)
     endif
     if(k/=0) then
       write(36, *) "================================================="

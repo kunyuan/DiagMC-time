@@ -140,19 +140,24 @@ SUBROUTINE self_consistent
 
     call read_GWGamma
 
+    call read_monte_carlo_data
     !!-------- update the Gamma matrix with MC data -------
-    !call read_monte_carlo_data
-    !call Gam_mc2matrix_mc
+    call Gam_mc2matrix_mc
 
-    do iloop = 1, 10
-      call calculate_Gam1
-      flag = self_consistent_GW(1.d-8)
-    enddo
+    !call calculate_Gam1
+    !call output_Gam1
 
-    call write_GWGamma
+    flag = self_consistent_GW(1.d-8)
+
+    call calculate_Chi
+    call transfer_Chi_r(-1)
+    call transfer_Chi_t(-1)
 
     call transfer_Sigma_t(-1)
     call output_Quantities
+
+    call write_GWGamma
+    call update_flag
   endif
   return
 END SUBROUTINE self_consistent
@@ -218,12 +223,6 @@ SUBROUTINE monte_carlo
   call read_GWGamma
   call calculate_GamNormWeight  
 
-  call calculate_Gam1
-  call output_Gam1
-
-  write(logstr, *) "exp(i)", cdexp(-dcmplx(0.d0, real(MxT)-1.d0))
-  call write_log
-  
   call initialize_markov
 
   write(logstr,*) "Initializing monte carlo done!"
@@ -301,26 +300,27 @@ SUBROUTINE monte_carlo
   return
 END SUBROUTINE monte_carlo
 
-!SUBROUTINE read_flag
-  !implicit none
-  !open(11, status="old", file="selfconsist_loop")
-  !read(11, *) file_version
-  !close(11)
-  !return
-!END SUBROUTINE read_flag
+SUBROUTINE read_flag
+  implicit none
+  open(11, status="old", file="loop.inp")
+  read(11, *) file_version
+  close(11)
+  return
+END SUBROUTINE read_flag
 
 
-!SUBROUTINE update_flag
-  !implicit none
-  !open(11, status="old", file="selfconsist_loop")
-  !read(11, *) file_version
-  !close(11)
+SUBROUTINE update_flag
+  implicit none
 
-  !open(12, status="replace", file="selfconsist_loop")
-  !write(12, *) file_version+1
-  !close(12)
-  !return
-!END SUBROUTINE update_flag
+  open(11, status="old", file="loop.inp")
+  read(11, *) file_version
+  close(11)
+
+  open(12, status="replace", file="loop.inp")
+  write(12, *) file_version+1
+  close(12)
+  return
+END SUBROUTINE update_flag
 
 SUBROUTINE test_subroutine
     implicit none

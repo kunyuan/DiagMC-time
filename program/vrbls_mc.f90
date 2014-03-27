@@ -38,6 +38,7 @@ MODULE vrbls_mc
   character*100 :: logstr
 
   integer:: file_version
+  integer:: mc_version
 
   !======================== Input parameter ==============================
   integer          ::  Lx, Ly, L(2), Vol                ! System size
