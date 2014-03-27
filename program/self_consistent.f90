@@ -404,11 +404,9 @@ SUBROUTINE Gam_mc2matrix_mc
   norm = GamNormWeight/GamNorm
 
   do ityp = 1, NTypeGam/2
-    do iloop = 0, 1
-      do iorder = 1, MCOrder
-      typ = 2*(ityp-1)+1
-      Gam(typ, :, :, :, :) = Gam(typ, :, :, :, :) + GamMC(iorder,iloop,ityp,:,:,:,:)*norm
-      enddo
+    do iorder = 1, MCOrder
+    typ = 2*(ityp-1)+1
+    Gam(typ, :, :, :, :) = Gam(typ, :, :, :, :) + GamMC(iorder,ityp,:,:,:,:)*norm
     enddo
   enddo
 

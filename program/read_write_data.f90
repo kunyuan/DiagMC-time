@@ -80,6 +80,7 @@ SUBROUTINE write_log
   implicit none
   open(37, access="append", file=trim(title4)//".log")
   write(37,'(A)', advance='no') trim(logstr)
+  !write(*,'(A)', advance='no') trim(logstr)
   close(37)
 end SUBROUTINE
 
@@ -582,12 +583,10 @@ SUBROUTINE write_monte_carlo_data
       do iy = 0, Ly-1
         do ix = 0, Lx-1
           do ityp = 1, NtypeGam/2
-            do itopo = 0, 1
-              do iorder = 0, MCOrder
-                write(104)  GamMC(iorder, itopo, ityp, ix, iy, it1, it2)
-                write(104)  ReGamSqMC(iorder, itopo, ityp, ix, iy, it1, it2)
-                write(104)  ImGamSqMC(iorder, itopo, ityp, ix, iy, it1, it2)
-              enddo
+            do iorder = 0, MCOrder
+              write(104)  GamMC(iorder,  ityp, ix, iy, it1, it2)
+              write(104)  ReGamSqMC(iorder,  ityp, ix, iy, it1, it2)
+              write(104)  ImGamSqMC(iorder,  ityp, ix, iy, it1, it2)
             enddo
           enddo
         enddo
@@ -613,12 +612,10 @@ SUBROUTINE read_monte_carlo_data
       do iy = 0, Ly-1
         do ix = 0, Lx-1
           do ityp = 1, NtypeGam/2
-            do itopo = 0, 1
-              do iorder = 0, MCOrder
-                read(105)  GamMC(iorder, itopo, ityp, ix, iy, it1, it2)
-                read(105)  ReGamSqMC(iorder, itopo, ityp, ix, iy, it1, it2)
-                read(105)  ImGamSqMC(iorder, itopo, ityp, ix, iy, it1, it2)
-              enddo
+            do iorder = 0, MCOrder
+              read(105)  GamMC(iorder, ityp, ix, iy, it1, it2)
+              read(105)  ReGamSqMC(iorder, ityp, ix, iy, it1, it2)
+              read(105)  ImGamSqMC(iorder, ityp, ix, iy, it1, it2)
             enddo
           enddo
         enddo
@@ -964,40 +961,40 @@ SUBROUTINE output_GamMC
   complex*16 :: gam, gamn, norm
   double precision :: rgam2, igam2
 
-  open(34, access="append", file=trim(title3)//"_Gam_matrix_MC.dat")
+  !open(34, access="append", file=trim(title3)//"_Gam_matrix_MC.dat")
   open(35, access="append", file=trim(title3)//"_Gam_MC.dat")
 
   norm = GamNormWeight*Z_normal/GamNorm
-  !norm = GamOrder1(1, 0, 0)*Z_normal/GamMC(1,0,1,0,0,0,0)
+  !norm = GamOrder1(1, 0, 0)*Z_normal/GamMC(1,1,0,0,0,0)
 
-  write(34, *) "============================================"
-  write(34, *) "Beta", Beta, "Lx, Ly", Lx, Ly, "Order", MCOrder, "Seed",Seed
-  write(34, *) imc, Z_normal, GamNormWeight, GamNorm, norm
+  !write(34, *) "============================================"
+  !write(34, *) "Beta", Beta, "Lx, Ly", Lx, Ly, "Order", MCOrder, "Seed",Seed
+  !write(34, *) imc, Z_normal, GamNormWeight, GamNorm, norm
 
   write(35, *) "============================================"
   write(35, *) "Beta", Beta, "Lx, Ly", Lx, Ly, "Order", MCOrder, "Seed",Seed
   write(35, *) imc, Z_normal, GamNormWeight, GamNorm, norm
 
-  write(34, *) "Order 1, dx=0, dy=0, real part"
-  do it1 = 0, MxT-1
-    do it2 = 0, MxT-1
-      gam = GamMC(1, 0, 1, 0, 0, it1, it2)/Z_normal
-      gamn = gam*norm
-      write(34, '(f14.8)', advance='no') real(gamn)
-    enddo
-    write(34, *) 
-  enddo
+  !write(34, *) "Order 1, dx=0, dy=0, real part"
+  !do it1 = 0, MxT-1
+    !do it2 = 0, MxT-1
+      !gam = GamMC(1, 1, 0, 0, it1, it2)/Z_normal
+      !gamn = gam*norm
+      !write(34, '(f14.8)', advance='no') real(gamn)
+    !enddo
+    !write(34, *) 
+  !enddo
 
-  write(34, *) "Order 1, dx=0, dy=0, imag part"
-  do it1 = 0, MxT-1
-    do it2 = 0, MxT-1
-      gam = GamMC(1, 0, 1, 0, 0, it1, it2)/Z_normal
-      gamn = gam*norm
-      write(34, '(f14.8)', advance='no') dimag(gamn)
-    enddo
-    write(34, *) 
-  enddo
-  write(34, *) 
+  !write(34, *) "Order 1, dx=0, dy=0, imag part"
+  !do it1 = 0, MxT-1
+    !do it2 = 0, MxT-1
+      !gam = GamMC(1, 1, 0, 0, it1, it2)/Z_normal
+      !gamn = gam*norm
+      !write(34, '(f14.8)', advance='no') dimag(gamn)
+    !enddo
+    !write(34, *) 
+  !enddo
+  !write(34, *) 
 
 
   do iorder = 1, MCOrder
@@ -1005,10 +1002,10 @@ SUBROUTINE output_GamMC
     write(35, *) "dx = 0, dy = 0"
     do it1 = 0, MxT-1
       it2 = 0
-      gam = GamMC(iorder, 0, 1, 0, 0, it1, it2)/Z_normal
+      gam = GamMC(iorder, 1, 0, 0, it1, it2)/Z_normal
       gamn = gam*norm
 
-      rgam2 = ReGamSqMC(iorder,0, 1, 0, 0, it1, it2)/Z_normal
+      rgam2 = ReGamSqMC(iorder,1, 0, 0, it1, it2)/Z_normal
       rerr = sqrt(abs(rgam2)-(real(gam))**2.d0)/sqrt(Z_normal-1)
       if(abs(real(gam))<1.d-30) then
         rpercenterr = 0.d0
@@ -1016,7 +1013,7 @@ SUBROUTINE output_GamMC
         rpercenterr = rerr/abs(real(gam))
       endif
 
-      igam2 = ImGamSqMC(iorder,0, 1, 0, 0, it1, it2)/Z_normal
+      igam2 = ImGamSqMC(iorder,1, 0, 0, it1, it2)/Z_normal
       ierr = sqrt(abs(igam2)-(dimag(gam))**2.d0)/sqrt(Z_normal-1)
       if(abs(dimag(gam))<1.d-30) then
         ipercenterr = 0.d0
@@ -1030,7 +1027,7 @@ SUBROUTINE output_GamMC
     write(35, *)
   enddo
 
-  close(34)
+  !close(34)
   close(35)
 END SUBROUTINE output_GamMC
 

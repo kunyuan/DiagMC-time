@@ -235,7 +235,7 @@ SUBROUTINE markov(MaxSamp)
     endif
 
     !========================== REWEIGHTING =========================
-    if(mod(imc,1.e7)==0) then
+    if(mod(imc,1.e8)==0) then
       write(logstr,*) "Reweighting order of diagrams..."
       call write_log
       x=sum(GamWormOrder(:))
@@ -248,14 +248,27 @@ SUBROUTINE markov(MaxSamp)
       enddo
       write(logstr,*) "Reweighting is done!"
       call write_log
-      if(imc<=2.e7) then
+      if(imc<=2.e8) then
         GamWormOrder=0.d0
         GamOrder=0.d0
+      endif
+
+      write(logstr,*) "Check if there is a new G,W data..."
+      call write_log
+
+      call read_flag
+      if(mc_version/=file_version) then
+        write(logstr,*) "Updating G, W..."
+        call write_log
+
+        call read_GWGamma
+        call update_WeightCurrent
+        mc_version = file_version
       endif
     endif
     !================================================================
 
-    if(mod(imc,1.e8)==0) then
+    if(mod(imc,1.e9)==0) then
       write(logstr,*) "Writing data and configuration..."
       call write_log
       !call statistics
@@ -264,18 +277,6 @@ SUBROUTINE markov(MaxSamp)
       write(logstr,*) "Writing data and configuration done!"
       call write_log
 
-      write(logstr,*) "Check if there is a new G,W data..."
-      call write_log
-
-      call read_flag
-      if(mc_version/=file_version) then
-        write(logstr,*) "Updating G, W and the weight of Current config..."
-        call write_log
-
-        call read_GWGamma
-        call update_WeightCurrent
-        mc_version = file_version
-      endif
     endif
 
 
@@ -2435,11 +2436,11 @@ SUBROUTINE measure
       ityp = 3
     endif
 
-    if(SignFermiloop == 1.d0) then
-      nloop =0
-    else
-      nloop =1
-    endif
+    !if(SignFermiloop == 1.d0) then
+      !nloop =0
+    !else
+      !nloop =1
+    !endif
 
     !----- find the space and time variables for Gamma -------
     xg = GRVertex(1, MeasureGam)
@@ -2469,11 +2470,11 @@ SUBROUTINE measure
     factorM = factorM *CoefOfSymmetry(dx, dy)* CoefOfWeight(Order) *abs(WeightVertex(MeasureGam))
     !------------------- accumulation -------------------------------------------------------
 
-    GamMC(Order, nloop, ityp, dx, dy, dt1, dt2) = GamMC(Order, nloop, ityp, dx, dy, dt1, dt2) &
+    GamMC(Order,  ityp, dx, dy, dt1, dt2) = GamMC(Order,  ityp, dx, dy, dt1, dt2) &
       & + Phase/factorM
-    ReGamSqMC(Order,nloop, ityp, dx, dy, dt1, dt2 ) = ReGamSqMC(Order,nloop, ityp, dx, dy, dt1, dt2) &
+    ReGamSqMC(Order, ityp, dx, dy, dt1, dt2 ) = ReGamSqMC(Order, ityp, dx, dy, dt1, dt2) &
       & + (real(Phase)/factorM)**2.d0
-    ImGamSqMC(Order,nloop, ityp, dx, dy, dt1, dt2 ) = ImGamSqMC(Order,nloop, ityp, dx, dy, dt1, dt2) &
+    ImGamSqMC(Order, ityp, dx, dy, dt1, dt2 ) = ImGamSqMC(Order, ityp, dx, dy, dt1, dt2) &
       & + (dimag(Phase)/factorM)**2.d0
 
     if(Order==0) then
