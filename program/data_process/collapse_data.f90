@@ -1,130 +1,119 @@
-  program main
+INCLUDE "../vrbls_mc.f90"
+PROGRAM MAIN
+  USE vrbls_mc
     implicit none
-    integer :: itopo, ix, iy, ityp, ibasis, ibasis2, iomega1, iomega2
+    integer :: ix, iy, ityp, it1, it2
     integer :: i, itot, iorder
-    integer :: MCOrder
-    double precision :: ime(100), nme
     integer :: ifile
-    integer, parameter :: MxOmega = 16
-    double precision :: Gam1MR, GamNorm(100)
-    double precision :: GamMC1(100, 0:10, 3, 0:3, 0:3, -16:16, -16:16)
-    double precision :: GamSqMC1(100, 0:10, 3, 0:3, 0:3, -16:16, -16:16)
-    double precision :: GamMC2(100, 0:10, 3, 0:3, 0:3, -16:16, -16:16)
-    double precision :: GamSqMC2(100, 0:10, 3, 0:3, 0:3, -16:16, -16:16)
-    double precision :: Gam2Topo(100, 2, -16:16)
-    double precision :: Gam1, Gam2, Gam3
-    character*100 title
-    character*1 :: order
+    integer, parameter :: Mxjobs = 200
+    double precision :: imctmp
+    complex*16 :: iGam
+    complex*16 :: iGamNorm, iGamNormWeight
+    double precision :: iReGamSq
+    double precision :: iImGamSq
 
-    print *, 'title'
-    read  *, title
-    order = title(lnblnk(title):lnblnk(title))
-    read(order, *) MCOrder
-    
+    character(len=100),dimension(Mxjobs) :: title_file
+    character*1 :: order_coll
+    character*6 :: title_coll
 
-    open(101, status="old", file="data_collapse/"//trim(title)//"_monte_carlo_data.dat")
-
-    open(300, file=trim(title)//"_coll_monte_carlo_data.dat")
-    open(301, file=trim(title)//"_coll_Gamma.dat")
-
-    GamNorm(:) = 0.d0
-    ime(:) = 0.d0
-    GamMC1(:,:,:,:,:,:,:) = 0.d0
-    GamSqMC1(:,:,:,:,:,:,:) = 0.d0
-    GamMC2(:,:,:,:,:,:,:) = 0.d0
-    GamSqMC2(:,:,:,:,:,:,:) = 0.d0
-
-    itot = 1
-    do 
-      read(101, *, End=100) ime(itot), GamNorm(itot), Gam1MR
-      do iorder = 0, MCOrder
-        do ityp = 1, 3 
-          do ix = 0, 3
-            do iy = 0, 3
-              do iomega1 = -MxOmega, MxOmega
-                do iomega2 = -MxOmega, MxOmega
-                  read(101, *)  GamMC1(itot, iorder, ityp, ix, iy, iomega1, iomega2)
-                  read(101, *)  GamSqMC1(itot, iorder, ityp, ix, iy, iomega1, iomega2)
-                enddo
-              enddo
-            enddo
-          enddo
-        enddo
-
-        do ityp = 1, 3 
-          do ix = 0, 3
-            do iy = 0, 3
-              do iomega1 = -MxOmega, MxOmega
-                do iomega2 = -MxOmega, MxOmega
-                  read(101, *)  GamMC2(itot, iorder, ityp, ix, iy, iomega1, iomega2)
-                  read(101, *)  GamSqMC2(itot, iorder, ityp, ix, iy, iomega1, iomega2)
-                enddo
-              enddo
-            enddo
-          enddo
-        enddo
-      enddo
-
-      do iorder = 1, 2
-        do iomega1 = -MxOmega, MxOmega
-          read(101, *)  Gam2Topo(itot, iorder, iomega1)
-        enddo
-      enddo
-      write(*, *) itot, ime(itot), GamNorm(itot)
-      itot = itot + 1
+    open(10, file="read_list.dat")
+    i = 1
+    do
+      read(10, *, End=100) title_file(i)
+      i = i+1
     enddo
 100 continue
-    itot = itot - 1
-    write(*, *) itot, SUM(ime(:))
+    itot = i-1
 
-    write(300, *) SUM(ime(:)), SUM(GamNorm(:)), Gam1MR
-    do iorder = 0, MCOrder
-      do ityp = 1, 3
-        do ix = 0, 3
-          do iy = 0, 3
-            do iomega1 = -MxOmega, MxOmega
-              do iomega2 = -MxOmega, MxOmega
-                write(300, *)  SUM(GamMC1(:, iorder, ityp, ix, iy, iomega1, iomega2))
-                write(300, *)  SUM(GamSqMC1(:, iorder, ityp, ix, iy, iomega1, iomega2))
-              enddo
-            enddo
-          enddo
-        enddo
-      enddo
+    if(itot==0) stop
 
-      do ityp = 1, 3
-        do ix = 0, 3
-          do iy = 0, 3
-            do iomega1 = -MxOmega, MxOmega
-              do iomega2 = -MxOmega, MxOmega
-                write(300, *)  SUM(GamMC2(:, iorder, ityp, ix, iy, iomega1, iomega2))
-                write(300, *)  SUM(GamSqMC2(:, iorder, ityp, ix, iy, iomega1, iomega2))
-              enddo
-            enddo
-          enddo
-        enddo
-      enddo
-    enddo
-    do iorder = 1, 2
-      do iomega1 = -MxOmega, MxOmega
-        write(300, *)  SUM(Gam2Topo(:, iorder, iomega1))
-      enddo
-    enddo
+    order_coll = title_file(1)(8:8)
+    read(order_coll, *) MCOrder
+    title_coll = title_file(1)(3:8)
+    title_mc = trim(adjustl(title_coll))//"_coll"
 
-    write(301, *) "================================================="
-    write(301, *) SUM(ime(:)), SUM(GamNorm(:)), Gam1MR
-    do iorder = 1, MCOrder
-      write(301, *) "Order", iorder
-      do iomega1 = -MxOmega, MxOmega
-        Gam1 = SUM(GamMC1(:,iorder,1,0,0,iomega1,iomega1))*Gam1MR/SUM(GamNorm(:))
-        Gam2 = SUM(GamMC2(:,iorder,1,1,0,iomega1,iomega1))*Gam1MR/SUM(GamNorm(:))
-        write(301, *) iomega1, Gam1, Gam2
-      enddo
-      write(301, *)
-    enddo
+    open(101, status="old", file="../"//title_file(1), form="binary")
 
+    read(101) Lx, Ly
     close(101)
-    close(300)
-    close(301)
+
+    allocate(GamMC(0:MCOrder,1:NTypeGam/2, 0:Lx-1, 0:Ly-1, 0:MxT-1, 0:MxT-1))
+    allocate(ReGamSqMC(0:MCOrder,1:NTypeGam/2, 0:Lx-1, 0:Ly-1, 0:MxT-1, 0:MxT-1))
+    allocate(ImGamSqMC(0:MCOrder,1:NTypeGam/2, 0:Lx-1, 0:Ly-1, 0:MxT-1, 0:MxT-1))
+
+    GamNorm = 0.d0
+    imc = 0.d0
+
+    GamMC(:,:,:,:,:,:) = 0.d0
+    ReGamSqMC(:,:,:,:,:,:) = 0.d0
+    ImGamSqMC(:,:,:,:,:,:) = 0.d0
+
+    do i = 1, itot
+      open(101, status="old", file="../"//title_file(i), form="binary")
+
+      read(101) Lx, Ly
+      read(101) imctmp, iGamNorm, iGamNormWeight
+
+      imc = imc + imctmp
+      GamNorm = GamNorm + iGamNorm
+      GamNormWeight = iGamNormWeight
+
+      do iorder = 0, MCOrder
+        do ityp = 1, 3 
+          do ix = 0, Lx-1
+            do iy = 0, Ly-1
+              do it1 = 0, MxT-1
+                do it2 = 0, MxT-1
+                  read(101)  iGam
+                  GamMC(iorder, ityp, ix, iy, it1, it2) = GamMC(iorder, ityp, ix, iy, it1, it2) +  iGam
+                  read(101)  iReGamSq
+                  ReGamSqMC(iorder,ityp,ix,iy,it1,it2)=ReGamSqMC(iorder,ityp,ix,iy,it1,it2)+iReGamSq
+                  read(101)  iImGamSq
+                  ImGamSqMC(iorder,ityp,ix,iy,it1,it2)=ImGamSqMC(iorder,ityp,ix,iy,it1,it2)+iImGamSq
+                enddo
+              enddo
+            enddo
+          enddo
+        enddo
+      enddo
+      close(101)
+    enddo
+
+    write(*, *) itot, imc
+    call write_monte_carlo_data
+
+
+  CONTAINS
+
+  SUBROUTINE write_monte_carlo_data
+    implicit none
+    integer :: iorder, itopo, ix, iy, ityp, it1, it2
+
+    !=========== write into files =========================================
+    open(104, status="replace", &
+      & file="../"//trim(title_mc)//"_monte_carlo_data.bin.dat",form="binary")
+
+    write(104) imc, GamNorm, GamNormWeight
+    do it2 = 0, MxT-1
+      do it1 = 0, MxT-1
+        do iy = 0, Ly-1
+          do ix = 0, Lx-1
+            do ityp = 1, NtypeGam/2
+              do iorder = 0, MCOrder
+                write(104)  GamMC(iorder,  ityp, ix, iy, it1, it2)
+                write(104)  ReGamSqMC(iorder,  ityp, ix, iy, it1, it2)
+                write(104)  ImGamSqMC(iorder,  ityp, ix, iy, it1, it2)
+              enddo
+            enddo
+          enddo
+        enddo
+      enddo
+    enddo
+    !=========  write on the screen ========================================
+
+    
+    close(104)
+  END SUBROUTINE write_monte_carlo_data
+
   END program main
 
