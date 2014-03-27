@@ -74,7 +74,7 @@ SUBROUTINE calculate_Gam1
   enddo
 
   Gam(:,:,:,:,:) = (0.d0, 0.d0)
-  !Gam(:,0,0,:,:) = GamOrder1(:,:,:)
+  Gam(:,0,0,:,:) = GamOrder1(:,:,:)
 
 
 END SUBROUTINE calculate_Gam1

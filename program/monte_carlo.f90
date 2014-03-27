@@ -158,6 +158,8 @@ SUBROUTINE markov(MaxSamp)
   endif
 
   isamp=0
+  mc_version = 0
+
   do while(isamp<=MaxSamp)
     isamp=isamp+seg
 
@@ -223,6 +225,7 @@ SUBROUTINE markov(MaxSamp)
     imc = imc + 1.0
 
     if(mod(imc,Nstep*1.d0)==0 .and. .not. IsToss) call measure
+    if(imc>=320000000)   call check_config
 
     if(mod(imc,1.e7)==0) then
       call statistics
@@ -261,14 +264,21 @@ SUBROUTINE markov(MaxSamp)
       call write_monte_carlo_data
       write(logstr,*) "Writing data and configuration done!"
       call write_log
+
+      write(logstr,*) "Check if there is a new G,W data..."
+      call write_log
+
+      call read_flag
+      if(mc_version/=file_version) then
+        write(logstr,*) "Updating G, W and the weight of Current config..."
+        call write_log
+
+        call read_GWGamma
+        call update_WeightCurrent
+        mc_version = file_version
+      endif
     endif
 
-    !call read_flag
-    !if(mc_version/=file_version) then
-      !call read_GWGamma
-      !call update_WeightCurrent
-      !mc_version = file_version
-    !endif
 
   enddo
 END SUBROUTINE markov
