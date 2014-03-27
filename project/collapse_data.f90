@@ -1,4 +1,4 @@
-INCLUDE "../vrbls_mc.f90"
+INCLUDE "program/vrbls_mc.f90"
 PROGRAM MAIN
   USE vrbls_mc
     implicit none
@@ -32,7 +32,7 @@ PROGRAM MAIN
     title_coll = title_file(1)(3:8)
     title_mc = trim(adjustl(title_coll))//"_coll"
 
-    open(101, status="old", file="../"//title_file(1), form="binary")
+    open(101, status="old", file=title_file(1), form="binary")
 
     read(101) Lx, Ly
     close(101)
@@ -49,7 +49,7 @@ PROGRAM MAIN
     ImGamSqMC(:,:,:,:,:,:) = 0.d0
 
     do i = 1, itot
-      open(101, status="old", file="../"//title_file(i), form="binary")
+      open(101, status="old", file=title_file(i), form="binary")
 
       read(101) Lx, Ly
       read(101) imctmp, iGamNorm, iGamNormWeight
@@ -91,7 +91,7 @@ PROGRAM MAIN
 
     !=========== write into files =========================================
     open(104, status="replace", &
-      & file="../"//trim(title_mc)//"_monte_carlo_data.bin.dat",form="binary")
+      & file=trim(title_mc)//"_monte_carlo_data.bin.dat",form="binary")
 
     write(104) imc, GamNorm, GamNormWeight
     do it2 = 0, MxT-1
