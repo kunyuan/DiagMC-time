@@ -228,6 +228,11 @@ SUBROUTINE monte_carlo
   write(logstr,*) "Initializing monte carlo done!"
   call write_log
 
+  !do i = 1, MCOrder+1
+    !QuanName(i)="(total conf)"
+    !Norm(i) = 1.d0
+  !enddo
+
   if(InpMC==0) then
 
     write(logstr,*) "Start Thermalization..."
@@ -249,6 +254,26 @@ SUBROUTINE monte_carlo
     call write_log
     52 format(' Thermalization time:',f16.7,2x,'s')
 
+    !!================ MC SIMULATION FOR GAMMA =============================
+    imc = 0.d0
+    Z_normal=0.0
+    Z_worm=0.0
+    StatNum=0
+
+    ProbProp(:,:) = 0.d0
+    ProbAcc(:,:) = 0.d0
+
+    GamOrder(:) = 0.d0
+    GamWormOrder(:) = 0.d0
+
+    GamMC(:,:,:,:,:,:) = (0.d0, 0.d0)
+    ReGamSqMC(:,:,:,:,:,:) = 0.d0
+    ImGamSqMC(:,:,:,:,:,:) = 0.d0
+    GamNorm = (0.d0, 0.d0)
+    TestData(:)=0.d0
+
+    mc_version = 0
+
   else if(InpMC==1) then
 
     !------- read the configuration and MC data from previous simulation --
@@ -259,31 +284,6 @@ SUBROUTINE monte_carlo
     call check_config
 
   endif
-
-  !!================ MC SIMULATION FOR GAMMA =============================
-  imc = 0.d0
-  Z_normal=0.0
-  Z_worm=0.0
-  StatNum=0
-
-  ProbProp(:,:) = 0.d0
-  ProbAcc(:,:) = 0.d0
-
-  GamOrder(:) = 0.d0
-  GamWormOrder(:) = 0.d0
-
-  GamMC(:,:,:,:,:,:) = (0.d0, 0.d0)
-  ReGamSqMC(:,:,:,:,:,:) = 0.d0
-  ImGamSqMC(:,:,:,:,:,:) = 0.d0
-  GamNorm = (0.d0, 0.d0)
-  TestData(:)=0.d0
-
-  do i = 1, MCOrder+1
-    QuanName(i)="(total conf)"
-    Norm(i) = 1.d0
-  enddo
-
-  mc_version = 0
 
   write(logstr,*) "Simulation started!"
   call write_log
