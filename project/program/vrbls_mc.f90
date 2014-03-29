@@ -36,6 +36,7 @@ MODULE vrbls_mc
   character*100 :: title_mc
   character*100 :: title
   character*100 :: logstr
+  character*100 :: title_loop_log
 
   integer:: file_version
   integer:: mc_version

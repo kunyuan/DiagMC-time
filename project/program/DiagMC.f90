@@ -24,7 +24,7 @@ PROGRAM MAIN
 
   title1 = trim(adjustl(title_loop))//'_'//trim(adjustl(title1))
   title_mc = trim(adjustl(title2))//'_'//trim(adjustl(title1))
-
+  title_loop_logself="project.log"
 
   write(logstr,*) "Initializing..."
   call write_log

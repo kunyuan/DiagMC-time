@@ -4,16 +4,18 @@ import os
 import sys
 import time
 import subprocess
+import logging
 
 #IsCluster=True
 IsCluster=False
 TurnOnSelfConsist=True
 cpu=4
 #sourcedir="."
-#execute="./test"
 execute="./gamma3.exe"
 homedir=os.getcwd()
 proclist=[]
+logging.basicConfig(filename=homedir+"/project.log",level=logging.INFO,format="[job][%(asctime)s][%(levelname)s]:%(message)s",datefmt='%m/%d %I:%M:%S %p')
+logging.info("Jobs manage daemon is started...")
 
 def para_init():
     para=dict()
@@ -36,13 +38,17 @@ def para_init():
 
 def check_status():
     time.sleep(10)
+    flag = open("stop.inp", "r").readline().lstrip().rstrip()
+    if(flag!='0'):
+        logging.info("Jobs manage daemon is ended...")
+        sys.exit()
     for elemp in proclist:
         if elemp[0].poll()==0:
-            print str(elemp[1])+" is done"
             proclist.remove(elemp)
-            log=open("./logfile.log","a")
-            log.write("#"+str(elemp[1])+" job is ended at "+time.strftime("%Y-%m-%d %A %X %Z",time.localtime())+"\n")
-            log.close()
+            #log=open("./logfile.log","a")
+            #log.write("#"+str(elemp[1])+" job is ended at "+time.strftime("%Y-%m-%d %A %X %Z",time.localtime())+"\n")
+            #log.close()
+            logging.info("Job "+str(elemp[1])+" is ended!")
     return
 
 def submit_jobs(para,i,execute,homedir):
@@ -149,11 +155,8 @@ def submit_jobs(para,i,execute,homedir):
                             g.close()
                             proclist.append((p,pid))
                             #print i,j
-                            print str(pid)+" is started"
-                            log=open("./logfile.log","a")
-                            log.write("#"+str(pid)+" job is started at "+time.strftime("%Y-%m-%d %A %X %Z",time.localtime())+"\n")
-                            log.close()
-
+                            logging.info("Job "+str(pid)+" is started...")
+                            logging.info("input:\n"+stri)
                             break
 
     return i
@@ -187,12 +190,12 @@ for eachline in inlist:
         flag=False
         for kelem in para.keys():
             if len(para[kelem])==0:
-                print kelem+" is missing in inlist file!"
+                logging.error(kelem+" is missing in inlist file!")
                 flag=True
         if flag:
             sys.exit()
         if len(para['Reweight']) != int(para['Order'][0]):
-            print "Reweight doesn't match Order!"
+            logging.error("Reweight doesn't match Order!")
             sys.exit()
         num=submit_jobs(para,num,execute,homedir)
         para=para_init()
@@ -203,19 +206,19 @@ for eachline in inlist:
             key=eachline.split(":")[0].lstrip(' ').rstrip(' ')
             value=eachline.split(":")[1].lstrip(' ').rstrip(' ')
         except:
-            print "I don't understand '"+eachline+"'!"
+            logging.error("I don't understand '"+eachline+"'!")
             continue
         # parse list parameter
         if para.has_key(key):
             try:
                 para[key]=[elem.lstrip(' ').rstrip(' ') for elem in value.split(',')]
             except ValueError:
-                print "Could not covert data "+key+":"+value
+                logging.error("Could not covert data "+key+":"+value)
                 sys.exit()
             except:
-                print "Error happens!"
+                logging.error("Error happens!")
         else:
-            print "What is "+key+"?"
+            logging.error("What is "+key+"?")
             sys.exit()
 
 while True:
@@ -224,3 +227,4 @@ while True:
     else:
         break
 
+logging.info("Jobs manage daemon is ended...")
