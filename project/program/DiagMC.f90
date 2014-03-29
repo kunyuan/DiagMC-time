@@ -147,7 +147,6 @@ SUBROUTINE self_consistent
 
     write(logstr, *) "Reading monte carlo data..."
     call write_log
-
     call read_monte_carlo_data
 
     write(logstr, *) "Read done!"
