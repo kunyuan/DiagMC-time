@@ -180,6 +180,9 @@ contains
         if(this%Content(tail:tail)/=char(10)) write(36,*)
         close(36)
       endif
+
+      call this%ClearContent()
+      call this%SetLevel('i')
 101 format('[job]','[',A,']','[',A,']:',A)
   end subroutine
 
@@ -209,7 +212,7 @@ contains
       implicit none
       class(logging) :: this
       character(len=*),intent(in) :: str
-      this%Content=''
+      this%Content='' 
       this%Level=2
       call this%AddLine(str)
       call this%Write
