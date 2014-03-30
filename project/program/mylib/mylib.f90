@@ -110,7 +110,7 @@ module logging_module
 
     generic,public :: WriteStamp => write_stamp,write_stamp_num,write_stamp_char
     procedure,public :: WriteLine
-    procedure,public :: Close => write_close
+    procedure,public :: WriteClose
   end type logging
 
 contains
@@ -315,7 +315,7 @@ contains
       endif
   end subroutine
 
-  subroutine write_close(this)
+  subroutine WriteClose(this)
       implicit none
       class(logging) :: this
       if(this%status) then

@@ -569,7 +569,7 @@ SUBROUTINE check_weight
       i = VertexKey2Value(ikey)
       call LogMC%WriteLine("Gam"+str(i)+str(gam(ikey))+str(WeightVertex(i)))
     enddo
-    call LogMC%Close
+    call LogMC%WriteClose
     call print_config
     stop
   endif
