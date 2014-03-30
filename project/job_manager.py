@@ -14,7 +14,7 @@ cpu=4
 execute="./gamma3.exe"
 homedir=os.getcwd()
 proclist=[]
-logging.basicConfig(filename=homedir+"/project.log",level=logging.INFO,format="[job][%(asctime)s][%(levelname)s]:%(message)s",datefmt='%m/%d %I:%M:%S %p')
+logging.basicConfig(filename=homedir+"/project.log",level=logging.INFO,format="[job][%(asctime)s][%(levelname)s]:%(message)s",datefmt='%y/%m/%d %H:%M:%S')
 logging.info("Jobs manage daemon is started...")
 
 def para_init():

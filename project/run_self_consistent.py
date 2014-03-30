@@ -4,7 +4,7 @@ import time
 import logging
 
 homedir=os.getcwd()
-logging.basicConfig(filename=homedir+"/project.log",level=logging.INFO,format="[loop][%(asctime)s][%(levelname)s]:%(message)s",datefmt='%m/%d %I:%M:%S %p')
+logging.basicConfig(filename=homedir+"/project.log",level=logging.INFO,format="[loop][%(asctime)s][%(levelname)s]:%(message)s",datefmt='%y/%m/%d %H:%M:%S')
 execf="./gamma3.exe"
 interval=300
 title = "0.50_2"
