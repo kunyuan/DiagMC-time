@@ -163,6 +163,7 @@ SUBROUTINE markov(MaxSamp)
   mc_version = 0
 
   call LogMC%QuickLog("Starting Markov...")
+  call check_weight
 
   do while(isamp<=MaxSamp)
     isamp=isamp+seg
@@ -227,7 +228,6 @@ SUBROUTINE markov(MaxSamp)
     endif
 
     imc = imc + 1.0
-    !call check_config
 
     if(mod(imc,Nstep*1.d0)==0 .and. .not. IsToss) call measure
 
