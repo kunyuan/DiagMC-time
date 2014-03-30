@@ -1,0 +1,26 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+101	mylib.f90	/^101 format('[job]','[',A,']','[',A,']:',A)$/;"	l	subroutine:write_log	file:
+Add	mylib.f90	/^  subroutine Add(/;"	s	module:logging_module
+AddLine	mylib.f90	/^  subroutine AddLine(/;"	s	module:logging_module
+ClearContent	mylib.f90	/^  subroutine ClearContent(/;"	s	module:logging_module
+Content	mylib.f90	/^    character(len=1024) :: Content=/;"	k	type:logging
+FileName	mylib.f90	/^    character(len=256) :: FileName=/;"	k	type:logging
+Init	mylib.f90	/^  subroutine Init(/;"	s	module:logging_module
+Level	mylib.f90	/^    integer :: Level=/;"	k	type:logging
+LevelName	mylib.f90	/^  character(len=10),parameter :: LevelName(/;"	v	module:logging_module
+SetFilename	mylib.f90	/^  subroutine SetFilename(/;"	s	module:logging_module
+logging	mylib.f90	/^  type :: logging$/;"	t	module:logging_module
+logging_module	mylib.f90	/^module logging_module$/;"	m
+quicklog_char	mylib.f90	/^  subroutine quicklog_char(/;"	s	module:logging_module
+quicklog_num	mylib.f90	/^  subroutine quicklog_num(/;"	s	module:logging_module
+set_level_char	mylib.f90	/^  subroutine set_level_char(/;"	s	module:logging_module
+set_level_num	mylib.f90	/^  subroutine set_level_num(/;"	s	module:logging_module
+str_double	mylib.f90	/^  function str_double(/;"	f	module:string_basic
+str_int	mylib.f90	/^  function str_int(/;"	f	module:string_basic
+string_basic	mylib.f90	/^module string_basic$/;"	m
+write_log	mylib.f90	/^  subroutine write_log(/;"	s	module:logging_module
