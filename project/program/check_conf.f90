@@ -26,21 +26,18 @@ SUBROUTINE check_isdelta
   implicit none
   
   if(IsDeltaVertex(MeasureGam)/=1) then
-    write(36, *) "================================================="
-    write(36, *) "Oops, check_isdelta found a bug!"
-    write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-    write(36, *) "Diagram order", Order, "MeasureGam", MeasureGam
-    write(36, *) "================================================="
-    call print_config
+    call LogMC%AddLine("Oops, check_isdelta found a bug!")
+    call LogMC%AddLine("IsWormPresent:"+str(IsWormPresent)+", update number:"+str(iupdate))
+    call LogMC%AddLine("Diagramorder:"+str(Order)+", MeasureGam:"+str(MeasureGam))
+    call LogMC%Write('e')
     stop
   endif
 
   if(IsDeltaLn(NeighVertex(3, MeasureGam))/=0) then
-    write(36, *) "================================================="
-    write(36, *) "Oops, check_isdelta found a bug!"
-    write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-    write(36, *) "Diagram order", Order, "MeasureW", NeighVertex(3,MeasureGam)
-    write(36, *) "================================================="
+    call LogMC%AddLine("Oops, check_isdelta found a bug!")
+    call LogMC%AddLine("IsWormPresent:"+str(IsWormPresent)+", update number:"+str(iupdate))
+    call LogMC%AddLine("Diagramorder:"+str(Order)+", MeasureGam:"+str(NeighVertex(3,MeasureGam)))
+    call LogMC%Write('e')
     call print_config
     stop
   endif
@@ -53,26 +50,24 @@ SUBROUTINE check_topo
   integer :: nextLn, nLn
   
   if(NGLn/=2*(Order+1) .or. NWLn/=Order+1 .or. NVertex/=2*(Order+1)) then
-    write(36, *) "================================================="
-    write(36, *) "Oops, check_topo found a bug!"
-    write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-    write(36, *) "Diagram order", Order
-    write(36, *) "number of glines", NGLn, "number of wlines", NWLn, &
-      & "number of gamma", NVertex
-    write(36, *) "================================================="
+    call LogMC%AddLine("Oops, check_topo found a bug!")
+    call LogMC%AddLine("IsWormPresent"+str(IsWormPresent)+", update number"+str(iupdate))
+    call LogMC%AddLine("Diagram order"+str(Order))
+    call LogMC%AddLine("number of glines"+str(NGLn)+",number of wlines"+str(NWLn)+ &
+      & ",number of gamma"+str(NVertex))
+    call LogMC%Write('e')
     call print_config
     stop
   endif
 
   do i = 1, NGLn
     if(LnValue2Key(GLnKey2Value(i))/=i) then
-      write(36, *) "================================================="
-      write(36, *) "Oops, check_topo found a bug!"
-      write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-      write(36, *) "gline's location is wrong!"
-      write(36, *) "real location", i, "gline's number", GLnKey2Value(i), "gline's &
-        & location", LnValue2Key(GLnKey2Value(i))
-      write(36, *) "================================================="
+      call LogMC%AddLine("Oops, check_topo found a bug!")
+      call LogMC%AddLine("IsWormPresent"+str(IsWormPresent)+", update number"+str(iupdate))
+      call LogMC%AddLine("gline's location is wrong!")
+      call LogMC%AddLine("real location"+str(i)+",gline's number"+str(GLnKey2Value(i))+",gline's &
+        & location"+str(LnValue2Key(GLnKey2Value(i))))
+      call LogMC%Write('e')
       call print_config
       stop
     endif
@@ -85,24 +80,22 @@ SUBROUTINE check_topo
       nextLn = NeighVertex(2, NeighLn(2, nextLn))
       nLn = nLn + 1
       if(nLn>NGLn) then
-        write(36, *) "================================================="
-        write(36, *) "Oops, check_topo found a bug!"
-        write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-        write(36, *) "The Fermi loop is wrong!"
-        write(36, *) "The gline number in a loop:", nLn
-        write(36, *) "================================================="
+        call LogMC%AddLine("Oops, check_topo found a bug!")
+        call LogMC%AddLine("IsWormPresent"+str(IsWormPresent)+", update number"+str(iupdate))
+        call LogMC%AddLine("The Fermi loop is wrong!")
+        call LogMC%AddLine("The gline number in a loop:"+str(nLn))
+        call LogMC%Write('e')
         call print_config
         stop
       endif
     enddo
 
     !if(nLn/=NGLn) then
-      !write(36, *) "================================================="
-      !write(36, *) "Oops, check_topo found a bug!"
-      !write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-      !write(36, *) "The Fermi loop is wrong!"
-      !write(36, *) "The gline number in a loop:", nLn
-      !write(36, *) "================================================="
+      !call LogMC%AddLine("Oops, check_topo found a bug!")
+      !call LogMC%AddLine("IsWormPresent"+str(IsWormPresent)+", update number"+str(iupdate))
+      !call LogMC%AddLine("The Fermi loop is wrong!")
+      !call LogMC%AddLine("The gline number in a loop:"+str(nLn))
+      !call LogMC%Write('e')
       !call print_config
       !stop
     !endif
@@ -110,26 +103,24 @@ SUBROUTINE check_topo
 
   do i = 1, NWLn
     if(LnValue2Key(WLnKey2Value(i))/=i) then
-      write(36, *) "================================================="
-      write(36, *) "Oops, check_topo found a bug!"
-      write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-      write(36, *) "wline's location is wrong!"
-      write(36, *) "real location", i, "wline's number", WLnKey2Value(i), "wline's &
-        & location", LnValue2Key(WLnKey2Value(i))
-      write(36, *) "================================================="
+      call LogMC%AddLine("Oops, check_topo found a bug!")
+      call LogMC%AddLine("IsWormPresent"+str(IsWormPresent)+", update number"+str(iupdate))
+      call LogMC%AddLine("wline's location is wrong!")
+      call LogMC%AddLine("real location"+str(i)+",wline's number"+str(WLnKey2Value(i))+",wline's &
+        & location"+str(LnValue2Key(WLnKey2Value(i))))
+      call LogMC%Write('e')
       call print_config
       stop
     endif
 
     if(IsWormPresent .eqv. .false.) then
       if(NeighLn(1, WLnKey2Value(i))==NeighLn(2, WLnKey2Value(i))) then
-        write(36, *) "================================================="
-        write(36, *) "Oops, check_topo found a bug!"
-        write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-        write(36, *) "wline's topology is wrong!"
-        write(36, *) "wline's number", WLnKey2Value(i), "wline's left Gam", NeighLn(1, &
-          &  WLnKey2Value(i)), "right Gam", NeighLn(2, WLnKey2Value(i))
-        write(36, *) "================================================="
+        call LogMC%AddLine("Oops, check_topo found a bug!")
+        call LogMC%AddLine("IsWormPresent"+str(IsWormPresent)+", update number"+str(iupdate))
+        call LogMC%AddLine("wline's topology is wrong!")
+        call LogMC%AddLine("wline's number"+str(WLnKey2Value(i))+",wline's left Gam"+str(NeighLn(1, &
+          &  WLnKey2Value(i)))+",right Gam"+str(NeighLn(2, WLnKey2Value(i))))
+        call LogMC%Write('e')
         call print_config
         stop
       endif
@@ -138,13 +129,12 @@ SUBROUTINE check_topo
 
   do i = 1, NVertex
     if(VertexValue2Key(VertexKey2Value(i))/=i) then
-      write(36, *) "================================================="
-      write(36, *) "Oops, check_topo found a bug!"
-      write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-      write(36, *) "gamma's location is wrong!"
-      write(36, *) "real location", i, "gamma's number", VertexKey2Value(i), "gamma's &
-        & location", VertexValue2Key(VertexKey2Value(i))
-      write(36, *) "================================================="
+      call LogMC%AddLine("Oops, check_topo found a bug!")
+      call LogMC%AddLine("IsWormPresent"+str(IsWormPresent)+", update number"+str(iupdate))
+      call LogMC%AddLine("gamma's location is wrong!")
+      call LogMC%AddLine("real location"+str(i)+",gamma's number"+str(VertexKey2Value(i))+",gamma's &
+        & location"+str(VertexValue2Key(VertexKey2Value(i))))
+      call LogMC%Write('e')
       call print_config
       stop
     endif
@@ -161,23 +151,21 @@ SUBROUTINE check_stat
 
   if(IsWormPresent) then
     if(StatusVertex(Ira)<=1)  then
-      write(36, *) "================================================="
-      write(36, *) "Oops, check_stat found a bug!"
-      write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-      write(36, *) "Ira's status is wrong!"
-      write(36, *) "Ira's number", Ira, "Ira's status",StatusVertex(Ira)
-      write(36, *) "================================================="
+      call LogMC%AddLine("Oops, check_stat found a bug!")
+      call LogMC%AddLine("IsWormPresent"+str(IsWormPresent)+",update number"+str(iupdate))
+      call LogMC%AddLine("Ira's status is wrong!")
+      call LogMC%AddLine("Ira's number"+str(Ira)+",Ira's status"+str(StatusVertex(Ira)))
+      call LogMC%Write('e')
       call print_config
       stop
     endif
 
     if(StatusVertex(Masha)<=1)  then
-      write(36, *) "================================================="
-      write(36, *) "Oops, check_stat found a bug!"
-      write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-      write(36, *) "Masha's status is wrong!"
-      write(36, *) "Masha's number", Masha, "Masha's status",StatusVertex(Masha)
-      write(36, *) "================================================="
+      call LogMC%AddLine("Oops, check_stat found a bug!")
+      call LogMC%AddLine("IsWormPresent"+str(IsWormPresent)+",update number"+str(iupdate))
+      call LogMC%AddLine("Masha's status is wrong!")
+      call LogMC%AddLine("Masha's number"+str(Masha)+",Masha's status"+str(StatusVertex(Masha)))
+      call LogMC%Write('e')
       call print_config
       stop
     endif
@@ -192,14 +180,11 @@ SUBROUTINE check_stat
       if(Ira==i .or. Masha==i) stat = stat+2
     endif
     if(StatusVertex(i)/=stat) then
-
-      write(36, *) "================================================="
-      write(36, *) "Oops, check_stat found a bug!"
-      write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-      write(36, *) "Gamma's status is wrong!"
-      write(36, *) "Gamma's number", i, "real status", stat, "Gamma's status",StatusVertex(i)
-      write(36, *) "================================================="
-
+      call LogMC%AddLine("Oops, check_stat found a bug!")
+      call LogMC%AddLine("IsWormPresent"+str(IsWormPresent)+",update number"+str(iupdate))
+      call LogMC%AddLine("Gamma's status is wrong!")
+      call LogMC%AddLine("Gamma's number"+str(i)+",real status"+str(stat)+",Gamma's status"+str(StatusVertex(i)))
+      call LogMC%Write('e')
       call print_config
       stop
     endif
@@ -210,13 +195,11 @@ SUBROUTINE check_stat
     stat = 0
     if(NeighLn(1,i)==MeasureGam .or. NeighLn(2,i)==MeasureGam) stat = stat+1
     if(StatusLn(i)/=stat) then
-      write(36, *) "================================================="
-      write(36, *) "Oops, check_stat found a bug!"
-      write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-      write(36, *) "line's status is wrong!"
-      write(36, *) "line's number", i, "real status", stat, "line's status",StatusLn(i)
-      write(36, *) "================================================="
-
+      call LogMC%AddLine("Oops, check_stat found a bug!")
+      call LogMC%AddLine("IsWormPresent"+str(IsWormPresent)+",update number"+str(iupdate))
+      call LogMC%AddLine("line's status is wrong!")
+      call LogMC%AddLine("line's number"+str(i)+",real status"+str(stat)+",line's status"+str(StatusLn(i)))
+      call LogMC%Write('e')
       call print_config
       stop
     endif
@@ -231,13 +214,11 @@ SUBROUTINE check_stat
         & .or. NeighLn(2,i)==Masha)                            stat = stat+2
     endif
     if(StatusLn(i)/=stat) then
-      write(36, *) "================================================="
-      write(36, *) "Oops, check_stat found a bug!"
-      write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-      write(36, *) "line's status is wrong!"
-      write(36, *) "line's number", i, "real status", stat, "line's status",StatusLn(i)
-      write(36, *) "================================================="
-
+      call LogMC%AddLine("Oops, check_stat found a bug!")
+      call LogMC%AddLine("IsWormPresent"+str(IsWormPresent)+",update number"+str(iupdate))
+      call LogMC%AddLine("line's status is wrong!")
+      call LogMC%AddLine("line's number"+str(i)+",real status"+str(stat)+",line's status"+str(StatusLn(i)))
+      call LogMC%Write('e')
       call print_config
       stop
     endif
@@ -253,12 +234,11 @@ SUBROUTINE check_time
     if(IsDeltaVertex(i)==1) then
       if(TVertex(1, i)/=TVertex(2, i) .or. TVertex(1, i)/=TVertex(3, i) .or. TVertex(2, i) &
         & /=TVertex(3, i)) then
-        write(36, *) "================================================="
-        write(36, *) "Oops, check_time found a bug!"
-        write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-        write(36, *) "delta Gamma is wrong!"
-        write(36, *) "gamma's number", i, "time", TVertex(1, i), TVertex(2, i), TVertex(3, i)
-        write(36, *) "================================================="
+        call LogMC%AddLine("Oops, check_time found a bug!")
+        call LogMC%AddLine("IsWormPresent"+str(IsWormPresent)+",update number"+str(iupdate))
+        call LogMC%AddLine("delta Gamma is wrong!")
+        call LogMC%AddLine("gamma's number"+str(i)+",time"+str(TVertex(1, i))+str(TVertex(2, i))+str(TVertex(3, i)))
+        call LogMC%Write('e')
         call print_config
         stop
       endif
@@ -269,12 +249,11 @@ SUBROUTINE check_time
     i = WLnKey2Value(ikey)
     if(IsDeltaLn(i)==1) then
       if(TVertex(3, NeighLn(1, i))/=TVertex(3, NeighLn(2, i))) then
-        write(36, *) "================================================="
-        write(36, *) "Oops, check_time found a bug!"
-        write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-        write(36, *) "delta W is wrong!"
-        write(36, *) "W's number", i, "time", TVertex(3, NeighLn(1,i)),TVertex(3, NeighLn(2,i))
-        write(36, *) "================================================="
+        call LogMC%AddLine("Oops, check_time found a bug!")
+        call LogMC%AddLine("IsWormPresent"+str(IsWormPresent)+",update number"+str(iupdate))
+        call LogMC%AddLine("delta W is wrong!")
+        call LogMC%AddLine("W's number"+str(i)+",time"+str(TVertex(3,NeighLn(1,i)))+str(TVertex(3,NeighLn(2,i))))
+        call LogMC%Write('e')
         call print_config
         stop
       endif
@@ -290,42 +269,38 @@ SUBROUTINE check_site
   do ikey = 1, NVertex
     i = VertexKey2Value(ikey)
     if(GRVertex(1, i)<0 .or. GRVertex(1, i)>Lx-1) then
-      write(36, *) "================================================="
-      write(36, *) "Oops, check_site found a bug!"
-      write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-      write(36, *) "GX is wrong!"
-      write(36, *) "gamma's number", i, "GX", GRVertex(1, i)
-      write(36, *) "================================================="
+      call LogMC%AddLine("Oops, check_site found a bug!")
+      call LogMC%AddLine("IsWormPresent"+str(IsWormPresent)+",update number"+str(iupdate))
+      call LogMC%AddLine("GX is wrong!")
+      call LogMC%AddLine("gamma's number"+str(i)+",GX"+str(GRVertex(1, i)))
+      call LogMC%Write('e')
       call print_config
       stop
     endif
     if(GRVertex(2, i)<0 .or. GRVertex(2, i)>Ly-1) then
-      write(36, *) "================================================="
-      write(36, *) "Oops, check_site found a bug!"
-      write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-      write(36, *) "GY is wrong!"
-      write(36, *) "gamma's number", i, "GY", GRVertex(2, i)
-      write(36, *) "================================================="
+      call LogMC%AddLine("Oops, check_site found a bug!")
+      call LogMC%AddLine("IsWormPresent"+str(IsWormPresent)+",update number"+str(iupdate))
+      call LogMC%AddLine("GY is wrong!")
+      call LogMC%AddLine("gamma's number"+str(i)+",GY"+str(GRVertex(2, i)))
+      call LogMC%Write('e')
       call print_config
       stop
     endif
     if(WRVertex(1, i)<0 .or. WRVertex(1, i)>Lx-1) then
-      write(36, *) "================================================="
-      write(36, *) "Oops, check_site found a bug!"
-      write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-      write(36, *) "WX is wrong!"
-      write(36, *) "gamma's number", i, "WX", WRVertex(1, i)
-      write(36, *) "================================================="
+      call LogMC%AddLine("Oops, check_site found a bug!")
+      call LogMC%AddLine("IsWormPresent"+str(IsWormPresent)+",update number"+str(iupdate))
+      call LogMC%AddLine("GY is wrong!")
+      call LogMC%AddLine("gamma's number"+str(i)+",WX"+str(WRVertex(1, i)))
+      call LogMC%Write('e')
       call print_config
       stop
     endif
     if(WRVertex(2, i)<0 .or. WRVertex(2, i)>Ly-1) then
-      write(36, *) "================================================="
-      write(36, *) "Oops, check_site found a bug!"
-      write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-      write(36, *) "WY is wrong!"
-      write(36, *) "gamma's number", i, "WY", WRVertex(2, i)
-      write(36, *) "================================================="
+      call LogMC%AddLine("Oops, check_site found a bug!")
+      call LogMC%AddLine("IsWormPresent"+str(IsWormPresent)+",update number"+str(iupdate))
+      call LogMC%AddLine("GY is wrong!")
+      call LogMC%AddLine("gamma's number"+str(i)+",WY"+str(WRVertex(2, i)))
+      call LogMC%Write('e')
       call print_config
       stop
     endif
@@ -353,12 +328,11 @@ SUBROUTINE check_k_conserve
       if(i==Masha) k = add_k(k, -kMasha)
     endif
     if(k/=0) then
-      write(36, *) "================================================="
-      write(36, *) "Oops, check_k_conserve found a bug!"
-      write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-      write(36, *) "k on gamma is not conserved!"
-      write(36, *) "gamma's number", i, "k", k
-      write(36, *) "================================================="
+      call LogMC%AddLine("Oops, check_k_conserve found a bug!")
+      call LogMC%AddLine("IsWormPresent"+str(IsWormPresent)+",update number"+str(iupdate))
+      call LogMC%AddLine("k on gamma is not conserved!")
+      call LogMC%AddLine("gamma's number"+str(i)+",k"+str(k))
+      call LogMC%Write('e')
       call print_config
       stop
     endif
@@ -409,42 +383,39 @@ SUBROUTINE check_type
     if(sum1+2*(SpInVertex(1, Gam1)+SpInVertex(1, Gam2)-SpInVertex(2, Gam1)-SpInVertex(2, Gam2))/=0) flag=5
 
     if(flag==1 .or. flag==2) then
-      write(36, *) "================================================="
-      write(36, *) "Oops, check_type found a bug!"
-      write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-      write(36, *) "The type of Gamma is wrong!"
-      write(36, *) "wline's number", i, "Gamma", Gam1, Gam2
-      write(36, *) "================================================="
+      call LogMC%AddLine("Oops, check_type found a bug!")
+      call LogMC%AddLine("IsWormPresent"+str(IsWormPresent)+",update number"+str(iupdate))
+      call LogMC%AddLine("The type of Gamma is wrong!")
+      call LogMC%AddLine("wline's number"+str(i)+",Gamma"+str(Gam1)+str(Gam2))
+      call LogMC%Write('e')
       call print_config
       stop
     else if(flag==3) then
-      write(36, *) "================================================="
-      write(36, *) "Oops, check_type found a bug!"
-      write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-      write(36, *) "The type of wline is wrong!"
-      write(36, *) "wline's number", i, "Gamma", Gam1, Gam2
-      write(36, *) TypeLn(i), TypeVertex(Gam1), TypeVertex(Gam2)
-      write(36, *) "================================================="
+      call LogMC%AddLine("Oops, check_type found a bug!")
+      call LogMC%AddLine("IsWormPresent"+str(IsWormPresent)+",update number"+str(iupdate))
+      call LogMC%AddLine("The type of wline is wrong!")
+      call LogMC%AddLine("wline's number"+str(i)+",Gamma"+str(Gam1)+str(Gam2))
+      call LogMC%AddLine(str(TypeLn(i))+str(TypeVertex(Gam1))+str(TypeVertex(Gam2)))
+      call LogMC%Write('e')
       call print_config
       stop
     else if(flag==4) then
-      write(36, *) "================================================="
-      write(36, *) "Oops, check_type found a bug!"
-      write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-      write(36, *) "The type of glines are wrong!"
-      write(36, *) "wline's number", i, "Gamma", Gam1, Gam2
-      write(36, *) sum1, TypeLn(G1), TypeLn(G3), TypeLn(G2), TypeLn(G4)
-      write(36, *) "================================================="
+      call LogMC%AddLine("Oops, check_type found a bug!")
+      call LogMC%AddLine("IsWormPresent"+str(IsWormPresent)+",update number"+str(iupdate))
+      call LogMC%AddLine("The type of glines are wrong!")
+      call LogMC%AddLine("wline's number"+str(i)+",Gamma"+str(Gam1)+str(Gam2))
+      call LogMC%AddLine(str(sum1)+str(TypeLn(G1))+str(TypeLn(G3))+str(TypeLn(G2))+str(TypeLn(G4)))
+      call LogMC%Write('e')
       call print_config
       stop
     else if(flag==5) then
-      write(36, *) "================================================="
-      write(36, *) "Oops, check_type found a bug!"
-      write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-      write(36, *) "The type of gamma inside lines are wrong!"
-      write(36, *) "wline's number", i, "Gamma", Gam1, Gam2
-      write(36, *) sum1, SpInVertex(:, Gam1), SpInVertex(:, Gam2)
-      write(36, *) "================================================="
+      call LogMC%AddLine("Oops, check_type found a bug!")
+      call LogMC%AddLine("IsWormPresent"+str(IsWormPresent)+",update number"+str(iupdate))
+      call LogMC%AddLine("The type of gamma inside lines are wrong!")
+      call LogMC%AddLine("wline's number"+str(i)+",Gamma"+str(Gam1)+str(Gam2))
+      call LogMC%AddLine(str(sum1)+str(SpInVertex(1, &
+          &  Gam1))+str(SpInVertex(2,Gam1))+str(SpInVertex(1,Gam2))+str(SpInVertex(2,Gam2)))
+      call LogMC%Write('e')
       call print_config
       stop
     endif
@@ -467,12 +438,11 @@ SUBROUTINE check_irreducibility
       do j = i+1, NGLn
         Gj = GLnKey2Value(j)
         if(kLn(Gj)==kLn(Gi)) then
-          write(36, *) "================================================="
-          write(36, *) "Oops, check_irreducibility found a bug!"
-          write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-          write(36, *) "Gline is not irreducible!"
-          write(36, *) "Gline's number", Gi, "k", kLn(Gi)
-          write(36, *) "================================================="
+          call LogMC%AddLine("Oops, check_irreducibility found a bug!")
+          call LogMC%AddLine("IsWormPresent"+str(IsWormPresent)+",update number"+str(iupdate))
+          call LogMC%AddLine("Gline is not irreducible!")
+          call LogMC%AddLine("Gline's number"+str(Gi)+",k"+str(kLn(Gi)))
+          call LogMC%Write('e')
           call print_config
           stop
         endif
@@ -484,12 +454,11 @@ SUBROUTINE check_irreducibility
     do i = 1, NWLn
       Wi = WLnKey2Value(i)
       if(kLn(Wi)==0) then
-        write(36, *) "================================================="
-        write(36, *) "Oops, check_irreducibility found a bug!"
-        write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-        write(36, *) "Wline is not irreducible!"
-        write(36, *) "Wline's number", Wi, "k", kLn(Wi)
-        write(36, *) "================================================="
+        call LogMC%AddLine("Oops, check_irreducibility found a bug!")
+        call LogMC%AddLine("IsWormPresent"+str(IsWormPresent)+",update number"+str(iupdate))
+        call LogMC%AddLine("Wline is not irreducible!")
+        call LogMC%AddLine("Wline's number"+str(Wi)+",k"+str(kLn(Wi)))
+        call LogMC%Write('e')
         call print_config
         stop
       endif
@@ -497,12 +466,11 @@ SUBROUTINE check_irreducibility
       do j = i+1, NWLn
         Wj = WLnKey2Value(j)
         if(abs(kLn(Wj))==abs(kLn(Wi))) then
-          write(36, *) "================================================="
-          write(36, *) "Oops, check_irreducibility found a bug!"
-          write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-          write(36, *) "Wline is not irreducible!"
-          write(36, *) "Wline's number", Wi, "k", kLn(Wi)
-          write(36, *) "================================================="
+          call LogMC%AddLine("Oops, check_irreducibility found a bug!")
+          call LogMC%AddLine("IsWormPresent"+str(IsWormPresent)+",update number"+str(iupdate))
+          call LogMC%AddLine("Wline is not irreducible!")
+          call LogMC%AddLine("Wline's number"+str(Wi)+",k"+str(kLn(Wi)))
+          call LogMC%Write('e')
           call print_config
           stop
         endif
@@ -524,12 +492,12 @@ SUBROUTINE check_irreducibility
           if(NeighLn(2,Wk)==NeighLn(1,Gi) .or. NeighLn(2,Wk)==NeighLn(1,Gj)) cycle
           if(NeighLn(2,Wk)==NeighLn(2,Gi) .or. NeighLn(2,Wk)==NeighLn(2,Gj)) cycle
           if(abs(add_k(kLn(Gi), -kLn(Gj)))==abs(kLn(Wk))) then
-            write(36, *) "================================================="
-            write(36, *) "Oops, check_irreducibility found a bug!"
-            write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-            write(36, *) "Gamma is not irreducible!"
-            write(36, *) "Gline's number", Gi, Gj, "Wline", Wk, "k", kLn(Gi), kLn(Gj), kLn(Wk)
-            write(36, *) "================================================="
+            call LogMC%AddLine("Oops, check_irreducibility found a bug!")
+            call LogMC%AddLine("IsWormPresent"+str(IsWormPresent)+",update number"+str(iupdate))
+            call LogMC%AddLine("Gamma is not irreducible!")
+            call LogMC%AddLine("Gline's number"+str(Gi)+str(Gj)+",Wline"+str(Wk)+ &
+                & ",k"+str(kLn(Gi))+str(kLn(Gj))+str(kLn(Wk)))
+            call LogMC%Write('e')
             call print_config
             stop
           endif
@@ -579,58 +547,29 @@ SUBROUTINE check_weight
   !weight = weight*(1.d0/Beta)**Order *SignFermiLoop
   weight = weight *(-1.d0)**Order*SignFermiLoop
 
-  if(real(Phase*WeightCurrent - weight)>1.d-8) then
-    write(36, *) "================================================="
-    write(36, *) "Oops, check_weight found a bug!"
-    write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-
-    write(36, *) "real weight", weight
-    write(36, *) "current weight", Phase*WeightCurrent
-    write(36, *) Order, Beta
+  if(real(Phase*WeightCurrent-weight)>1.d-8.or.dimag(Phase*WeightCurrent-weight)>1.d-8) then
+    call LogMC%WriteStamp('e')
+    call LogMC%WriteLine("Oops, check_weight found a bug!")
+    call LogMC%WriteLine("IsWormPresent"+str(IsWormPresent)+",update number"+str(iupdate))
+    call LogMC%WriteLine("real weight"+str(weight))
+    call LogMC%WriteLine("current weight"+str(Phase*WeightCurrent))
+    call LogMC%WriteLine(str(Order)+str(Beta))
 
     do ikey = 1, NGLn
       i = GLnKey2Value(ikey)
-      write(36, *) i, gln(ikey), WeightLn(i)
+      call LogMC%WriteLine("G"+str(i)+str(gln(ikey))+str(WeightLn(i)))
     enddo
 
     do ikey = 1, NWLn
       i = WLnKey2Value(ikey)
-      write(36, *) i, wln(ikey), WeightLn(i)
+      call LogMC%WriteLine("W"+str(i)+str(wln(ikey))+str(WeightLn(i)))
     enddo
 
     do ikey = 1, NVertex
       i = VertexKey2Value(ikey)
-      write(36, *) i, gam(ikey), WeightVertex(i)
+      call LogMC%WriteLine("Gam"+str(i)+str(gam(ikey))+str(WeightVertex(i)))
     enddo
-    write(36, *) "================================================="
-
-    call print_config
-    stop
-  else if(dimag(Phase*WeightCurrent - weight)>1.d-8) then
-    write(36, *) "================================================="
-    write(36, *) "Oops, check_weight found a bug!"
-    write(36, *) "IsWormPresent", IsWormPresent, "update number", iupdate
-
-    write(36, *) "real weight", weight
-    write(36, *) "current weight", Phase*WeightCurrent
-    write(36, *) Order, Beta
-
-    do ikey = 1, NGLn
-      i = GLnKey2Value(ikey)
-      write(36, *) i, gln(ikey), WeightLn(i)
-    enddo
-
-    do ikey = 1, NWLn
-      i = WLnKey2Value(ikey)
-      write(36, *) i, wln(ikey), WeightLn(i)
-    enddo
-
-    do ikey = 1, NVertex
-      i = VertexKey2Value(ikey)
-      write(36, *) i, gam(ikey), WeightVertex(i)
-    enddo
-    write(36, *) "================================================="
-
+    call LogMC%Close
     call print_config
     stop
   endif
