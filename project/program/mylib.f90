@@ -144,10 +144,10 @@ contains
       integer,dimension(8) :: values
       character(len=100) :: timestr
       call date_and_time(VALUES=values)
-      timestr=trim(adjustl(str(values(1))))//"/"  &
-          &  //trim(adjustl(str(values(2))))//'/'//trim(adjustl(str(values(3)))) &
-          &  //' '//trim(adjustl(str(values(5))))//':' &
-          &  //trim(adjustl(str(values(6))))//':'//trim(adjustl(str(values(7))))
+      timestr=trim(adjustl(str(values(1)-2000,'(i2.2)')))//"/"  &
+          &  //trim(adjustl(str(values(2),'(i2.2)')))//'/'//trim(adjustl(str(values(3),'(i2.2)'))) &
+          &  //' '//trim(adjustl(str(values(5),'(i2.2)')))//':' &
+          &  //trim(adjustl(str(values(6),'(i2.2)')))//':'//trim(adjustl(str(values(7),'(i2.2)')))
       if(this%FileName=='*') then
         write(*,101,advance='no') &
             & trim(timestr),trim(LevelName(this%Level)),trim(adjustl(this%Content))
@@ -160,7 +160,7 @@ contains
         write(36,*)
         close(36)
       endif
-101 format('[job]','[',A,']','[',A,']',A)
+101 format('[job]','[',A,']','[',A,']:',A)
   end subroutine
 end module
 
