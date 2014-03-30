@@ -20,12 +20,9 @@ SUBROUTINE calculate_GamNormWeight
     Gam0 = Gam0 *weight_Gam0(ityp, 0, 0)
     GamNormWeight = GamNormWeight + Gam0*(real(MxT)/Beta)**2.d0
   enddo
-
-  write(logstr, *) "Norm weight", GamNormWeight
-  call write_log
-
   return
 END SUBROUTINE calculate_GamNormWeight
+
 
 !====================== the 1st order of Gamma ======================
 SUBROUTINE calculate_Gam1

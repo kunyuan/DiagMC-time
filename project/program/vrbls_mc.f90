@@ -1,5 +1,6 @@
 !********************************************************************
 MODULE vrbls_mc
+  USE logging_module
   IMPLICIT NONE
 
   !======================== Parameters ====================================
@@ -40,6 +41,10 @@ MODULE vrbls_mc
 
   integer:: file_version
   integer:: mc_version
+
+  type(logging) :: LogLoop
+  type(logging) :: LogMC
+  type(logging) :: LogTerm
 
   !======================== Input parameter ==============================
   integer          ::  Lx, Ly, L(2), Vol                ! System size

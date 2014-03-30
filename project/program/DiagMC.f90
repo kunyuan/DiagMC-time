@@ -1,8 +1,12 @@
+INCLUDE "mylib/mylib.f90"
 INCLUDE "vrbls_mc.f90"
 PROGRAM MAIN
+  USE string_basic
+  USE logging_module
   USE vrbls_mc
   implicit none
   integer :: InpMC, it, i, ISub,ID
+  type(logging) :: logtmp
 
   print *, 'Lx, Ly, Ntoss, Nsamp, IsForever, NStep, Jcp, beta, MCOrder, Seed, ISub, InpMC, ID, title'
   read  *,  Lx, Ly, Ntoss, Nsamp, IsForever, NStep, Jcp, beta, MCOrder, Seed, ISub, InpMC, ID, title
@@ -24,10 +28,20 @@ PROGRAM MAIN
 
   title1 = trim(adjustl(title_loop))//'_'//trim(adjustl(title1))
   title_mc = trim(adjustl(title2))//'_'//trim(adjustl(title1))
-  title_loop_logself="project.log"
 
-  write(logstr,*) "Initializing..."
-  call write_log
+  call LogLoop%init(trim(adjustl(title_loop))//"_project.log")
+  call LogMC%init(trim(title_mc)//".log")
+  call LogTerm%init('*')
+
+  if(ISub==1) then
+    logtmp = LogLoop
+  else if(ISub==2) then
+    logtmp = LogMC
+  else if(ISub==3) then
+    logtmp = LogTerm
+  endif
+
+  call logtmp%QuickLog("Initializing basic properties...")
 
   !!================= INITIALIZATION =======================================
   Mu(1)  = 1.d0
@@ -85,16 +99,14 @@ PROGRAM MAIN
   MaxStat=1024
   allocate(ObsRecord(1:MaxStat,1:NObs))
 
-  write(logstr,*) "Initializing more..."
-  call write_log
+  call logtmp%QuickLog("Initializing time and RNG...")
 
   call set_time_elapse
   call set_RNG
   call initialize_self_consistent
   call def_symmetry
-  write(logstr,*) "Initializing done!" 
-  call write_log
 
+  call logtmp%QuickLog("Initialization Done!...")
   !!=====================================================================
 
   if(ISub==1) then
@@ -103,7 +115,6 @@ PROGRAM MAIN
     open(10,access="append", file="read_list.dat")
     write(10, *) trim(adjustl(title_mc))//"_monte_carlo_data.bin.dat"
     close(10)
-
     call monte_carlo
   else if(ISub==3) then
     call test_subroutine
@@ -141,16 +152,13 @@ SUBROUTINE self_consistent
     !!!======================================================================
   else if(InpMC==1) then
 
-    write(logstr, *) "Reading G,W, Gamma..."
-    call write_log
+    call LogLoop%QuickLog("Reading G,W, and Gamma...")
     call read_GWGamma
 
-    write(logstr, *) "Reading monte carlo data..."
-    call write_log
+    call LogLoop%QuickLog("Reading MC data...")
     call read_monte_carlo_data
 
-    write(logstr, *) "Read done!"
-    call write_log
+    call LogLoop%QuickLog("Reading Done!...")
 
     !!-------- update the Gamma matrix with MC data -------
     call Gam_mc2matrix_mc
@@ -208,8 +216,7 @@ LOGICAL FUNCTION self_consistent_GW(err)
 
     WNow = weight_W(1, 0, 0, 0)
 
-    write(logstr, *) "G-W loop:", iloop, real(WOld), real(WNow)
-    call write_log
+    call LogLoop%QuickLog("G-W loop:"//str(iloop)//str(real(WOld))//str(real(WNOw)))
   enddo
   call calculate_Sigma
   call calculate_Polar
@@ -228,16 +235,14 @@ SUBROUTINE monte_carlo
   integer :: isamp, iblck, mc_version
   double precision :: WR, GamR
 
-  write(logstr,*) "Initializing monte carlo..."
-  call write_log
+  call LogMC%QuickLog("Initializing monte carlo...")
 
   call read_GWGamma
   call calculate_GamNormWeight  
 
   call initialize_markov
 
-  write(logstr,*) "Initializing monte carlo done!"
-  call write_log
+  call LogMC%QuickLog("Initializing monte carlo done!")
 
   !do i = 1, MCOrder+1
     !QuanName(i)="(total conf)"
@@ -246,8 +251,7 @@ SUBROUTINE monte_carlo
 
   if(InpMC==0) then
 
-    write(logstr,*) "Start Thermalization..."
-    call write_log
+    call LogMC%QuickLog("Start Thermalization ...")
 
     ProbProp(:,:) = 0.d0
     ProbAcc(:,:) = 0.d0
@@ -256,14 +260,12 @@ SUBROUTINE monte_carlo
     IsToss=.true.
     call markov(Ntoss)
 
-    write(logstr,*) "Thermalization done!"
-    call write_log
+    call LogMC%QuickLog("Thermalization done!")
 
     call time_elapse
     t_simu = t_elap
-    write(logstr,52) t_simu
-    call write_log
-    52 format(' Thermalization time:',f16.7,2x,'s')
+    call LogMC%QuickLog('Thermalization time: '//trim(str(t_simu,'(f12.2)'))//'s')
+    
 
     !!================ MC SIMULATION FOR GAMMA =============================
     imc = 0.d0
@@ -288,25 +290,24 @@ SUBROUTINE monte_carlo
   else if(InpMC==1) then
 
     !------- read the configuration and MC data from previous simulation --
+    call LogMC%QuickLog("Reading the previous MC data...")
+
     call read_monte_carlo_conf
     call read_monte_carlo_data
-
     call print_config
     call check_config
 
+    call LogMC%QuickLog("Read the previous MC data Done!...")
   endif
 
-  write(logstr,*) "Simulation started!"
-  call write_log
+  call LogMC%QuickLog("Running MC Simulations...")
 
   IsToss=.false.
   call markov(Nsamp)
 
   call time_elapse
   t_simu = t_elap
-  write(logstr,51) t_simu
-  call write_log
-  51 format(' Simulation time:',f16.7,2x,'s')
+  call LogMC%QuickLog('Simulation time: '//trim(str(t_simu,'(f12.2)'))//'s')
 
   return
 END SUBROUTINE monte_carlo

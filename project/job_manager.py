@@ -49,6 +49,7 @@ def check_status():
             #log.write("#"+str(elemp[1])+" job is ended at "+time.strftime("%Y-%m-%d %A %X %Z",time.localtime())+"\n")
             #log.close()
             logging.info("Job "+str(elemp[1])+" is ended!")
+            print "Job "+str(elemp[1])+" is end!"
     return
 
 def submit_jobs(para,i,execute,homedir):
@@ -154,9 +155,9 @@ def submit_jobs(para,i,execute,homedir):
                             f.close()
                             g.close()
                             proclist.append((p,pid))
-                            #print i,j
                             logging.info("Job "+str(pid)+" is started...")
                             logging.info("input:\n"+stri)
+                            print "Job "+str(pid)+" is started..."
                             break
 
     return i
