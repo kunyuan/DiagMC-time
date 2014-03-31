@@ -69,9 +69,9 @@ SUBROUTINE initialize_W0PF
   ratio = 0.25d0*Jcp*real(MxT)/Beta
 
   W0PF(1,    0, 0) = dcmplx(ratio, 0.d0)
-  W0PF(Lx-1, 0, 0) = dcmplx(ratio, 0.d0)
+  W0PF(L(1)-1, 0, 0) = dcmplx(ratio, 0.d0)
   W0PF(0,    1, 0) = dcmplx(ratio, 0.d0)
-  W0PF(0, Ly-1, 0) = dcmplx(ratio, 0.d0)
+  W0PF(0, L(2)-1, 0) = dcmplx(ratio, 0.d0)
 
   call transfer_W0(1)
 END SUBROUTINE initialize_W0PF
@@ -92,7 +92,7 @@ END SUBROUTINE initialize_Gam0PF
 
 SUBROUTINE calculate_Polar
   implicit none
-  integer :: px, py, omega
+  integer :: px, py, p(2), omega
   integer :: omegaGin, omegaGout
   complex(kind=8) :: Gin, Gout, Gam1
   double precision :: ratio
@@ -102,17 +102,18 @@ SUBROUTINE calculate_Polar
   ratio = 2.d0/real(MxT)*(Beta/real(MxT))**4.d0
   do omega = 0, MxT-1
     do omegaGin = 0, MxT-1
-      do px = 0, Lx-1
-        do py = 0, Ly-1
+      do py = 0, L(2)-1
+        do px = 0, L(1)-1
+          p = (/px, py/)
           omegaGout = omegaGin - omega
 
           Gin = weight_G(1, omegaGin)
           if(omegaGout>=0) then
             Gout = weight_G(1, omegaGout)
-            Gam1 = weight_Gam(5, px, py, omegaGin, omegaGout)
+            Gam1 = weight_Gam(5, p, omegaGin, omegaGout)
           else
             Gout = weight_G(1, omegaGout+MxT)
-            Gam1 = weight_Gam(5, px, py, omegaGin, omegaGout+MxT)
+            Gam1 = weight_Gam(5, p, omegaGin, omegaGout+MxT)
           endif
           
           Polar(px, py, omega) = Polar(px, py, omega)+d_times_cd(ratio, cdexp((0.d0, -1.d0) &
@@ -127,27 +128,28 @@ END SUBROUTINE calculate_Polar
 
 SUBROUTINE calculate_Sigma
   implicit none
-  integer :: px, py, omega
+  integer :: px, py, p(2), omega
   integer :: omegaG, omegaW
   complex(kind=8) :: G1, W1, Gam1
   double precision :: ratio
 
   Sigma(:) = (0.d0, 0.d0)
 
-  ratio = -3.d0/(real(Lx)*real(Ly)*real(MxT))*(Beta/real(MxT))**4.d0
+  ratio = -3.d0/(real(L(1))*real(L(2))*real(MxT))*(Beta/real(MxT))**4.d0
   do omega = 0, MxT-1
     do omegaG = 0, MxT-1
-      do py = 0, Ly-1
-        do px = 0, Lx-1
+      do py = 0, L(2)-1
+        do px = 0, L(1)-1
+          p = (/px, py/)
           omegaW = omega-omegaG
 
           G1 = weight_G(1, omegaG)
           if(omegaW>=0) then
-            W1 = weight_W(1, px, py, omegaW)
+            W1 = weight_W(1, p, omegaW)
           else
-            W1 = weight_W(1, px, py, omegaW+MxT)
+            W1 = weight_W(1, p, omegaW+MxT)
           endif
-          Gam1 = weight_Gam(5, px, py, omegaG, omega)
+          Gam1 = weight_Gam(5, p, omegaG, omega)
           
           Sigma(omega) = Sigma(omega)+d_times_cd(ratio, G1*W1*Gam1)
         enddo
@@ -168,8 +170,8 @@ SUBROUTINE calculate_W
   W(1,:,:,:) = W0PF(:,:,:)/((1.d0, 0.d0)-W0PF(:,:,:)*Polar(:,:,:))
 
   do  omega = 0, MxT-1
-    do py = 0, Ly-1
-      do px = 0, Lx-1
+    do py = 0, L(2)-1
+      do px = 0, L(1)-1
         W(3,px,py,omega) = d_times_cd(-1.d0,W(1,px,py,omega))
         W(5,px,py,omega) = d_times_cd( 2.d0,W(1,px,py,omega))
       enddo
@@ -214,8 +216,8 @@ SUBROUTINE calculate_Chi
   Chi(:,:,:) = Polar(:,:,:)/((1.d0,0.d0) -W0PF(:,:,:)*Polar(:,:,:))
 
   do omega = 0, MxT-1
-    do py = 0, Ly-1
-      do px = 0, Lx-1
+    do py = 0, L(2)-1
+      do px = 0, L(1)-1
         Chi(px, py, omega) = d_times_cd(ratio, Chi(px, py, omega))
       enddo
     enddo
@@ -238,8 +240,8 @@ SUBROUTINE plus_minus_W0(Backforth)
   endif
 
   do  omega = 0, MxT-1
-    do py = 0, Ly-1
-      do px = 0, Lx-1
+    do py = 0, L(2)-1
+      do px = 0, L(1)-1
         W(3,px,py,omega) = d_times_cd(-1.d0,W(1,px,py,omega))
         W(5,px,py,omega) = d_times_cd( 2.d0,W(1,px,py,omega))
       enddo
@@ -295,18 +297,18 @@ END FUNCTION weight_G0
 
 
 !!--------- calculate weight for bare interaction ----
-Complex*16 FUNCTION weight_W0(typ, dx, dy)
+Complex*16 FUNCTION weight_W0(typ, dr)
   implicit none
-  integer, intent(in) :: dx, dy, typ
+  integer, intent(in) :: dr(2), typ
   integer :: dx1, dy1
   double precision :: ratio
 
   ratio = Jcp
 
-  dx1 = dx;       dy1 = dy
-  if(dx1>=0  .and. dx1<Lx .and. dy1>=0 .and. dy1<Ly) then
-    if(dx1>dLx)     dx1 = Lx-dx1
-    if(dy1>dLy)     dy1 = Ly-dy1
+  dx1 = dr(1);       dy1 = dr(2)
+  if(dx1>=0  .and. dx1<L(1) .and. dy1>=0 .and. dy1<L(2)) then
+    if(dx1>dL(1))     dx1 = L(1)-dx1
+    if(dy1>dL(2))     dy1 = L(2)-dy1
 
     weight_W0 = (0.d0, 0.d0)
 
@@ -327,13 +329,13 @@ END FUNCTION weight_W0
 
 
 !!--------- calculate weight for bare Gamma ---------
-COMPLEX*16 FUNCTION weight_Gam0(typ, dx, dy)
+COMPLEX*16 FUNCTION weight_Gam0(typ, dr)
   implicit none
-  integer, intent(in)  :: dx, dy, typ
+  integer, intent(in)  :: dr(2), typ
   double precision :: ratio
 
-  if(dx>=0 .and. dx<Lx .and. dy>=0 .and. dy<Ly) then
-    if(dx==0.and.dy==0) then
+  if(dr(1)>=0 .and. dr(1)<L(1) .and. dr(2)>=0 .and. dr(2)<L(2)) then
+    if(dr(1)==0.and.dr(2)==0) then
       if(typ==1 .or. typ==2 .or. typ==5 .or. typ==6) then
         weight_Gam0 = (1.d0, 0.d0)
       else
@@ -343,7 +345,7 @@ COMPLEX*16 FUNCTION weight_Gam0(typ, dx, dy)
       weight_Gam0 = (0.d0, 0.d0)
     endif
   else
-    call logtmp%QuickLog("Weight_Gam"//str(dx)//str(dy)//"dx, dy bigger than system size!")
+    call logtmp%QuickLog("Weight_Gam"//str(dr(1))//str(dr(2))//"dx, dy bigger than system size!")
     stop
   endif
 END FUNCTION weight_Gam0
@@ -361,32 +363,31 @@ COMPLEX*16 FUNCTION weight_G(typ1, t1)
 END FUNCTION weight_G
 
 !!--------- extract weight for W ---------
-COMPLEX*16 FUNCTION weight_W(typ1, dx1, dy1, t1)
+COMPLEX*16 FUNCTION weight_W(typ1, dr, t1)
   implicit none
-  integer, intent(in)  :: dx1, dy1, t1, typ1
+  integer, intent(in)  :: dr(2), t1, typ1
 
   if(t1>=0) then
-    weight_W = W(typ1, dx1, dy1, t1)
+    weight_W = W(typ1, dr(1), dr(2), t1)
   else
-    weight_W = W(typ1, dx1, dy1, t1+MxT)
+    weight_W = W(typ1, dr(1), dr(2), t1+MxT)
   endif
 END FUNCTION weight_W
 
 !!--------- extract weight for Gamma ---------
-COMPLEX*16 FUNCTION weight_Gam(typ1, dx1, dy1, t1, t2)
+COMPLEX*16 FUNCTION weight_Gam(typ1, dr, t1, t2)
   implicit none
-  integer, intent(in)  :: dx1, dy1, t1, t2, typ1
+  integer, intent(in)  :: dr(2), t1, t2, typ1
   double precision :: GaR
-  integer :: ib, jb, dx, dy
   
   if(t1>=0 .and. t2>=0) then
-    weight_Gam = Gam(typ1, dx1, dy1, t1, t2)
+    weight_Gam = Gam(typ1, dr(1), dr(2), t1, t2)
   else if(t1<0 .and. t2>=0) then
-    weight_Gam = -Gam(typ1, dx1, dy1, t1+MxT, t2)
+    weight_Gam = -Gam(typ1, dr(1), dr(2), t1+MxT, t2)
   else if(t1>=0 .and. t2<0) then
-    weight_Gam = -Gam(typ1, dx1, dy1, t1, t2+MxT)
+    weight_Gam = -Gam(typ1, dr(1), dr(2), t1, t2+MxT)
   else
-    weight_Gam = -Gam(typ1, dx1, dy1, t1+MxT, t2+MxT)
+    weight_Gam = -Gam(typ1, dr(1), dr(2), t1+MxT, t2+MxT)
   endif
 END FUNCTION weight_Gam
 
@@ -440,8 +441,8 @@ END SUBROUTINE Gam_mc2matrix_mc
   !norm = GamNormWeight*ime/GamNorm
 
   !do ityp = 1, ntypGa
-    !do dx = 0, dLx
-      !do dy = 0, dLy
+    !do dx = 0, dL(1)
+      !do dy = 0, dL(2)
 
 
       !enddo

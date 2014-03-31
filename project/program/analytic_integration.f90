@@ -16,8 +16,8 @@ SUBROUTINE calculate_GamNormWeight
 
   !--------- bare Gamma --------------------
   do ityp = 1, 6
-    Gam0 = weight_meas_Gam(ityp, 0, 0)
-    Gam0 = Gam0 *weight_Gam0(ityp, 0, 0)
+    Gam0 = weight_meas_Gam(ityp, (/0, 0/))
+    Gam0 = Gam0 *weight_Gam0(ityp, (/0, 0/))
     GamNormWeight = GamNormWeight + Gam0*(real(MxT)/Beta)**2.d0
   enddo
   return
@@ -57,10 +57,10 @@ SUBROUTINE calculate_Gam1
 
         Gin = weight_G(gintyp(ityp), t1)
         Gout = weight_G(gouttyp(ityp), t2)
-        Gam1 = weight_Gam0(ga1typ(ityp), 0, 0)
-        Gam2 = weight_Gam0(ga2typ(ityp), 0, 0) 
-        Gam3 = weight_Gam0(ga3typ(ityp), 0, 0) 
-        iW = weight_W(wtyp(ityp), 0, 0, t2)
+        Gam1 = weight_Gam0(ga1typ(ityp), (/0, 0/))
+        Gam2 = weight_Gam0(ga2typ(ityp), (/0, 0/)) 
+        Gam3 = weight_Gam0(ga3typ(ityp), (/0, 0/)) 
+        iW = weight_W(wtyp(ityp), (/0, 0/), t2)
 
         weight = Gin *Gout *iW *Gam1 *Gam2 *Gam3
 

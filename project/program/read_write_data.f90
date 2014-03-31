@@ -160,7 +160,7 @@ SUBROUTINE DRAW
     !theta2=pi4
     radian=90.d0/pi2
     scx=500/beta
-    scy=400./Lx/Ly
+    scy=400./L(1)/L(2)
     x1=scx*beta
     y1=scy*Vol
     scydash=scy/40.
@@ -228,7 +228,7 @@ SUBROUTINE DRAW
     ini=640.0
     seg=15.0
     write(11,*) '0 0 0 setrgbcolor'
-    write(tempstr, *) "Beta: ",beta,"    Lx: ",Lx,"       Ly: ",Ly
+    write(tempstr, *) "Beta: ",beta,"    L(1): ",L(1),"       L(2): ",L(2)
     write(11,803) 0.,ini,tempstr
     write(tempstr,*)  "Jcp: ",Jcp," Seed: ",Seed
     ini=ini-seg
@@ -462,7 +462,7 @@ END SUBROUTINE DRAW
 INTEGER FUNCTION site_num(X,Y)
   implicit none
   integer :: x,y
-  site_num=y*Ly+x+1
+  site_num=y*L(2)+x+1
   return
 END FUNCTION site_num
 !====================================================================
@@ -493,8 +493,8 @@ SUBROUTINE read_GWGamma
   enddo
 
   do it1 = 0, MxT-1
-    do iy = 0, Ly-1
-      do ix = 0, Lx-1
+    do iy = 0, L(2)-1
+      do ix = 0, L(1)-1
         do ityp = 1, NTypeW
           read(101, *) W(ityp, ix, iy, it1)
         enddo
@@ -504,8 +504,8 @@ SUBROUTINE read_GWGamma
 
   do it2 = 0, MxT-1
     do it1 = 0, MxT-1
-      do iy = 0, Ly-1
-        do ix = 0, Lx-1
+      do iy = 0, L(2)-1
+        do ix = 0, L(1)-1
           do ityp = 1, NTypeG
             read(102, *) Gam(ityp, ix, iy, it1, it2)
           enddo
@@ -539,8 +539,8 @@ SUBROUTINE write_GWGamma
   enddo
 
   do it1 = 0, MxT-1
-    do iy = 0, Ly-1
-      do ix = 0, Lx-1
+    do iy = 0, L(2)-1
+      do ix = 0, L(1)-1
         do ityp = 1, NTypeW
           write(101, *) W(ityp, ix, iy, it1)
         enddo
@@ -550,8 +550,8 @@ SUBROUTINE write_GWGamma
 
   do it2 = 0, MxT-1
     do it1 = 0, MxT-1
-      do iy = 0, Ly-1
-        do ix = 0, Lx-1
+      do iy = 0, L(2)-1
+        do ix = 0, L(1)-1
           do ityp = 1, NTypeG
             write(102, *) Gam(ityp, ix, iy, it1, it2)
           enddo
@@ -577,12 +577,12 @@ SUBROUTINE write_monte_carlo_data
   open(104, status="replace", &
     & file=trim(title_mc)//"_monte_carlo_data.bin.dat",form="binary")
 
-  write(104) Lx, Ly
+  write(104) L(1), L(2)
   write(104) imc, GamNorm, GamNormWeight
   do it2 = 0, MxT-1
     do it1 = 0, MxT-1
-      do iy = 0, Ly-1
-        do ix = 0, Lx-1
+      do iy = 0, L(2)-1
+        do ix = 0, L(1)-1
           do ityp = 1, NtypeGam/2
             do iorder = 0, MCOrder
               write(104)  GamMC(iorder,  ityp, ix, iy, it1, it2)
@@ -607,13 +607,13 @@ SUBROUTINE read_monte_carlo_data
 
   open(105, status="old", file=trim(title)//"_monte_carlo_data.bin.dat",form="binary")
 
-  read(105) Lx, Ly
+  read(105) L(1), L(2)
   read(105) imc, GamNorm, GamNormWeight
 
   do it2 = 0, MxT-1
     do it1 = 0, MxT-1
-      do iy = 0, Ly-1
-        do ix = 0, Lx-1
+      do iy = 0, L(2)-1
+        do ix = 0, L(1)-1
           do ityp = 1, NtypeGam/2
             do iorder = 0, MCOrder
               read(105)  GamMC(iorder, ityp, ix, iy, it1, it2)
@@ -765,7 +765,7 @@ SUBROUTINE read_monte_carlo_conf
     endif
 
     WeightVertex(i) = weight_vertex(StatusVertex(i), IsDeltaVertex(i), &
-      & GRVertex(1,i)-WRVertex(1,i), GRVertex(2,i)-WRVertex(2,i), &
+      & GRVertex(:,i)-WRVertex(:,i), &
       & TVertex(3,i)-TVertex(2,i), TVertex(1,i)-TVertex(3,i), TypeVertex(i))
 
     ComCurrent = ComCurrent* WeightVertex(i)
@@ -816,8 +816,8 @@ SUBROUTINE read_monte_carlo_conf
     TypeLn(i) = TypeGam2W(TypeVertex(iGam), TypeVertex(jGam))
 
     tau = TVertex(3, iGam)-TVertex(3, jGam)
-    WeightLn(i) = weight_wline(StatusLn(i), IsDeltaLn(i), WRVertex(1,jGam)-WRVertex(1,iGam), &
-      & WRVertex(2,jGam)-WRVertex(2, iGam), tau, TypeLn(i))
+    WeightLn(i) = weight_wline(StatusLn(i), IsDeltaLn(i), WRVertex(:,jGam)-WRVertex(:,iGam), &
+      & tau, TypeLn(i))
     ComCurrent = ComCurrent* WeightLn(i)
   enddo
 
@@ -852,23 +852,9 @@ SUBROUTINE output_Quantities
   open(15, access="append", file=trim(title_loop)//"_Chi.dat")
   open(16, access="append", file=trim(title_loop)//"_Sigma.dat")
 
-  !open(11, access="append", file=trim(title_loop)//"_G.dat")
-  !open(12, access="append", file=trim(title_loop)//"_G_omega_0.dat")
-  !open(13, access="append", file=trim(title_loop)//"_W.dat")
-  !open(14, access="append", file=trim(title_loop)//"_W_omega_0.dat")
-  !open(15, access="append", file=trim(title_loop)//"_Chi.dat")
-  !open(16, access="append", file=trim(title_loop)//"_Chi_omega_0.dat")
-  !open(17, access="append", file=trim(title_loop)//"_Gamma.dat")
-  !open(18, access="append", file=trim(title_loop)//"_Gamma_omega_0.dat")
-  !open(19, access="append", file=trim(title_loop)//"_Sigma.dat")
-  !open(20, access="append", file=trim(title_loop)//"_Sigma_omega_0.dat")
-  !open(21, access="append", file=trim(title_loop)//"_Pi.dat")
-  !open(22, access="append", file=trim(title_loop)//"_Pi_omega_0.dat")
-  !open(23, access="append", file=trim(title_loop)//"_Gamma_matrix.dat")
-
   do it = 0, MxT-1
-    do dy = 0, dLy
-      do dx = 0, dLx
+    do dy = 0, dL(2)
+      do dx = 0, dL(1)
         write(15, *) dx, dy, it, Chi(dx, dy, it)
       enddo
     enddo
@@ -876,93 +862,11 @@ SUBROUTINE output_Quantities
   close(15)
 
   do it = 0, MxT-1
-    write(16, *) (it+0.5d0)*Beta/MxT, Lx*Ly*(MxT/Beta)**2.d0*real(Sigma(it)), Lx*Ly*(MxT/Beta)**2.d0*dimag(Sigma(it))
+    write(16, *) (it+0.5d0)*Beta/MxT, L(1)*L(2)*(MxT/Beta)**2.d0*real(Sigma(it)),  &
+      & L(1)*L(2)*(MxT/Beta)**2.d0*dimag(Sigma(it))
   enddo
   close(16)
 
-  !do ifile = 11, 22
-    !write(ifile, *) "=============================================================="
-    !write(ifile, *) "Beta", Beta, "Lx, Ly", Lx, Ly, "Order", MCOrder, "Seed",Seed
-    !write(ifile, *) ime, GamNorm, GamNormWeight
-  !enddo
-
-  !do omega = -MxOmegaG2, MxOmegaG2
-    !GGI = weight_G(omega, 2)
-    !write(11, *) omega, GGI
-    !if(omega==0)      write(12, *) GGI
-  !enddo
-
-  !close(11)
-  !close(12)
-
-  !do ityp = 1, 2, 5
-    !do omega = -MxOmegaW2, MxOmegaW2
-      !WWR1 = weight_W( 0, 0, omega, 1)
-      !WWR2 = weight_W( 0, 1, omega, 1)
-      !WWR3 = weight_W( 1, 1, omega, 1)
-      !write(13, *) ityp, omega, WWR1, WWR2, WWR3
-
-      !if(omega==0)      write(14, *) ityp, WWR1, WWR2, WWR3
-    !enddo
-  !enddo
-
-  !close(13)
-  !close(14)
-
-  !do dx = 0, dLx
-    !do dy = 0, dLy
-      !do omega = -MxOmegaChi, MxOmegaChi
-        !write(15, *) Beta, dx, dy, omega, -3.d0*trChiR(dx, dy, omega)/Beta
-        !if(omega==0)      write(16, *) Beta, dx, dy, -3.d0*trChiR(dx, dy, 0)/Beta
-      !enddo
-    !enddo
-  !enddo
-
-  !close(15)
-  !close(16)
-
-  !do omega1 = -MxOmegaDiag, MxOmegaDiag
-    !do omega2 = -MxOmegaDiag, MxOmegaDiag
-      !GaR1 = weight_Gamma(1, 0, omega1, omega2, 1)
-      !write(23, '(f14.8)', advance='no') GaR1 
-    !enddo
-
-    !write(23, *)
-    !GaR1 = weight_Gamma(0, 0, omega1, omega1, 1)
-    !GaR2 = weight_Gamma(1, 0, omega1, omega1, 1)
-    !GaR3 = weight_Gamma(1, 1, omega1, omega1, 1)
-    !write(17, *) GaR1-1.d0, GaR2, GaR3
-    !if(omega1==0)      write(18, *) GaR1-1.d0, GaR2, GaR3
-  !enddo
-
-  !close(17)
-  !close(18)
-  !close(23)
-
-  !do iorder = 0, MCOrder
-    !write(19, *) "Order:", iorder
-    !do omega = -MxOmegaSigma, MxOmegaSigma
-      !write(19, *) Beta, omega, SigmaI(iorder, 1, omega)
-      !if(omega==0)      write(20, *) Beta, iorder, SigmaI(iorder, 1, 0)
-    !enddo
-  !enddo
-
-  !close(19)
-  !close(20)
-
-  !do ityp = 1, ntypPi
-    !do dx = 0, dLx
-      !do dy = 0, dLy
-        !do omega = -MxOmegaChi, MxOmegaChi
-          !write(21, *) Beta, dx, dy, omega, PiR(ityp, dx, dy, omega)
-          !if(omega==0)      write(22, *) Beta, dx, dy, PiR(ityp, dx, dy, 0)
-        !enddo
-      !enddo
-    !enddo
-  !enddo
-
-  !close(21)
-  !close(22)
 END SUBROUTINE output_Quantities
 
 
@@ -971,26 +875,32 @@ SUBROUTINE output_GamMC
   implicit none
   integer :: i, j, iorder, it1, it2
   double precision :: rerr, ierr, rpercenterr, ipercenterr
-  complex*16 :: gam, gamn, normal
+  complex*16 :: gam, gamn, normal, norm_err
   double precision :: rgam2, igam2
 
   !open(34, access="append", file=trim(title_mc)//"_Gam_matrix_MC.dat")
   open(35, access="append", file=trim(title_mc)//"_Gam_MC.dat")
-  open(36, access="append", file=trim(title_mc)//"_Gam_errorbar.dat")
+  !open(36, access="append", file=trim(title_mc)//"_Gam_errorbar.dat")
 
   normal = GamNormWeight*Z_normal/GamNorm
+
+  gam = GamMC(1, 1, 0, 0, 0, 0)/Z_normal
+  rgam2 = ReGamSqMC(1,1, 0, 0, 0, 0)/Z_normal
+  rerr = sqrt(abs(rgam2)-(real(gam))**2.d0)/sqrt(Z_normal-1)
+  norm_err = Error(1)/rerr
+
   !norm = GamOrder1(1, 0, 0)*Z_normal/GamMC(1,1,0,0,0,0)
 
   !write(34, *) "============================================"
-  !write(34, *) "Beta", Beta, "Lx, Ly", Lx, Ly, "Order", MCOrder, "Seed",Seed
+  !write(34, *) "Beta", Beta, "L(1), L(2)", L(1), L(2), "Order", MCOrder, "Seed",Seed
   !write(34, *) imc, Z_normal, GamNormWeight, GamNorm, norm
 
   write(35, *) "============================================"
-  write(35, *) "Beta", Beta, "Lx, Ly", Lx, Ly, "Order", MCOrder, "Seed",Seed
-  write(35, *) imc, Z_normal, GamNormWeight, GamNorm, norm
+  write(35, *) "Beta", Beta, "L(1), L(2)", L(1), L(2), "Order", MCOrder, "Seed",Seed
+  write(35, *) imc, Z_normal, GamNormWeight, GamNorm, normal, norm_err
 
-  write(36, *) "============================================"
-  write(36, *) "Beta", Beta, "Lx, Ly", Lx, Ly, "Order", MCOrder, "Seed",Seed
+  !write(36, *) "============================================"
+  !write(36, *) "Beta", Beta, "L(1), L(2)", L(1), L(2), "Order", MCOrder, "Seed",Seed
 
   !write(34, *) "Order 1, dx=0, dy=0, real part"
   !do it1 = 0, MxT-1
@@ -1024,6 +934,8 @@ SUBROUTINE output_GamMC
 
       rgam2 = ReGamSqMC(iorder,1, 0, 0, it1, it2)/Z_normal
       rerr = sqrt(abs(rgam2)-(real(gam))**2.d0)/sqrt(Z_normal-1)
+      rerr = rerr*norm_err
+
       if(abs(real(gam))<1.d-30) then
         rpercenterr = 0.d0
       else
@@ -1032,75 +944,33 @@ SUBROUTINE output_GamMC
 
       igam2 = ImGamSqMC(iorder,1, 0, 0, it1, it2)/Z_normal
       ierr = sqrt(abs(igam2)-(dimag(gam))**2.d0)/sqrt(Z_normal-1)
+      ierr = ierr*norm_err
+
       if(abs(dimag(gam))<1.d-30) then
         ipercenterr = 0.d0
       else
         ipercenterr = ierr/abs(dimag(gam))
       endif
 
-      write(35, '(i3,2x,i3,E20.10E3,"+/-",f10.6,"%    +i",E20.10E3,"+/-",f10.6,"%")') it1, it2, &
+      write(35, '(i3,2x,i3,E20.10E3,"+/-",f13.6,"%    +i",E20.10E3,"+/-",f13.6,"%")') it1, it2, &
         & real(gamn),rpercenterr, dimag(gamn), ipercenterr
 
-      if(iorder==1 ) then
-        if(it1==0) then
-          write(36, '(i3,2x,i3,E20.10E3,"+/-",f20.16,"    +i",E20.10E3,"+/-",f20.16)') it1, it2, &
-            & real(gam),rerr, dimag(gam), ierr
-          write(36, '(i3,2x,i3,E20.10E3,"+/-",f20.16,"    +i",E20.10E3,"+/-",f20.16)') it1, it2, &
-            & Quan(1)/Norm(1),Error(1), Quan(2)/Norm(1), Error(2)
-          write(36, *) rerr/Error(1), ierr/Error(2)
-        else if(it1==32) then
-          write(36, '(i3,2x,i3,E20.10E3,"+/-",f20.16,"    +i",E20.10E3,"+/-",f20.16)') it1, it2, &
-            & real(gam),rerr, dimag(gam), ierr
-          write(36, '(i3,2x,i3,E20.10E3,"+/-",f20.16,"    +i",E20.10E3,"+/-",f20.16)') it1, it2, &
-            & Quan(3)/Norm(1),Error(3), Quan(4)/Norm(1), Error(4)
-          write(36, *) rerr/Error(3), ierr/Error(4)
-        else if(it1==64) then
-          write(36, '(i3,2x,i3,E20.10E3,"+/-",f20.16,"    +i",E20.10E3,"+/-",f20.16)') it1, it2, &
-            & real(gam),rerr, dimag(gam), ierr
-          write(36, '(i3,2x,i3,E20.10E3,"+/-",f20.16,"    +i",E20.10E3,"+/-",f20.16)') it1, it2, &
-            & Quan(5)/Norm(1),Error(5), Quan(6)/Norm(1), Error(6)
-          write(36, *) rerr/Error(5), ierr/Error(6)
-        else if(it1==127) then
-          write(36, '(i3,2x,i3,E20.10E3,"+/-",f20.16,"    +i",E20.10E3,"+/-",f20.16)') it1, it2, &
-            & real(gam),rerr, dimag(gam), ierr
-          write(36, '(i3,2x,i3,E20.10E3,"+/-",f20.16,"    +i",E20.10E3,"+/-",f20.16)') it1, it2, &
-            & Quan(7)/Norm(1),Error(7), Quan(8)/Norm(1), Error(8)
-          write(36, *) rerr/Error(7), ierr/Error(8)
-        endif
-      else if(iorder==2) then
-        if(it1==0) then
-          write(36, '(i3,2x,i3,E20.10E3,"+/-",f20.16,"    +i",E20.10E3,"+/-",f20.16)') it1, it2, &
-            & real(gam),rerr, dimag(gam), ierr
-          write(36, '(i3,2x,i3,E20.10E3,"+/-",f20.16,"    +i",E20.10E3,"+/-",f20.16)') it1, it2, &
-            & Quan(9)/Norm(1),Error(9), Quan(10)/Norm(1), Error(10)
-          write(36, *) rerr/Error(9), ierr/Error(10)
-        else if(it1==32) then
-          write(36, '(i3,2x,i3,E20.10E3,"+/-",f20.16,"    +i",E20.10E3,"+/-",f20.16)') it1, it2, &
-            & real(gam),rerr, dimag(gam), ierr
-          write(36, '(i3,2x,i3,E20.10E3,"+/-",f20.16,"    +i",E20.10E3,"+/-",f20.16)') it1, it2, &
-            & Quan(11)/Norm(1),Error(11), Quan(12)/Norm(1), Error(12)
-          write(36, *) rerr/Error(11), ierr/Error(12)
-        else if(it1==64) then
-          write(36, '(i3,2x,i3,E20.10E3,"+/-",f20.16,"    +i",E20.10E3,"+/-",f20.16)') it1, it2, &
-            & real(gam),rerr, dimag(gam), ierr
-          write(36, '(i3,2x,i3,E20.10E3,"+/-",f20.16,"    +i",E20.10E3,"+/-",f20.16)') it1, it2, &
-            & Quan(13)/Norm(1),Error(13), Quan(14)/Norm(1), Error(14)
-          write(36, *) rerr/Error(13), ierr/Error(14)
-        else if(it1==127) then
-          write(36, '(i3,2x,i3,E20.10E3,"+/-",f20.16,"    +i",E20.10E3,"+/-",f20.16)') it1, it2, &
-            & real(gam),rerr, dimag(gam), ierr
-          write(36, '(i3,2x,i3,E20.10E3,"+/-",f20.16,"    +i",E20.10E3,"+/-",f20.16)') it1, it2, &
-            & Quan(15)/Norm(1),Error(15), Quan(16)/Norm(1), Error(16)
-          write(36, *) rerr/Error(15), ierr/Error(16)
-        endif
-      endif
+      !if(iorder==1 ) then
+        !if(it1==0) then
+          !write(36, '(i3,2x,i3,E20.10E3,"+/-",f20.16,"    +i",E20.10E3,"+/-",f20.16)') it1, it2, &
+            !& real(gam),rerr, dimag(gam), ierr
+          !write(36, '(i3,2x,i3,E20.10E3,"+/-",f20.16,"    +i",E20.10E3,"+/-",f20.16)') it1, it2, &
+            !& Quan(1)/Norm(1),Error(1), Quan(2)/Norm(1), Error(2)
+          !write(36, *) rerr/Error(1), ierr/Error(2)
+        !endif
+      !endif
     enddo
     write(35, *)
   enddo
 
   !close(34)
   close(35)
-  close(36)
+  !close(36)
 END SUBROUTINE output_GamMC
 
 
