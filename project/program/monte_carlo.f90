@@ -2250,23 +2250,24 @@ COMPLEX*16 FUNCTION weight_vertex(stat, isdelta, dr0, dtau1, dtau2, typ)
 
   if(stat==0) then
     !----------------- for bold Gamma ------------------------------
-    !if(isdelta==0) weight_vertex = weight_Gam(typ, dr, t1, t2)
-    !if(isdelta==1) weight_vertex = weight_Gam0(typ, dr)
+    if(isdelta==0) weight_vertex = weight_Gam(typ, dr, t1, t2)
+    if(isdelta==1) weight_vertex = weight_Gam0(typ, dr)
 
     !----------------- for bare Gamma ------------------------------
-    if(isdelta==0) weight_vertex = (0.d0, 0.d0)
-    if(isdelta==1) weight_vertex = weight_Gam0(typ, dr)
+    !if(isdelta==0) weight_vertex = (0.d0, 0.d0)
+    !if(isdelta==1) weight_vertex = weight_Gam0(typ, dr)
     !------------------------ end ----------------------------------
 
   else if(stat==2) then
     !----------------- for bold Gamma ------------------------------
-    !if(isdelta==0) weight_vertex = weight_Gam(1, dr, t1, t2)
-    !if(isdelta==1) weight_vertex = weight_Gam0(1, dr)
+    if(isdelta==0) weight_vertex = weight_Gam(1, dr, t1, t2)
+    if(isdelta==1) weight_vertex = weight_Gam0(1, dr)
 
     !----------------- for bare Gamma ------------------------------
-    if(isdelta==0) weight_vertex = (0.d0, 0.d0)
-    if(isdelta==1) weight_vertex = weight_Gam0(1, dr)
+    !if(isdelta==0) weight_vertex = (0.d0, 0.d0)
+    !if(isdelta==1) weight_vertex = weight_Gam0(1, dr)
     !------------------------ end ----------------------------------
+
   else if(stat==1 .or. stat==3) then
     if(isdelta==1) weight_vertex = weight_meas_Gam(typ, dr)
     if(isdelta==0) weight_vertex = (0.d0, 0.d0)

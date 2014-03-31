@@ -840,12 +840,14 @@ SUBROUTINE output_Quantities
 
   open(15, access="append", file=trim(title_loop)//"_Chi.dat")
   open(16, access="append", file=trim(title_loop)//"_Sigma.dat")
+  open(17, access="append", file=trim(title_loop)//"_Chi_sum.dat")
 
-  do it = 0, MxT-1
-    do dy = 0, dL(2)
-      do dx = 0, dL(1)
-        write(15, *) dx, dy, it, Chi(dx, dy, it)
+  do dy = 0, dL(2)
+    do dx = 0, dL(1)
+      do it = 0, MxT-1
+        write(15, '(3i4,2x,f20.14,"   +-  ",f20.14)') dx, dy, it, real(Chi(dx, dy, it)),dimag(Chi(dx, dy, it))
       enddo
+      write(15, *)
     enddo
   enddo
   close(15)
@@ -855,6 +857,13 @@ SUBROUTINE output_Quantities
       & L(1)*L(2)*(MxT/Beta)**2.d0*dimag(Sigma(it))
   enddo
   close(16)
+
+  write(17, *) "============================================"
+  write(17, *) "Beta", Beta, "L(1), L(2)", L(1), L(2), "Order", MCOrder
+  do it = 0, MxT-1
+    write(17, '(i5,2x,f20.14,"  +-  ",f20.14)') it, real(SUM(Chi(:, :, it))),dimag(SUM(Chi(:, :, it)))
+  enddo
+  close(17)
 
 END SUBROUTINE output_Quantities
 
