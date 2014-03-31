@@ -7,11 +7,9 @@ PROGRAM MAIN
   implicit none
   integer :: InpMC, it, i, ISub,ID
 
-  print *, 'Lx, Ly, Ntoss, Nsamp, IsForever, NStep, Jcp, beta, MCOrder, Seed, ISub, InpMC, ID, title'
-  read  *,  Lx, Ly, Ntoss, Nsamp, IsForever, NStep, Jcp, beta, MCOrder, Seed, ISub, InpMC, ID, title
+  print *, 'L(1), L(2), Ntoss, Nsamp, IsForever, NStep, Jcp, beta, MCOrder, Seed, ISub, InpMC, ID, title'
+  read  *,  L(1), L(2), Ntoss, Nsamp, IsForever, NStep, Jcp, beta, MCOrder, Seed, ISub, InpMC, ID, title
 
-  L(1)=Lx
-  L(2)=Ly
   logL(:)=dlog(L(:)*1.d0)
   SpatialWeight(:,:)=0.d0
 
@@ -44,9 +42,9 @@ PROGRAM MAIN
   Mu(2)  = 1.d0
 
   !================== space variables ==================================
-  Vol = Lx*Ly
-  dLx = Floor(Lx/2.d0)
-  dLy = Floor(Ly/2.d0)
+  Vol = L(1)*L(2)
+  dL(1) = Floor(L(1)/2.d0)
+  dL(2) = Floor(L(2)/2.d0)
 
   !================ irreducibility check ===============================
   CheckG = .true.
@@ -80,17 +78,17 @@ PROGRAM MAIN
   Error(:)=0.d0
   QuanName(:)="Undefined"
 
-  allocate(W(NTypeW, 0:Lx-1, 0:Ly-1, 0:MxT-1))
-  allocate(Gam(NTypeGam, 0:Lx-1, 0:Ly-1, 0:MxT-1, 0:MxT-1))
+  allocate(W(NTypeW, 0:L(1)-1, 0:L(2)-1, 0:MxT-1))
+  allocate(Gam(NTypeGam, 0:L(1)-1, 0:L(2)-1, 0:MxT-1, 0:MxT-1))
 
-  allocate(W0PF(0:Lx-1, 0:Ly-1, 0:MxT-1))
-  allocate(Gam0PF(0:Lx-1, 0:Ly-1, 0:MxT-1, 0:MxT-1))
-  allocate(Polar(0:Lx-1, 0:Ly-1, 0:MxT-1))
-  allocate(Chi(0:Lx-1, 0:Ly-1, 0:MxT-1))
+  allocate(W0PF(0:L(1)-1, 0:L(2)-1, 0:MxT-1))
+  allocate(Gam0PF(0:L(1)-1, 0:L(2)-1, 0:MxT-1, 0:MxT-1))
+  allocate(Polar(0:L(1)-1, 0:L(2)-1, 0:MxT-1))
+  allocate(Chi(0:L(1)-1, 0:L(2)-1, 0:MxT-1))
 
-  allocate(GamMC(0:MCOrder,1:NTypeGam/2, 0:Lx-1, 0:Ly-1, 0:MxT-1, 0:MxT-1))
-  allocate(ReGamSqMC(0:MCOrder,1:NTypeGam/2, 0:Lx-1, 0:Ly-1, 0:MxT-1, 0:MxT-1))
-  allocate(ImGamSqMC(0:MCOrder,1:NTypeGam/2, 0:Lx-1, 0:Ly-1, 0:MxT-1, 0:MxT-1))
+  allocate(GamMC(0:MCOrder,1:NTypeGam/2, 0:L(1)-1, 0:L(2)-1, 0:MxT-1, 0:MxT-1))
+  allocate(ReGamSqMC(0:MCOrder,1:NTypeGam/2, 0:L(1)-1, 0:L(2)-1, 0:MxT-1, 0:MxT-1))
+  allocate(ImGamSqMC(0:MCOrder,1:NTypeGam/2, 0:L(1)-1, 0:L(2)-1, 0:MxT-1, 0:MxT-1))
 
   MaxStat=1024
   allocate(ObsRecord(1:MaxStat,1:NObs))
@@ -192,7 +190,7 @@ LOGICAL FUNCTION self_consistent_GW(err)
 
   !!------ calculate G, W in momentum domain --------------
   WOld = (10.d0, 0.d0)
-  WNow = weight_W(1, 0, 0, 0)
+  WNow = weight_W(1, (/0, 0/), 0)
   self_consistent_GW = .true.
 
   iloop = 0
@@ -210,7 +208,7 @@ LOGICAL FUNCTION self_consistent_GW(err)
     call calculate_G
     call calculate_W
 
-    WNow = weight_W(1, 0, 0, 0)
+    WNow = weight_W(1, (/0, 0/), 0)
 
     call LogFile%QuickLog("G-W loop:"//str(iloop)//str(real(WOld))//str(real(WNOw)))
   enddo
@@ -335,7 +333,7 @@ SUBROUTINE test_subroutine
     !integer :: isamp
     !!======== test x,y distribution =========================
     !integer :: i,nr(2),cr(2),dr(2),N,x,y
-    !double precision :: hist(2,0:MxLx-1),weight
+    !double precision :: hist(2,0:MxL(1)-1),weight
     !call initialize_markov
     !print *,"Testing..."
     !hist(:,:)=0.d0
@@ -349,13 +347,13 @@ SUBROUTINE test_subroutine
     !enddo
     !open(11,file="testx.dat")
     !write(11,*) "X:",L(1),logL(1)
-    !do x=0,Lx
+    !do x=0,L(1)
       !write(11,*) x, hist(1,x)/N, SpatialWeight(1,x)
     !enddo
     !close(11)
     !open(11,file="testy.dat")
     !write(11,*) "Y:",L(2),logL(2)
-    !do y=0,Ly
+    !do y=0,L(2)
       !write(11,*) y, hist(2,y)/N, SpatialWeight(2,y)
     !enddo
     !close(11)
