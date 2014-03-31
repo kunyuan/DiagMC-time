@@ -49,8 +49,7 @@ PROGRAM MAIN
   !================ irreducibility check ===============================
   CheckG = .true.
   CheckW = .true.
-  CheckGam = .false.
-  !CheckGam = .true.
+  CheckGam = .true.
 
   !================ updates frequency   ================================
   Pupdate( :)  = 0.d0
@@ -67,7 +66,7 @@ PROGRAM MAIN
   Pupdate(15)  = 1.d0
   Pupdate(16)  = 1.d0
   Pupdate(17)  = 1.d0
-  !Pupdate(18)  = 1.d0
+  Pupdate(18)  = 1.d0
 
   !===============  Test variables ==================================
   TestData(:)=0.d0
