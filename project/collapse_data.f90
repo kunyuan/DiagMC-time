@@ -18,13 +18,17 @@ PROGRAM MAIN
     character*1 :: order_coll
     character*6 :: title_coll
     logical :: flag,alive
+    complex*16, allocatable :: GamTmp(:,:,:,:,:,:)
+    double precision, allocatable :: ReGamSqTmp(:,:,:,:,:,:)
+    double precision, allocatable :: ImGamSqTmp(:,:,:,:,:,:)
+    integer :: EffectiveSamp
 
-    call LogFile%Initial("project.log")
+    call LogFile%Initial("project.log","loop.collapse")
     call LogFile%QuickLog("Reading data files list form read_list.dat...")
     inquire(file="read_list.dat",exist=alive)
     if(.not. alive) then
-      call LogFile%QuickLog("read_list.dat is not exist!")
-      stop
+      call LogFile%QuickLog("read_list.dat is not exist!",'e')
+      stop -1
     endif
     open(10, file="read_list.dat")
     i = 1
@@ -47,7 +51,7 @@ PROGRAM MAIN
     do i=1,itot
       inquire(file=title_file(i),exist=alive)
       if(alive) then
-        open(101, status="old", file=title_file(i), form="binary", iostat=ios)
+        open(101, status="old", file=title_file(i), form="binary")
         read(101, iostat=ios) Lx, Ly
         if(ios==0) then
           flag=.false.
@@ -58,57 +62,73 @@ PROGRAM MAIN
       endif
     enddo 
     if(flag) then
-        call LogFile%QuickLog("I can't find any data file contains Lx,Ly information!")
-        stop
+        call LogFile%QuickLog("I can't find any data file contains Lx,Ly information!",'e')
+        stop -1
     endif
 
 
     allocate(GamMC(0:MCOrder,1:NTypeGam/2, 0:Lx-1, 0:Ly-1, 0:MxT-1, 0:MxT-1))
     allocate(ReGamSqMC(0:MCOrder,1:NTypeGam/2, 0:Lx-1, 0:Ly-1, 0:MxT-1, 0:MxT-1))
     allocate(ImGamSqMC(0:MCOrder,1:NTypeGam/2, 0:Lx-1, 0:Ly-1, 0:MxT-1, 0:MxT-1))
+    allocate(GamTmp(0:MCOrder,1:NTypeGam/2, 0:Lx-1, 0:Ly-1, 0:MxT-1, 0:MxT-1))
+    allocate(ReGamSqTmp(0:MCOrder,1:NTypeGam/2, 0:Lx-1, 0:Ly-1, 0:MxT-1, 0:MxT-1))
+    allocate(ImGamSqTmp(0:MCOrder,1:NTypeGam/2, 0:Lx-1, 0:Ly-1, 0:MxT-1, 0:MxT-1))
 
     GamNorm = 0.d0
     imc = 0.d0
+    EffectiveSamp=0
 
     GamMC(:,:,:,:,:,:) = 0.d0
     ReGamSqMC(:,:,:,:,:,:) = 0.d0
     ImGamSqMC(:,:,:,:,:,:) = 0.d0
 
     do i = 1, itot
-      open(101, status="old", file=title_file(i), form="binary")
+      ios=0
+      inquire(file=title_file(i),exist=alive)
+      if(alive) then
+        open(101, status="old", file=title_file(i), form="binary")
 
-      read(101) Lx, Ly
-      read(101) imctmp, iGamNorm, iGamNormWeight
+        read(101,iostat=ios) Lx, Ly
+        read(101,iostat=ios) imctmp, iGamNorm, iGamNormWeight
 
-      imc = imc + imctmp
-      GamNorm = GamNorm + iGamNorm
-      GamNormWeight = iGamNormWeight
-
-      do iorder = 0, MCOrder
-        do ityp = 1, 3 
-          do ix = 0, Lx-1
-            do iy = 0, Ly-1
-              do it1 = 0, MxT-1
-                do it2 = 0, MxT-1
-                  read(101)  iGam
-                  GamMC(iorder, ityp, ix, iy, it1, it2) = GamMC(iorder, ityp, ix, iy, it1, it2) +  iGam
-                  read(101)  iReGamSq
-                  ReGamSqMC(iorder,ityp,ix,iy,it1,it2)=ReGamSqMC(iorder,ityp,ix,iy,it1,it2)+iReGamSq
-                  read(101)  iImGamSq
-                  ImGamSqMC(iorder,ityp,ix,iy,it1,it2)=ImGamSqMC(iorder,ityp,ix,iy,it1,it2)+iImGamSq
+        do iorder = 0, MCOrder
+          do ityp = 1, 3 
+            do ix = 0, Lx-1
+              do iy = 0, Ly-1
+                do it1 = 0, MxT-1
+                  do it2 = 0, MxT-1
+                    read(101,iostat=ios)  GamTmp(iorder, ityp, ix, iy, it1, it2)
+                    read(101,iostat=ios)  ReGamSqTmp(iorder,ityp,ix,iy,it1,it2)
+                    read(101,iostat=ios)  ImGamSqTmp(iorder,ityp,ix,iy,it1,it2)
+                  enddo
                 enddo
               enddo
             enddo
           enddo
         enddo
-      enddo
-      close(101)
+        close(101)
+      endif
+      if(ios==0) then
+        EffectiveSamp=EffectiveSamp+1
+        imc = imc + imctmp
+        GamNorm = GamNorm + iGamNorm
+        GamNormWeight = iGamNormWeight
+        GamMC=GamMC+GamTmp
+        ReGamSqMC=ReGamSqMC+ReGamSqTmp
+        ImGamSqMC=ImGamSqMC+ImGamSqTmp
+      endif
     enddo
 
-    write(*, *) itot, imc
-    call write_monte_carlo_data
-
-
+    call LogFile%QuickLog("File Num:"+str(itot)+" ,Effective Samples Num:"+str(EffectiveSamp))
+    if(EffectiveSamp>itot/2) then
+      call LogFile%QuickLog("Writing collpased data...")
+      call write_monte_carlo_data
+      call LogFile%QuickLog("Collpasing data is done!")
+      stop 0
+    else
+      call LogFile%QuickLog("Too few Effective Samples, self consistent loop aborted!",'w')
+      stop -1
+    endif
   CONTAINS
 
   SUBROUTINE write_monte_carlo_data

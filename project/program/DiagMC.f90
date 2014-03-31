@@ -28,13 +28,15 @@ PROGRAM MAIN
   title1 = trim(adjustl(title_loop))//'_'//trim(adjustl(title1))
   title_mc = trim(adjustl(title2))//'_'//trim(adjustl(title1))
 
-  call LogTerm%Initial('*')
   if(ISub==1) then
-    call LogFile%Initial("project.log")
+    call LogFile%Initial("project.log","loop")
+    call LogTerm%Initial('*','loop')
   else if(ISub==2) then
-    call LogFile%Initial(trim(title_mc)//".log")
+    call LogFile%Initial(trim(title_mc)//".log","job."//trim(adjustl(title2)))
+    call LogTerm%Initial('*',"job."//trim(adjustl(title2)))
   else if(ISub==3) then
-    call LogFile%Initial('*')
+    call LogFile%Initial('*','test')
+    call LogTerm%Initial('*','test')
   endif
 
   call LogFile%QuickLog("Initializing basic properties...")
