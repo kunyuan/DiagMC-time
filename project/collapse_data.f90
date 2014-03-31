@@ -52,7 +52,7 @@ PROGRAM MAIN
       inquire(file=title_file(i),exist=alive)
       if(alive) then
         open(101, status="old", file=title_file(i), form="binary")
-        read(101, iostat=ios) Lx, Ly
+        read(101, iostat=ios) L(1), L(2)
         if(ios==0) then
           flag=.false.
           close(101)
@@ -62,17 +62,17 @@ PROGRAM MAIN
       endif
     enddo 
     if(flag) then
-        call LogFile%QuickLog("I can't find any data file contains Lx,Ly information!",'e')
+        call LogFile%QuickLog("I can't find any data file contains L(1),L(2) information!",'e')
         stop -1
     endif
 
 
-    allocate(GamMC(0:MCOrder,1:NTypeGam/2, 0:Lx-1, 0:Ly-1, 0:MxT-1, 0:MxT-1))
-    allocate(ReGamSqMC(0:MCOrder,1:NTypeGam/2, 0:Lx-1, 0:Ly-1, 0:MxT-1, 0:MxT-1))
-    allocate(ImGamSqMC(0:MCOrder,1:NTypeGam/2, 0:Lx-1, 0:Ly-1, 0:MxT-1, 0:MxT-1))
-    allocate(GamTmp(0:MCOrder,1:NTypeGam/2, 0:Lx-1, 0:Ly-1, 0:MxT-1, 0:MxT-1))
-    allocate(ReGamSqTmp(0:MCOrder,1:NTypeGam/2, 0:Lx-1, 0:Ly-1, 0:MxT-1, 0:MxT-1))
-    allocate(ImGamSqTmp(0:MCOrder,1:NTypeGam/2, 0:Lx-1, 0:Ly-1, 0:MxT-1, 0:MxT-1))
+    allocate(GamMC(0:MCOrder,1:NTypeGam/2, 0:L(1)-1, 0:L(2)-1, 0:MxT-1, 0:MxT-1))
+    allocate(ReGamSqMC(0:MCOrder,1:NTypeGam/2, 0:L(1)-1, 0:L(2)-1, 0:MxT-1, 0:MxT-1))
+    allocate(ImGamSqMC(0:MCOrder,1:NTypeGam/2, 0:L(1)-1, 0:L(2)-1, 0:MxT-1, 0:MxT-1))
+    allocate(GamTmp(0:MCOrder,1:NTypeGam/2, 0:L(1)-1, 0:L(2)-1, 0:MxT-1, 0:MxT-1))
+    allocate(ReGamSqTmp(0:MCOrder,1:NTypeGam/2, 0:L(1)-1, 0:L(2)-1, 0:MxT-1, 0:MxT-1))
+    allocate(ImGamSqTmp(0:MCOrder,1:NTypeGam/2, 0:L(1)-1, 0:L(2)-1, 0:MxT-1, 0:MxT-1))
 
     GamNorm = 0.d0
     imc = 0.d0
@@ -88,13 +88,13 @@ PROGRAM MAIN
       if(alive) then
         open(101, status="old", file=title_file(i), form="binary")
 
-        read(101,iostat=ios) Lx, Ly
+        read(101) L(1), L(2)
         read(101,iostat=ios) imctmp, iGamNorm, iGamNormWeight
 
         do iorder = 0, MCOrder
           do ityp = 1, 3 
-            do ix = 0, Lx-1
-              do iy = 0, Ly-1
+            do ix = 0, L(1)-1
+              do iy = 0, L(2)-1
                 do it1 = 0, MxT-1
                   do it2 = 0, MxT-1
                     read(101,iostat=ios)  GamTmp(iorder, ityp, ix, iy, it1, it2)
@@ -139,12 +139,12 @@ PROGRAM MAIN
     open(104, status="replace", &
       & file=trim(title_mc)//"_monte_carlo_data.bin.dat",form="binary")
 
-    write(104) Lx, Ly
+    write(104) L(1), L(2)
     write(104) imc, GamNorm, GamNormWeight
     do it2 = 0, MxT-1
       do it1 = 0, MxT-1
-        do iy = 0, Ly-1
-          do ix = 0, Lx-1
+        do iy = 0, L(2)-1
+          do ix = 0, L(1)-1
             do ityp = 1, NtypeGam/2
               do iorder = 0, MCOrder
                 write(104)  GamMC(iorder,  ityp, ix, iy, it1, it2)

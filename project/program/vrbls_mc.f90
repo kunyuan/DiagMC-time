@@ -13,12 +13,12 @@ MODULE vrbls_mc
   integer, parameter          :: Mnint =-2147483647
 
   integer, parameter :: D = 2                       ! 2-dimensional system
-  integer, parameter :: MxLx  = 8, MxLy = 8       ! the largest system
-  !                                                   size,MxLx>MxLy
-  integer, parameter :: MxVol = MxLx**D             ! the maximum system volume
-  integer, parameter :: MxT   = 128                  ! the maximum number of time segments
+  !integer, parameter :: MxL(1)  = 8, MxL(2) = 8         ! the largest system
+  integer, parameter,dimension(2) :: MxL =(/8,8/)   ! the largest system
+  integer, parameter :: MxVol = MxL(1)**D           ! the maximum system volume
+  integer, parameter :: MxT   = 128                 ! the maximum number of time segments
   integer, parameter :: MxK   = 1000000             ! the maximum momentum
-  !integer, parameter :: MxOmegaBasis = 2048         ! the maximum omega used in basis
+  !integer, parameter :: MxOmegaBasis = 2048        ! the maximum omega used in basis
 
   double precision, parameter :: MxError = 0.25     ! the maximum error for MC
   integer, parameter          :: MxNblck = 1000000    ! the maximum memory blocks in MC simulations
@@ -46,9 +46,9 @@ MODULE vrbls_mc
   type(logging) :: LogTerm
 
   !======================== Input parameter ==============================
-  integer          ::  Lx, Ly, L(2), Vol                ! System size
+  integer          ::  L(2), Vol                ! System size
   double precision  ::  logL(2)
-  integer          ::  dLx, dLy
+  integer          ::  dL(2)
   double precision ::  Jcp                        ! interaction
   double precision ::  Mu(2)                      ! Chem. potential for spin down & up
   double precision ::  Beta                       ! inverse temperature
@@ -138,8 +138,8 @@ MODULE vrbls_mc
   double precision :: WeightCurrent            ! the current weight of the configuration
   double precision :: CoefOfWorm
   double precision :: CoefOfWeight(0:MxOrder)  ! the coeffecients for different orders and worm section
-  double precision :: CoefOfSymmetry(0:MxLx, 0:MxLy)
-  double precision :: SpatialWeight(1:2,0:MxLx-1)  ! 1, fox x direction 2, for y direction;
+  double precision :: CoefOfSymmetry(0:MxL(1), 0:MxL(2))
+  double precision :: SpatialWeight(1:2,0:MxL(1)-1)  ! 1, fox x direction 2, for y direction;
                                                  !!! attention: dx,dy=0~L!!!!
 
   !------------- MC steps -----------------------------------
@@ -224,7 +224,7 @@ MODULE vrbls_mc
   integer          :: MaxStat
   integer          :: StatNum
   integer, parameter :: NObs = 20              ! Total # observables
-  double precision   :: Quan(NObs)                 ! 1st--#quan.  2nd--#block
+  double precision   :: Quan(NObs)             ! 1st--#quan.  2nd--#block
   double precision   :: Norm(NObs)
   double precision   :: Error(NObs)
   character(len=30),dimension(NObs) :: QuanName
