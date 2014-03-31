@@ -2440,20 +2440,39 @@ SUBROUTINE measure
     endif
 
     !===============  test variables =================================
-    !Quan(1) = GamNorm
-    !Norm(1) = Norm(1) + 1.d0/factorM
+    Norm(1:16) = Z_normal
 
-    !Quan(Order+1) = Quan(Order+1)+ abs(1.d0/factorM)
-
-    !sumt = 0
-    !do ikey = 1, 1+Order
-      !sumt = sumt + TypeLn(WLnKey2Value(ikey))
-    !enddo
-    !if(sumt==Order+1) TestData(MCOrder+1+Order) = TestData(MCOrder+1+Order) +1.d0/factorM
-
-    !Quan(1) = Quan(1) + Floor(rn()*2.d0)
-    !Norm(1) = Norm(1) + 1.d0
+    if(Order==1 .and. ityp==1 .and. dx==0 .and. dy==0) then
+      if(dt1==0 .and. dt2==0) then
+        Quan(1) = Quan(1) + real(Phase)/factorM
+        Quan(2) = Quan(2) + dimag(Phase)/factorM
+      else if(dt1==32 .and. dt2==32) then
+        Quan(3) = Quan(3) + real(Phase)/factorM
+        Quan(4) = Quan(4) + dimag(Phase)/factorM
+      else if(dt1==64 .and. dt2==64) then
+        Quan(5) = Quan(5) + real(Phase)/factorM
+        Quan(6) = Quan(6) + dimag(Phase)/factorM
+      else if(dt1==127 .and. dt2==127) then
+        Quan(7) = Quan(7) + real(Phase)/factorM
+        Quan(8) = Quan(8) + dimag(Phase)/factorM
+      endif
+    endif
     !================================================================
+    if(Order==2 .and. ityp==1 .and. dx==0 .and. dy==0) then
+      if(dt1==0 .and. dt2==0) then
+        Quan(9) = Quan(9) + real(Phase)/factorM
+        Quan(10) = Quan(10) + dimag(Phase)/factorM
+      else if(dt1==32 .and. dt2==32) then
+        Quan(11) = Quan(11) + real(Phase)/factorM
+        Quan(12) = Quan(12) + dimag(Phase)/factorM
+      else if(dt1==64 .and. dt2==64) then
+        Quan(13) = Quan(13) + real(Phase)/factorM
+        Quan(14) = Quan(14) + dimag(Phase)/factorM
+      else if(dt1==127 .and. dt2==127) then
+        Quan(15) = Quan(15) + real(Phase)/factorM
+        Quan(16) = Quan(16) + dimag(Phase)/factorM
+      endif
+    endif
     !=============================================================
 
   endif
@@ -2482,30 +2501,7 @@ SUBROUTINE statistics
       deallocate(temp)
     endif
 
-    !do iorder = 0, MCOrder
-      !i=iorder+1
-      !ObsRecord(StatNum,i)=Quan(i)/Norm(i)
-      !call ERSTAT(ObsRecord(:,i),StatNum,amax,tmax,amin,tmin) 
-      !Error(i)=(amax-amin)/2.d0;
-    !enddo
-
-    !do iorder = MCOrder+1, 2*MCOrder
-      !i= iorder+1
-      !QuanName(i)="(sp-up)/(order-1,sp-up)"
-      !Quan(i)=TestData(i)/TestData(i-1)
-      !Norm(i)=1.d0
-      !ObsRecord(StatNum,i)=Quan(i)/Norm(i)
-      !call ERSTAT(ObsRecord(:,i),StatNum,amax,tmax,amin,tmin) 
-      !Error(i)=(amax-amin)/2.d0;
-    !enddo
-
-    !QuanName(1)="random number"
-    !ObsRecord(StatNum,1)= Quan(1)/Norm(1)
-    !call ERSTAT(ObsRecord(:,1),StatNum,amax,tmax,amin,tmin) 
-    !Error(1)=(amax-amin)/2.d0;
-
-    !do i=1,NObs
-    do i=1,MCOrder+1
+    do i=1,NObs
       if(Norm(i)>1e-6) then
         x=Quan(i)/Norm(i)
         ObsRecord(StatNum,i)=x 

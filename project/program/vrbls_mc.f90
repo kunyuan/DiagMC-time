@@ -224,7 +224,7 @@ MODULE vrbls_mc
   integer          :: MaxStat
   integer          :: StatNum
   integer, parameter :: NObs = 20              ! Total # observables
-  double precision   :: Quan(NObs)                 ! 1st--#quan.  2nd--#block
+  double precision   :: Quan(NObs)             ! 1st--#quan.  2nd--#block
   double precision   :: Norm(NObs)
   double precision   :: Error(NObs)
   character(len=30),dimension(NObs) :: QuanName
