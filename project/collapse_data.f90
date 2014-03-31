@@ -1,21 +1,31 @@
 INCLUDE "program/vrbls_mc.f90"
+INCLUDE "program/mylib/mylib.f90"
 PROGRAM MAIN
   USE vrbls_mc
+  USE string_basic
+  USE logging_module
     implicit none
     integer :: ix, iy, ityp, it1, it2
     integer :: i, itot, iorder
-    integer :: ifile
+    integer :: ifile,ios
     integer, parameter :: Mxjobs = 200
     double precision :: imctmp
     complex*16 :: iGam
     complex*16 :: iGamNorm, iGamNormWeight
     double precision :: iReGamSq
     double precision :: iImGamSq
-
     character(len=100),dimension(Mxjobs) :: title_file
     character*1 :: order_coll
     character*6 :: title_coll
+    logical :: flag,alive
 
+    call LogFile%Initial("project.log")
+    call LogFile%QuickLog("Reading data files list form read_list.dat...")
+    inquire(file="read_list.dat",exist=alive)
+    if(.not. alive) then
+      call LogFile%QuickLog("read_list.dat is not exist!")
+      stop
+    endif
     open(10, file="read_list.dat")
     i = 1
     do
@@ -32,10 +42,26 @@ PROGRAM MAIN
     title_coll = title_file(1)(3:8)
     title_mc = trim(adjustl(title_coll))//"_coll"
 
-    open(101, status="old", file=title_file(1), form="binary")
 
-    read(101) L(1), L(2)
-    close(101)
+    flag=.true.
+    do i=1,itot
+      inquire(file=title_file(i),exist=alive)
+      if(alive) then
+        open(101, status="old", file=title_file(i), form="binary", iostat=ios)
+        read(101, iostat=ios) L(1), L(2)
+        if(ios==0) then
+          flag=.false.
+          close(101)
+          exit
+        endif
+        close(101)
+      endif
+    enddo 
+    if(flag) then
+        call LogFile%QuickLog("I can't find any data file contains Lx,Ly information!")
+        stop
+    endif
+
 
     allocate(GamMC(0:MCOrder,1:NTypeGam/2, 0:L(1)-1, 0:L(2)-1, 0:MxT-1, 0:MxT-1))
     allocate(ReGamSqMC(0:MCOrder,1:NTypeGam/2, 0:L(1)-1, 0:L(2)-1, 0:MxT-1, 0:MxT-1))

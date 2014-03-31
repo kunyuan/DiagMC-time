@@ -322,7 +322,7 @@ Complex*16 FUNCTION weight_W0(typ, dr)
       endif
     endif
   else
-    call logtmp%QuickLog("Weight_W"//str(dx1)//str(dy1)//"dx, dy bigger than system size!")
+    call LogFile%QuickLog("Weight_W"+str(dx1)+str(dy1)+"dx, dy bigger than system size!")
     stop
   endif
 END FUNCTION weight_W0
@@ -345,7 +345,7 @@ COMPLEX*16 FUNCTION weight_Gam0(typ, dr)
       weight_Gam0 = (0.d0, 0.d0)
     endif
   else
-    call logtmp%QuickLog("Weight_Gam"//str(dr(1))//str(dr(2))//"dx, dy bigger than system size!")
+    call logFile%QuickLog("Weight_Gam"//str(dr(1))//str(dr(2))//"dx, dy bigger than system size!")
     stop
   endif
 END FUNCTION weight_Gam0

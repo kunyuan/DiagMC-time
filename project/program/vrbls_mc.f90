@@ -31,19 +31,18 @@ MODULE vrbls_mc
 
   !=======================================================================
 
-  character*100 :: title1
-  character*100 :: title2
-  character*100 :: title_loop
-  character*100 :: title_mc
-  character*100 :: title
-  character*100 :: logstr
-  character*100 :: title_loop_log
+  character*128 :: title1
+  character*128 :: title2
+  character*128 :: title_loop
+  character*128 :: title_mc
+  character*128 :: title
+  character*128 :: logstr
+  character*128 :: title_loop_log
 
   integer:: file_version
   integer:: mc_version
 
-  type(logging) :: LogLoop
-  type(logging) :: LogMC
+  type(logging) :: LogFile
   type(logging) :: LogTerm
 
   !======================== Input parameter ==============================
