@@ -971,13 +971,14 @@ SUBROUTINE output_GamMC
   implicit none
   integer :: i, j, iorder, it1, it2
   double precision :: rerr, ierr, rpercenterr, ipercenterr
-  complex*16 :: gam, gamn, norm
+  complex*16 :: gam, gamn, normal
   double precision :: rgam2, igam2
 
   !open(34, access="append", file=trim(title_mc)//"_Gam_matrix_MC.dat")
   open(35, access="append", file=trim(title_mc)//"_Gam_MC.dat")
+  open(36, access="append", file=trim(title_mc)//"_Gam_errorbar.dat")
 
-  norm = GamNormWeight*Z_normal/GamNorm
+  normal = GamNormWeight*Z_normal/GamNorm
   !norm = GamOrder1(1, 0, 0)*Z_normal/GamMC(1,1,0,0,0,0)
 
   !write(34, *) "============================================"
@@ -987,6 +988,9 @@ SUBROUTINE output_GamMC
   write(35, *) "============================================"
   write(35, *) "Beta", Beta, "Lx, Ly", Lx, Ly, "Order", MCOrder, "Seed",Seed
   write(35, *) imc, Z_normal, GamNormWeight, GamNorm, norm
+
+  write(36, *) "============================================"
+  write(36, *) "Beta", Beta, "Lx, Ly", Lx, Ly, "Order", MCOrder, "Seed",Seed
 
   !write(34, *) "Order 1, dx=0, dy=0, real part"
   !do it1 = 0, MxT-1
@@ -1014,9 +1018,9 @@ SUBROUTINE output_GamMC
     write(35, *) "Order", iorder
     write(35, *) "dx = 0, dy = 0"
     do it1 = 0, MxT-1
-      it2 = 0
+      it2 = it1
       gam = GamMC(iorder, 1, 0, 0, it1, it2)/Z_normal
-      gamn = gam*norm
+      gamn = gam*normal
 
       rgam2 = ReGamSqMC(iorder,1, 0, 0, it1, it2)/Z_normal
       rerr = sqrt(abs(rgam2)-(real(gam))**2.d0)/sqrt(Z_normal-1)
@@ -1036,12 +1040,67 @@ SUBROUTINE output_GamMC
 
       write(35, '(i3,2x,i3,E20.10E3,"+/-",f10.6,"%    +i",E20.10E3,"+/-",f10.6,"%")') it1, it2, &
         & real(gamn),rpercenterr, dimag(gamn), ipercenterr
+
+      if(iorder==1 ) then
+        if(it1==0) then
+          write(36, '(i3,2x,i3,E20.10E3,"+/-",f20.16,"    +i",E20.10E3,"+/-",f20.16)') it1, it2, &
+            & real(gam),rerr, dimag(gam), ierr
+          write(36, '(i3,2x,i3,E20.10E3,"+/-",f20.16,"    +i",E20.10E3,"+/-",f20.16)') it1, it2, &
+            & Quan(1)/Norm(1),Error(1), Quan(2)/Norm(1), Error(2)
+          write(36, *) rerr/Error(1), ierr/Error(2)
+        else if(it1==32) then
+          write(36, '(i3,2x,i3,E20.10E3,"+/-",f20.16,"    +i",E20.10E3,"+/-",f20.16)') it1, it2, &
+            & real(gam),rerr, dimag(gam), ierr
+          write(36, '(i3,2x,i3,E20.10E3,"+/-",f20.16,"    +i",E20.10E3,"+/-",f20.16)') it1, it2, &
+            & Quan(3)/Norm(1),Error(3), Quan(4)/Norm(1), Error(4)
+          write(36, *) rerr/Error(3), ierr/Error(4)
+        else if(it1==64) then
+          write(36, '(i3,2x,i3,E20.10E3,"+/-",f20.16,"    +i",E20.10E3,"+/-",f20.16)') it1, it2, &
+            & real(gam),rerr, dimag(gam), ierr
+          write(36, '(i3,2x,i3,E20.10E3,"+/-",f20.16,"    +i",E20.10E3,"+/-",f20.16)') it1, it2, &
+            & Quan(5)/Norm(1),Error(5), Quan(6)/Norm(1), Error(6)
+          write(36, *) rerr/Error(5), ierr/Error(6)
+        else if(it1==127) then
+          write(36, '(i3,2x,i3,E20.10E3,"+/-",f20.16,"    +i",E20.10E3,"+/-",f20.16)') it1, it2, &
+            & real(gam),rerr, dimag(gam), ierr
+          write(36, '(i3,2x,i3,E20.10E3,"+/-",f20.16,"    +i",E20.10E3,"+/-",f20.16)') it1, it2, &
+            & Quan(7)/Norm(1),Error(7), Quan(8)/Norm(1), Error(8)
+          write(36, *) rerr/Error(7), ierr/Error(8)
+        endif
+      else if(iorder==2) then
+        if(it1==0) then
+          write(36, '(i3,2x,i3,E20.10E3,"+/-",f20.16,"    +i",E20.10E3,"+/-",f20.16)') it1, it2, &
+            & real(gam),rerr, dimag(gam), ierr
+          write(36, '(i3,2x,i3,E20.10E3,"+/-",f20.16,"    +i",E20.10E3,"+/-",f20.16)') it1, it2, &
+            & Quan(9)/Norm(1),Error(9), Quan(10)/Norm(1), Error(10)
+          write(36, *) rerr/Error(9), ierr/Error(10)
+        else if(it1==32) then
+          write(36, '(i3,2x,i3,E20.10E3,"+/-",f20.16,"    +i",E20.10E3,"+/-",f20.16)') it1, it2, &
+            & real(gam),rerr, dimag(gam), ierr
+          write(36, '(i3,2x,i3,E20.10E3,"+/-",f20.16,"    +i",E20.10E3,"+/-",f20.16)') it1, it2, &
+            & Quan(11)/Norm(1),Error(11), Quan(12)/Norm(1), Error(12)
+          write(36, *) rerr/Error(11), ierr/Error(12)
+        else if(it1==64) then
+          write(36, '(i3,2x,i3,E20.10E3,"+/-",f20.16,"    +i",E20.10E3,"+/-",f20.16)') it1, it2, &
+            & real(gam),rerr, dimag(gam), ierr
+          write(36, '(i3,2x,i3,E20.10E3,"+/-",f20.16,"    +i",E20.10E3,"+/-",f20.16)') it1, it2, &
+            & Quan(13)/Norm(1),Error(13), Quan(14)/Norm(1), Error(14)
+          write(36, *) rerr/Error(13), ierr/Error(14)
+        else if(it1==127) then
+          write(36, '(i3,2x,i3,E20.10E3,"+/-",f20.16,"    +i",E20.10E3,"+/-",f20.16)') it1, it2, &
+            & real(gam),rerr, dimag(gam), ierr
+          write(36, '(i3,2x,i3,E20.10E3,"+/-",f20.16,"    +i",E20.10E3,"+/-",f20.16)') it1, it2, &
+            & Quan(15)/Norm(1),Error(15), Quan(16)/Norm(1), Error(16)
+          write(36, *) rerr/Error(15), ierr/Error(16)
+        endif
+      endif
     enddo
     write(35, *)
   enddo
 
   !close(34)
   close(35)
+  close(36)
 END SUBROUTINE output_GamMC
 
 
