@@ -461,19 +461,31 @@ END FUNCTION site_num
 SUBROUTINE read_GWGamma
   implicit none
   integer :: ix, iy, ityp, it1, it2, ios
+  logical :: alive
 
-  open(100, status="old", file=trim(title_loop)//"_G_file.dat",iostat=ios)
-  open(101, status="old", file=trim(title_loop)//"_W_file.dat",iostat=ios)
-  open(102, status="old", file=trim(title_loop)//"_Gamma_file.dat",iostat=ios)
-
-  if(ios/=0) then
-    call LogFile%QuickLog("You have to run self consistent loop first!",'e')
-    stop
+  inquire(file=trim(title_loop)//"_G_file.dat",exist=alive)
+  if(.not. alive) then
+    call LogFile%QuickLog("There is no G file yet!",'e')
+    stop -1
   endif
+  inquire(file=trim(title_loop)//"_W_file.dat",exist=alive)
+  if(.not. alive) then
+    call LogFile%QuickLog("There is no W file yet!",'e')
+    stop -1
+  endif
+  inquire(file=trim(title_loop)//"_Gamma_file.dat",exist=alive)
+  if(.not. alive) then
+    call LogFile%QuickLog("There is no Gamma file yet!",'e')
+    stop -1
+  endif
+
+  open(100, status="old", file=trim(title_loop)//"_G_file.dat")
+  open(101, status="old", file=trim(title_loop)//"_W_file.dat")
+  open(102, status="old", file=trim(title_loop)//"_Gamma_file.dat")
 
   do it1 = 0, MxT-1
     do ityp = 1, NTypeG
-      read(100, *) G(ityp, it1)
+      read(100, *,iostat=ios) G(ityp, it1)
     enddo
   enddo
 
@@ -481,7 +493,7 @@ SUBROUTINE read_GWGamma
     do iy = 0, Ly-1
       do ix = 0, Lx-1
         do ityp = 1, NTypeW
-          read(101, *) W(ityp, ix, iy, it1)
+          read(101, *,iostat=ios) W(ityp, ix, iy, it1)
         enddo
       enddo
     enddo
@@ -492,15 +504,16 @@ SUBROUTINE read_GWGamma
       do iy = 0, Ly-1
         do ix = 0, Lx-1
           do ityp = 1, NTypeG
-            read(102, *) Gam(ityp, ix, iy, it1, it2)
+            read(102, *,iostat=ios) Gam(ityp, ix, iy, it1, it2)
           enddo
         enddo
       enddo
     enddo
   enddo
-
-
-
+  if(ios/=0) then
+    call LogFile%QuickLog("Failed to read G,W or Gamma information!",'e')
+    stop -1
+  endif
   close(100)
   close(101)
   close(102)
@@ -589,13 +602,15 @@ END SUBROUTINE write_monte_carlo_data
 SUBROUTINE read_monte_carlo_data
   implicit none
   integer :: iorder, ix, iy, ityp, it1, it2, itopo,ios
+  logical :: alive
 
-  open(105, status="old", file=trim(title)//"_monte_carlo_data.bin.dat",form="binary",iostat=ios)
-  
-  if(ios/=0) then
+  inquire(file=trim(title)//"_monte_carlo_data.bin.dat",exist=alive)
+  if(.not. alive) then
     call LogFile%QuickLog("There is no monte carlo binary data yet!",'e')
-    stop
+    stop -1
   endif
+
+  open(105, status="old", file=trim(title)//"_monte_carlo_data.bin.dat",form="binary")
 
   read(105,iostat=ios) Lx, Ly
   read(105,iostat=ios) imc, GamNorm, GamNormWeight
@@ -616,11 +631,11 @@ SUBROUTINE read_monte_carlo_data
     enddo
   enddo
 
+  close(105)
   if(ios/=0) then
     call LogFile%QuickLog("The monte carlo binary data is broken?",'e')
-    stop
+    stop -1
   endif
-  close(105)
 END SUBROUTINE read_monte_carlo_data
 
 SUBROUTINE write_monte_carlo_conf
@@ -665,43 +680,53 @@ END SUBROUTINE write_monte_carlo_conf
 
 SUBROUTINE read_monte_carlo_conf
   implicit none
-  integer :: i
+  integer :: i,ios
   integer :: ikey, ikeyG, ikeyW
   integer :: iGin, iGout, iW
   integer :: iGam, jGam
   complex*16 :: ComCurrent
   double precision :: tau
+  logical :: alive
 
+  inquire(file=trim(title)//"_monte_carlo_conf.bin.dat",exist=alive)
+  if(.not. alive) then
+    call LogFile%QuickLog("There is no monte carlo binary configuration yet!",'e')
+    stop -1
+  endif
   open(106, status="old", file=trim(title)//"_monte_carlo_conf.bin.dat",form="binary")
 
-  read(106)  mc_version, Z_normal, Z_worm, StatNum
-  read(106)  ProbProp(:,:), ProbAcc(:,:)
-  read(106)  GamOrder(:), GamWormOrder(:)
-  read(106)  CoefOfWorm, CoefOfWeight(:)
-  read(106)  TestData(:)
-  read(106)  TailLn, TailVertex
-  read(106)  NextLn(:)
-  read(106)  NextVertex(:)
-  read(106)  Order, MeasureGam, SignFermiLoop, IsWormPresent 
-  read(106)  Ira, Masha, SpinMasha, kMasha
-  read(106)  StatusVertex(:)
-  read(106)  TypeVertex(:)
-  read(106)  GRVertex(1, :), GRVertex(2, :)
-  read(106)  WRVertex(1, :), WRVertex(2, :)
-  read(106)  TVertex(1, :), TVertex(2, :), TVertex(3, :)
-  read(106)  DirecVertex(:)             
-  read(106)  IsDeltaVertex(:)
-  read(106)  IsDeltaLn(:)
-  read(106)  kLn(:)
+  read(106,iostat=ios)  mc_version, Z_normal, Z_worm, StatNum
+  read(106,iostat=ios)  ProbProp(:,:), ProbAcc(:,:)
+  read(106,iostat=ios)  GamOrder(:), GamWormOrder(:)
+  read(106,iostat=ios)  CoefOfWorm, CoefOfWeight(:)
+  read(106,iostat=ios)  TestData(:)
+  read(106,iostat=ios)  TailLn, TailVertex
+  read(106,iostat=ios)  NextLn(:)
+  read(106,iostat=ios)  NextVertex(:)
+  read(106,iostat=ios)  Order, MeasureGam, SignFermiLoop, IsWormPresent 
+  read(106,iostat=ios)  Ira, Masha, SpinMasha, kMasha
+  read(106,iostat=ios)  StatusVertex(:)
+  read(106,iostat=ios)  TypeVertex(:)
+  read(106,iostat=ios)  GRVertex(1, :), GRVertex(2, :)
+  read(106,iostat=ios)  WRVertex(1, :), WRVertex(2, :)
+  read(106,iostat=ios)  TVertex(1, :), TVertex(2, :), TVertex(3, :)
+  read(106,iostat=ios)  DirecVertex(:)             
+  read(106,iostat=ios)  IsDeltaVertex(:)
+  read(106,iostat=ios)  IsDeltaLn(:)
+  read(106,iostat=ios)  kLn(:)
 
   do i = 1, 2
-    read(106)  NeighLn(i,:)
+    read(106,iostat=ios)  NeighLn(i,:)
   enddo
 
   do i = 1, 3
-    read(106)  NeighVertex(i,:) 
+    read(106,iostat=ios)  NeighVertex(i,:) 
   enddo
   close(106)
+  if(ios/=0) then
+    call LogFile%QuickLog("The monte carlo binary configuration is broken?",'e')
+    stop -1
+  endif
 
   NVertex = 2*(Order+1)
   NGLn = NVertex
