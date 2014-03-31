@@ -7,9 +7,9 @@
 
 
 !--------- worm weight function  ---------
-DOUBLE PRECISION FUNCTION weight_worm(dxg, dyg, dxw, dyw, dtau)
+DOUBLE PRECISION FUNCTION weight_worm(drg, drw, dtau)
   implicit none
-  integer, intent(in)  :: dxg, dyg, dxw, dyw
+  integer, intent(in)  :: drg(2), drw(2)
   double precision, intent(in) :: dtau
 
   weight_worm = 1.d0
@@ -29,21 +29,21 @@ complex*16 FUNCTION weight_meas_G(t1)
   return
 END FUNCTION weight_meas_G
 
-complex*16 FUNCTION weight_meas_W(dx, dy, t1)
+complex*16 FUNCTION weight_meas_W(dr, t1)
   implicit none
-  integer, intent(in)  :: dx, dy
+  integer, intent(in)  :: dr(2)
   integer, intent(in) :: t1
 
   weight_meas_W = (1.d0, 0.d0)
   return
 END FUNCTION weight_meas_W
 
-complex*16 FUNCTION weight_meas_Gam(ityp, dx, dy)
+complex*16 FUNCTION weight_meas_Gam(ityp, dr)
   implicit none
-  integer, intent(in)  :: dx, dy, ityp
+  integer, intent(in)  :: dr(2), ityp
 
   weight_meas_Gam = (0.d0, 0.d0)
-  if(dx==0 .and. dy==0) then
+  if(dr(1)==0 .and. dr(2)==0) then
     if(ityp ==1 .or. ityp == 2) then
       weight_meas_Gam = (1.d0, 0.d0)
     else if(ityp == 5 .or. ityp == 6) then
@@ -62,11 +62,11 @@ SUBROUTINE def_symmetry
 
   CoefOfSymmetry(:,:) = 2.d0   !typ 1,2; 3,4; 5,6
 
-  !do i = 1, Lx-1
+  !do i = 1, L(1)-1
     !CoefOfSymmetry(i, :) = 2.d0* CoefOfSymmetry(i, :)
   !enddo
 
-  !do j = 1, Ly-1
+  !do j = 1, L(2)-1
     !CoefOfSymmetry(:, j) = 2.d0* CoefOfSymmetry(:, j)
   !enddo
   return
@@ -92,8 +92,8 @@ SUBROUTINE update_WeightCurrent
   do ikey = 1, NWLn
     i = WLnKey2Value(ikey)
     Gam1 = NeighLn(1,i);       Gam2 = NeighLn(2,i)
-    wln = weight_wline(StatusLn(i),IsDeltaLn(i), WRVertex(1, Gam1)-WRVertex(1, Gam2), &
-      & WRVertex(2, Gam1)-WRVertex(2, Gam2), TVertex(3, Gam2)-TVertex(3,Gam1), TypeLn(i))
+    wln = weight_wline(StatusLn(i),IsDeltaLn(i), WRVertex(:, Gam1)-WRVertex(:, Gam2), &
+      &  TVertex(3, Gam2)-TVertex(3,Gam1), TypeLn(i))
     WeightLn(i) = wln
     weight = weight *wln
   enddo
@@ -103,8 +103,8 @@ SUBROUTINE update_WeightCurrent
     i = VertexKey2Value(ikey)
     tau1 = TVertex(3, i)-TVertex(2, i)
     tau2 = TVertex(1, i)-TVertex(3, i)
-    wgam = weight_vertex(StatusVertex(i), IsDeltaVertex(i), GRVertex(1, i)-WRVertex(1, i), &
-      & GRVertex(2, i)-WRVertex(2, i), tau1, tau2, TypeVertex(i))
+    wgam = weight_vertex(StatusVertex(i), IsDeltaVertex(i), GRVertex(:, i)-WRVertex(:, i), &
+      & tau1, tau2, TypeVertex(i))
     WeightVertex(i) = wgam
     weight = weight *wgam
   enddo
@@ -172,48 +172,16 @@ SUBROUTINE generate_xy(CurrentR,NewR,dR,Weight,Flag)
   return
 END SUBROUTINE generate_xy
 
-INTEGER FUNCTION diff_x(dx)
+SUBROUTINE diff_r(dr0, dr)
   implicit none
-  integer, intent(in) :: dx
-  diff_x = dx
-  if(diff_x<0)     diff_x = Lx+diff_x
-END FUNCTION diff_x
-
-INTEGER FUNCTION diff_y(dy)
-  implicit none
-  integer, intent(in) :: dy
-  diff_y = dy
-  if(diff_y<0)     diff_y = Ly+diff_y
-END FUNCTION diff_y
-
-!LOGICAL FUNCTION Is_x_valid(x1, x2)
-  !implicit none
-  !integer, intent(in) :: x1, x2
-  !integer :: dx
-  !dx = x1 - x2
-  !if(dx<0)     dx = Lx+dx
-  !if(dx>dLx)   dx = Lx-dx
-  !if(abs(dx)<=1) then
-    !Is_x_valid = .true.
-  !else
-    !Is_x_valid = .false.
-  !endif
-!END FUNCTION Is_x_valid
-
-!LOGICAL FUNCTION Is_y_valid(y1, y2)
-  !implicit none
-  !integer, intent(in) :: y1, y2
-  !integer :: dy
-  !dy = y1 - y2
-  !if(dy<0)     dy = Ly+dy
-  !if(dy>dLy)   dy = Ly-dy
-  !if(abs(dy)<=1) then
-    !Is_y_valid = .true.
-  !else
-    !Is_y_valid = .false.
-  !endif
-!END FUNCTION Is_y_valid
-
+  integer, intent(in) :: dr0(2)
+  integer, intent(out) :: dr(2)
+  integer :: i
+  do i = 1, 2
+    dr(i) = dr0(i)
+    if(dr(i)<0)     dr(i) = L(i)+ dr(i)
+  enddo
+END SUBROUTINE diff_r
 
 !!---------- int k -------------------------
 INTEGER FUNCTION generate_k()
@@ -1451,10 +1419,10 @@ END FUNCTION d_times_cd
 !!=======================================================================
 !MODULE test
     !implicit none
-    !integer,parameter :: Lx=4,Ly=4
+    !integer,parameter :: L(1)=4,L(2)=4
     !integer,parameter :: Omega=2
     !integer,parameter :: NtypeW=7
-    !double precision :: WR(NtypeW,0:Lx-1,0:Ly-1,-Omega:Omega,-Omega:Omega)
+    !double precision :: WR(NtypeW,0:L(1)-1,0:L(2)-1,-Omega:Omega,-Omega:Omega)
 !end module
 
 !program main
@@ -1464,17 +1432,17 @@ END FUNCTION d_times_cd
     !WR(:,:,:,:,:)=1
     !WR(1,0,0,:,:)=3
     !write(*,*) "Before"
-    !do iy=0,Ly-1
+    !do iy=0,L(2)-1
       !write(*,*) WR(1,:,iy,2,2)
     !enddo
     !call FFT(WR,NtypW,(2*Omega+1)**2,1)
     !print *, "First FFT"
-    !do iy=0,Ly-1
+    !do iy=0,L(2)-1
       !write(*,*) WR(1,:,iy,2,2)
     !enddo
     !call FFT(WR,NtypW,(2*Omega+1)**2,-1)
     !print *, "Second FFT"
-    !do iy=0,Ly-1
+    !do iy=0,L(2)-1
       !write(*,*) WR(1,:,iy,2,2)
     !enddo
 
@@ -1484,7 +1452,7 @@ SUBROUTINE transfer_W0(BackForth)
     implicit none
     integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
     call FFT_r(W0PF,1,MxT,BackForth)
-    call FFT_tau_single(W0PF,1,Lx*Ly,BackForth)
+    call FFT_tau_single(W0PF,1,L(1)*L(2),BackForth)
 END SUBROUTINE
 
 SUBROUTINE transfer_Gam0(BackForth)
@@ -1502,9 +1470,9 @@ SUBROUTINE transfer_Gam0(BackForth)
         enddo
       enddo
 
-      call FFT_tau_double(Gam0PF,1,Lx*Ly,BackForth)
+      call FFT_tau_double(Gam0PF,1,L(1)*L(2),BackForth)
     else if(BackForth ==-1) then
-      call FFT_tau_double(Gam0PF,1,Lx*Ly,BackForth)
+      call FFT_tau_double(Gam0PF,1,L(1)*L(2),BackForth)
 
       do it2 = 0, MxT-1
         do it1 = 0, MxT-1
@@ -1566,7 +1534,7 @@ END SUBROUTINE
 SUBROUTINE transfer_W_t(BackForth)
     implicit none
     integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
-    call FFT_tau_single(W,NtypeW,Lx*Ly,BackForth)
+    call FFT_tau_single(W,NtypeW,L(1)*L(2),BackForth)
 END SUBROUTINE
 
 SUBROUTINE transfer_Gam_r(BackForth)
@@ -1587,9 +1555,9 @@ SUBROUTINE transfer_Gam_t(BackForth)
         enddo
       enddo
 
-      call FFT_tau_double(Gam,NtypeGam,Lx*Ly,BackForth)
+      call FFT_tau_double(Gam,NtypeGam,L(1)*L(2),BackForth)
     else if(BackForth ==-1) then
-      call FFT_tau_double(Gam,NtypeGam,Lx*Ly,BackForth)
+      call FFT_tau_double(Gam,NtypeGam,L(1)*L(2),BackForth)
 
       do it2 = 0, MxT-1
         do it1 = 0, MxT-1
@@ -1609,7 +1577,7 @@ END SUBROUTINE
 SUBROUTINE transfer_Chi_t(BackForth)
     implicit none
     integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
-    call FFT_tau_single(Chi,1,Lx*Ly,BackForth)
+    call FFT_tau_single(Chi,1,L(1)*L(2),BackForth)
 END SUBROUTINE
 
 !SUBROUTINE transfer_Polar_r(BackForth)
@@ -1621,7 +1589,7 @@ END SUBROUTINE
 !SUBROUTINE transfer_Polar_t(BackForth)
     !implicit none
     !integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
-    !call FFT_tau_single(Polar,1,Lx*Ly,BackForth)
+    !call FFT_tau_single(Polar,1,L(1)*L(2),BackForth)
 !END SUBROUTINE
 
 SUBROUTINE transfer_r(Backforth)
@@ -1668,29 +1636,29 @@ SUBROUTINE FFT_r(XR,Ntype,Nz,BackForth)
     integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
     integer,intent(in) :: Nz
     integer,intent(in) :: Ntype
-    complex*16    :: XR(Ntype,0:Lx-1,0:Ly-1,0:Nz-1)
+    complex*16    :: XR(Ntype,0:L(1)-1,0:L(2)-1,0:Nz-1)
     integer :: Power,Noma
     integer :: ix,iy,iz,it
     double precision,allocatable ::   Real1(:), Im1(:)
 
-    do iy=0,Ly-1
-      do ix=0,Lx-1
-        if(ix>Lx/2 .and. iy<=Ly/2) then
-          XR(:,ix,iy,:)=XR(:,Lx-ix,iy,:)
-        else if(ix<=Lx/2 .and. iy>Ly/2) then
-          XR(:,ix,iy,:)=XR(:,ix,Ly-iy,:)
-        else if(ix>Lx/2 .and. iy>Ly/2)  then
-          XR(:,ix,iy,:)=XR(:,Lx-ix,Ly-iy,:)
+    do iy=0,L(2)-1
+      do ix=0,L(1)-1
+        if(ix>L(1)/2 .and. iy<=L(2)/2) then
+          XR(:,ix,iy,:)=XR(:,L(1)-ix,iy,:)
+        else if(ix<=L(1)/2 .and. iy>L(2)/2) then
+          XR(:,ix,iy,:)=XR(:,ix,L(2)-iy,:)
+        else if(ix>L(1)/2 .and. iy>L(2)/2)  then
+          XR(:,ix,iy,:)=XR(:,L(1)-ix,L(2)-iy,:)
         endif
       enddo
     enddo
 
     !do FFT in x direction
-    Power=log(Lx*1.d0)/log(2.d0)+1.d-14  
+    Power=log(L(1)*1.d0)/log(2.d0)+1.d-14  
     Noma=2**power
     allocate(Real1(0:Noma-1),Im1(0:Noma-1))
     do iz=0,Nz-1
-      do iy=0,Ly-1
+      do iy=0,L(2)-1
         do it=1,Ntype
            Real1(:)=real(XR(it,:,iy,iz))
            Im1(:)=dimag(XR(it,:,iy,iz))
@@ -1702,11 +1670,11 @@ SUBROUTINE FFT_r(XR,Ntype,Nz,BackForth)
     deallocate(Real1,Im1)
 
     !do FFT in y direction
-    power=log(Ly*1.d0)/log(2.d0)+1.d-14  
+    power=log(L(2)*1.d0)/log(2.d0)+1.d-14  
     Noma=2**Power
     allocate(Real1(0:Noma-1),Im1(0:Noma-1))
     do iz=0,Nz-1
-      do ix=0,Lx-1
+      do ix=0,L(1)-1
         do it=1,Ntype
            Real1(:)=real(XR(it,ix,:,iz))
            Im1(:)=dimag(XR(it,ix,:,iz))
@@ -2046,7 +2014,7 @@ END SUBROUTINE time_elapse
 !============   initialize diagrams =================================
 SUBROUTINE first_order_diagram
   implicit none
-  integer :: i
+  integer :: i, dr0(2)
   double precision :: ratio
   complex*16 :: Anew
 
@@ -2170,13 +2138,14 @@ SUBROUTINE first_order_diagram
   WeightLn(4) = weight_gline(StatusLn(4),TVertex(2,NeighLn(2,4))-TVertex(1,NeighLn(1,4)),TypeLn(4))
   WeightLn(5) = weight_gline(StatusLn(5),TVertex(2,NeighLn(2,5))-TVertex(1,NeighLn(1,5)),TypeLn(5))
 
-  WeightLn(3) = weight_wline(StatusLn(3),0,0,0,TVertex(3,NeighLn(2,3))-TVertex(3,NeighLn(1,3)),TypeLn(3))
-  WeightLn(6) = weight_wline(StatusLn(6),0,0,0,TVertex(3,NeighLn(2,6))-TVertex(3,NeighLn(1,6)),TypeLn(6))
+  dr0(:) = 0
+  WeightLn(3) = weight_wline(StatusLn(3),IsDeltaLn(3),dr0,TVertex(3,NeighLn(2,3))-TVertex(3,NeighLn(1,3)),TypeLn(3))
+  WeightLn(6) = weight_wline(StatusLn(6),IsDeltaLn(6),dr0,TVertex(3,NeighLn(2,6))-TVertex(3,NeighLn(1,6)),TypeLn(6))
 
-  WeightVertex(1) = weight_vertex(StatusVertex(1), 1, 0, 0, 0.d0, 0.d0, TypeVertex(1))
-  WeightVertex(2) = weight_vertex(StatusVertex(2), 1, 0, 0, 0.d0, 0.d0, TypeVertex(2))
-  WeightVertex(3) = weight_vertex(StatusVertex(3), 1, 0, 0, 0.d0, 0.d0, TypeVertex(3))
-  WeightVertex(4) = weight_vertex(StatusVertex(4), 1, 0, 0, 0.d0, 0.d0, TypeVertex(4))
+  WeightVertex(1) = weight_vertex(StatusVertex(1), 1, dr0, 0.d0, 0.d0, TypeVertex(1))
+  WeightVertex(2) = weight_vertex(StatusVertex(2), 1, dr0, 0.d0, 0.d0, TypeVertex(2))
+  WeightVertex(3) = weight_vertex(StatusVertex(3), 1, dr0, 0.d0, 0.d0, TypeVertex(3))
+  WeightVertex(4) = weight_vertex(StatusVertex(4), 1, dr0, 0.d0, 0.d0, TypeVertex(4))
 
 
   !ratio = (1.d0/Beta)**Order *SignFermiLoop
@@ -2195,7 +2164,7 @@ end SUBROUTINE first_order_diagram
 
 SUBROUTINE first_order_diagram_with_bubble
   implicit none
-  integer :: i
+  integer :: i, dr0(2)
   double precision :: ratio
   complex*16 :: Anew
 
@@ -2319,13 +2288,14 @@ SUBROUTINE first_order_diagram_with_bubble
   WeightLn(4) = weight_gline(StatusLn(4),TVertex(2,NeighLn(2,4))-TVertex(1,NeighLn(1,4)),TypeLn(4))
   WeightLn(5) = weight_gline(StatusLn(5),TVertex(2,NeighLn(2,5))-TVertex(1,NeighLn(1,5)),TypeLn(5))
 
-  WeightLn(3) = weight_wline(StatusLn(3),0,0,0,TVertex(3,NeighLn(2,3))-TVertex(3,NeighLn(1,3)),TypeLn(3))
-  WeightLn(6) = weight_wline(StatusLn(6),0,0,0,TVertex(3,NeighLn(2,6))-TVertex(3,NeighLn(1,6)),TypeLn(6))
+  dr0(:) = 0
+  WeightLn(3) = weight_wline(StatusLn(3),IsDeltaLn(3),dr0,TVertex(3,NeighLn(2,3))-TVertex(3,NeighLn(1,3)),TypeLn(3))
+  WeightLn(6) = weight_wline(StatusLn(6),IsDeltaLn(6),dr0,TVertex(3,NeighLn(2,6))-TVertex(3,NeighLn(1,6)),TypeLn(6))
 
-  WeightVertex(1) = weight_vertex(StatusVertex(1), 1, 0, 0, 0.d0, 0.d0, TypeVertex(1))
-  WeightVertex(2) = weight_vertex(StatusVertex(2), 1, 0, 0, 0.d0, 0.d0, TypeVertex(2))
-  WeightVertex(3) = weight_vertex(StatusVertex(3), 1, 0, 0, 0.d0, 0.d0, TypeVertex(3))
-  WeightVertex(4) = weight_vertex(StatusVertex(4), 1, 0, 0, 0.d0, 0.d0, TypeVertex(4))
+  WeightVertex(1) = weight_vertex(StatusVertex(1), 1, dr0, 0.d0, 0.d0, TypeVertex(1))
+  WeightVertex(2) = weight_vertex(StatusVertex(2), 1, dr0, 0.d0, 0.d0, TypeVertex(2))
+  WeightVertex(3) = weight_vertex(StatusVertex(3), 1, dr0, 0.d0, 0.d0, TypeVertex(3))
+  WeightVertex(4) = weight_vertex(StatusVertex(4), 1, dr0, 0.d0, 0.d0, TypeVertex(4))
 
 
   !ratio = (1.d0/Beta)**Order *SignFermiLoop
@@ -2344,7 +2314,7 @@ end SUBROUTINE first_order_diagram_with_bubble
 
 SUBROUTINE second_order_diagram
   implicit none
-  integer :: i
+  integer :: i, dr0(2)
   double precision :: ratio
   complex*16 :: Anew
 
@@ -2488,16 +2458,17 @@ SUBROUTINE second_order_diagram
   WeightLn(7) = weight_gline(StatusLn(7),TVertex(2,NeighLn(2,7))-TVertex(1,NeighLn(1,7)),TypeLn(7))
   WeightLn(8) = weight_gline(StatusLn(8),TVertex(2,NeighLn(2,8))-TVertex(1,NeighLn(1,8)),TypeLn(8))
 
-  WeightLn(3) = weight_wline(StatusLn(3),0,0,0,TVertex(3,NeighLn(2,3))-TVertex(3,NeighLn(1,3)),TypeLn(3))
-  WeightLn(6) = weight_wline(StatusLn(6),0,0,0,TVertex(3,NeighLn(2,6))-TVertex(3,NeighLn(1,6)),TypeLn(6))
-  WeightLn(9) = weight_wline(StatusLn(9),0,0,0,TVertex(3,NeighLn(2,9))-TVertex(3,NeighLn(1,9)),TypeLn(9))
+  dr0(:) = 0
+  WeightLn(3) = weight_wline(StatusLn(3),IsDeltaLn(3),dr0,TVertex(3,NeighLn(2,3))-TVertex(3,NeighLn(1,3)),TypeLn(3))
+  WeightLn(6) = weight_wline(StatusLn(6),IsDeltaLn(6),dr0,TVertex(3,NeighLn(2,6))-TVertex(3,NeighLn(1,6)),TypeLn(6))
+  WeightLn(9) = weight_wline(StatusLn(9),IsDeltaLn(9),dr0,TVertex(3,NeighLn(2,9))-TVertex(3,NeighLn(1,9)),TypeLn(9))
 
-  WeightVertex(1) = weight_vertex(StatusVertex(1), 1, 0, 0, 0.d0, 0.d0, TypeVertex(1))
-  WeightVertex(2) = weight_vertex(StatusVertex(2), 1, 0, 0, 0.d0, 0.d0, TypeVertex(2))
-  WeightVertex(3) = weight_vertex(StatusVertex(3), 1, 0, 0, 0.d0, 0.d0, TypeVertex(3))
-  WeightVertex(4) = weight_vertex(StatusVertex(4), 1, 0, 0, 0.d0, 0.d0, TypeVertex(4))
-  WeightVertex(5) = weight_vertex(StatusVertex(5), 1, 0, 0, 0.d0, 0.d0, TypeVertex(5))
-  WeightVertex(6) = weight_vertex(StatusVertex(6), 1, 0, 0, 0.d0, 0.d0, TypeVertex(6))
+  WeightVertex(1) = weight_vertex(StatusVertex(1), 1, dr0, 0.d0, 0.d0, TypeVertex(1))
+  WeightVertex(2) = weight_vertex(StatusVertex(2), 1, dr0, 0.d0, 0.d0, TypeVertex(2))
+  WeightVertex(3) = weight_vertex(StatusVertex(3), 1, dr0, 0.d0, 0.d0, TypeVertex(3))
+  WeightVertex(4) = weight_vertex(StatusVertex(4), 1, dr0, 0.d0, 0.d0, TypeVertex(4))
+  WeightVertex(5) = weight_vertex(StatusVertex(5), 1, dr0, 0.d0, 0.d0, TypeVertex(5))
+  WeightVertex(6) = weight_vertex(StatusVertex(6), 1, dr0, 0.d0, 0.d0, TypeVertex(6))
 
 
   !ratio = (1.d0/Beta)**Order *SignFermiLoop
