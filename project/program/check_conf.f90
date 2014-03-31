@@ -267,39 +267,39 @@ SUBROUTINE check_site
 
   do ikey = 1, NVertex
     i = VertexKey2Value(ikey)
-    if(GRVertex(1, i)<0 .or. GRVertex(1, i)>Lx-1) then
-      call LogFile%WriteStamp('e')
-      call LogFile%WriteLine("Oops, check_site found a bug!")
-      call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+",update number"+str(iupdate))
-      call LogFile%WriteLine("GX is wrong!")
-      call LogFile%WriteLine("gamma's number"+str(i)+",GX"+str(GRVertex(1, i)))
+    if(GRVertex(1, i)<0 .or. GRVertex(1, i)>L(1)-1) then
+      call LogMC%AddLine("Oops, check_site found a bug!")
+      call LogMC%AddLine("IsWormPresent"+str(IsWormPresent)+",update number"+str(iupdate))
+      call LogMC%AddLine("GX is wrong!")
+      call LogMC%AddLine("gamma's number"+str(i)+",GX"+str(GRVertex(1, i)))
+      call LogMC%Write('e')
       call print_config
       stop
     endif
-    if(GRVertex(2, i)<0 .or. GRVertex(2, i)>Ly-1) then
-      call LogFile%WriteStamp('e')
-      call LogFile%WriteLine("Oops, check_site found a bug!")
-      call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+",update number"+str(iupdate))
-      call LogFile%WriteLine("GY is wrong!")
-      call LogFile%WriteLine("gamma's number"+str(i)+",GY"+str(GRVertex(2, i)))
+    if(GRVertex(2, i)<0 .or. GRVertex(2, i)>L(2)-1) then
+      call LogMC%AddLine("Oops, check_site found a bug!")
+      call LogMC%AddLine("IsWormPresent"+str(IsWormPresent)+",update number"+str(iupdate))
+      call LogMC%AddLine("GY is wrong!")
+      call LogMC%AddLine("gamma's number"+str(i)+",GY"+str(GRVertex(2, i)))
+      call LogMC%Write('e')
       call print_config
       stop
     endif
-    if(WRVertex(1, i)<0 .or. WRVertex(1, i)>Lx-1) then
-      call LogFile%WriteStamp('e')
-      call LogFile%WriteLine("Oops, check_site found a bug!")
-      call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+",update number"+str(iupdate))
-      call LogFile%WriteLine("GY is wrong!")
-      call LogFile%WriteLine("gamma's number"+str(i)+",WX"+str(WRVertex(1, i)))
+    if(WRVertex(1, i)<0 .or. WRVertex(1, i)>L(1)-1) then
+      call LogMC%AddLine("Oops, check_site found a bug!")
+      call LogMC%AddLine("IsWormPresent"+str(IsWormPresent)+",update number"+str(iupdate))
+      call LogMC%AddLine("GY is wrong!")
+      call LogMC%AddLine("gamma's number"+str(i)+",WX"+str(WRVertex(1, i)))
+      call LogMC%Write('e')
       call print_config
       stop
     endif
-    if(WRVertex(2, i)<0 .or. WRVertex(2, i)>Ly-1) then
-      call LogFile%WriteStamp('e')
-      call LogFile%WriteLine("Oops, check_site found a bug!")
-      call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+",update number"+str(iupdate))
-      call LogFile%WriteLine("GY is wrong!")
-      call LogFile%WriteLine("gamma's number"+str(i)+",WY"+str(WRVertex(2, i)))
+    if(WRVertex(2, i)<0 .or. WRVertex(2, i)>L(2)-1) then
+      call LogMC%AddLine("Oops, check_site found a bug!")
+      call LogMC%AddLine("IsWormPresent"+str(IsWormPresent)+",update number"+str(iupdate))
+      call LogMC%AddLine("GY is wrong!")
+      call LogMC%AddLine("gamma's number"+str(i)+",WY"+str(WRVertex(2, i)))
+      call LogMC%Write('e')
       call print_config
       stop
     endif
@@ -529,8 +529,8 @@ SUBROUTINE check_weight
   do ikey = 1, NWLn
     i = WLnKey2Value(ikey)
     Gam1 = NeighLn(1,i);       Gam2 = NeighLn(2,i)
-    wln(ikey) = weight_wline(StatusLn(i),IsDeltaLn(i), WRVertex(1, Gam1)-WRVertex(1, Gam2), &
-      & WRVertex(2, Gam1)-WRVertex(2, Gam2), TVertex(3, Gam2)-TVertex(3,Gam1), TypeLn(i))
+    wln(ikey) = weight_wline(StatusLn(i),IsDeltaLn(i), WRVertex(:, Gam1)-WRVertex(:, Gam2), &
+      & TVertex(3, Gam2)-TVertex(3,Gam1), TypeLn(i))
     weight = weight *wln(ikey)
   enddo
 
@@ -538,8 +538,8 @@ SUBROUTINE check_weight
     i = VertexKey2Value(ikey)
     tau1 = TVertex(3, i)-TVertex(2, i)
     tau2 = TVertex(1, i)-TVertex(3, i)
-    gam(ikey) = weight_vertex(StatusVertex(i), IsDeltaVertex(i), GRVertex(1, i)-WRVertex(1, i), &
-      & GRVertex(2, i)-WRVertex(2, i), tau1, tau2, TypeVertex(i))
+    gam(ikey) = weight_vertex(StatusVertex(i), IsDeltaVertex(i), GRVertex(:, i)-WRVertex(:, i), &
+      & tau1, tau2, TypeVertex(i))
     weight = weight *gam(ikey)
   enddo
 
