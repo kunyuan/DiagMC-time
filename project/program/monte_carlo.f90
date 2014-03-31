@@ -29,15 +29,15 @@ SUBROUTINE initialize_markov
       if(i==MxNVertex)  NextVertex(i) = -1
     enddo
 
-    call LogMC%QuickLog("Initializing the configuration...")
+    call LogFile%QuickLog("Initializing the configuration...")
 
     call def_prob
     call def_spatial_weight
     call def_spin
     call def_diagram
 
-    call LogMC%QuickLog("Initialization Done!")
-    call LogMC%QuickLog("Weight of Initialization Diagram: "//trim(str(WeightCurrent)))
+    call LogFile%QuickLog("Initialization Done!")
+    call LogFile%QuickLog("Weight of Initialization Diagram: "//trim(str(WeightCurrent)))
 
     return
 end SUBROUTINE initialize_markov
@@ -162,7 +162,7 @@ SUBROUTINE markov(MaxSamp)
   isamp=0
   mc_version = 0
 
-  call LogMC%QuickLog("Starting Markov...")
+  call LogFile%QuickLog("Starting Markov...")
   call check_weight
 
   do while(isamp<=MaxSamp)
@@ -238,11 +238,11 @@ SUBROUTINE markov(MaxSamp)
       call print_config
       call check_config
 
-      call LogMC%QuickLog("Check if there is a new G,W data...")
+      call LogFile%QuickLog("Check if there is a new G,W data...")
 
       call read_flag
       if(mc_version/=file_version) then
-        call LogMC%QuickLog("Updating G, W, and Gamma...")
+        call LogFile%QuickLog("Updating G, W, and Gamma...")
 
         call read_GWGamma
         call update_WeightCurrent
@@ -252,19 +252,19 @@ SUBROUTINE markov(MaxSamp)
 
     !========================== REWEIGHTING =========================
     if(mod(imc,1.e8)==0) then
-      call LogMC%AddLine("Reweighting order of diagrams...")
+      call LogFile%WriteStamp()
+      call LogFile%WriteLine("Reweighting order of diagrams...")
 
       x=sum(GamWormOrder(:))
       CoefOfWeight(:)=x/(GamWormOrder(:)+50.d0)
 
-      call LogMC%AddLine("Reweight Ratios:")
+      call LogFile%WriteLine("Reweight Ratios:")
 
       do i=0,MCOrder
-        call LogMC%AddLine('Order '//trim(str(i))//':'//trim(str(CoefOfWeight(i))))
+        call LogFile%WriteLine('Order'+str(i)+' :'+str(CoefOfWeight(i)))
       enddo
 
-      call LogMC%AddLine("Reweighting is done!")
-      call LogMC%Write()
+      call LogFile%WriteLine("Reweighting is done!")
 
       if(imc<=2.e8) then
         GamWormOrder=0.d0
@@ -274,13 +274,13 @@ SUBROUTINE markov(MaxSamp)
     !================================================================
 
     if(mod(imc,5.e8)==0) then
-      call LogMC%QuickLog("Writing data and configuration...")
+      call LogFile%QuickLog("Writing data and configuration...")
 
       !call statistics
       call write_monte_carlo_conf
       call write_monte_carlo_data
 
-      call LogMC%QuickLog("Writing data and configuration done!")
+      call LogFile%QuickLog("Writing data and configuration done!")
     endif
 
 
@@ -1635,7 +1635,7 @@ SUBROUTINE change_Gamma_type
     else if(TypeLn(iWLn)<=4) then
       typW = TypeLn(iWLn)-2
     else
-      call LogMC%QuickLog("change Gamma type error!"//trim(str(iWLn)), 'e')
+      call LogFile%QuickLog("change Gamma type error!"//trim(str(iWLn)), 'e')
       stop
     endif
   endif
@@ -2163,11 +2163,9 @@ COMPLEX*16 FUNCTION weight_gline(stat, tau, typ)
     !  Have measuring vertex around
     weight_gline = weight_meas_G(t)
   else
-    call LogMC%SetLevel('e')
-    call LogMC%AddLine("The number of update: "//trim(str(iupdate)))
-    call LogMC%AddLine("line status error!"//trim(str(stat)))
-    call LogMC%Write()
-
+    call LogFile%WriteStamp('e')
+    call LogFile%WriteLine("The number of update: "+str(iupdate))
+    call LogFile%WriteLine("line status error!"+str(stat))
     call print_config
     stop
   endif
@@ -2176,10 +2174,9 @@ COMPLEX*16 FUNCTION weight_gline(stat, tau, typ)
   !if(stat >= 0 .and. stat<=1) then
     !weight_gline = weight_meas_G(t)
   !else
-    !call LogMC%SetLevel('e')
-    !call LogMC%AddLine("The number of update: "//trim(str(iupdate)))
-    !call LogMC%AddLine("line status error!"//trim(str(stat)))
-    !call LogMC%Write()
+    !call LogFile%WriteStamp('e')
+    !call LogFile%WriteLine("The number of update: "+str(iupdate))
+    !call LogFile%WriteLine("line status error!"+str(stat))
     !stop
   !endif
   !------------------------ end -----------------------------------------
@@ -2215,11 +2212,9 @@ COMPLEX*16 FUNCTION weight_wline(stat, isdelta, dr0, tau, typ)
     if(isdelta==0) weight_wline = weight_meas_W(dr, t)
     if(isdelta==1) weight_wline = (0.d0, 0.d0)
   else
-    call LogMC%SetLevel('e')
-    call LogMC%AddLine("The number of update: "//trim(str(iupdate)))
-    call LogMC%AddLine("line status error!"//trim(str(stat)))
-    call LogMC%Write()
-
+    call LogFile%WriteStamp('e')
+    call LogFile%WriteLine("The number of update: "+str(iupdate))
+    call LogFile%WriteLine("line status error!"+str(stat))
     call print_config
     stop
   endif
@@ -2229,10 +2224,9 @@ COMPLEX*16 FUNCTION weight_wline(stat, isdelta, dr0, tau, typ)
     !if(isdelta==0) weight_wline = weight_meas_W(dr, t)
     !if(isdelta==1) weight_wline = weight_meas_W(dr, 0)
   !else
-    !call LogMC%SetLevel('e')
-    !call LogMC%AddLine("The number of update: "//trim(str(iupdate)))
-    !call LogMC%AddLine("line status error!"//trim(str(stat)))
-    !call LogMC%Write()
+    !call LogFile%WriteStamp('e')
+    !call LogFile%WriteLine("The number of update: "+str(iupdate))
+    !call LogFile%WriteLine("line status error!"+str(stat))
     !stop
   !endif
   !------------------------ end -----------------------------------------
@@ -2278,10 +2272,9 @@ COMPLEX*16 FUNCTION weight_vertex(stat, isdelta, dr0, dtau1, dtau2, typ)
     if(isdelta==1) weight_vertex = weight_meas_Gam(typ, dr)
     if(isdelta==0) weight_vertex = (0.d0, 0.d0)
   else
-    call LogMC%SetLevel('e')
-    call LogMC%AddLine("The number of update: "//trim(str(iupdate)))
-    call LogMC%AddLine("vertex status error!"//trim(str(stat)))
-    call LogMC%Write()
+    call LogFile%WriteStamp('e')
+    call LogFile%WriteLine("The number of update: "+str(iupdate))
+    call LogFile%WriteLine("vertex status error!"+str(stat))
     stop
   endif
 
@@ -2290,10 +2283,9 @@ COMPLEX*16 FUNCTION weight_vertex(stat, isdelta, dr0, dtau1, dtau2, typ)
     !if(isdelta==1)  weight_vertex = weight_meas_Gam(typ, dr)
     !if(isdelta==0)  weight_vertex = (0.d0, 0.d0)
   !else
-    !call LogMC%SetLevel('e')
-    !call LogMC%AddLine("The number of update: "//trim(str(iupdate)))
-    !call LogMC%AddLine("vertex status error!"//trim(str(stat)))
-    !call LogMC%Write()
+    !call LogFile%WriteStamp('e')
+    !call LogFile%WriteLine("The number of update: "+str(iupdate))
+    !call LogFile%WriteLine("vertex status error!"+str(stat))
     !stop
   !endif
   !------------------------ end -----------------------------------------
@@ -2463,7 +2455,7 @@ SUBROUTINE statistics
       temp=ObsRecord
       MaxStat=MaxStat*2
       if(MaxStat>MxNblck) then
-        call LogMC%QuickLog("Too many memory blocks, even bigger than "//trim(str(MxNblck)), 'e')
+        call LogFile%QuickLog("Too many memory blocks, even bigger than "//trim(str(MxNblck)), 'e')
         stop
       endif
       deallocate(ObsRecord)

@@ -11,8 +11,8 @@
 _in_*
 out_*
 job_*
-program/infile
-program/outfile
-program/outfile/*
-program/graph
+project/infile
+project/outfile
+project/outfile/*
+project/graph
 

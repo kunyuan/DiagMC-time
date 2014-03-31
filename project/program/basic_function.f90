@@ -254,17 +254,14 @@ SUBROUTINE update_Hash4G(oldk, newk)
   implicit none
   integer, intent(in) :: oldk, newk
 
-  call LogMC%SetLevel('e')
-
   if(Hash4G(oldk)==1) then
     Hash4G(oldk)=0
   else
     if(CheckG) then
-      !call LogMC%AddLine("===================================="
-      !call LogMC%AddLine("Oops, update_Hash4G found a bug!"
-      !call LogMC%AddLine("IsWormPresent", IsWormPresent, "update number", iupdate
-      !call LogMC%AddLine("G Hash table for old k", oldk, " is not 1!!", Hash4G(oldk)
-      !call LogMC%AddLine("===================================="
+      call LogFile%WriteStamp('e')
+      call LogFile%WriteLine("Oops, update_Hash4G found a bug!")
+      call LogFile%WriteLine("IsWormPresent:"+str(IsWormPresent)+", update number:"+str(iupdate))
+      call LogFile%WriteLine("G Hash table for old k"+str(oldk)+" is not 1!!"+str(Hash4G(oldk)))
       call print_config
       stop
     endif
@@ -274,11 +271,10 @@ SUBROUTINE update_Hash4G(oldk, newk)
     Hash4G(newk)=1
   else
     if(CheckG) then
-      !call LogMC%AddLine("===================================="
-      !call LogMC%AddLine("Oops, update_Hash4G found a bug!"
-      !call LogMC%AddLine("IsWormPresent", IsWormPresent, "update number", iupdate
-      !call LogMC%AddLine("G Hash table for new k", newk, " is not 0!!", Hash4G(newk)
-      !call LogMC%AddLine("===================================="
+      call LogFile%WriteStamp('e')
+      call LogFile%WriteLine("Oops, update_Hash4G found a bug!")
+      call LogFile%WriteLine("IsWormPresent:"+str(IsWormPresent)+", update number:"+str(iupdate))
+      call LogFile%WriteLine("G Hash table for new k"+str(newk)+" is not 0!!"+str(Hash4G(newk)))
       call print_config
       stop
     endif
@@ -290,17 +286,15 @@ END SUBROUTINE update_Hash4G
 SUBROUTINE add_Hash4G(newk)
   implicit none
   integer, intent(in) :: newk
-  call LogMC%SetLevel('e')
 
   if(Hash4G(newk)==0) then
     Hash4G(newk)=1
   else
     if(CheckG) then
-      !call LogMC%AddLine("===================================="
-      !call LogMC%AddLine("Oops, add_Hash4G found a bug!"
-      !call LogMC%AddLine("IsWormPresent", IsWormPresent, "update number", iupdate
-      !call LogMC%AddLine("G Hash table for new k", newk, " is not 0!!", Hash4G(newk)
-      !call LogMC%AddLine("===================================="
+      call LogFile%WriteStamp('e')
+      call LogFile%WriteLine("Oops, add_Hash4G found a bug!")
+      call LogFile%WriteLine("IsWormPresent:"+str(IsWormPresent)+", update number:"+str(iupdate))
+      call LogFile%WriteLine("G Hash table for new k"+str(newk)+" is not 0!!"+str(Hash4G(newk)))
       call print_config
       stop
     endif
@@ -311,17 +305,14 @@ END SUBROUTINE add_Hash4G
 SUBROUTINE delete_Hash4G(oldk)
   implicit none
   integer, intent(in) :: oldk
-  call LogMC%SetLevel('e')
-
   if(Hash4G(oldk)==1) then
     Hash4G(oldk)=0
   else
     if(CheckG) then
-      !call LogMC%AddLine("===================================="
-      !call LogMC%AddLine("Oops, delete_Hash4G found a bug!"
-      !call LogMC%AddLine("IsWormPresent", IsWormPresent, "update number", iupdate
-      !call LogMC%AddLine("G Hash table for old k", oldk, " is not 1!!", Hash4G(oldk)
-      !call LogMC%AddLine("===================================="
+      call LogFile%WriteStamp('e')
+      call LogFile%WriteLine("Oops, delete_Hash4G found a bug!")
+      call LogFile%WriteLine("IsWormPresent:"+str(IsWormPresent)+", update number:"+str(iupdate))
+      call LogFile%WriteLine("G Hash table for old k"+str(oldk)+" is not 1!!"+str(Hash4G(oldk)))
       call print_config
       stop
     endif
@@ -335,8 +326,6 @@ SUBROUTINE update_Hash4W(oldk, newk)
   implicit none
   integer, intent(in) :: oldk, newk
   integer :: aoldk, anewk
-  call LogMC%SetLevel('e')
-
   aoldk = abs(oldk)
   anewk = abs(newk)
 
@@ -344,11 +333,10 @@ SUBROUTINE update_Hash4W(oldk, newk)
     Hash4W(aoldk)=0
   else
     if(CheckW) then
-      !call LogMC%AddLine("===================================="
-      !call LogMC%AddLine("Oops, update_Hash4W found a bug!"
-      !call LogMC%AddLine("IsWormPresent", IsWormPresent, "update number", iupdate
-      !call LogMC%AddLine("W Hash table for old k", aoldk, " is not 1!!", Hash4W(aoldk)
-      !call LogMC%AddLine("===================================="
+      call LogFile%WriteStamp('e')
+      call LogFile%WriteLine("Oops, update_Hash4W found a bug!")
+      call LogFile%WriteLine("IsWormPresent:"+str(IsWormPresent)+", update number:"+str(iupdate))
+      call LogFile%WriteLine("W Hash table for old k"+str(aoldk)+" is not 1!!"+str(Hash4W(aoldk)))
       call print_config
       stop
     endif
@@ -358,11 +346,10 @@ SUBROUTINE update_Hash4W(oldk, newk)
     Hash4W(anewk)=1
   else
     if(CheckW) then
-      !call LogMC%AddLine("===================================="
-      !call LogMC%AddLine("Oops, update_Hash4W found a bug!"
-      !call LogMC%AddLine("IsWormPresent", IsWormPresent, "update number", iupdate
-      !call LogMC%AddLine("W Hash table for new k", anewk, " is not 0!!", Hash4W(anewk)
-      !call LogMC%AddLine("===================================="
+      call LogFile%WriteStamp('e')
+      call LogFile%WriteLine("Oops, update_Hash4W found a bug!")
+      call LogFile%WriteLine("IsWormPresent:"+str(IsWormPresent)+", update number:"+str(iupdate))
+      call LogFile%WriteLine("W Hash table for new k"+str(anewk)+" is not 0!!"+str(Hash4W(anewk)))
       call print_config
       stop
     endif
@@ -375,19 +362,16 @@ SUBROUTINE add_Hash4W(newk)
   integer, intent(in) :: newk
   integer :: anewk
 
-  call LogMC%SetLevel('e')
-
   anewk = abs(newk)
 
   if(Hash4W(anewk)==0) then
     Hash4W(anewk)=1
   else
     if(CheckW) then
-      !call LogMC%AddLine("===================================="
-      !call LogMC%AddLine("Oops, add_Hash4W found a bug!"
-      !call LogMC%AddLine("IsWormPresent", IsWormPresent, "update number", iupdate
-      !call LogMC%AddLine("W Hash table for new k", anewk, " is not 0!!", Hash4W(anewk)
-      !call LogMC%AddLine("===================================="
+      call LogFile%WriteStamp('e')
+      call LogFile%WriteLine("Oops, add_Hash4W found a bug!")
+      call LogFile%WriteLine("IsWormPresent:"+str(IsWormPresent)+", update number:"+str(iupdate))
+      call LogFile%WriteLine("W Hash table for new k"+str(anewk)+" is not 0!!"+str(Hash4W(anewk)))
       call print_config
       stop
     endif
@@ -400,20 +384,16 @@ SUBROUTINE delete_Hash4W(oldk)
   integer, intent(in) :: oldk
   integer :: aoldk
 
-  call LogMC%SetLevel('e')
-
   aoldk = abs(oldk)
 
   if(Hash4W(aoldk)==1) then
     Hash4W(aoldk)=0
   else
     if(CheckW) then
-      !call LogMC%AddLine("===================================="
-      !call LogMC%AddLine("Oops, delete_Hash4W found a bug!"
-      !call LogMC%AddLine("IsWormPresent", IsWormPresent, "update number", iupdate
-      !call LogMC%AddLine("W Hash table for old k", aoldk, " is not 1!!", Hash4W(aoldk)
-      !call LogMC%AddLine("===================================="
-
+      call LogFile%WriteStamp('e')
+      call LogFile%WriteLine("Oops, delete_Hash4W found a bug!")
+      call LogFile%WriteLine("IsWormPresent:"+str(IsWormPresent)+", update number:"+str(iupdate))
+      call LogFile%WriteLine("W Hash table for old k"+str(aoldk)+" is not 1!!"+str(Hash4W(aoldk)))
       call print_config
       stop
     endif
@@ -429,8 +409,6 @@ LOGICAL FUNCTION Is_reducible_G(GLn)
   integer, intent(in) :: GLn
   integer :: newk
 
-  call LogMC%SetLevel('e')
-
   Is_reducible_G = .false.
   newk = kLn(GLn)
 
@@ -444,11 +422,10 @@ LOGICAL FUNCTION Is_reducible_G(GLn)
       Is_reducible_G = .true.
       return
     else if(Hash4G(newk)/=0) then
-      !call LogMC%AddLine("===================================="
-      !call LogMC%AddLine("Oops, Is_reducible_G found a bug!"
-      !call LogMC%AddLine("IsWormPresent", IsWormPresent, "update number", iupdate
-      !call LogMC%AddLine("G Hash table for new k", newk, " is not 0 or 1!!", Hash4G(newk)
-      !call LogMC%AddLine("===================================="
+      call LogFile%WriteStamp('e')
+      call LogFile%WriteLine("Oops, Is_reducible_G found a bug!")
+      call LogFile%WriteLine("IsWormPresent:"+str(IsWormPresent)+", update number:"+str(iupdate))
+      call LogFile%WriteLine("G Hash table for new k"+str(newk)+" is not 0 or 1!!"+str(Hash4G(newk)))
       call print_config
       stop
     endif
@@ -504,8 +481,6 @@ LOGICAL FUNCTION Is_reducible_W(WLn)
   integer, intent(in) :: WLn
   integer :: absk 
 
-  call LogMC%SetLevel('e')
-
   absk = abs(kLn(WLn))
   Is_reducible_W = .false.
 
@@ -524,12 +499,10 @@ LOGICAL FUNCTION Is_reducible_W(WLn)
       Is_reducible_W = .true.
       return
     else if(Hash4W(absk)/=0) then
-      !call LogMC%AddLine("===================================="
-      !call LogMC%AddLine("Oops, Is_reducible_W found a bug!"
-      !call LogMC%AddLine("IsWormPresent", IsWormPresent, "update number", iupdate
-      !call LogMC%AddLine("W Hash table for new k", absk, " is not 0 or 1!!", Hash4W(absk)
-      !call LogMC%AddLine("===================================="
-
+      call LogFile%WriteStamp('e')
+      call LogFile%WriteLine("Oops, Is_reducible_W found a bug!")
+      call LogFile%WriteLine("IsWormPresent:"+str(IsWormPresent)+", update number:"+str(iupdate))
+      call LogFile%WriteLine("W Hash table for new k"+str(absk)+" is not 0 or 1!!"+str(Hash4W(absk)))
       call print_config
       stop
     endif
@@ -595,7 +568,7 @@ INTEGER FUNCTION add_ira_stat(stat)
   implicit none
   integer, intent(in) :: stat
   if(stat == -1) then
-    call LogMC%QuickLog("add_ira_stat, stat = -1",'e')
+    call LogFile%QuickLog("add_ira_stat, stat = -1",'e')
     call print_config
     stop
   endif
@@ -605,7 +578,7 @@ INTEGER FUNCTION add_ira_stat(stat)
     add_ira_stat = stat
   endif
   if(add_ira_stat>=4) then
-    call LogMC%QuickLog(trim(str(iupdate))//" add_ira_stat(stat>3): "//trim(str(add_ira_stat)),'e')
+    call LogFile%QuickLog(str(iupdate)+" add_ira_stat(stat>3): "+str(add_ira_stat),'e')
     call print_config
     stop
   endif
@@ -616,7 +589,7 @@ INTEGER FUNCTION delete_ira_stat(stat)
   implicit none
   integer, intent(in) :: stat
   if(stat == -1) then
-    call LogMC%QuickLog("del_ira_stat, stat = -1",'e')
+    call LogFile%QuickLog("del_ira_stat, stat = -1",'e')
     call print_config
     stop
   endif
@@ -624,7 +597,7 @@ INTEGER FUNCTION delete_ira_stat(stat)
   if(delete_ira_stat == -2) delete_ira_stat = 0
   if(delete_ira_stat == -1) delete_ira_stat = 1
   if(delete_ira_stat<0) then
-    call LogMC%QuickLog(trim(str(iupdate))//" del_ira_stat(stat<0): "//trim(str(delete_ira_stat)),'e')
+    call LogFile%QuickLog(str(iupdate)+" del_ira_stat(stat<0): "+str(delete_ira_stat),'e')
     call print_config
     stop
   endif
@@ -635,7 +608,7 @@ INTEGER FUNCTION add_mea_stat(stat)
   implicit none
   integer, intent(in) :: stat
   if(stat == -1) then
-    call LogMC%QuickLog("add_mea, stat = -1",'e')
+    call LogFile%QuickLog("add_mea, stat = -1",'e')
     call print_config
     stop
   endif
@@ -644,7 +617,7 @@ INTEGER FUNCTION add_mea_stat(stat)
   if(add_mea_stat == 2)   add_mea_stat = 1
 
   if(add_mea_stat>=4) then
-    call LogMC%QuickLog(trim(str(iupdate))//" add_mea(stat>3): "//trim(str(add_mea_stat)),'e')
+    call LogFile%QuickLog(str(iupdate)+" add_mea(stat>3): "+str(add_mea_stat),'e')
     call print_config
     stop
   endif
@@ -655,13 +628,13 @@ INTEGER FUNCTION delete_mea_stat(stat)
   implicit none
   integer,intent(in) :: stat
   if(stat == -1) then
-    call LogMC%QuickLog("del_mea_stat, stat = -1",'e')
+    call LogFile%QuickLog("del_mea_stat, stat = -1",'e')
     call print_config
     stop
   endif
   delete_mea_stat = stat - 1
   if(delete_mea_stat<0) then
-    call LogMC%QuickLog(trim(str(iupdate))//"del_mea_stat(stat<0): "//trim(str(delete_mea_stat)),'e')
+    call LogFile%QuickLog(str(iupdate)+"del_mea_stat(stat<0): "+str(delete_mea_stat),'e')
     call print_config
     stop
   endif
@@ -681,10 +654,9 @@ INTEGER FUNCTION wline_stat(stat1, stat2)
   endif
 
   if(wline_stat>3) then
-    call LogMC%SetLevel('e')
-    call LogMC%AddLine("wline_stat error!")
-    call LogMC%AddLine(trim(str(wline_stat))//'  1: '//trim(str(stat1))//'2: '//trim(str(stat2)))
-    call LogMC%Write()
+    call LogFile%WriteStamp('e')
+    call LogFile%WriteLine("wline_stat error!")
+    call LogFile%WriteLine(str(wline_stat)+'  1: '+str(stat1)+'  2: '+str(stat2))
     call print_config
     stop
   endif
@@ -706,10 +678,9 @@ INTEGER FUNCTION gline_stat(stat1, stat2)
   endif
 
   if(gline_stat>1) then
-    call LogMC%SetLevel('e')
-    call LogMC%AddLine("gline_stat error!")
-    call LogMC%AddLine(trim(str(gline_stat))//'  1: '//trim(str(stat1))//'2: '//trim(str(stat2)))
-    call LogMC%Write()
+    call LogFile%WriteStamp('e')
+    call LogFile%WriteLine("gline_stat error!")
+    call LogFile%WriteLine(str(gline_stat)+'  1: '+str(stat1)+'  2: '+str(stat2))
     call print_config
     stop
   endif
@@ -726,13 +697,13 @@ SUBROUTINE insert_line(newline, isdelta, k, knd, typ, stat, weigh)
   newline = TailLn
   TailLn  = NextLn(TailLn)
   if(StatusLn(TailLn)>=0) then
-    call LogMC%QuickLog("update: "//trim(str(iupdate))//", insert_line error!!!", 'e')
+    call LogFile%QuickLog("update: "+str(iupdate)+", insert_line error!!!", 'e')
     call print_config
     stop
   endif
 
   if(TailLn == -1) then
-    call LogMC%QuickLog("insert_line error! tail=-1!", 'e')
+    call LogFile%QuickLog("insert_line error! tail=-1!", 'e')
     call print_config
     stop
   endif
@@ -763,7 +734,7 @@ SUBROUTINE undo_insert_line(occline, knd)
   integer :: tmp
 
   if(StatusLn(occline)==-1) then
-    call LogMC%QuickLog("update: "//trim(str(iupdate))//" , undo_insert_line error!!!", 'e')
+    call LogFile%QuickLog("update: "+str(iupdate)+" , undo_insert_line error!!!", 'e')
     call print_config
     stop
   endif
@@ -789,7 +760,7 @@ SUBROUTINE undo_insert_line(occline, knd)
   endif
 
   if(TailLn == -1) then
-    call LogMC%QuickLog("undo_insert_line error! tail=-1!", 'e')
+    call LogFile%QuickLog("undo_insert_line error! tail=-1!", 'e')
     stop
   endif
   return
@@ -807,13 +778,13 @@ SUBROUTINE insert_gamma(newgamma, isdelta, gx, gy, wx, wy, t1, t2, t3, dir, typ,
   newgamma = TailVertex
   TailVertex = NextVertex(TailVertex)
   if(StatusVertex(TailVertex)>=0) then
-    call LogMC%QuickLog("update: "//trim(str(iupdate))//" , insert_gamma error!!!", 'e')
+    call LogFile%QuickLog("update: "+str(iupdate)+" , insert_gamma error!!!", 'e')
     call print_config
     stop
   endif
 
   if(TailVertex == -1) then
-    call LogMC%QuickLog("insert_gamma error! tail=-1!", 'e')
+    call LogFile%QuickLog("insert_gamma error! tail=-1!", 'e')
     call print_config
     stop
   endif
@@ -853,7 +824,7 @@ SUBROUTINE delete_line(occline, knd)
   endif
 
   if(StatusLn(occline)==-1) then
-    call LogMC%QuickLog("update: "//trim(str(iupdate))//" , delete_gamma error!!!", 'e')
+    call LogFile%QuickLog("update: "+str(iupdate)+" , delete_gamma error!!!", 'e')
     call print_config
     stop
   endif
@@ -879,7 +850,7 @@ SUBROUTINE delete_line(occline, knd)
   endif
 
   if(TailLn == -1) then
-    call LogMC%QuickLog("delete_gamma error! tail=-1!", 'e')
+    call LogFile%QuickLog("delete_gamma error! tail=-1!", 'e')
     stop
   endif
   return
@@ -891,14 +862,14 @@ SUBROUTINE undo_delete_line(newline, knd, stat)
   integer, intent(in) :: newline, knd, stat
 
   if(TailLn/=newline)    then
-    call LogMC%QuickLog("update: "//trim(str(iupdate))//"  ,  undo_delete_line error!!!", 'e')
+    call LogFile%QuickLog("update: "+str(iupdate)+"  ,undo_delete_line error!!!", 'e')
     call print_config
     stop
   endif
   StatusLn(newline) = stat
   TailLn = NextLn(newline)
   if(TailLn == -1) then
-    call LogMC%QuickLog("undo_delete_line error! tail=-1!", 'e')
+    call LogFile%QuickLog("undo_delete_line error! tail=-1!", 'e')
     call print_config
     stop
   endif
@@ -925,7 +896,7 @@ SUBROUTINE delete_gamma(occgamma)
   integer :: tmp
 
   if(StatusVertex(occgamma)==-1) then
-    call LogMC%QuickLog("update: "//trim(str(iupdate))//" , delete_gamma error!!!", 'e')
+    call LogFile%QuickLog("update: "+str(iupdate)+" , delete_gamma error!!!", 'e')
     call print_config
     stop
   endif
@@ -940,7 +911,7 @@ SUBROUTINE delete_gamma(occgamma)
   NVertex = NVertex -1
 
   if(TailVertex == -1) then
-    call LogMC%QuickLog("delete_gamma error! tail=-1!", 'e')
+    call LogFile%QuickLog("delete_gamma error! tail=-1!", 'e')
     stop
   endif
   return
@@ -952,16 +923,14 @@ SUBROUTINE undo_delete_gamma(newgamma)
   integer, intent(in) :: newgamma
 
   if(TailVertex/=newgamma)    then
-    call LogMC%QuickLog("update: "//trim(str(iupdate))//" , undo_delete_gamma error!!!", 'e')
-    call write_log
+    call LogFile%QuickLog("update: "+str(iupdate)+" , undo_delete_gamma error!!!", 'e')
     stop
   endif
   StatusVertex(newgamma) = 0
 
   TailVertex = NextVertex(newgamma)
   if(TailVertex == -1) then
-    call LogMC%QuickLog("undo_delete_gamma error! tail=-1!", 'e')
-    call write_log
+    call LogFile%QuickLog("undo_delete_gamma error! tail=-1!", 'e')
     stop
   endif
    
