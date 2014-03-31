@@ -82,9 +82,7 @@ module logging_module
   type :: logging
     private
     character(len=256) :: FileName="*"
-    character(len=1024) :: Content=''
     integer :: Level=2
-    logical :: status=.true.
   contains
     private
     procedure :: set_level_num
@@ -93,58 +91,61 @@ module logging_module
     procedure :: quicklog_num
     procedure :: quicklog_char
     procedure :: quicklog_null
-    procedure :: write_log
-    procedure :: write_log_num
-    procedure :: write_log_char
     procedure :: write_stamp
     procedure :: write_stamp_num
     procedure :: write_stamp_char
-    generic,public :: SetLevel => set_level_num,set_level_char,set_level_null
+    procedure :: init_num
+    procedure :: init_char
+    procedure :: init_null
     generic,public :: QuickLog => quicklog_num,quicklog_char,quicklog_null
-    generic,public :: Write => write_log_num,write_log_char, write_log
-    procedure,public :: Init
-    procedure,public :: SetFileName
-    procedure,public :: ClearContent
-    procedure,public :: Add
-    procedure,public :: AddLine
-
+    generic,public :: Initial => init_num,init_char,init_null
     generic,public :: WriteStamp => write_stamp,write_stamp_num,write_stamp_char
     procedure,public :: WriteLine
-    procedure,public :: WriteClose
   end type logging
 
 contains
-  subroutine Init(this,filename,content,level)
+
+  subroutine init_num(this,file,level)
       implicit none
       class(logging) :: this 
-      character(len=*),optional,intent(in) :: filename,content
-      integer,optional :: level
+      character(len=*),optional,intent(in) :: file
+      integer,intent(in) :: level
 
-      if(present(filename)) then
-        call this%SetFileName(filename)
+      if(present(file)) then
+         this%FileName=file
       else
-        call this%SetFileName('*')
+         this%FileName='*'
       endif
 
-      if(present(content)) then
-        this%Content=content
-      else
-        this%Content=''
-      endif
-
-      if(present(level)) then
-        call this%SetLevel(level)
-      else
-        call this%SetLevel(2)
-      endif
-      this%status=.false.
+      call this%set_level_num(level)
   end subroutine
 
-  subroutine SetFilename(this,str)
+  subroutine init_char(this,file,level)
       implicit none
-      class(logging) :: this
-      character(len=*),intent(in) :: str
-      this%filename=trim(adjustl(str))
+      class(logging) :: this 
+      character(len=*),optional,intent(in) :: file
+      character,intent(in) :: level
+
+      if(present(file)) then
+         this%FileName=file
+      else
+         this%FileName='*'
+      endif
+
+      call this%set_level_char(level)
+  end subroutine
+
+  subroutine init_null(this,file)
+      implicit none
+      class(logging) :: this 
+      character(len=*),optional,intent(in) :: file
+
+      if(present(file)) then
+         this%FileName=file
+      else
+         this%FileName='*'
+      endif
+      this%Level=2
   end subroutine
 
   subroutine set_level_num(this,num)
@@ -165,15 +166,15 @@ contains
       class(logging) :: this
       character,intent(in) :: str
       if(str=='d' .or. str=='D') then
-        this.Level=1
+        this%Level=1
       elseif(str=='i' .or. str=='I') then
-        this.Level=2
+        this%Level=2
       elseif(str=='w' .or. str=='W') then
-        this.Level=3
+        this%Level=3
       elseif(str=='e' .or. str=='E') then
-        this.Level=4
+        this%Level=4
       else
-        this.Level=5
+        this%Level=5
       endif
   end subroutine
 
@@ -183,84 +184,11 @@ contains
       this%Level=2
   end subroutine
 
-  subroutine ClearContent(this)
-      implicit none
-      class(logging) :: this 
-      this%Content=''
-  end subroutine
-
-  subroutine Add(this, str)
-      implicit none
-      class(logging) :: this
-      character(len=*),intent(in) :: str
-      this%Content=trim(this%Content)//trim(str)
-  end subroutine
-
-  subroutine AddLine(this, str)
-      implicit none
-      class(logging) :: this
-      character(len=*),intent(in) :: str
-      this%Content=trim(this%Content)//"    "//trim(str)//char(10)
-  end subroutine
-
-  subroutine write_log_num(this,num)
-      implicit none
-      class(logging) :: this
-      integer,intent(in) :: num
-      call this%SetLevel(num)
-      call this%Write()
-  end subroutine
-
-  subroutine write_log_char(this,c)
-      implicit none
-      class(logging) :: this
-      character,intent(in) :: c
-      call this%SetLevel(c)
-      call this%Write()
-  end subroutine
-
-  subroutine write_log(this)
-      implicit none
-      class(logging) :: this
-      integer,dimension(8) :: values
-      character(len=100) :: timestr
-      integer :: tail
-      call date_and_time(VALUES=values)
-      timestr=trim(adjustl(str(values(1)-2000,'(i2.2)')))//"/"  &
-          &  //trim(adjustl(str(values(2),'(i2.2)')))//'/'//trim(adjustl(str(values(3),'(i2.2)'))) &
-          &  //' '//trim(adjustl(str(values(5),'(i2.2)')))//':' &
-          &  //trim(adjustl(str(values(6),'(i2.2)')))//':'//trim(adjustl(str(values(7),'(i2.2)')))
-      tail=len(this%Content)
-      if(this%FileName=='*') then
-        write(*,101,advance='no') &
-            & trim(timestr),trim(LevelName(this%Level)),char(10)//trim(this%Content)
-        if(this%Content(tail:tail)/=char(10)) write(*,*)
-        !write(*,"(A)",advance='no') "[job]["//trim(timestr)//"]["//trim(LevelName(this%Level)) &
-            !& //"]"//trim(this%Content)
-        !print *,"hello",this%Content
-      else
-        if(this%status) then
-          close(36)
-        endif
-        open(36,file=this%FileName,access='append')
-        this%status=.true.
-        write(36,101,advance='no') &
-            & trim(timestr),trim(LevelName(this%Level)),char(10)//trim(this%Content)
-        if(this%Content(tail:tail)/=char(10)) write(36,*)
-        close(36)
-        this%status=.false.
-      endif
-
-      call this%ClearContent()
-      call this%SetLevel('i')
-101 format('[job]','[',A,']','[',A,']:',A)
-  end subroutine
-
   subroutine write_stamp_num(this,num)
       implicit none
       class(logging) :: this
       integer,intent(in) :: num
-      call this%SetLevel(num)
+      call this%set_level_num(num)
       call this%WriteStamp()
   end subroutine
 
@@ -268,7 +196,7 @@ contains
       implicit none
       class(logging) :: this
       character,intent(in) :: c
-      call this%SetLevel(c)
+      call this%set_level_char(c)
       call this%WriteStamp()
   end subroutine
 
@@ -284,18 +212,18 @@ contains
           &  //' '//trim(adjustl(str(values(5),'(i2.2)')))//':' &
           &  //trim(adjustl(str(values(6),'(i2.2)')))//':'//trim(adjustl(str(values(7),'(i2.2)')))
       if(this%FileName=='*') then
+        write(*,*)
         write(*,101,advance='no') &
             & trim(timestr),trim(LevelName(this%Level))
         write(*,*)
       else
         open(36,file=this%FileName,access='append')
-        this%status=.true.
+        write(36,*)
         write(36,101,advance='no') &
             & trim(timestr),trim(LevelName(this%Level))
         write(36,*)
+        close(36)
       endif
-      call this%ClearContent()
-      call this%SetLevel('i')
 101 format('[job]','[',A,']','[',A,']:')
   end subroutine
 
@@ -304,28 +232,14 @@ contains
       class(logging) :: this
       character(len=*),intent(in) :: str
       if(this%FileName=='*') then
-        write(*,"(A)",advance='no') "    "//trim(str)//char(10) 
+        write(*,"(A)",advance='no') trim(str) 
+        write(*,*)
       else
-        if(this%status) then
-          write(36,"(A)",advance='no') "    "//trim(str)//char(10)  
-        else
-          call this%ClearContent
-          call this%QuickLog("Please open"+' '//this.FileName+" before logging!")
-        endif
-      endif
-  end subroutine
-
-  subroutine WriteClose(this)
-      implicit none
-      class(logging) :: this
-      if(this%status) then
+        open(36,file=this%FileName,access='append')
+        write(36,"(A)",advance='no') trim(str)  
+        write(36,*)
         close(36)
-      else
-        call this%ClearContent
-        call this%QuickLog("Please open"+' '//this.FileName+" before close!")
       endif
-      call this%ClearContent
-      this%status=.false.
   end subroutine
 
   subroutine quicklog_num(this,str,num)
@@ -333,10 +247,8 @@ contains
       class(logging) :: this
       character(len=*),intent(in) :: str
       integer,intent(in) :: num
-      this%Content=''
-      call this%SetLevel(num)
-      call this%AddLine(str)
-      call this%Write
+      call this%WriteStamp(num)
+      call this%WriteLine(str)
   end subroutine
 
   subroutine quicklog_char(this,str,c)
@@ -344,20 +256,17 @@ contains
       class(logging) :: this
       character(len=*),intent(in) :: str
       character,intent(in) :: c
-      this%Content=''
-      call this%SetLevel(c)
-      call this%AddLine(str)
-      call this%Write
+      call this%WriteStamp(c)
+      call this%WriteLine(str)
   end subroutine
 
   subroutine quicklog_null(this,str)
       implicit none
       class(logging) :: this
       character(len=*),intent(in) :: str
-      this%Content='' 
       this%Level=2
-      call this%AddLine(str)
-      call this%Write
+      call this%WriteStamp()
+      call this%WriteLine(str)
   end subroutine
 
 end module

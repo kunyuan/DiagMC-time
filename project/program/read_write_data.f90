@@ -11,35 +11,33 @@ SUBROUTINE print_status
     integer :: iorder,i
     character*30 :: updatename(Nupdate)
 
-    open(36, access="append", file=trim(title_mc)//".log")
 
-    write(36, *) "================================================"
-    write(36,*) "MC steps: ",imc
+    call LogFile%WriteStamp()
+    call LogFile%WriteLine("MC steps:"+str(imc))
     call time_elapse
-    write(36,251) t_elap
-  251 format(' Printing interval:',f16.7,2x,'s')
-    write(36,*) "Efficiency: ",imc/t_elap," per second."
-    write(36, *) "------------------------------------------------"
-
-    write(36,*) 'Statistics Number =', StatNum
-
+    call LogFile%WriteLine("Printing interval:"+str(t_elap,'(f12.3)')+'s')
+    call LogFile%WriteLine("Efficiency: "+str(imc/t_elap,'(f12.0)')+"steps per second.")
+    call LogFile%WriteLine('Statistics Number ='+str(StatNum))
     !i = 1
     !if(Norm(i)>1e-6) then
-      !write(36,"(i2, A,f15.6,'+/-',f15.6)") i,QuanName(i),Quan(i)/Norm(i),Error(i)*sqrt(Norm(i))
+      !write(logstr,"(i2, A,f15.6,'+/-',f15.6)") i,QuanName(i),Quan(i)/Norm(i),Error(i)*sqrt(Norm(i))
+      !call LogFile%WriteLine(logstr)
     !endif
 
     do i=1,MCOrder+1
       if(Norm(i)>1e-6) then
-        write(36,"(i2, A,f15.6,'+/-',f15.6)") i-1,QuanName(i),Quan(i)/Norm(i),Error(i) 
+        write(logstr,"(i2, A,f15.6,'+/-',f15.6)") i-1,QuanName(i),Quan(i)/Norm(i),Error(i) 
+        call LogFile%WriteLine(logstr)
       endif
     enddo
 
     do i=MCOrder+2,2*MCOrder+1
       if(Norm(i)>1e-6) then
-        write(36,"(i2, A,f15.6,'+/-',f15.6)") i-MCOrder-1,QuanName(i),Quan(i)/Norm(i),Error(i) 
+        write(logstr,"(i2, A,f15.6,'+/-',f15.6)") i-MCOrder-1,QuanName(i),Quan(i)/Norm(i),Error(i) 
+        call LogFile%WriteLine(logstr)
       endif
     enddo
-    write(36, *) "------------------------------------------------"
+    call LogFile%WriteLine("------------------------------------------------")
 
     updatename(1)= " 1: create worm along wline"
     updatename(2)= " 2: delete worm along wline"
@@ -61,28 +59,16 @@ SUBROUTINE print_status
     updatename(18)= "18: change Gamma isdelta"
 
     do iorder = 0, MCOrder
-      write(36, *) "Order", iorder
+      call LogFile%WriteLine("Order"+str(iorder))
       do i = 1, Nupdate
         if(ProbProp(iorder, i)/=0.d0) then
-          write(36, '(A,3f17.5)') updatename(i), ProbProp(iorder, i), ProbAcc(iorder, i), &
+          write(logstr, '(A,3f17.5)') updatename(i), ProbProp(iorder, i), ProbAcc(iorder, i), &
             & ProbAcc(iorder, i)/ProbProp(iorder, i)
+          call LogFile%WriteLine(logstr)
         endif
       enddo
-      write(36, *)
     enddo
-    write(36, *) "================================================"
-    write(36, *)
-
-    close(36)
 END SUBROUTINE print_status
-
-SUBROUTINE write_log
-  implicit none
-  open(37, access="append", file=trim(title_mc)//".log")
-  write(37,'(A)', advance='no') trim(logstr)
-  !write(*,'(A)', advance='no') trim(logstr)
-  close(37)
-end SUBROUTINE
 
 !====================================================================
 !===================== PRINT CONFIGURATION ==========================
@@ -93,44 +79,43 @@ SUBROUTINE print_config
   implicit none
   integer :: i, iln, iv
   
-  open(8, access='append', file=trim(title_mc)//"_mc.conf")
-  !open(8, access="append", file=trim(title_mc)//".log")
+  open(108, access='append', file=trim(title_mc)//"_mc.conf")
   
-  write(8, *) "============================================================"
-  write(8, *) imc, IsWormPresent, iupdate
+  write(108, *) "============================================================"
+  write(108, *) imc, IsWormPresent, iupdate
 
   if(IsWormPresent .eqv. .true.) then
-    write(8, *) "Ira", Ira, "Masha", Masha, "SpinMasha", SpinMasha
-    write(8, *) "kMasha", kMasha
+    write(108, *) "Ira", Ira, "Masha", Masha, "SpinMasha", SpinMasha
+    write(108, *) "kMasha", kMasha
   endif
 
-  write(8, *) "Order", Order
-  write(8, *) "SignFermiLoop", SignFermiLoop
+  write(108, *) "Order", Order
+  write(108, *) "SignFermiLoop", SignFermiLoop
 
-  write(8, *) "Measuring Gamma", MeasureGam
-  write(8, *) "Phase", Phase
-  write(8, *) "Weight", WeightCurrent
+  write(108, *) "Measuring Gamma", MeasureGam
+  write(108, *) "Phase", Phase
+  write(108, *) "Weight", WeightCurrent
 
   do i = 1, NGLn
     iln = GLnKey2Value(i)
     if(StatusLn(iln) <0) cycle
-    write(8, 10) iln, KindLn(iln), IsDeltaLn(iln), TypeLn(iln), kLn(iln), StatusLn(iln), NeighLn(1:2,iln)
+    write(108, 10) iln, KindLn(iln), IsDeltaLn(iln), TypeLn(iln), kLn(iln), StatusLn(iln), NeighLn(1:2,iln)
   enddo
 
   do i = 1, NWLn
     iln = WLnKey2Value(i)
     if(StatusLn(iln) <0) cycle
-    write(8, 10) iln, KindLn(iln), IsDeltaLn(iln), TypeLn(iln), kLn(iln), StatusLn(iln), NeighLn(1:2,iln)
+    write(108, 10) iln, KindLn(iln), IsDeltaLn(iln), TypeLn(iln), kLn(iln), StatusLn(iln), NeighLn(1:2,iln)
   enddo
 
   do i = 1, NVertex
     iv = VertexKey2Value(i)
     if(StatusVertex(iv) <0) cycle
-    write(8, 12) iv,IsDeltaVertex(iv), TypeVertex(iv), SpInVertex(1, iv),SpInVertex(2, iv), &
+    write(108, 12) iv,IsDeltaVertex(iv), TypeVertex(iv), SpInVertex(1, iv),SpInVertex(2, iv), &
       & GRVertex(1, iv),GRVertex(2, iv),WRVertex(1, iv),WRVertex(2, iv), TVertex(1, iv), TVertex(2, iv),  &
       & TVertex(3, iv), DirecVertex(iv), StatusVertex(iv), NeighVertex(:,iv)
   enddo
-  write(8, *) "============================================================"
+  write(108, *) "============================================================"
 
   10 format(' Line:',i2,2x,'kind:',i2,2x,'isdelta:',i2,2x,'type:',i2,2x,'k:',i8,2x,'stat:',i2, 2x,&
     & 'neigh:',i6,i6)
@@ -138,7 +123,7 @@ SUBROUTINE print_config
     & 'gr:(',i4,i4,'), wr:(',i4,i4,')', 't:(', f7.4, f7.4, f7.4, ')',2x, &
     & 'direction:', i2,2x, 'stat:',i2, 2x,'neigh:', i6,i6,i6)
 
-  close(8)
+  close(108)
   call DRAW
 END SUBROUTINE print_config
 
@@ -481,8 +466,8 @@ SUBROUTINE read_GWGamma
   open(101, status="old", file=trim(title_loop)//"_W_file.dat",iostat=ios)
   open(102, status="old", file=trim(title_loop)//"_Gamma_file.dat",iostat=ios)
 
-  if(.not. (ios==0)) then
-    write(*,*) "You have to run self consistent loop first!"
+  if(ios/=0) then
+    call LogFile%QuickLog("You have to run self consistent loop first!",'e')
     stop
   endif
 
@@ -603,12 +588,17 @@ END SUBROUTINE write_monte_carlo_data
 
 SUBROUTINE read_monte_carlo_data
   implicit none
-  integer :: iorder, ix, iy, ityp, it1, it2, itopo
+  integer :: iorder, ix, iy, ityp, it1, it2, itopo,ios
 
-  open(105, status="old", file=trim(title)//"_monte_carlo_data.bin.dat",form="binary")
+  open(105, status="old", file=trim(title)//"_monte_carlo_data.bin.dat",form="binary",iostat=ios)
+  
+  if(ios/=0) then
+    call LogFile%QuickLog("There is no monte carlo binary data yet!",'e')
+    stop
+  endif
 
-  read(105) Lx, Ly
-  read(105) imc, GamNorm, GamNormWeight
+  read(105,iostat=ios) Lx, Ly
+  read(105,iostat=ios) imc, GamNorm, GamNormWeight
 
   do it2 = 0, MxT-1
     do it1 = 0, MxT-1
@@ -616,17 +606,20 @@ SUBROUTINE read_monte_carlo_data
         do ix = 0, Lx-1
           do ityp = 1, NtypeGam/2
             do iorder = 0, MCOrder
-              read(105)  GamMC(iorder, ityp, ix, iy, it1, it2)
-              read(105)  ReGamSqMC(iorder, ityp, ix, iy, it1, it2)
-              read(105)  ImGamSqMC(iorder, ityp, ix, iy, it1, it2)
+              read(105,iostat=ios)  GamMC(iorder, ityp, ix, iy, it1, it2)
+              read(105,iostat=ios)  ReGamSqMC(iorder, ityp, ix, iy, it1, it2)
+              read(105,iostat=ios)  ImGamSqMC(iorder, ityp, ix, iy, it1, it2)
             enddo
           enddo
         enddo
       enddo
     enddo
   enddo
-  
 
+  if(ios/=0) then
+    call LogFile%QuickLog("The monte carlo binary data is broken?",'e')
+    stop
+  endif
   close(105)
 END SUBROUTINE read_monte_carlo_data
 
@@ -724,8 +717,7 @@ SUBROUTINE read_monte_carlo_conf
   enddo
 
   if(ikey/=NVertex+1) then
-    write(logstr, *) "read_monte_carlo_conf: Number of Vertex Error!"
-    call write_log
+    call LogFile%QuickLog("read_monte_carlo_conf: Number of Vertex Error!",'e')
     stop
   endif
 
@@ -733,8 +725,7 @@ SUBROUTINE read_monte_carlo_conf
   do ikey = 1, NVertex
     i = VertexKey2Value(ikey)
     if(StatusVertex(i)==-1) then
-      write(logstr, *) "read_monte_carlo_conf: Status of Vertex Error!"
-      call write_log
+      call LogFile%QuickLog("read_monte_carlo_conf: Status of Vertex Error!",'e')
       stop
     endif
 
@@ -787,14 +778,12 @@ SUBROUTINE read_monte_carlo_conf
   enddo
 
   if(ikeyG/=NGLn+1) then
-    write(logstr, *) "read_monte_carlo_conf: Number of Glines Error!"
-    call write_log
+    call LogFile%QuickLog("read_monte_carlo_conf: Number of Glines Error!",'e')
     stop
   endif
 
   if(ikeyW/=NWLn+1) then
-    write(logstr, *) "read_monte_carlo_conf: Number of Glines Error!"
-    call write_log
+    call LogFile%QuickLog("read_monte_carlo_conf: Number of Glines Error!",'e')
     stop
   endif
 
