@@ -268,38 +268,38 @@ SUBROUTINE check_site
   do ikey = 1, NVertex
     i = VertexKey2Value(ikey)
     if(GRVertex(1, i)<0 .or. GRVertex(1, i)>L(1)-1) then
-      call LogMC%AddLine("Oops, check_site found a bug!")
-      call LogMC%AddLine("IsWormPresent"+str(IsWormPresent)+",update number"+str(iupdate))
-      call LogMC%AddLine("GX is wrong!")
-      call LogMC%AddLine("gamma's number"+str(i)+",GX"+str(GRVertex(1, i)))
-      call LogMC%Write('e')
+      call LogFile%WriteStamp('e')
+      call LogFile%WriteLine("Oops, check_site found a bug!")
+      call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+",update number"+str(iupdate))
+      call LogFile%WriteLine("GX is wrong!")
+      call LogFile%WriteLine("gamma's number"+str(i)+",GX"+str(GRVertex(1, i)))
       call print_config
       stop
     endif
     if(GRVertex(2, i)<0 .or. GRVertex(2, i)>L(2)-1) then
-      call LogMC%AddLine("Oops, check_site found a bug!")
-      call LogMC%AddLine("IsWormPresent"+str(IsWormPresent)+",update number"+str(iupdate))
-      call LogMC%AddLine("GY is wrong!")
-      call LogMC%AddLine("gamma's number"+str(i)+",GY"+str(GRVertex(2, i)))
-      call LogMC%Write('e')
+      call LogFile%WriteStamp('e')
+      call LogFile%WriteLine("Oops, check_site found a bug!")
+      call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+",update number"+str(iupdate))
+      call LogFile%WriteLine("GY is wrong!")
+      call LogFile%WriteLine("gamma's number"+str(i)+",GY"+str(GRVertex(2, i)))
       call print_config
       stop
     endif
     if(WRVertex(1, i)<0 .or. WRVertex(1, i)>L(1)-1) then
-      call LogMC%AddLine("Oops, check_site found a bug!")
-      call LogMC%AddLine("IsWormPresent"+str(IsWormPresent)+",update number"+str(iupdate))
-      call LogMC%AddLine("GY is wrong!")
-      call LogMC%AddLine("gamma's number"+str(i)+",WX"+str(WRVertex(1, i)))
-      call LogMC%Write('e')
+      call LogFile%WriteStamp('e')
+      call LogFile%WriteLine("Oops, check_site found a bug!")
+      call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+",update number"+str(iupdate))
+      call LogFile%WriteLine("GY is wrong!")
+      call LogFile%WriteLine("gamma's number"+str(i)+",WX"+str(WRVertex(1, i)))
       call print_config
       stop
     endif
     if(WRVertex(2, i)<0 .or. WRVertex(2, i)>L(2)-1) then
-      call LogMC%AddLine("Oops, check_site found a bug!")
-      call LogMC%AddLine("IsWormPresent"+str(IsWormPresent)+",update number"+str(iupdate))
-      call LogMC%AddLine("GY is wrong!")
-      call LogMC%AddLine("gamma's number"+str(i)+",WY"+str(WRVertex(2, i)))
-      call LogMC%Write('e')
+      call LogFile%WriteStamp('e')
+      call LogFile%WriteLine("Oops, check_site found a bug!")
+      call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+",update number"+str(iupdate))
+      call LogFile%WriteLine("GY is wrong!")
+      call LogFile%WriteLine("gamma's number"+str(i)+",WY"+str(WRVertex(2, i)))
       call print_config
       stop
     endif
