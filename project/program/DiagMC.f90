@@ -152,6 +152,7 @@ SUBROUTINE self_consistent
 
     call LogFile%QuickLog("Reading MC data...")
     call read_monte_carlo_data
+    call output_GamMC
 
     call LogFile%QuickLog("Reading Done!...")
 

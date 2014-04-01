@@ -5,8 +5,6 @@
 SUBROUTINE check_config
   implicit none
 
-  open(36, access="append", file=trim(title_mc)//".log")
-
   call check_topo
   call check_stat
   call check_irreducibility
@@ -16,8 +14,6 @@ SUBROUTINE check_config
   call check_time
   call check_site
   call check_weight
-
-  close(36)
   return
 END SUBROUTINE check_config
 
@@ -571,6 +567,11 @@ SUBROUTINE check_weight
     call print_config
     stop
   endif
+
+  !if(real(Phase*WeightCurrent-weight)>1.d-8.or.dimag(Phase*WeightCurrent-weight)>1.d-8) then
+    !call print_config
+    !stop
+  !endif
   return
 END SUBROUTINE check_weight
 
