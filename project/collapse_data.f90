@@ -90,13 +90,12 @@ PROGRAM MAIN
 
         read(101) L(1), L(2)
         read(101,iostat=ios) imctmp, iGamNorm, iGamNormWeight
-
-        do iorder = 0, MCOrder
-          do ityp = 1, 3 
-            do ix = 0, L(1)-1
-              do iy = 0, L(2)-1
-                do it1 = 0, MxT-1
-                  do it2 = 0, MxT-1
+        do it2 = 0, MxT-1
+          do it1 = 0, MxT-1
+            do iy = 0, L(2)-1
+              do ix = 0, L(1)-1
+                do ityp = 1, NtypeGam/2
+                  do iorder = 0, MCOrder
                     read(101,iostat=ios)  GamTmp(iorder, ityp, ix, iy, it1, it2)
                     read(101,iostat=ios)  ReGamSqTmp(iorder,ityp,ix,iy,it1,it2)
                     read(101,iostat=ios)  ImGamSqTmp(iorder,ityp,ix,iy,it1,it2)
@@ -116,6 +115,7 @@ PROGRAM MAIN
         GamMC=GamMC+GamTmp
         ReGamSqMC=ReGamSqMC+ReGamSqTmp
         ImGamSqMC=ImGamSqMC+ImGamSqTmp
+        call write_GamMC
       endif
     enddo
 
@@ -123,6 +123,8 @@ PROGRAM MAIN
     if(EffectiveSamp>itot/2) then
       call LogFile%QuickLog("Writing collpased data...")
       call write_monte_carlo_data
+      call LogFile%QuickLog("Writing GamMC data...")
+      call write_GamMC
       call LogFile%QuickLog("Collpasing data is done!")
       stop 0
     else
@@ -161,6 +163,28 @@ PROGRAM MAIN
     
     close(104)
   END SUBROUTINE write_monte_carlo_data
+
+  SUBROUTINE write_GamMC
+    implicit none
+    integer :: iorder, itopo, ix, iy, ityp, it1, it2
+
+    !=========== write into files =========================================
+    open(104, access="append", file=trim(title_mc)//"_GamMC.dat")
+
+    write(104, *) EffectiveSamp
+    write(104, *) L(1), L(2)
+    write(104, *) imc, GamNorm, GamNormWeight
+    !do iorder = 0, MCOrder
+      !do ityp = 1, NtypeGam/2
+        do it1 = 0, MxT-1
+          it2 = it1
+          write(104, *)GamMC(1, 1, 0, 0, it1,it2)*GamNormWeight/GamNorm
+        enddo
+      !enddo
+    !enddo
+    
+    close(104)
+  END SUBROUTINE write_GamMC
 
   END program main
 
