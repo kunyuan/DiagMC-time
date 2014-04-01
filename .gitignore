@@ -1,5 +1,4 @@
 job_*
-project/outfile/*
 *.mod
 *.dwarf
 *.sublime*
@@ -13,6 +12,7 @@ project/infile
 project/graph
 *.o
 project/outfile
+project/outfile/*
 *.swp
 out_*
 *.conf
