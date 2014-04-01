@@ -567,6 +567,11 @@ SUBROUTINE check_weight
     call print_config
     stop
   endif
+
+  !if(real(Phase*WeightCurrent-weight)>1.d-8.or.dimag(Phase*WeightCurrent-weight)>1.d-8) then
+    !call print_config
+    !stop
+  !endif
   return
 END SUBROUTINE check_weight
 

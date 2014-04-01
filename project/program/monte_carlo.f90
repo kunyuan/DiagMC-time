@@ -228,7 +228,6 @@ SUBROUTINE markov(MaxSamp)
     endif
 
     imc = imc + 1.0
-    !call check_config
 
     if(mod(imc,Nstep*1.d0)==0 .and. .not. IsToss) call measure
 
@@ -1049,11 +1048,11 @@ SUBROUTINE add_interaction
     & tau, typAB)
   
   !---  change the topology for the configuration after update --
-  call insert_gamma(GamA, 1, GRVertex(1,GamC), GRVertex(2,GamC),WRVertex(1,GamC), &
-    &  WRVertex(2,GamC), tauA, tauA, tauA, dirW, typGamA, statA, WA)
+  call insert_gamma(GamA, 1, GRVertex(1,GamC), GRVertex(2,GamC),GRVertex(1,GamC), &
+    &  GRVertex(2,GamC), tauA, tauA, tauA, dirW, typGamA, statA, WA)
 
-  call insert_gamma(GamB, 1, GRVertex(1,GamD), GRVertex(2,GamD),WRVertex(1,GamD), &
-    &  WRVertex(2,GamD), tauB, tauB, tauB, 3-dirW, typGamB, statB, WB)
+  call insert_gamma(GamB, 1, GRVertex(1,GamD), GRVertex(2,GamD),GRVertex(1,GamD), &
+    &  GRVertex(2,GamD), tauB, tauB, tauB, 3-dirW, typGamB, statB, WB)
 
   call insert_line(GIA, -1, kIA, 1, TypeLn(GIC), statIA, WGIA)
   call insert_line(GMB, -1, kMB, 1, TypeLn(GMD), statMB, WGMB)
@@ -1603,7 +1602,7 @@ SUBROUTINE change_wline_space
       !------ update the weight of elements ------------
       WeightLn(iWLn) = WW
       WeightVertex(iGam) = WiGam
-      WeightVertex(iGam) = WjGam
+      WeightVertex(jGam) = WjGam
 
       call update_weight(Anew, Aold)
 
@@ -1670,6 +1669,13 @@ SUBROUTINE change_Gamma_type
 
   !------- step5 : accept the update --------------------
   ProbProp(Order, 14) = ProbProp(Order, 14) + 1
+
+  !call LogFile%WriteStamp('d')
+  !call LogFile%WriteLine('change Gamma type: vertex '+str(iGam)+', W '+str(iWLn))
+  !call LogFile%WriteLine('original type: vertex '+str(TypeVertex(iGam))+', W '+str(TypeLn(iWLn)))
+  !call LogFile%WriteLine('new type: vertex '+str(typGam)+', W '+str(typW))
+  !call LogFile%WriteLine('new weight: vertex '+str(WGam)+', W '+str(WW))
+  !call LogFile%WriteLine(str(weight_Gam(typGam, GRVertex(:,iGam)-WRVertex(:,iGam), 0, 0)))
 
   if(rn()<=Pacc) then
 
@@ -2278,8 +2284,8 @@ COMPLEX*16 FUNCTION weight_vertex(stat, isdelta, dr0, dtau1, dtau2, typ)
 
   else if(stat==2) then
     !----------------- for bold Gamma ------------------------------
-    if(isdelta==0) weight_vertex = weight_Gam(1, dr, t1, t2)
-    if(isdelta==1) weight_vertex = weight_Gam0(1, dr)
+    if(isdelta==0) weight_vertex = weight_Gam(typ, dr, t1, t2)
+    if(isdelta==1) weight_vertex = weight_Gam0(typ, dr)
 
     !----------------- for bare Gamma ------------------------------
     !if(isdelta==0) weight_vertex = (0.d0, 0.d0)
