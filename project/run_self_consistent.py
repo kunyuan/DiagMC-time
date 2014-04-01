@@ -20,9 +20,7 @@ def run_loop():
         i=i+1
         logging.info("Loop "+str(i)+" running...")
         try:
-            print "call collapse_data"
             subprocess.check_output("./collapse_data.exe")
-            print "collapse_data done"
         except subprocess.CalledProcessError as e:
             ret=e.returncode
             logging.error('collapse_data.exe return a non-zero value '+str(ret)+', something happened!')
@@ -30,7 +28,7 @@ def run_loop():
             logging.error('Collapse_data failed!')
         else:
             try:
-                os.system(execf+" <./infile/_in_selfconsist >./outfile/Output_sc")
+                os.system(execf+" <./infile/_in_0 >./outfile/out_0.txt")
                 flag = open("stop.inp", "r").readline().lstrip().rstrip()
                 #logging.info("flag: "+flag)
             except:
