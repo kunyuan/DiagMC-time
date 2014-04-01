@@ -48,7 +48,7 @@ def check_status():
         if elemp[0].poll()!=None:
             proclist.remove(elemp)
             logging.info("Job "+str(elemp[1])+" is ended!")
-            print "Job "+str(elemp[1])+"is stated..."
+            print "Job "+str(elemp[1])+"is ended!"
     return
 
 def submit_jobs(para,i,execute,homedir):

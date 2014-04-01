@@ -381,7 +381,10 @@ SUBROUTINE create_worm_along_wline
   Aold = WeightLn(iWLn) *WeightVertex(iGam) *WeightVertex(jGam) *WeightLn(iGin) &
   & *WeightLn(iGout) *WeightLn(jGin) *WeightLn(jGout)
 
-  if(abs(Anew)==0.d0)   return
+  if(abs(Anew)==0.d0) then
+    kLn(iWLn) = kiWold
+    return
+  endif
 
   if(iGin==jGout)  then
     Anew = Anew/WjGout
@@ -541,7 +544,10 @@ SUBROUTINE delete_worm_along_wline
   Aold = WeightLn(iWLn) *WeightVertex(Ira) *WeightVertex(Masha) *WeightLn(iGin) &
   & *WeightLn(iGout) *WeightLn(jGin) *WeightLn(jGout)
 
-  if(abs(Anew)==0.d0)   return
+  if(abs(Anew)==0.d0) then
+    kLn(iWLn) = kiWold
+    return
+  endif
 
   if(iGin==jGout)  then
     Anew = Anew/WjGout
@@ -768,7 +774,7 @@ SUBROUTINE move_worm_along_gline
   endif
   
   kGold = kLn(GLn)
-  kLn(GLn) = add_k(kLn(GLn), (-1)**(dir+1) *kMasha)
+  kLn(GLn) = add_k(kGold, (-1)**(dir+1) *kMasha)
 
   !------- step3 : configuration check ------------------
   !-------- irreducibility  check -----------------------
@@ -868,7 +874,10 @@ SUBROUTINE move_worm_along_gline
   Anew = WiGam *WjGam *WiW *WjW *WG
   Aold = WeightVertex(iGam) *WeightVertex(jGam) *WeightLn(iW) *WeightLn(jW) *WeightLn(GLn)
 
-  if(Anew==0.d0)  return
+  if(abs(Anew)==0.d0) then
+    kLn(GLn) = kGold
+    return
+  endif
 
   if(iW==jW) then
     Anew = Anew/WjW
@@ -922,6 +931,7 @@ SUBROUTINE move_worm_along_gline
     ProbAcc(Order, 6) = ProbAcc(Order, 6) + 1
   else
     kLn(GLn) = kGold
+    return
   endif
 END SUBROUTINE move_worm_along_gline
 !-----------------------------------------------------------
@@ -1038,11 +1048,11 @@ SUBROUTINE add_interaction
     & tau, typAB)
   
   !---  change the topology for the configuration after update --
-  call insert_gamma(GamA, 1, GRVertex(1,GamC), GRVertex(2,GamC),WRVertex(1,GamC), &
-    &  WRVertex(2,GamC), tauA, tauA, tauA, dirW, typGamA, statA, WA)
+  call insert_gamma(GamA, 1, GRVertex(1,GamC), GRVertex(2,GamC),GRVertex(1,GamC), &
+    &  GRVertex(2,GamC), tauA, tauA, tauA, dirW, typGamA, statA, WA)
 
-  call insert_gamma(GamB, 1, GRVertex(1,GamD), GRVertex(2,GamD),WRVertex(1,GamD), &
-    &  WRVertex(2,GamD), tauB, tauB, tauB, 3-dirW, typGamB, statB, WB)
+  call insert_gamma(GamB, 1, GRVertex(1,GamD), GRVertex(2,GamD),GRVertex(1,GamD), &
+    &  GRVertex(2,GamD), tauB, tauB, tauB, 3-dirW, typGamB, statB, WB)
 
   call insert_line(GIA, -1, kIA, 1, TypeLn(GIC), statIA, WGIA)
   call insert_line(GMB, -1, kMB, 1, TypeLn(GMD), statMB, WGMB)
@@ -1198,7 +1208,7 @@ END SUBROUTINE add_interaction
 !-----------------------------------------------------------------
 SUBROUTINE remove_interaction
   implicit none
-  integer :: dir, dirW, flag, kM
+  integer :: dir, dirW, flag, kM, kIA, kMB
   integer :: GAC, GBD, GamC, GamD
   integer :: WAB, GIA, GMB, GamA, GamB
   integer :: statIC, statMD, statIA, statMB, statAB
@@ -1230,6 +1240,8 @@ SUBROUTINE remove_interaction
 
   dirW = DirecVertex(GamA)
   kM = add_k(kMasha, (-1)**dirW*kLn(WAB))
+  kIA = kLn(GIA)
+  kMB = kLn(GMB)
 
   statIA = StatusLn(GIA)
   statMB = StatusLn(GMB)
@@ -1306,8 +1318,8 @@ SUBROUTINE remove_interaction
 
     !--------------- update k -----------------------------------
     kMasha = kM
-    call delete_Hash4G(kLn(GIA))
-    call delete_Hash4G(kLn(GMB))
+    call delete_Hash4G(kIA)
+    call delete_Hash4G(kMB)
 
     !--------------- update the status of elements --------------
     StatusLn(GAC) = statIC
@@ -1590,7 +1602,7 @@ SUBROUTINE change_wline_space
       !------ update the weight of elements ------------
       WeightLn(iWLn) = WW
       WeightVertex(iGam) = WiGam
-      WeightVertex(iGam) = WjGam
+      WeightVertex(jGam) = WjGam
 
       call update_weight(Anew, Aold)
 
@@ -1657,6 +1669,13 @@ SUBROUTINE change_Gamma_type
 
   !------- step5 : accept the update --------------------
   ProbProp(Order, 14) = ProbProp(Order, 14) + 1
+
+  !call LogFile%WriteStamp('d')
+  !call LogFile%WriteLine('change Gamma type: vertex '+str(iGam)+', W '+str(iWLn))
+  !call LogFile%WriteLine('original type: vertex '+str(TypeVertex(iGam))+', W '+str(TypeLn(iWLn)))
+  !call LogFile%WriteLine('new type: vertex '+str(typGam)+', W '+str(typW))
+  !call LogFile%WriteLine('new weight: vertex '+str(WGam)+', W '+str(WW))
+  !call LogFile%WriteLine(str(weight_Gam(typGam, GRVertex(:,iGam)-WRVertex(:,iGam), 0, 0)))
 
   if(rn()<=Pacc) then
 
@@ -1925,7 +1944,12 @@ SUBROUTINE change_Gamma_time
 
     !------ update the time and weight of elements ------
     if(isdelta==0) then
-      TVertex(dir, iGam) = newtau
+      if(dir<3) then
+        TVertex(3-dir, iGam) = newtau
+      else 
+        TVertex(3, iGam) = newtau
+      endif
+
       WeightLn(iLn) = WLn
     else 
       TVertex(:, iGam) = newtau
@@ -2260,8 +2284,8 @@ COMPLEX*16 FUNCTION weight_vertex(stat, isdelta, dr0, dtau1, dtau2, typ)
 
   else if(stat==2) then
     !----------------- for bold Gamma ------------------------------
-    if(isdelta==0) weight_vertex = weight_Gam(1, dr, t1, t2)
-    if(isdelta==1) weight_vertex = weight_Gam0(1, dr)
+    if(isdelta==0) weight_vertex = weight_Gam(typ, dr, t1, t2)
+    if(isdelta==1) weight_vertex = weight_Gam0(typ, dr)
 
     !----------------- for bare Gamma ------------------------------
     !if(isdelta==0) weight_vertex = (0.d0, 0.d0)
