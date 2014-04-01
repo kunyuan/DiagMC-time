@@ -14,6 +14,7 @@ cpu=4
 execute="./gamma3.exe"
 homedir=os.getcwd()
 proclist=[]
+loop_proc=[]
 logging.basicConfig(filename=homedir+"/project.log",level=logging.INFO,format="\n[job.daemon][%(asctime)s][%(levelname)s]:\n%(message)s",datefmt='%y/%m/%d %H:%M:%S')
 logging.info("Jobs manage daemon is started...")
 
@@ -44,11 +45,11 @@ def check_status():
         sys.exit()
     #os.system("clear")
     for elemp in proclist:
-        #print elemp[0].poll()
+        print elemp[0].poll()
         if elemp[0].poll()!=None:
             proclist.remove(elemp)
             logging.info("Job "+str(elemp[1])+" is ended!")
-            print "Job "+str(elemp[1])+"is stated..."
+            print "Job "+str(elemp[1])+" is ended..."
     return
 
 def submit_jobs(para,i,execute,homedir):
@@ -68,34 +69,20 @@ def submit_jobs(para,i,execute,homedir):
     #if you want to iterate some parameter, add more "for" here
     for belem in para["Beta"]:
         for jelem in para["Jcp"]:
-            if TurnOnSelfConsist:
-                infile="_in_selfconsist"
-                item=[]
-                item.append(para["Lx"][0])
-                item.append(para["Ly"][0])
-                item.append(para["Toss"][0])
-                item.append(para["Sample"][0])
-                item.append(para["IsForever"][0])
-                item.append(para["Sweep"][0])
-                item.append(jelem)  #jcp
-                item.append(belem)  #beta
-                item.append(para["Order"][0])
-                item.append(str(-1))   #Seed
-                item.append(str(1))
-                item.append(str(1))
-                item.append(str(0))
-                item.append(para["ReadFile"][0])
-                stri=" ".join(item)
-                for eve in para["Reweight"]:
-                    stri=stri+"\n"+eve
-                stri=stri+"\n"+para["Worm/Norm"][0]+"\n\n"
-                f=open(infilepath+"/"+infile,"w")
-                f.write(stri)
-                f.close()
 
-            for j in range(0,int(para["Duplicate"][0])):
-                lastnum+=1
-                pid=lastnum  #the unique id and random number seed for job
+            if TurnOnSelfConsist:
+                start=-1
+            else:
+                start=0
+
+            for j in range(start,int(para["Duplicate"][0])):
+                if j==-1: # when turn on self consisitent loop
+                    pid=0
+                else:
+                    lastnum+=1
+                    pid=lastnum  #the unique id and random number seed for job
+                    pass
+                
                 infile="_in_"+str(pid)
                 outfile="out_"+str(pid)+".txt"
                 jobfile="_job_"+str(pid)+".sh"
@@ -110,8 +97,13 @@ def submit_jobs(para,i,execute,homedir):
                 item.append(belem)  #beta
                 item.append(para["Order"][0])
                 item.append(str(-int(random.random()*2**30)))   #Seed
-                item.append(para["Type"][0])
-                item.append(para["IsLoad"][0])
+                if j==-1:  # when turn on self consisitent loop
+                    item.append(str(1))
+                    item.append(str(1))
+                else:
+                    item.append(para["Type"][0])
+                    item.append(para["IsLoad"][0])
+
                 item.append(str(pid))
                 item.append(para["ReadFile"][0])
                 stri=" ".join(item)
@@ -151,9 +143,14 @@ def submit_jobs(para,i,execute,homedir):
                             f=open(infilepath+"/"+infile,"r")
                             g=open(outfilepath+"/"+outfile,"a")
                             p=subprocess.Popen(execute,stdin=f,stdout=g)
+                            print p.pid
                             f.close()
                             g.close()
-                            proclist.append((p,pid))
+                            if j>=0:
+                                proclist.append((p,pid))
+                            else:
+                                loop_proc.append(p)
+
                             logging.info("Job "+str(pid)+" is started...")
                             logging.info("input:\n"+stri)
                             print "Job "+str(pid)+" is started..."
@@ -225,6 +222,13 @@ while True:
     if len(proclist)!=0:
         check_status()
     else:
+        print TurnOnSelfConsist,loop_proc
+        if TurnOnSelfConsist and len(loop_proc)!=0:
+            print "before kill",loop_proc[0].poll()
+            loop_proc[0].kill()
+            print "after kill",loop_proc[0].poll()
+            logging.info("Loop daemon is killed.")
+            print "Loop daemon is killed."
         break
 
 logging.info("Jobs manage daemon is ended...")
