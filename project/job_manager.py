@@ -12,6 +12,7 @@ TurnOnSelfConsist=True
 cpu=4
 #sourcedir="."
 execute="./gamma3.exe"
+loop_execute="./run_self_consistent.py"
 homedir=os.getcwd()
 proclist=[]
 loop_proc=[]
@@ -45,16 +46,17 @@ def check_status():
         sys.exit()
     #os.system("clear")
     for elemp in proclist:
-        print elemp[0].poll()
         if elemp[0].poll()!=None:
             proclist.remove(elemp)
             logging.info("Job "+str(elemp[1])+" is ended!")
             print "Job "+str(elemp[1])+" is ended..."
     return
 
-def submit_jobs(para,i,execute,homedir):
+def submit_jobs(para,execute,homedir):
     infilepath=homedir+"/infile"
     outfilepath=homedir+"/outfile"
+    topstr="top -p"
+
     if(os.path.exists(infilepath)!=True):
         os.system("mkdir "+infilepath)
     if(os.path.exists(outfilepath)!=True):
@@ -142,21 +144,31 @@ def submit_jobs(para,i,execute,homedir):
                             f.close()
                             f=open(infilepath+"/"+infile,"r")
                             g=open(outfilepath+"/"+outfile,"a")
-                            p=subprocess.Popen(execute,stdin=f,stdout=g)
-                            print p.pid
-                            f.close()
-                            g.close()
                             if j>=0:
+                                p=subprocess.Popen(execute,stdin=f,stdout=g)
                                 proclist.append((p,pid))
                             else:
+                                p=subprocess.Popen(loop_execute,stdin=f,stdout=g)
                                 loop_proc.append(p)
-
+                            f.close()
+                            g.close()
+                            topstr=topstr+str(p.pid)+","
+                            f=open("./mytop.sh","w")
+                            f.write(topstr[:-1])
+                            f.close()                            
+                            os.system("chmod +x ./mytop.sh")
+                            if j==-1:
+                                f=open("./kill_loop.sh","w")
+                                f.write("kill -9 "+str(p.pid))
+                                f.close()
+                                os.system("chmod +x ./kill_loop.sh")
+                            
                             logging.info("Job "+str(pid)+" is started...")
                             logging.info("input:\n"+stri)
                             print "Job "+str(pid)+" is started..."
                             break
 
-    return i
+    return
 
 #compile the source automatically
 
@@ -174,7 +186,6 @@ if(last!="\r\n"):
 
 inlist.close()
 inlist=open(homedir+"/inlist","r")
-num=0
 #parse inlist file
 para=para_init()
 for eachline in inlist:
@@ -194,7 +205,7 @@ for eachline in inlist:
         if len(para['Reweight']) != int(para['Order'][0]):
             logging.error("Reweight doesn't match Order!")
             sys.exit()
-        num=submit_jobs(para,num,execute,homedir)
+        submit_jobs(para,execute,homedir)
         para=para_init()
         continue
 
@@ -224,9 +235,7 @@ while True:
     else:
         print TurnOnSelfConsist,loop_proc
         if TurnOnSelfConsist and len(loop_proc)!=0:
-            print "before kill",loop_proc[0].poll()
             loop_proc[0].kill()
-            print "after kill",loop_proc[0].poll()
             logging.info("Loop daemon is killed.")
             print "Loop daemon is killed."
         break
