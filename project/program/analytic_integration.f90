@@ -70,10 +70,15 @@ SUBROUTINE calculate_Gam1
     enddo
   enddo
 
-  Gam(:,:,:,:,:) = (0.d0, 0.d0)
-  Gam(:,0,0,:,:) = GamOrder1(:,:,:)
+  !================== bold Gamma ===============================
 
+  do t2 = 0, MxT-1
+    do t1 = 0, MxT-1
+      do ityp = 1, 3
 
+      enddo
+    enddo
+  enddo
 END SUBROUTINE calculate_Gam1
 !====================================================================
 
