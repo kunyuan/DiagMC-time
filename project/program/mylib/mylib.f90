@@ -81,6 +81,7 @@ module logging_module
 
   type :: logging
     private
+    character(len=32) :: Title=''
     character(len=256) :: FileName="*"
     integer :: Level=2
   contains
@@ -105,10 +106,11 @@ module logging_module
 
 contains
 
-  subroutine init_num(this,file,level)
+  subroutine init_num(this,file,title,level)
       implicit none
       class(logging) :: this 
       character(len=*),optional,intent(in) :: file
+      character(len=*),optional,intent(in) :: title
       integer,intent(in) :: level
 
       if(present(file)) then
@@ -117,13 +119,20 @@ contains
          this%FileName='*'
       endif
 
+      if(present(title)) then
+         this%Title=title
+      else
+         this%Title=''
+      endif
+
       call this%set_level_num(level)
   end subroutine
 
-  subroutine init_char(this,file,level)
+  subroutine init_char(this,file,title,level)
       implicit none
       class(logging) :: this 
       character(len=*),optional,intent(in) :: file
+      character(len=*),optional,intent(in) :: title
       character,intent(in) :: level
 
       if(present(file)) then
@@ -132,19 +141,33 @@ contains
          this%FileName='*'
       endif
 
+      if(present(title)) then
+         this%Title=title
+      else
+         this%Title=''
+      endif
+
       call this%set_level_char(level)
   end subroutine
 
-  subroutine init_null(this,file)
+  subroutine init_null(this,file,title)
       implicit none
       class(logging) :: this 
       character(len=*),optional,intent(in) :: file
+      character(len=*),optional,intent(in) :: title
 
       if(present(file)) then
          this%FileName=file
       else
          this%FileName='*'
       endif
+
+      if(present(title)) then
+         this%Title=title
+      else
+         this%Title=''
+      endif
+
       this%Level=2
   end subroutine
 
@@ -213,18 +236,18 @@ contains
           &  //trim(adjustl(str(values(6),'(i2.2)')))//':'//trim(adjustl(str(values(7),'(i2.2)')))
       if(this%FileName=='*') then
         write(*,*)
-        write(*,101,advance='no') &
+        write(*,101,advance='no') trim(this%Title), &
             & trim(timestr),trim(LevelName(this%Level))
         write(*,*)
       else
         open(36,file=this%FileName,access='append')
         write(36,*)
-        write(36,101,advance='no') &
+        write(36,101,advance='no') trim(this%Title), &
             & trim(timestr),trim(LevelName(this%Level))
         write(36,*)
         close(36)
       endif
-101 format('[job]','[',A,']','[',A,']:')
+101 format('[',A,']','[',A,']','[',A,']:')
   end subroutine
 
   subroutine WriteLine(this,str)
