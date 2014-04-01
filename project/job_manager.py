@@ -14,7 +14,7 @@ cpu=4
 execute="./gamma3.exe"
 homedir=os.getcwd()
 proclist=[]
-logging.basicConfig(filename=homedir+"/project.log",level=logging.INFO,format="[job][%(asctime)s][%(levelname)s]:%(message)s",datefmt='%y/%m/%d %H:%M:%S')
+logging.basicConfig(filename=homedir+"/project.log",level=logging.INFO,format="\n[job.daemon][%(asctime)s][%(levelname)s]:\n%(message)s",datefmt='%y/%m/%d %H:%M:%S')
 logging.info("Jobs manage daemon is started...")
 
 def para_init():
@@ -42,14 +42,13 @@ def check_status():
     if(flag!='0'):
         logging.info("Jobs manage daemon is ended...")
         sys.exit()
+    #os.system("clear")
     for elemp in proclist:
-        if elemp[0].poll()==0:
+        #print elemp[0].poll()
+        if elemp[0].poll()!=None:
             proclist.remove(elemp)
-            #log=open("./logfile.log","a")
-            #log.write("#"+str(elemp[1])+" job is ended at "+time.strftime("%Y-%m-%d %A %X %Z",time.localtime())+"\n")
-            #log.close()
             logging.info("Job "+str(elemp[1])+" is ended!")
-            print "Job "+str(elemp[1])+" is end!"
+            print "Job "+str(elemp[1])+"is stated..."
     return
 
 def submit_jobs(para,i,execute,homedir):
