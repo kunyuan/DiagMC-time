@@ -5,8 +5,6 @@
 SUBROUTINE check_config
   implicit none
 
-  open(36, access="append", file=trim(title_mc)//".log")
-
   call check_topo
   call check_stat
   call check_irreducibility
@@ -16,8 +14,6 @@ SUBROUTINE check_config
   call check_time
   call check_site
   call check_weight
-
-  close(36)
   return
 END SUBROUTINE check_config
 

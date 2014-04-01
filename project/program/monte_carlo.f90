@@ -228,6 +228,7 @@ SUBROUTINE markov(MaxSamp)
     endif
 
     imc = imc + 1.0
+    !call check_config
 
     if(mod(imc,Nstep*1.d0)==0 .and. .not. IsToss) call measure
 
@@ -381,7 +382,10 @@ SUBROUTINE create_worm_along_wline
   Aold = WeightLn(iWLn) *WeightVertex(iGam) *WeightVertex(jGam) *WeightLn(iGin) &
   & *WeightLn(iGout) *WeightLn(jGin) *WeightLn(jGout)
 
-  if(abs(Anew)==0.d0)   return
+  if(abs(Anew)==0.d0) then
+    kLn(iWLn) = kiWold
+    return
+  endif
 
   if(iGin==jGout)  then
     Anew = Anew/WjGout
@@ -541,7 +545,10 @@ SUBROUTINE delete_worm_along_wline
   Aold = WeightLn(iWLn) *WeightVertex(Ira) *WeightVertex(Masha) *WeightLn(iGin) &
   & *WeightLn(iGout) *WeightLn(jGin) *WeightLn(jGout)
 
-  if(abs(Anew)==0.d0)   return
+  if(abs(Anew)==0.d0) then
+    kLn(iWLn) = kiWold
+    return
+  endif
 
   if(iGin==jGout)  then
     Anew = Anew/WjGout
@@ -768,7 +775,7 @@ SUBROUTINE move_worm_along_gline
   endif
   
   kGold = kLn(GLn)
-  kLn(GLn) = add_k(kLn(GLn), (-1)**(dir+1) *kMasha)
+  kLn(GLn) = add_k(kGold, (-1)**(dir+1) *kMasha)
 
   !------- step3 : configuration check ------------------
   !-------- irreducibility  check -----------------------
@@ -868,7 +875,10 @@ SUBROUTINE move_worm_along_gline
   Anew = WiGam *WjGam *WiW *WjW *WG
   Aold = WeightVertex(iGam) *WeightVertex(jGam) *WeightLn(iW) *WeightLn(jW) *WeightLn(GLn)
 
-  if(Anew==0.d0)  return
+  if(abs(Anew)==0.d0) then
+    kLn(GLn) = kGold
+    return
+  endif
 
   if(iW==jW) then
     Anew = Anew/WjW
@@ -922,6 +932,7 @@ SUBROUTINE move_worm_along_gline
     ProbAcc(Order, 6) = ProbAcc(Order, 6) + 1
   else
     kLn(GLn) = kGold
+    return
   endif
 END SUBROUTINE move_worm_along_gline
 !-----------------------------------------------------------
@@ -1198,7 +1209,7 @@ END SUBROUTINE add_interaction
 !-----------------------------------------------------------------
 SUBROUTINE remove_interaction
   implicit none
-  integer :: dir, dirW, flag, kM
+  integer :: dir, dirW, flag, kM, kIA, kMB
   integer :: GAC, GBD, GamC, GamD
   integer :: WAB, GIA, GMB, GamA, GamB
   integer :: statIC, statMD, statIA, statMB, statAB
@@ -1230,6 +1241,8 @@ SUBROUTINE remove_interaction
 
   dirW = DirecVertex(GamA)
   kM = add_k(kMasha, (-1)**dirW*kLn(WAB))
+  kIA = kLn(GIA)
+  kMB = kLn(GMB)
 
   statIA = StatusLn(GIA)
   statMB = StatusLn(GMB)
@@ -1306,8 +1319,8 @@ SUBROUTINE remove_interaction
 
     !--------------- update k -----------------------------------
     kMasha = kM
-    call delete_Hash4G(kLn(GIA))
-    call delete_Hash4G(kLn(GMB))
+    call delete_Hash4G(kIA)
+    call delete_Hash4G(kMB)
 
     !--------------- update the status of elements --------------
     StatusLn(GAC) = statIC
@@ -1925,7 +1938,12 @@ SUBROUTINE change_Gamma_time
 
     !------ update the time and weight of elements ------
     if(isdelta==0) then
-      TVertex(dir, iGam) = newtau
+      if(dir<3) then
+        TVertex(3-dir, iGam) = newtau
+      else 
+        TVertex(3, iGam) = newtau
+      endif
+
       WeightLn(iLn) = WLn
     else 
       TVertex(:, iGam) = newtau
