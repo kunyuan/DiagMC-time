@@ -8,11 +8,11 @@ import logging
 
 #IsCluster=True
 IsCluster=False
-TurnOnSelfConsist=True
+TurnOnSelfConsist=False
 cpu=4
 #sourcedir="."
 execute="./gamma3.exe"
-loop_execute="./run_self_consistent.py"
+loop_execute=['python','./run_self_consistent.py']
 homedir=os.getcwd()
 proclist=[]
 loop_proc=[]
@@ -36,6 +36,7 @@ def para_init():
     para["Worm/Norm"]=[]
     para["ReadFile"]=[]
     para["Duplicate"]=[]
+    para["IsCluster"]=[]
     return para
 
 def check_status():
@@ -61,7 +62,7 @@ def submit_jobs(para,execute,homedir):
         os.system("mkdir "+infilepath)
     if(os.path.exists(outfilepath)!=True):
         os.system("mkdir "+outfilepath)
-    filelist=[int(elem.split('_')[-1]) for elem in os.listdir(infilepath) if elem!='_in_selfconsist']
+    filelist=[int(elem.split('_')[-1]) for elem in os.listdir(infilepath)]
     filelist.sort()
     if(len(filelist)!=0):
         lastnum=filelist[-1]
@@ -125,10 +126,15 @@ def submit_jobs(para,execute,homedir):
                     f.write("#PBS -o "+homedir+"/Output\n")
                     f.write("#PBS -e "+homedir+"/Error\n")
                     f.write("cd "+homedir+"\n")
-                    f.write("./"+execute+" < "+infilepath+"/"+infile)
-                    f.close()
-                    os.system("qsub "+jobfile)
-                    os.system("rm "+jobfile)
+                    if j>=0:
+                        f.write("./"+execute+" < "+infilepath+"/"+infile)
+                        f.close()
+                        os.system("qsub "+jobfile)
+                        os.system("rm "+jobfile)
+                    else:
+                        f.write(" ".join(loop_execute))
+                        f.close()
+                    
                 else: 
                     #print execute,infile
                     while True:
@@ -170,14 +176,16 @@ def submit_jobs(para,execute,homedir):
 
     return
 
-#compile the source automatically
+if len(sys.argv)>1:
+    if sys.argv[1]=='l' or sys.argv[1]=='-l':
+        logging.info("Self consistent loop is automatically started!")
+        print "Self consistent loop is automatically started!"
+        TurnOnSelfConsist=True
+else:
+    logging.info("Please take care of Self consistent loop by yourself!")
+    print "Please take care of Self consistent loop by yourself!"
+    TurnOnSelfConsist=False
 
-#filelist=os.listdir(sourcedir)
-#sourcename=[elem for elem in filelist if elem[-3:]=="f90"]
-#sourcename.sort()
-#sourcename=sourcename[-1]
-#compilerstr="ifort "+sourcedir+"/"+sourcename+" -O3 -o "+homedir+"/"+execute
-#os.system(compilerstr)
 
 inlist=open(homedir+"/inlist","r")
 last=inlist.readline()[-2:]
@@ -205,6 +213,15 @@ for eachline in inlist:
         if len(para['Reweight']) != int(para['Order'][0]):
             logging.error("Reweight doesn't match Order!")
             sys.exit()
+        low=para['IsCluster'][0].lower()
+        if low=="false" or low==".false.":
+            IsCluster=False
+        elif low=="true" or low==".true.":
+            IsCluster=True
+        else:
+            logging.error("I don't understand '"+eachline+"'!")
+            sys.exit()
+
         submit_jobs(para,execute,homedir)
         para=para_init()
         continue
