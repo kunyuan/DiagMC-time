@@ -503,7 +503,7 @@ SUBROUTINE read_GWGamma
     do it1 = 0, MxT-1
       do iy = 0, L(2)-1
         do ix = 0, L(1)-1
-          do ityp = 1, NTypeG
+          do ityp = 1, NTypeGam
             read(102, *,iostat=ios) Gam(ityp, ix, iy, it1, it2)
           enddo
         enddo
@@ -550,7 +550,7 @@ SUBROUTINE write_GWGamma
     do it1 = 0, MxT-1
       do iy = 0, L(2)-1
         do ix = 0, L(1)-1
-          do ityp = 1, NTypeG
+          do ityp = 1, NTypeGam
             write(102, *) Gam(ityp, ix, iy, it1, it2)
           enddo
         enddo
@@ -1075,14 +1075,14 @@ SUBROUTINE output_Gam
   write(105, *) "Order", 1, "dx = 0, dy = 0"
   do it1 = 0, MxT-1
     it2 =  it1 
-    !gam1 = Gam(1, 0, 0, it1, it2)
-    gam1 = GamMC(1, 1, 0, 0, it1, it2)*GamNormWeight/GamNorm
+    gam1 = Gam(1, 0, 0, it1, it2)
+    !gam1 = GamMC(1, 1, 0, 0, it1, it2)*GamNormWeight/GamNorm
     write(105, '(i3,E20.10E3,"    +i",E20.10E3)') it1, real(gam1), dimag(gam1)
   enddo
   do it1 = 0, MxT-1
     it2 =  it1 
-    !gam1 = Gam(3, 0, 0, it1, it2)
-    gam1 = GamMC(3, 1, 0, 0, it1, it2)*GamNormWeight/GamNorm
+    gam1 = Gam(3, 0, 0, it1, it2)
+    !gam1 = GamMC(1, 2, 0, 0, it1, it2)*GamNormWeight/GamNorm
     write(105, '(i3,E20.10E3,"    +i",E20.10E3)') it1, real(gam1), dimag(gam1)
   enddo
   write(105, *)
