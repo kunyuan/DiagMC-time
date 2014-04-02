@@ -6,6 +6,7 @@ job_*
 *.dat
 *.exe
 _in_*
+*.tags*
 project/infile
 *.log
 *.out
