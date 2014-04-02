@@ -106,16 +106,17 @@ SUBROUTINE def_spin
   !-- calculate the type of W according to the neighbor vertexes --
   !---- TypeGam2W(Type(Gamleft), Type(Gamright)) = Type(W)
   TypeGam2W(1,1) = 1;      TypeGam2W(1,4) = 1
-  TypeGam2W(4,1) = 1;      TypeGam2W(4,4) = 1
+  TypeGam2W(1,2) = 3;      TypeGam2W(1,3) = 3
 
-  TypeGam2W(2,2) = 2;      TypeGam2W(2,3) = 2
+  TypeGam2W(3,1) = 4;      TypeGam2W(3,4) = 4
   TypeGam2W(3,2) = 2;      TypeGam2W(3,3) = 2
 
-  TypeGam2W(1,2) = 3;      TypeGam2W(1,3) = 3
+  TypeGam2W(2,1) = 4;      TypeGam2W(2,4) = 4
+  TypeGam2W(2,2) = 2;      TypeGam2W(2,3) = 2
+
+  TypeGam2W(4,1) = 1;      TypeGam2W(4,4) = 1
   TypeGam2W(4,2) = 3;      TypeGam2W(4,3) = 3
 
-  TypeGam2W(2,1) = 4;      TypeGam2W(2,4) = 4
-  TypeGam2W(3,1) = 4;      TypeGam2W(3,4) = 4
 
   TypeGam2W(5,6) = 5;      TypeGam2W(6,5) = 6
 
@@ -228,6 +229,10 @@ SUBROUTINE markov(MaxSamp)
     endif
 
     imc = imc + 1.0
+    !if(imc>100000000.d0 .and. imc<=110000000.d0) then
+      !call print_config
+      !call check_config
+    !endif
 
     if(mod(imc,Nstep*1.d0)==0 .and. .not. IsToss) call measure
 
@@ -847,12 +852,12 @@ SUBROUTINE move_worm_along_gline
     & WRVertex(:, jGam)-WRVertex(:, Masha), TVertex(3, jGam)-TVertex(3, Masha))
 
   tau1 = TVertex(3, iGam)-TVertex(2, iGam)
-  tau2 = TVertex(1, iGam)-TVertex(1, iGam)
+  tau2 = TVertex(1, iGam)-TVertex(3, iGam)
   WiGam = weight_vertex(statiGam, IsDeltaVertex(iGam),GRVertex(:, iGam)-WRVertex(:, iGam),   &
     & tau1, tau2, typiGam)
 
   tau1 = TVertex(3, jGam)-TVertex(2, jGam)
-  tau2 = TVertex(1, jGam)-TVertex(1, jGam)
+  tau2 = TVertex(1, jGam)-TVertex(3, jGam)
   WjGam = weight_vertex(statjGam, IsDeltaVertex(jGam),GRVertex(:, jGam)-WRVertex(:, jGam),   &
     & tau1, tau2, typjGam)
 
@@ -1640,16 +1645,9 @@ SUBROUTINE change_Gamma_type
   endif
 
   if(dir==1) then
-    typW = 5-TypeLn(iWLn)
+    typW = TypeGam2W(typGam, TypeVertex(jGam))
   else
-    if(TypeLn(iWLn)<=2) then
-      typW = TypeLn(iWLn)+2
-    else if(TypeLn(iWLn)<=4) then
-      typW = TypeLn(iWLn)-2
-    else
-      call LogFile%QuickLog("change Gamma type error!"//trim(str(iWLn)), 'e')
-      stop
-    endif
+    typW = TypeGam2W(TypeVertex(jGam), typGam)
   endif
 
   !------- step4 : weight calculation -------------------
@@ -1669,13 +1667,6 @@ SUBROUTINE change_Gamma_type
 
   !------- step5 : accept the update --------------------
   ProbProp(Order, 14) = ProbProp(Order, 14) + 1
-
-  !call LogFile%WriteStamp('d')
-  !call LogFile%WriteLine('change Gamma type: vertex '+str(iGam)+', W '+str(iWLn))
-  !call LogFile%WriteLine('original type: vertex '+str(TypeVertex(iGam))+', W '+str(TypeLn(iWLn)))
-  !call LogFile%WriteLine('new type: vertex '+str(typGam)+', W '+str(typW))
-  !call LogFile%WriteLine('new weight: vertex '+str(WGam)+', W '+str(WW))
-  !call LogFile%WriteLine(str(weight_Gam(typGam, GRVertex(:,iGam)-WRVertex(:,iGam), 0, 0)))
 
   if(rn()<=Pacc) then
 
@@ -1981,7 +1972,7 @@ SUBROUTINE change_wline_isdelta
 
   !------- step2 : propose a new config -----------------
   iWLn = generate_wline()
-  if(StatusLn(iWLn)==1 .or. StatusLn(iWLn)==3)  return
+  if(StatusLn(iWLn)==1)  return
 
   iGam = NeighLn(1, iWLn)
   jGam = NeighLn(2, iWLn)
@@ -1989,6 +1980,7 @@ SUBROUTINE change_wline_isdelta
   jGout = NeighVertex(2, jGam)
 
   t3iGam = TVertex(3, iGam)
+
   t1jGam = TVertex(1, jGam)
   t2jGam = TVertex(2, jGam)
   t3jGam = TVertex(3, jGam)
@@ -2039,6 +2031,16 @@ SUBROUTINE change_wline_isdelta
 
   !------- step5 : accept the update --------------------
   ProbProp(Order, 17) = ProbProp(Order, 17) + 1
+
+  !if(backforth==0 .and. WW ==0.d0) then
+    !call LogFile%WriteStamp('d')
+    !call LogFile%WriteLine('change_wline_isdelta: w '+str(iWLn))
+    !call LogFile%WriteLine('iGam: '+str(iGam)+' jGam: '+str(jGam))
+    !call LogFile%WriteLine('iGam: '+str(IsDeltaVertex(iGam))+' jGam: '+str(IsDeltaVertex(jGam)))
+    !call LogFile%WriteLine('w(W): '+str(WW)+' w(jGam): '+str(WjGam))
+    !call LogFile%WriteLine(str(TypeLn(iWLn))+str(WRVertex(1,jGam)-WRVertex(1,iGam))+&
+      !& str(WRVertex(2,jGam)-WRVertex(2,iGam)))
+  !endif
 
   if(rn()<=Pacc) then
 

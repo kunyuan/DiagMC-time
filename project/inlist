@@ -3,7 +3,7 @@ Sample: 1000000
 Sweep:  10
 Toss:  1000
 IsLoad: 0
-Type: 1
+Type: 2
 #1: self consist loop; 2: monte carlo; 3: test
 
 Lx:   4
@@ -15,5 +15,5 @@ Reweight: 1
 Worm/Norm: 0.1 
 ReadFile: 0.50_1_coll
 
-Duplicate:  1
+Duplicate:  3
 %%%%%%%%%%%%%%%%%%%%%%%%%%

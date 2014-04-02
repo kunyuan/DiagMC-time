@@ -178,7 +178,7 @@ PROGRAM MAIN
       !do ityp = 1, NtypeGam/2
         do it1 = 0, MxT-1
           it2 = it1
-          write(104, *)GamMC(1, 1, 0, 0, it1,it2)*GamNormWeight/GamNorm
+          write(104, *)GamMC(1, 2, 0, 0, it1,it2)*GamNormWeight/GamNorm
         enddo
       !enddo
     !enddo
