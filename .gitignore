@@ -18,3 +18,4 @@ out_*
 *.conf
 project/mytop.sh
 project/kill_loop.sh
+*.tags*
