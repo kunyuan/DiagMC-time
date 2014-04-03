@@ -300,6 +300,17 @@ Sigma_full consistent with nikolay's result
 
 ====================================================
 
+17. bold Gamma
+
+Test example: Order 0, 1
+IsDeltaGamma(:) = 1; IsDeltaW(:) = 0; real weight from self-consistent loop
+compare with direct integration
+
+result: 
+find a bug in move_measuring_index
+
+====================================================
+
 
 
 ====================================================
