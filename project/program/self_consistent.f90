@@ -73,7 +73,8 @@ SUBROUTINE initialize_W0PF
   W0PF(0,    1, 0) = dcmplx(ratio, 0.d0)
   W0PF(0, L(2)-1, 0) = dcmplx(ratio, 0.d0)
 
-  call transfer_W0(1)
+  call transfer_W0_r(1)
+  call transfer_W0_t(1)
 END SUBROUTINE initialize_W0PF
 
 !!------- Initialization of Gam0 in monmentum and frequency ----------
@@ -85,7 +86,8 @@ SUBROUTINE initialize_Gam0PF
   Gam0PF(:,:,:,:) = (0.d0, 0.d0)
   Gam0PF(0,0,0,0) = dcmplx(ratio, 0.d0)
 
-  call transfer_Gam0(1)
+  call transfer_Gam0_r(1)
+  call transfer_Gam0_t(1)
 END SUBROUTINE initialize_Gam0PF
  
 !!============== WEIGHT CALCULATING ==================================
@@ -415,8 +417,6 @@ SUBROUTINE Gam_mc2matrix_mc
   Gam(4,:,:,:,:) = Gam(3,:,:,:,:)
   Gam(6,:,:,:,:) = Gam(5,:,:,:,:)
   
-  call output_Gam
-
 END SUBROUTINE Gam_mc2matrix_mc
  
 

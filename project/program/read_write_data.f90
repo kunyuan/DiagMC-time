@@ -503,7 +503,7 @@ SUBROUTINE read_GWGamma
     do it1 = 0, MxT-1
       do iy = 0, L(2)-1
         do ix = 0, L(1)-1
-          do ityp = 1, NTypeG
+          do ityp = 1, NTypeGam
             read(102, *,iostat=ios) Gam(ityp, ix, iy, it1, it2)
           enddo
         enddo
@@ -550,7 +550,7 @@ SUBROUTINE write_GWGamma
     do it1 = 0, MxT-1
       do iy = 0, L(2)-1
         do ix = 0, L(1)-1
-          do ityp = 1, NTypeG
+          do ityp = 1, NTypeGam
             write(102, *) Gam(ityp, ix, iy, it1, it2)
           enddo
         enddo
@@ -575,7 +575,7 @@ SUBROUTINE write_monte_carlo_data
   open(104, status="replace", &
     & file=trim(title_mc)//"_monte_carlo_data.bin.dat",form="binary")
 
-  write(104) L(1), L(2)
+  write(104) Beta, MCOrder, L(1), L(2)
   write(104) imc, GamNorm, GamNormWeight
   do it2 = 0, MxT-1
     do it1 = 0, MxT-1
@@ -611,7 +611,7 @@ SUBROUTINE read_monte_carlo_data
   endif
 
   open(105, status="old", file=trim(title)//"_monte_carlo_data.bin.dat",form="binary")
-  read(105,iostat=ios) L(1), L(2)
+  read(105,iostat=ios) Beta, MCOrder, L(1), L(2)
   read(105,iostat=ios) imc, GamNorm, GamNormWeight
 
   do it2 = 0, MxT-1
@@ -922,7 +922,7 @@ SUBROUTINE output_GamMC
   normal = GamNormWeight*Z_normal/GamNorm
 
   gam = GamMC(1, 1, 0, 0, 0, 0)/Z_normal
-  rgam2 = ReGamSqMC(1,1, 0, 0, 0, 0)/Z_normal
+  rgam2 = ReGamSqMC(1, 1, 0, 0, 0, 0)/Z_normal
   rerr = sqrt(abs(rgam2)-(real(gam))**2.d0)/sqrt(Z_normal-1)
   norm_err = Error(1)/rerr
 
@@ -1017,7 +1017,7 @@ SUBROUTINE output_Gam1
   complex*16 :: gam
 
   open(104, status='replace', file=trim(title_loop)//"_Gam1_matrix.dat")
-  open(105, status='replace', file=trim(title_loop)//"_Gam1.dat")
+  open(105, access='append', file=trim(title_loop)//"_Gam1.dat")
 
   write(104, *) "Order 1, dx=0, dy=0, real part"
   do it2 = 0, MxT-1
@@ -1037,7 +1037,7 @@ SUBROUTINE output_Gam1
 
   write(105, *) "Order", 1, "dx = 0, dy = 0"
   do it1 = 0, MxT-1
-    it2 =  0
+    it2 =  it1
     gam = GamOrder1(1, it1, it2)
     write(105, '(i3,E20.10E3,"    +i",E20.10E3)') it1, real(gam), dimag(gam)
   enddo
@@ -1075,14 +1075,14 @@ SUBROUTINE output_Gam
   write(105, *) "Order", 1, "dx = 0, dy = 0"
   do it1 = 0, MxT-1
     it2 =  it1 
-    !gam1 = Gam(1, 0, 0, it1, it2)
-    gam1 = GamMC(1, 1, 0, 0, it1, it2)*GamNormWeight/GamNorm
+    gam1 = Gam(1, 0, 0, it1, it2)
+    !gam1 = GamMC(1, 1, 0, 0, it1, it2)*GamNormWeight/GamNorm
     write(105, '(i3,E20.10E3,"    +i",E20.10E3)') it1, real(gam1), dimag(gam1)
   enddo
   do it1 = 0, MxT-1
     it2 =  it1 
-    !gam1 = Gam(3, 0, 0, it1, it2)
-    gam1 = GamMC(3, 1, 0, 0, it1, it2)*GamNormWeight/GamNorm
+    gam1 = Gam(3, 0, 0, it1, it2)
+    !gam1 = GamMC(1, 2, 0, 0, it1, it2)*GamNormWeight/GamNorm
     write(105, '(i3,E20.10E3,"    +i",E20.10E3)') it1, real(gam1), dimag(gam1)
   enddo
   write(105, *)
