@@ -415,8 +415,6 @@ SUBROUTINE Gam_mc2matrix_mc
   Gam(4,:,:,:,:) = Gam(3,:,:,:,:)
   Gam(6,:,:,:,:) = Gam(5,:,:,:,:)
   
-  call output_Gam
-
 END SUBROUTINE Gam_mc2matrix_mc
  
 
