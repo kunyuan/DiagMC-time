@@ -250,7 +250,7 @@ while True:
     if len(proclist)!=0:
         check_status()
     else:
-        print TurnOnSelfConsist,loop_proc
+        #print TurnOnSelfConsist,loop_proc
         if TurnOnSelfConsist and len(loop_proc)!=0:
             loop_proc[0].kill()
             logging.info("Loop daemon is killed.")

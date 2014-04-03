@@ -55,20 +55,20 @@ PROGRAM MAIN
 
   !================ updates frequency   ================================
   Pupdate( :)  = 0.d0
-  Pupdate( 1)  = 1.d0
-  Pupdate( 2)  = 1.d0
-  Pupdate( 5)  = 1.d0
-  Pupdate( 6)  = 1.d0
-  Pupdate( 7)  = 1.d0
-  Pupdate( 8)  = 1.d0
-  Pupdate(11)  = 1.d0
-  Pupdate(12)  = 1.d0
-  Pupdate(13)  = 1.d0
-  Pupdate(14)  = 1.d0
-  Pupdate(15)  = 1.d0
-  Pupdate(16)  = 1.d0
-  Pupdate(17)  = 1.d0
-  Pupdate(18)  = 1.d0
+  Pupdate( 1)  = 1.d0      ! create_worm_along_wline
+  Pupdate( 2)  = 1.d0      ! delete_worm_along_wline
+  Pupdate( 5)  = 1.d0      ! move_worm_along_wline
+  Pupdate( 6)  = 1.d0      ! move_worm_along_gline
+  Pupdate( 7)  = 1.d0      ! add_interaction
+  Pupdate( 8)  = 1.d0      ! remove_interaction
+  Pupdate(11)  = 1.d0      ! reconnect
+  Pupdate(12)  = 1.d0      ! change_gline_space
+  Pupdate(13)  = 1.d0      ! change_wline_space
+  Pupdate(14)  = 1.d0      ! change_Gamma_type
+  Pupdate(15)  = 1.d0      ! move_measuring_index
+  !Pupdate(16)  = 1.d0      ! change_Gamma_time
+  Pupdate(17)  = 1.d0      ! change_wline_isdelta
+  Pupdate(18)  = 1.d0      ! change_gamma_isdelta
 
   !===============  Test variables ==================================
   TestData(:)=0.d0
@@ -229,9 +229,9 @@ SUBROUTINE monte_carlo
   call read_GWGamma
   call calculate_GamNormWeight  
 
-  call calculate_Gam1
-  call output_Gam1
-  stop
+  !call output_Quantities
+  !call calculate_Gam1
+  !stop
 
   call initialize_markov
 
