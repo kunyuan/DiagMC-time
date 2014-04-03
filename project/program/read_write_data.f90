@@ -922,7 +922,7 @@ SUBROUTINE output_GamMC
   normal = GamNormWeight*Z_normal/GamNorm
 
   gam = GamMC(1, 1, 0, 0, 0, 0)/Z_normal
-  rgam2 = ReGamSqMC(1,1, 0, 0, 0, 0)/Z_normal
+  rgam2 = ReGamSqMC(1, 1, 0, 0, 0, 0)/Z_normal
   rerr = sqrt(abs(rgam2)-(real(gam))**2.d0)/sqrt(Z_normal-1)
   norm_err = Error(1)/rerr
 
@@ -1037,7 +1037,7 @@ SUBROUTINE output_Gam1
 
   write(105, *) "Order", 1, "dx = 0, dy = 0"
   do it1 = 0, MxT-1
-    it2 =  0
+    it2 =  it1
     gam = GamOrder1(1, it1, it2)
     write(105, '(i3,E20.10E3,"    +i",E20.10E3)') it1, real(gam), dimag(gam)
   enddo

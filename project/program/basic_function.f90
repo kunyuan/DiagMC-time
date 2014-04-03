@@ -1417,19 +1417,30 @@ END FUNCTION d_times_cd
 
 !CONTAINS
 
-SUBROUTINE transfer_W0(BackForth)
+SUBROUTINE transfer_W0_r(BackForth)
     implicit none
     integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
     call FFT_r(W0PF,1,MxT,BackForth)
+END SUBROUTINE
+
+SUBROUTINE transfer_W0_t(BackForth)
+    implicit none
+    integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
     call FFT_tau_single(W0PF,1,L(1)*L(2),BackForth)
 END SUBROUTINE
 
-SUBROUTINE transfer_Gam0(BackForth)
+SUBROUTINE transfer_Gam0_r(BackForth)
     implicit none
     integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
     integer :: it1, it2
 
     call FFT_r(Gam0PF,1,MxT**2,BackForth)
+end SUBROUTINE
+
+SUBROUTINE transfer_Gam0_t(BackForth)
+    implicit none
+    integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
+    integer :: it1, it2
 
     if(BackForth/=-1) then
       do it2 = 0, MxT-1
@@ -1452,7 +1463,6 @@ SUBROUTINE transfer_Gam0(BackForth)
     endif
 END SUBROUTINE
 
-
 SUBROUTINE transfer_G0(BackForth)
     implicit none
     integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
@@ -1471,6 +1481,32 @@ SUBROUTINE transfer_G0(BackForth)
       enddo
     endif
 END SUBROUTINE
+
+SUBROUTINE transfer_GamOrder1_t(BackForth)
+    implicit none
+    integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
+    integer ::it1, it2
+    if(BackForth/=-1) then
+      do it2 = 0, MxT-1
+        do it1 = 0, MxT-1
+          GamOrder1(:,it1,it2) = GamOrder1(:,it1,it2)* cdexp(dcmplx(0.d0,-Pi*real(it1)/real(MxT)))
+          GamOrder1(:,it1,it2) = GamOrder1(:,it1,it2)* cdexp(dcmplx(0.d0,-Pi*real(it2)/real(MxT)))
+        enddo
+      enddo
+
+      call FFT_tau_double(GamOrder1,NtypeGam,1,BackForth)
+    else if(BackForth ==-1) then
+      call FFT_tau_double(GamOrder1,NtypeGam,1,BackForth)
+
+      do it2 = 0, MxT-1
+        do it1 = 0, MxT-1
+          GamOrder1(:,it1,it2) = GamOrder1(:,it1,it2)* cdexp(dcmplx(0.d0,Pi*real(it1)/real(MxT)))
+          GamOrder1(:,it1,it2) = GamOrder1(:,it1,it2)* cdexp(dcmplx(0.d0,Pi*real(it2)/real(MxT)))
+        enddo
+      enddo
+    endif
+END SUBROUTINE
+
 
 SUBROUTINE transfer_G_t(BackForth)
     implicit none
@@ -1549,6 +1585,25 @@ SUBROUTINE transfer_Chi_t(BackForth)
     call FFT_tau_single(Chi,1,L(1)*L(2),BackForth)
 END SUBROUTINE
 
+SUBROUTINE transfer_Sigma_t(BackForth)
+    implicit none
+    integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
+    integer       :: it
+
+    if(BackForth/=-1) then
+      do it = 0, MxT-1
+        Sigma(it) = Sigma(it)* cdexp(dcmplx(0.d0,-Pi*real(it)/real(MxT)))
+      enddo
+      call FFT_tau_single(Sigma,1,1,BackForth)
+    else if(BackForth==-1) then
+      call FFT_tau_single(Sigma,1,1,BackForth)
+      do it = 0, MxT-1
+        Sigma(it) = Sigma(it)* cdexp(dcmplx(0.d0, Pi*real(it)/real(MxT)))
+      enddo
+    endif
+    return
+END SUBROUTINE
+
 !SUBROUTINE transfer_Polar_r(BackForth)
     !implicit none
     !integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
@@ -1578,25 +1633,6 @@ SUBROUTINE transfer_t(Backforth)
   call transfer_W_t(Backforth)
   call transfer_Gam_t(Backforth)
   return
-END SUBROUTINE
-
-SUBROUTINE transfer_Sigma_t(BackForth)
-    implicit none
-    integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
-    integer       :: it
-
-    if(BackForth/=-1) then
-      do it = 0, MxT-1
-        Sigma(it) = Sigma(it)* cdexp(dcmplx(0.d0,-Pi*real(it)/real(MxT)))
-      enddo
-      call FFT_tau_single(Sigma,1,1,BackForth)
-    else if(BackForth==-1) then
-      call FFT_tau_single(Sigma,1,1,BackForth)
-      do it = 0, MxT-1
-        Sigma(it) = Sigma(it)* cdexp(dcmplx(0.d0, Pi*real(it)/real(MxT)))
-      enddo
-    endif
-    return
 END SUBROUTINE
 
 

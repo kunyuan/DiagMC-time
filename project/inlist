@@ -9,11 +9,11 @@ Type: 2
 Lx:   4
 Ly:   4
 Jcp:   1.0
-Beta:  0.5
+Beta:  2.0
 Order:  1
 Reweight: 1
-Worm/Norm: 0.1 
-ReadFile: 0.50_1_coll
+Worm/Norm: 0.5 
+ReadFile: 2.00_1_coll
 
 Duplicate:  2
 IsCluster:  .false.
