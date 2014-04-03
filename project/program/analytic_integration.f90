@@ -92,27 +92,30 @@ SUBROUTINE calculate_Gam1
   call transfer_Gam_t(-1)
 
   call transfer_GamOrder1_t(-1)
+  call output_Gam1
 
   !================== bare Gamma ===============================
-  !do t2 = 0, MxT-1
-    !do t1 = 0, MxT-1
+  GamOrder1(:,:,:) = (0.d0, 0.d0)
+  do t2 = 0, MxT-1
+    do t1 = 0, MxT-1
 
-        !Gin = weight_G(1, t1)
-        !Gout = weight_G(1, t2)
-        !Gam1 = weight_Gam0(1, (/0, 0/))
-        !Gam2 = weight_Gam0(1, (/0, 0/)) 
-        !Gam3 = weight_Gam0(1, (/0, 0/)) 
-        !if(t1+t2<MxT) then
-          !iW = weight_W(1, (/0, 0/), t1+t2)
-        !else 
-          !iW = weight_W(1, (/0, 0/), t1+t2-MxT)
-        !endif
+        Gin = weight_G(1, t1)
+        Gout = weight_G(1, t2)
+        Gam1 = weight_Gam0(1, (/0, 0/))
+        Gam2 = weight_Gam0(1, (/0, 0/)) 
+        Gam3 = weight_Gam0(1, (/0, 0/)) 
+        if(t1+t2<MxT) then
+          iW = weight_W(1, (/0, 0/), t1+t2)
+        else 
+          iW = weight_W(1, (/0, 0/), t1+t2-MxT)
+        endif
 
-        !weight = Gin *Gout *iW *Gam1 *Gam2 *Gam3
+        weight = Gin *Gout *iW *Gam1 *Gam2 *Gam3
 
-        !GamOrder1(1,t1,t2) = GamOrder1(1,t1,t2) -weight
-    !enddo
-  !enddo
+        GamOrder1(1,t1,t2) = -1.d0* weight
+    enddo
+  enddo
+  call output_Gam1
 
 END SUBROUTINE calculate_Gam1
 !====================================================================

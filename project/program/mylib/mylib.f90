@@ -25,10 +25,11 @@ contains
       character(len=*),optional,intent(in) :: format
       if(present(format)) then
         write(outstr,trim(adjustl(format))) num
+        outstr=adjustl(outstr)
       else
         write(outstr,'(i10)') num
+        outstr=" "//adjustl(outstr)
       endif
-      outstr=" "//adjustl(outstr)
   end function
 
   function str_logic(logic) result(outstr)
@@ -49,11 +50,12 @@ contains
       character(len=*),optional,intent(in) :: format
       if(present(format)) then
         write(outstr,trim(adjustl(format))) num
+        outstr=adjustl(outstr)
       else
         !write(outstr,'(d16.8)') num
         write(outstr,*) num
+        outstr=" "//adjustl(outstr)
       endif
-      outstr=" "//adjustl(outstr)
   end function
 
   function str_double_complex(num,format) result(outstr)
@@ -63,7 +65,7 @@ contains
       character(len=*),optional,intent(in) :: format
       if(present(format)) then
         write(outstr,trim(adjustl(format))) num
-        outstr=" "//adjustl(outstr)
+        outstr=adjustl(outstr)
       else
         outstr=" ("+str(real(num))+","+str(dimag(num))+")"
       endif
