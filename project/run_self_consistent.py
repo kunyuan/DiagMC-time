@@ -4,40 +4,46 @@ import subprocess
 import time
 import logging
 
-homedir=os.getcwd()
-logging.basicConfig(filename=homedir+"/project.log",level=logging.INFO,format="\n[loop.daemon][%(asctime)s][%(levelname)s]:\n%(message)s",datefmt='%y/%m/%d %H:%M:%S')
-execf="./gamma3.exe"
-interval=300
-title = "0.50_2"
-#time.sleep(300)
-logging.info("Self Consistent Loop daemon started!")
-logging.info(title+" is the target!")
-i=0
-flag = "0"
-
-while flag=="0":
-    i=i+1
-    logging.info("Loop "+str(i)+" running...")
-    try:
-        subprocess.check_output("./collapse_data.exe")
-    except subprocess.CalledProcessError as e:
-        ret=e.returncode
-        logging.error('collapse_data.exe return a non-zero value '+str(ret)+', something happened!')
-    except:
-        logging.error('Collapse_data failed!')
-    else:
+def run_loop():
+    homedir=os.getcwd()
+    logging.basicConfig(filename=homedir+"/project.log",level=logging.INFO,format="\n[loop.daemon][%(asctime)s][%(levelname)s]:\n%(message)s",datefmt='%y/%m/%d %H:%M:%S')
+    execf="./gamma3.exe"
+    interval=300
+    title = "0.50_2"
+    #time.sleep(300)
+    logging.info("Self Consistent Loop daemon started!")
+    logging.info(title+" is the target!")
+    i=0
+    flag = "0"
+    print "loop daemon started..."
+    while flag=="0":
+        i=i+1
+        logging.info("Loop "+str(i)+" running...")
         try:
-            os.system(execf+" <./infile/_in_selfconsist >./outfile/Output_sc")
-            flag = open("stop.inp", "r").readline().lstrip().rstrip()
-            #logging.info("flag: "+flag)
+            subprocess.check_output("./collapse_data.exe")
+        except subprocess.CalledProcessError as e:
+            ret=e.returncode
+            logging.error('collapse_data.exe return a non-zero value '+str(ret)+', something happened!')
         except:
-            logging.error('self_consistent error')
+            logging.error('Collapse_data failed!')
+        else:
+            try:
+                os.system(execf+" <./infile/_in_0 >./outfile/out_0.txt")
+                flag = open("stop.inp", "r").readline().lstrip().rstrip()
+                #logging.info("flag: "+flag)
+            except:
+                logging.error('self_consistent error')
 
-    logging.info("Loop "+str(i)+" done!")
-    logging.info("Sleeping...")
-    time.sleep(interval)
+        logging.info("Loop "+str(i)+" done!")
+        logging.info("Sleeping...")
+        time.sleep(interval)
+        logging.info("Self Consistent Loop daemon ended!")
+    pass
 
-logging.info("Self Consistent Loop daemon ended!")
+# if __name__=="__main__":
+print "Start loop..."
+run_loop()
+    # pass
 
 
     
