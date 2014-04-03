@@ -1706,6 +1706,7 @@ SUBROUTINE move_measuring_index
 
   !------- step2 : propose a new config -----------------
   iGam = generate_vertex()
+  if(iGam==MeasureGam)         return
   if(IsDeltaVertex(iGam)/=1)   return
 
   iGin  = NeighVertex(1, iGam);      iGout = NeighVertex(2, iGam)
@@ -1715,8 +1716,6 @@ SUBROUTINE move_measuring_index
   jGam  = MeasureGam
   jGin  = NeighVertex(1, jGam);      jGout = NeighVertex(2, jGam)
   jW    = NeighVertex(3, jGam)
-  
-  if(iGam==jGam)            return
 
   !----- the status for the new config ------------------
   statiGam  = add_mea_stat(StatusVertex(iGam))
@@ -2032,16 +2031,6 @@ SUBROUTINE change_wline_isdelta
   !------- step5 : accept the update --------------------
   ProbProp(Order, 17) = ProbProp(Order, 17) + 1
 
-  !if(backforth==0 .and. WW ==0.d0) then
-    !call LogFile%WriteStamp('d')
-    !call LogFile%WriteLine('change_wline_isdelta: w '+str(iWLn))
-    !call LogFile%WriteLine('iGam: '+str(iGam)+' jGam: '+str(jGam))
-    !call LogFile%WriteLine('iGam: '+str(IsDeltaVertex(iGam))+' jGam: '+str(IsDeltaVertex(jGam)))
-    !call LogFile%WriteLine('w(W): '+str(WW)+' w(jGam): '+str(WjGam))
-    !call LogFile%WriteLine(str(TypeLn(iWLn))+str(WRVertex(1,jGam)-WRVertex(1,iGam))+&
-      !& str(WRVertex(2,jGam)-WRVertex(2,iGam)))
-  !endif
-
   if(rn()<=Pacc) then
 
     !------ update the diagram info -------------------
@@ -2080,11 +2069,15 @@ SUBROUTINE change_gamma_isdelta
   complex*16 :: WiGin, WiGout, WiGam, Anew, Aold, sgn
 
   !------- step1 : check if worm is present -------------
-  if(IsWormPresent .eqv. .true.)    return
+  if(IsWormPresent .eqv. .true.)   return
 
   !------- step2 : propose a new config -----------------
   iGam = generate_vertex()
   if(iGam==MeasureGam)  return
+   
+  !backforth = Floor(rn()*2.d0)
+  !if(backforth/=IsDeltaVertex(iGam))  return
+  backforth = IsDeltaVertex(iGam)
 
   iGin = NeighVertex(1, iGam)
   iGout = NeighVertex(2, iGam)
@@ -2093,7 +2086,6 @@ SUBROUTINE change_gamma_isdelta
   t2iGam = TVertex(2, iGam)
   t3iGam = TVertex(3, iGam)
 
-  backforth = IsDeltaVertex(iGam)
 
   if(backforth==0) then
     t1iGam = t3iGam

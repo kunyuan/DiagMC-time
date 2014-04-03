@@ -15,8 +15,6 @@ PROGRAM MAIN
     double precision :: iReGamSq
     double precision :: iImGamSq
     character(len=100),dimension(Mxjobs) :: title_file
-    character*1 :: order_coll
-    character*6 :: title_coll
     logical :: flag,alive
     complex*16, allocatable :: GamTmp(:,:,:,:,:,:)
     double precision, allocatable :: ReGamSqTmp(:,:,:,:,:,:)
@@ -41,18 +39,12 @@ PROGRAM MAIN
 
     if(itot==0) stop
 
-    order_coll = title_file(1)(8:8)
-    read(order_coll, *) MCOrder
-    title_coll = title_file(1)(3:8)
-    title_mc = trim(adjustl(title_coll))//"_coll"
-
-
     flag=.true.
     do i=1,itot
       inquire(file=title_file(i),exist=alive)
       if(alive) then
         open(101, status="old", file=title_file(i), form="binary")
-        read(101, iostat=ios) L(1), L(2)
+        read(101, iostat=ios) Beta, MCOrder, L(1), L(2)
         if(ios==0) then
           flag=.false.
           close(101)
@@ -66,6 +58,7 @@ PROGRAM MAIN
         stop -1
     endif
 
+    title_mc = str(Beta,'(f4.2)')+'_'+str(MCOrder,'(i1)')+'_coll'
 
     allocate(GamMC(0:MCOrder,1:NTypeGam/2, 0:L(1)-1, 0:L(2)-1, 0:MxT-1, 0:MxT-1))
     allocate(ReGamSqMC(0:MCOrder,1:NTypeGam/2, 0:L(1)-1, 0:L(2)-1, 0:MxT-1, 0:MxT-1))
@@ -88,7 +81,7 @@ PROGRAM MAIN
       if(alive) then
         open(101, status="old", file=title_file(i), form="binary")
 
-        read(101) L(1), L(2)
+        read(101) Beta, MCOrder, L(1), L(2)
         read(101,iostat=ios) imctmp, iGamNorm, iGamNormWeight
         do it2 = 0, MxT-1
           do it1 = 0, MxT-1
@@ -115,7 +108,6 @@ PROGRAM MAIN
         GamMC=GamMC+GamTmp
         ReGamSqMC=ReGamSqMC+ReGamSqTmp
         ImGamSqMC=ImGamSqMC+ImGamSqTmp
-        call write_GamMC
       endif
     enddo
 
@@ -141,7 +133,7 @@ PROGRAM MAIN
     open(104, status="replace", &
       & file=trim(title_mc)//"_monte_carlo_data.bin.dat",form="binary")
 
-    write(104) L(1), L(2)
+    write(104) Beta, MCOrder, L(1), L(2)
     write(104) imc, GamNorm, GamNormWeight
     do it2 = 0, MxT-1
       do it1 = 0, MxT-1
@@ -167,22 +159,18 @@ PROGRAM MAIN
   SUBROUTINE write_GamMC
     implicit none
     integer :: iorder, itopo, ix, iy, ityp, it1, it2
+    complex*16 :: gam
 
     !=========== write into files =========================================
-    open(104, access="append", file=trim(title_mc)//"_GamMC.dat")
-
-    write(104, *) EffectiveSamp
-    write(104, *) L(1), L(2)
-    write(104, *) imc, GamNorm, GamNormWeight
-    !do iorder = 0, MCOrder
-      !do ityp = 1, NtypeGam/2
-        do it1 = 0, MxT-1
-          it2 = it1
-          write(104, *)GamMC(1, 2, 0, 0, it1,it2)*GamNormWeight/GamNorm
-        enddo
-      !enddo
-    !enddo
+    open(104, status="replace", file=trim(title_mc)//"_GamMC.dat")
     
+    write(104, *) "Order", 1, "dx = 0, dy = 0"
+    do it1 = 0, MxT-1
+      it2 =  it1
+      gam = GamMC(1, 1, 0, 0, it1, it2)*GamNormWeight/GamNorm
+      write(104, '(i3,E20.10E3,"    +i",E20.10E3)') it1, real(gam), dimag(gam)
+    enddo
+    write(104, *)
     close(104)
   END SUBROUTINE write_GamMC
 

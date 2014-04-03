@@ -575,7 +575,7 @@ SUBROUTINE write_monte_carlo_data
   open(104, status="replace", &
     & file=trim(title_mc)//"_monte_carlo_data.bin.dat",form="binary")
 
-  write(104) L(1), L(2)
+  write(104) Beta, MCOrder, L(1), L(2)
   write(104) imc, GamNorm, GamNormWeight
   do it2 = 0, MxT-1
     do it1 = 0, MxT-1
@@ -611,7 +611,7 @@ SUBROUTINE read_monte_carlo_data
   endif
 
   open(105, status="old", file=trim(title)//"_monte_carlo_data.bin.dat",form="binary")
-  read(105,iostat=ios) L(1), L(2)
+  read(105,iostat=ios) Beta, MCOrder, L(1), L(2)
   read(105,iostat=ios) imc, GamNorm, GamNormWeight
 
   do it2 = 0, MxT-1
@@ -1017,7 +1017,7 @@ SUBROUTINE output_Gam1
   complex*16 :: gam
 
   open(104, status='replace', file=trim(title_loop)//"_Gam1_matrix.dat")
-  open(105, status='replace', file=trim(title_loop)//"_Gam1.dat")
+  open(105, access='append', file=trim(title_loop)//"_Gam1.dat")
 
   write(104, *) "Order 1, dx=0, dy=0, real part"
   do it2 = 0, MxT-1
