@@ -1705,17 +1705,18 @@ SUBROUTINE move_measuring_index
   if(IsWormPresent .eqv. .true.)    return
 
   !------- step2 : propose a new config -----------------
+  jGam  = MeasureGam
+  jGin  = NeighVertex(1, jGam);      jGout = NeighVertex(2, jGam)
+  jW    = NeighVertex(3, jGam)
+
   iGam = generate_vertex()
   if(iGam==MeasureGam)         return
   if(IsDeltaVertex(iGam)/=1)   return
 
   iGin  = NeighVertex(1, iGam);      iGout = NeighVertex(2, iGam)
   iW    = NeighVertex(3, iGam)
-  if(IsDeltaLn(iW)/=0)         return
 
-  jGam  = MeasureGam
-  jGin  = NeighVertex(1, jGam);      jGout = NeighVertex(2, jGam)
-  jW    = NeighVertex(3, jGam)
+  if(IsDeltaLn(iW)/=0)         return
 
   !----- the status for the new config ------------------
   statiGam  = add_mea_stat(StatusVertex(iGam))
@@ -1731,6 +1732,7 @@ SUBROUTINE move_measuring_index
 
   statiGin    = 1
   statiGout   = 1
+
   if(jGout/=iGin) then
     statjGout   = 0
   else
