@@ -15,5 +15,6 @@ Reweight: 1
 Worm/Norm: 0.5 
 ReadFile: 2.00_1_coll
 
-Duplicate:  1
+Duplicate:  2
+IsCluster:  .false.
 %%%%%%%%%%%%%%%%%%%%%%%%%%

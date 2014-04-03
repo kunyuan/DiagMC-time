@@ -8,12 +8,14 @@ import logging
 
 #IsCluster=True
 IsCluster=False
-TurnOnSelfConsist=True
+TurnOnSelfConsist=False
 cpu=4
 #sourcedir="."
 execute="./gamma3.exe"
+loop_execute=['python','./run_self_consistent.py']
 homedir=os.getcwd()
 proclist=[]
+loop_proc=[]
 logging.basicConfig(filename=homedir+"/project.log",level=logging.INFO,format="\n[job.daemon][%(asctime)s][%(levelname)s]:\n%(message)s",datefmt='%y/%m/%d %H:%M:%S')
 logging.info("Jobs manage daemon is started...")
 
@@ -34,6 +36,7 @@ def para_init():
     para["Worm/Norm"]=[]
     para["ReadFile"]=[]
     para["Duplicate"]=[]
+    para["IsCluster"]=[]
     return para
 
 def check_status():
@@ -44,21 +47,22 @@ def check_status():
         sys.exit()
     #os.system("clear")
     for elemp in proclist:
-        #print elemp[0].poll()
         if elemp[0].poll()!=None:
             proclist.remove(elemp)
             logging.info("Job "+str(elemp[1])+" is ended!")
-            print "Job "+str(elemp[1])+"is ended!"
+            print "Job "+str(elemp[1])+" is ended..."
     return
 
-def submit_jobs(para,i,execute,homedir):
+def submit_jobs(para,execute,homedir):
     infilepath=homedir+"/infile"
     outfilepath=homedir+"/outfile"
+    topstr="top -p"
+
     if(os.path.exists(infilepath)!=True):
         os.system("mkdir "+infilepath)
     if(os.path.exists(outfilepath)!=True):
         os.system("mkdir "+outfilepath)
-    filelist=[int(elem.split('_')[-1]) for elem in os.listdir(infilepath) if elem!='_in_selfconsist']
+    filelist=[int(elem.split('_')[-1]) for elem in os.listdir(infilepath)]
     filelist.sort()
     if(len(filelist)!=0):
         lastnum=filelist[-1]
@@ -68,34 +72,20 @@ def submit_jobs(para,i,execute,homedir):
     #if you want to iterate some parameter, add more "for" here
     for belem in para["Beta"]:
         for jelem in para["Jcp"]:
-            if TurnOnSelfConsist:
-                infile="_in_selfconsist"
-                item=[]
-                item.append(para["Lx"][0])
-                item.append(para["Ly"][0])
-                item.append(para["Toss"][0])
-                item.append(para["Sample"][0])
-                item.append(para["IsForever"][0])
-                item.append(para["Sweep"][0])
-                item.append(jelem)  #jcp
-                item.append(belem)  #beta
-                item.append(para["Order"][0])
-                item.append(str(-1))   #Seed
-                item.append(str(1))
-                item.append(str(1))
-                item.append(str(0))
-                item.append(para["ReadFile"][0])
-                stri=" ".join(item)
-                for eve in para["Reweight"]:
-                    stri=stri+"\n"+eve
-                stri=stri+"\n"+para["Worm/Norm"][0]+"\n\n"
-                f=open(infilepath+"/"+infile,"w")
-                f.write(stri)
-                f.close()
 
-            for j in range(0,int(para["Duplicate"][0])):
-                lastnum+=1
-                pid=lastnum  #the unique id and random number seed for job
+            if TurnOnSelfConsist:
+                start=-1
+            else:
+                start=0
+
+            for j in range(start,int(para["Duplicate"][0])):
+                if j==-1: # when turn on self consisitent loop
+                    pid=0
+                else:
+                    lastnum+=1
+                    pid=lastnum  #the unique id and random number seed for job
+                    pass
+                
                 infile="_in_"+str(pid)
                 outfile="out_"+str(pid)+".txt"
                 jobfile="_job_"+str(pid)+".sh"
@@ -110,8 +100,13 @@ def submit_jobs(para,i,execute,homedir):
                 item.append(belem)  #beta
                 item.append(para["Order"][0])
                 item.append(str(-int(random.random()*2**30)))   #Seed
-                item.append(para["Type"][0])
-                item.append(para["IsLoad"][0])
+                if j==-1:  # when turn on self consisitent loop
+                    item.append(str(1))
+                    item.append(str(1))
+                else:
+                    item.append(para["Type"][0])
+                    item.append(para["IsLoad"][0])
+
                 item.append(str(pid))
                 item.append(para["ReadFile"][0])
                 stri=" ".join(item)
@@ -131,10 +126,15 @@ def submit_jobs(para,i,execute,homedir):
                     f.write("#PBS -o "+homedir+"/Output\n")
                     f.write("#PBS -e "+homedir+"/Error\n")
                     f.write("cd "+homedir+"\n")
-                    f.write("./"+execute+" < "+infilepath+"/"+infile)
-                    f.close()
-                    os.system("qsub "+jobfile)
-                    os.system("rm "+jobfile)
+                    if j>=0:
+                        f.write("./"+execute+" < "+infilepath+"/"+infile)
+                        f.close()
+                        os.system("qsub "+jobfile)
+                        os.system("rm "+jobfile)
+                    else:
+                        f.write(" ".join(loop_execute))
+                        f.close()
+                    
                 else: 
                     #print execute,infile
                     while True:
@@ -150,25 +150,42 @@ def submit_jobs(para,i,execute,homedir):
                             f.close()
                             f=open(infilepath+"/"+infile,"r")
                             g=open(outfilepath+"/"+outfile,"a")
-                            p=subprocess.Popen(execute,stdin=f,stdout=g)
+                            if j>=0:
+                                p=subprocess.Popen(execute,stdin=f,stdout=g)
+                                proclist.append((p,pid))
+                            else:
+                                p=subprocess.Popen(loop_execute,stdin=f,stdout=g)
+                                loop_proc.append(p)
                             f.close()
                             g.close()
-                            proclist.append((p,pid))
+                            topstr=topstr+str(p.pid)+","
+                            f=open("./mytop.sh","w")
+                            f.write(topstr[:-1])
+                            f.close()                            
+                            os.system("chmod +x ./mytop.sh")
+                            if j==-1:
+                                f=open("./kill_loop.sh","w")
+                                f.write("kill -9 "+str(p.pid))
+                                f.close()
+                                os.system("chmod +x ./kill_loop.sh")
+                            
                             logging.info("Job "+str(pid)+" is started...")
                             logging.info("input:\n"+stri)
                             print "Job "+str(pid)+" is started..."
                             break
 
-    return i
+    return
 
-#compile the source automatically
+if len(sys.argv)>1:
+    if sys.argv[1]=='l' or sys.argv[1]=='-l':
+        logging.info("Self consistent loop is automatically started!")
+        print "Self consistent loop is automatically started!"
+        TurnOnSelfConsist=True
+else:
+    logging.info("Please take care of Self consistent loop by yourself!")
+    print "Please take care of Self consistent loop by yourself!"
+    TurnOnSelfConsist=False
 
-#filelist=os.listdir(sourcedir)
-#sourcename=[elem for elem in filelist if elem[-3:]=="f90"]
-#sourcename.sort()
-#sourcename=sourcename[-1]
-#compilerstr="ifort "+sourcedir+"/"+sourcename+" -O3 -o "+homedir+"/"+execute
-#os.system(compilerstr)
 
 inlist=open(homedir+"/inlist","r")
 last=inlist.readline()[-2:]
@@ -177,7 +194,6 @@ if(last!="\r\n"):
 
 inlist.close()
 inlist=open(homedir+"/inlist","r")
-num=0
 #parse inlist file
 para=para_init()
 for eachline in inlist:
@@ -197,7 +213,16 @@ for eachline in inlist:
         if len(para['Reweight']) != int(para['Order'][0]):
             logging.error("Reweight doesn't match Order!")
             sys.exit()
-        num=submit_jobs(para,num,execute,homedir)
+        low=para['IsCluster'][0].lower()
+        if low=="false" or low==".false.":
+            IsCluster=False
+        elif low=="true" or low==".true.":
+            IsCluster=True
+        else:
+            logging.error("I don't understand '"+eachline+"'!")
+            sys.exit()
+
+        submit_jobs(para,execute,homedir)
         para=para_init()
         continue
 
@@ -225,6 +250,11 @@ while True:
     if len(proclist)!=0:
         check_status()
     else:
+        print TurnOnSelfConsist,loop_proc
+        if TurnOnSelfConsist and len(loop_proc)!=0:
+            loop_proc[0].kill()
+            logging.info("Loop daemon is killed.")
+            print "Loop daemon is killed."
         break
 
 logging.info("Jobs manage daemon is ended...")
