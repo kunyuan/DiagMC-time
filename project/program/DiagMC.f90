@@ -138,9 +138,7 @@ SUBROUTINE self_consistent
     call calculate_Chi
     call transfer_Chi_r(-1)
     call transfer_Chi_t(-1)
-
     call transfer_Sigma_t(-1)
-
     call output_Quantities
 
     call write_GWGamma
@@ -152,22 +150,17 @@ SUBROUTINE self_consistent
 
     call LogFile%QuickLog("Reading MC data...")
     call read_monte_carlo_data
-    call output_GamMC
 
     call LogFile%QuickLog("Reading Done!...")
 
     !!-------- update the Gamma matrix with MC data -------
     call Gam_mc2matrix_mc
 
-    !call calculate_Gam1
-    !call output_Gam1
-
     flag = self_consistent_GW(1.d-8)
 
     call calculate_Chi
     call transfer_Chi_r(-1)
     call transfer_Chi_t(-1)
-
     call transfer_Sigma_t(-1)
     call output_Quantities
 
@@ -240,10 +233,7 @@ SUBROUTINE monte_carlo
 
   call LogFile%QuickLog("Initializing monte carlo done!")
 
-  !do i = 1, MCOrder+1
-    !QuanName(i)="(total conf)"
-    !Norm(i) = 1.d0
-  !enddo
+  QuanName(1) = "(1st-Gamma(0,0))"
 
   if(InpMC==0) then
 
