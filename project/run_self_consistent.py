@@ -7,12 +7,12 @@ import logging
 def run_loop():
     homedir=os.getcwd()
     logging.basicConfig(filename=homedir+"/project.log",level=logging.INFO,format="\n[loop.daemon][%(asctime)s][%(levelname)s]:\n%(message)s",datefmt='%y/%m/%d %H:%M:%S')
-    execf="./gamma3.exe"
+    execf=homedir+"/gamma3.exe"
     interval=300
-    title = "0.50_2"
+    #title = "0.50_2"
     #time.sleep(300)
     logging.info("Self Consistent Loop daemon started!")
-    logging.info(title+" is the target!")
+    #logging.info(title+" is the target!")
     i=0
     flag = "0"
     print "loop daemon started..."
@@ -20,7 +20,7 @@ def run_loop():
         i=i+1
         logging.info("Loop "+str(i)+" running...")
         try:
-            subprocess.check_output("./collapse_data.exe")
+            subprocess.check_output(homedir+"/tools/collapse_data.exe")
         except subprocess.CalledProcessError as e:
             ret=e.returncode
             logging.error('collapse_data.exe return a non-zero value '+str(ret)+', something happened!')
@@ -28,7 +28,7 @@ def run_loop():
             logging.error('Collapse_data failed!')
         else:
             try:
-                os.system(execf+" <./infile/_in_0 >./outfile/out_0.txt")
+                os.system(execf+" <"+homedir+"/infile/_in_0 >"+homedir+"/outfile/out_0.txt")
                 flag = open("stop.inp", "r").readline().lstrip().rstrip()
                 #logging.info("flag: "+flag)
             except:

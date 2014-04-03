@@ -70,6 +70,23 @@ contains
   end function
 end module
 
+! module read_write_module
+!   use string_basic
+!   implicit none
+!   interface write_array
+!     module procedure write_array_int!,write_array_double,write_array_complex
+!   end interface
+
+! contains
+
+! subroutine write_array(array, length, title, info)
+!   implicit none
+!   argument type, intent(inout) :: 
+  
+! end subroutine write_dat
+
+! end module
+
 module logging_module
   use string_basic
   implicit none
