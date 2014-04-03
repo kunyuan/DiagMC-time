@@ -3,8 +3,8 @@ echo "Compiling..."
 compilor="ifort"
 sourcecode1="./program/DiagMC.f90"
 target1="./gamma3.exe"
-sourcecode2="./collapse_data.f90"
-target2="./collapse_data.exe"
+sourcecode2="./tools/collapse_data.f90"
+target2="./tools/collapse_data.exe"
 
 if [ -n "$1" ]
 then

@@ -1748,6 +1748,10 @@ SUBROUTINE move_measuring_index
   !------- step4 : weight calculation -------------------
   tau1 = TVertex(3, iGam)-TVertex(2, iGam)
   tau2 = TVertex(1, iGam)-TVertex(3, iGam)
+!   if(abs(tau1)>1e-8 .or. abs(tau2)>1e-8) then
+!     print *," I am a Bug1!"
+!     stop
+!   endif
   WiGam = weight_vertex(statiGam, IsDeltaVertex(iGam), GRVertex(:, iGam)-WRVertex(:, iGam), &
     & tau1, tau2, TypeVertex(iGam))
 
@@ -1763,6 +1767,10 @@ SUBROUTINE move_measuring_index
 
   tau1 = TVertex(3, jGam)-TVertex(2, jGam)
   tau2 = TVertex(1, jGam)-TVertex(3, jGam)
+!   if(abs(tau1)>1e-8 .or. abs(tau2)>1e-8) then
+!     print *," I am a Bug2!"
+!     stop
+!   endif
   WjGam = weight_vertex(statjGam, IsDeltaVertex(jGam), GRVertex(:, jGam)-WRVertex(:, jGam),  &
     & tau1, tau2, TypeVertex(jGam))
 
@@ -1781,6 +1789,12 @@ SUBROUTINE move_measuring_index
     & *WeightVertex(jGam) *WeightLn(jW) *WeightLn(jGin) *WeightLn(jGout)
 
   if(abs(Anew)==0.d0)   return
+
+!   if(iGin==iGout .or. jGin==jGout) then
+!     call LogFile%QuickLog("a buble diagram!"+str(imc))
+!     call print_config
+!     stop
+!   endif
 
   if(iGin==jGout) then
     Anew = Anew/WjGout
@@ -2254,8 +2268,9 @@ COMPLEX*16 FUNCTION weight_wline(stat, isdelta, dr0, tau, typ)
   return
 END FUNCTION weight_wline
 
-!-------- the weight of a vertex -------------------------
-!dx = xg-xw;  dy = yg-yw; dtau1 = tau3-tau2; dtau2 = tau1-tau3
+!-------- the weight of a vertex ------------------------
+ !dx = xg-xw;  dy = yg-yw; dtau1 = tau3-tau2; dtau2 = tau1-tau3
+
 COMPLEX*16 FUNCTION weight_vertex(stat, isdelta, dr0, dtau1, dtau2, typ)
   implicit none
   integer :: stat, dr(2), t1, t2, typ, isdelta
