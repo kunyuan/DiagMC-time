@@ -2258,8 +2258,9 @@ COMPLEX*16 FUNCTION weight_wline(stat, isdelta, dr0, tau, typ)
   return
 END FUNCTION weight_wline
 
-!-------- the weight of a vertex -------------------------
-!dx = xg-xw;  dy = yg-yw; dtau1 = tau3-tau2; dtau2 = tau1-tau3
+!-------- the weight of a vertex ------------------------
+ !dx = xg-xw;  dy = yg-yw; dtau1 = tau3-tau2; dtau2 = tau1-tau3
+
 COMPLEX*16 FUNCTION weight_vertex(stat, isdelta, dr0, dtau1, dtau2, typ)
   implicit none
   integer :: stat, dr(2), t1, t2, typ, isdelta
