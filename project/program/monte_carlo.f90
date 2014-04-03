@@ -2449,7 +2449,7 @@ SUBROUTINE measure
     ImGamSqMC(Order, ityp, dx, dy, dt1, dt2 ) = ImGamSqMC(Order, ityp, dx, dy, dt1, dt2) &
       & + (dimag(Phase)/factorM)**2.d0
 
-    if(Order==0) then
+    if(Order==0 .and. IsDeltaVertex(NeighLn(3-dir, MeaW))==1) then
       factorM = CoefOfWeight(Order)
       GamNorm = GamNorm + Phase/factorM
     endif
