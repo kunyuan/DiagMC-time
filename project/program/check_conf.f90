@@ -542,7 +542,7 @@ SUBROUTINE check_weight
   !weight = weight*(1.d0/Beta)**Order *SignFermiLoop
   weight = weight *(-1.d0)**Order*SignFermiLoop
 
-  if(real(Phase*WeightCurrent-weight)>1.d-8.or.dimag(Phase*WeightCurrent-weight)>1.d-8) then
+  if(abs(real(Phase*WeightCurrent-weight))>1.d-8.or.abs(dimag(Phase*WeightCurrent-weight))>1.d-8) then
     call LogFile%WriteStamp('e')
     call LogFile%WriteLine("Oops, check_weight found a bug!")
     call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+",update number"+str(iupdate))

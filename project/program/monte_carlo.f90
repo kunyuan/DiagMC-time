@@ -106,16 +106,17 @@ SUBROUTINE def_spin
   !-- calculate the type of W according to the neighbor vertexes --
   !---- TypeGam2W(Type(Gamleft), Type(Gamright)) = Type(W)
   TypeGam2W(1,1) = 1;      TypeGam2W(1,4) = 1
-  TypeGam2W(4,1) = 1;      TypeGam2W(4,4) = 1
+  TypeGam2W(1,2) = 3;      TypeGam2W(1,3) = 3
 
-  TypeGam2W(2,2) = 2;      TypeGam2W(2,3) = 2
+  TypeGam2W(3,1) = 4;      TypeGam2W(3,4) = 4
   TypeGam2W(3,2) = 2;      TypeGam2W(3,3) = 2
 
-  TypeGam2W(1,2) = 3;      TypeGam2W(1,3) = 3
+  TypeGam2W(2,1) = 4;      TypeGam2W(2,4) = 4
+  TypeGam2W(2,2) = 2;      TypeGam2W(2,3) = 2
+
+  TypeGam2W(4,1) = 1;      TypeGam2W(4,4) = 1
   TypeGam2W(4,2) = 3;      TypeGam2W(4,3) = 3
 
-  TypeGam2W(2,1) = 4;      TypeGam2W(2,4) = 4
-  TypeGam2W(3,1) = 4;      TypeGam2W(3,4) = 4
 
   TypeGam2W(5,6) = 5;      TypeGam2W(6,5) = 6
 
@@ -228,6 +229,10 @@ SUBROUTINE markov(MaxSamp)
     endif
 
     imc = imc + 1.0
+    !if(imc>100000000.d0 .and. imc<=110000000.d0) then
+      !call print_config
+      !call check_config
+    !endif
 
     if(mod(imc,Nstep*1.d0)==0 .and. .not. IsToss) call measure
 
@@ -847,12 +852,12 @@ SUBROUTINE move_worm_along_gline
     & WRVertex(:, jGam)-WRVertex(:, Masha), TVertex(3, jGam)-TVertex(3, Masha))
 
   tau1 = TVertex(3, iGam)-TVertex(2, iGam)
-  tau2 = TVertex(1, iGam)-TVertex(1, iGam)
+  tau2 = TVertex(1, iGam)-TVertex(3, iGam)
   WiGam = weight_vertex(statiGam, IsDeltaVertex(iGam),GRVertex(:, iGam)-WRVertex(:, iGam),   &
     & tau1, tau2, typiGam)
 
   tau1 = TVertex(3, jGam)-TVertex(2, jGam)
-  tau2 = TVertex(1, jGam)-TVertex(1, jGam)
+  tau2 = TVertex(1, jGam)-TVertex(3, jGam)
   WjGam = weight_vertex(statjGam, IsDeltaVertex(jGam),GRVertex(:, jGam)-WRVertex(:, jGam),   &
     & tau1, tau2, typjGam)
 
@@ -1640,16 +1645,9 @@ SUBROUTINE change_Gamma_type
   endif
 
   if(dir==1) then
-    typW = 5-TypeLn(iWLn)
+    typW = TypeGam2W(typGam, TypeVertex(jGam))
   else
-    if(TypeLn(iWLn)<=2) then
-      typW = TypeLn(iWLn)+2
-    else if(TypeLn(iWLn)<=4) then
-      typW = TypeLn(iWLn)-2
-    else
-      call LogFile%QuickLog("change Gamma type error!"//trim(str(iWLn)), 'e')
-      stop
-    endif
+    typW = TypeGam2W(TypeVertex(jGam), typGam)
   endif
 
   !------- step4 : weight calculation -------------------
@@ -1669,13 +1667,6 @@ SUBROUTINE change_Gamma_type
 
   !------- step5 : accept the update --------------------
   ProbProp(Order, 14) = ProbProp(Order, 14) + 1
-
-  !call LogFile%WriteStamp('d')
-  !call LogFile%WriteLine('change Gamma type: vertex '+str(iGam)+', W '+str(iWLn))
-  !call LogFile%WriteLine('original type: vertex '+str(TypeVertex(iGam))+', W '+str(TypeLn(iWLn)))
-  !call LogFile%WriteLine('new type: vertex '+str(typGam)+', W '+str(typW))
-  !call LogFile%WriteLine('new weight: vertex '+str(WGam)+', W '+str(WW))
-  !call LogFile%WriteLine(str(weight_Gam(typGam, GRVertex(:,iGam)-WRVertex(:,iGam), 0, 0)))
 
   if(rn()<=Pacc) then
 
@@ -1714,18 +1705,18 @@ SUBROUTINE move_measuring_index
   if(IsWormPresent .eqv. .true.)    return
 
   !------- step2 : propose a new config -----------------
+  jGam  = MeasureGam
+  jGin  = NeighVertex(1, jGam);      jGout = NeighVertex(2, jGam)
+  jW    = NeighVertex(3, jGam)
+
   iGam = generate_vertex()
+  if(iGam==MeasureGam)         return
   if(IsDeltaVertex(iGam)/=1)   return
 
   iGin  = NeighVertex(1, iGam);      iGout = NeighVertex(2, iGam)
   iW    = NeighVertex(3, iGam)
-  if(IsDeltaLn(iW)/=0)         return
 
-  jGam  = MeasureGam
-  jGin  = NeighVertex(1, jGam);      jGout = NeighVertex(2, jGam)
-  jW    = NeighVertex(3, jGam)
-  
-  if(iGam==jGam)            return
+  if(IsDeltaLn(iW)/=0)         return
 
   !----- the status for the new config ------------------
   statiGam  = add_mea_stat(StatusVertex(iGam))
@@ -1741,6 +1732,7 @@ SUBROUTINE move_measuring_index
 
   statiGin    = 1
   statiGout   = 1
+
   if(jGout/=iGin) then
     statjGout   = 0
   else
@@ -1995,7 +1987,7 @@ SUBROUTINE change_wline_isdelta
 
   !------- step2 : propose a new config -----------------
   iWLn = generate_wline()
-  if(StatusLn(iWLn)==1 .or. StatusLn(iWLn)==3)  return
+  if(StatusLn(iWLn)==1)  return
 
   iGam = NeighLn(1, iWLn)
   jGam = NeighLn(2, iWLn)
@@ -2003,6 +1995,7 @@ SUBROUTINE change_wline_isdelta
   jGout = NeighVertex(2, jGam)
 
   t3iGam = TVertex(3, iGam)
+
   t1jGam = TVertex(1, jGam)
   t2jGam = TVertex(2, jGam)
   t3jGam = TVertex(3, jGam)
@@ -2092,11 +2085,15 @@ SUBROUTINE change_gamma_isdelta
   complex*16 :: WiGin, WiGout, WiGam, Anew, Aold, sgn
 
   !------- step1 : check if worm is present -------------
-  if(IsWormPresent .eqv. .true.)    return
+  if(IsWormPresent .eqv. .true.)   return
 
   !------- step2 : propose a new config -----------------
   iGam = generate_vertex()
   if(iGam==MeasureGam)  return
+   
+  !backforth = Floor(rn()*2.d0)
+  !if(backforth/=IsDeltaVertex(iGam))  return
+  backforth = IsDeltaVertex(iGam)
 
   iGin = NeighVertex(1, iGam)
   iGout = NeighVertex(2, iGam)
@@ -2105,7 +2102,6 @@ SUBROUTINE change_gamma_isdelta
   t2iGam = TVertex(2, iGam)
   t3iGam = TVertex(3, iGam)
 
-  backforth = IsDeltaVertex(iGam)
 
   if(backforth==0) then
     t1iGam = t3iGam
@@ -2462,7 +2458,7 @@ SUBROUTINE measure
     ImGamSqMC(Order, ityp, dx, dy, dt1, dt2 ) = ImGamSqMC(Order, ityp, dx, dy, dt1, dt2) &
       & + (dimag(Phase)/factorM)**2.d0
 
-    if(Order==0) then
+    if(Order==0 .and. IsDeltaVertex(NeighLn(3-dir, MeaW))==1) then
       factorM = CoefOfWeight(Order)
       GamNorm = GamNorm + Phase/factorM
     endif
