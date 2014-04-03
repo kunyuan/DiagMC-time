@@ -24,5 +24,3 @@ else
   echo "Done!"
 fi
 
-print "~/"
-
