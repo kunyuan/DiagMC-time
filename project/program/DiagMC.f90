@@ -10,6 +10,8 @@ PROGRAM MAIN
   print *, 'L(1), L(2), Ntoss, Nsamp, IsForever, NStep, Jcp, beta, MCOrder, Seed, ISub, InpMC, ID, title'
   read  *,  L(1), L(2), Ntoss, Nsamp, IsForever, NStep, Jcp, beta, MCOrder, Seed, ISub, InpMC, ID, title
 
+  isbold = .true.
+
   logL(:)=dlog(L(:)*1.d0)
   SpatialWeight(:,:)=0.d0
 
@@ -51,8 +53,11 @@ PROGRAM MAIN
   !================ irreducibility check ===============================
   CheckG = .true.
   CheckW = .true.
-  !CheckGam = .false.
-  CheckGam = .true.
+  if(isbold) then
+    CheckGam = .true.
+  else
+    CheckGam = .false.
+  endif
 
   !================ updates frequency   ================================
   Pupdate( :)  = 0.d0
