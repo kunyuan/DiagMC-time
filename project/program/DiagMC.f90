@@ -66,7 +66,7 @@ PROGRAM MAIN
   Pupdate(12)  = 1.d0      ! change_gline_space
   Pupdate(13)  = 1.d0      ! change_wline_space
   Pupdate(14)  = 1.d0      ! change_Gamma_type
-  !Pupdate(15)  = 1.d0      ! move_measuring_index
+  Pupdate(15)  = 1.d0      ! move_measuring_index
   Pupdate(16)  = 1.d0      ! change_Gamma_time
   Pupdate(17)  = 1.d0      ! change_wline_isdelta
   Pupdate(18)  = 1.d0      ! change_gamma_isdelta
@@ -157,16 +157,16 @@ SUBROUTINE self_consistent
     !!-------- update the Gamma matrix with MC data -------
     call Gam_mc2matrix_mc
 
-    !flag = self_consistent_GW(1.d-8)
+    flag = self_consistent_GW(1.d-8)
 
-    !call calculate_Chi
-    !call transfer_Chi_r(-1)
-    !call transfer_Chi_t(-1)
-    !call transfer_Sigma_t(-1)
+    call calculate_Chi
+    call transfer_Chi_r(-1)
+    call transfer_Chi_t(-1)
+    call transfer_Sigma_t(-1)
     call output_Quantities
 
     call write_GWGamma
-    !call update_flag
+    call update_flag
   endif
   return
 END SUBROUTINE self_consistent
@@ -229,7 +229,6 @@ SUBROUTINE monte_carlo
 
   call read_GWGamma
   call calculate_GamNormWeight  
-  call calculate_Gam1
 
   call initialize_markov
 

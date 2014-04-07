@@ -1056,24 +1056,26 @@ SUBROUTINE output_Gam
   integer :: ityp, it1, it2
   complex*16 :: gam1
 
-  !open(104, status='replace', file=trim(title_mc)//"_Gam_matrix.dat")
+  open(104, status='replace', file=trim(title_mc)//"_Gam_matrix.dat")
   open(105, status='replace', file=trim(title_mc)//"_Gam.dat")
 
-  !write(104, *) "Order 1, dx=0, dy=0, real part"
-  !do it2 = 0, MxT-1
-    !do it1 = 0, MxT-1
-      !write(104, '(f14.8)', advance='no')  real(Gam(1, 0, 0, it1, it2))
-    !enddo
-    !write(104, *)
-  !enddo
+  write(104, *) "Order 1, dx=0, dy=0, real part"
+  write(104, *) "2:  ", MxT, " * ",MxT
+  do it2 = 0, MxT-1
+    do it1 = 0, MxT-1
+      write(104, '(f14.8)', advance='no')  real(Gam(1, 0, 0, it1, it2))
+    enddo
+    write(104, *)
+  enddo
 
-  !write(104, *) "Order 1, dx=0, dy=0, imag part"
-  !do it2 = 0, MxT-1
-    !do it1 = 0, MxT-1
-      !write(104, '(f14.8)', advance='no')  dimag(Gam(1,0, 0, it1, it2))
-    !enddo
-    !write(104, *)
-  !enddo
+  write(104, *) "Order 1, dx=0, dy=0, imag part"
+  write(104, *) "2:  ", MxT, " * ",MxT
+  do it2 = 0, MxT-1
+    do it1 = 0, MxT-1
+      write(104, '(f14.8)', advance='no')  dimag(Gam(1,0, 0, it1, it2))
+    enddo
+    write(104, *)
+  enddo
 
   write(105, *) "Order", 1, "dx = 0, dy = 0"
   do it1 = 0, MxT-1
@@ -1090,7 +1092,7 @@ SUBROUTINE output_Gam
   enddo
   write(105, *)
 
-  !close(104)
+  close(104)
   close(105)
 END SUBROUTINE output_Gam
 
