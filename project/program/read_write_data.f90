@@ -577,6 +577,7 @@ SUBROUTINE write_monte_carlo_data
 
   write(104) Beta, MCOrder, L(1), L(2)
   write(104) imc, GamNorm, GamNormWeight
+  write(104) Z_normal, Quan(1), Norm(1), Error(1)
   do it2 = 0, MxT-1
     do it1 = 0, MxT-1
       do iy = 0, L(2)-1
@@ -613,6 +614,7 @@ SUBROUTINE read_monte_carlo_data
   open(105, status="old", file=trim(title)//"_monte_carlo_data.bin.dat",form="binary")
   read(105,iostat=ios) Beta, MCOrder, L(1), L(2)
   read(105,iostat=ios) imc, GamNorm, GamNormWeight
+  read(105,iostat=ios) Z_normal, Quan(1), Norm(1), Error(1)
 
   do it2 = 0, MxT-1
     do it1 = 0, MxT-1
