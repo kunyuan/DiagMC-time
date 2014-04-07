@@ -13,13 +13,13 @@ SUBROUTINE calculate_GamNormWeight
   complex*16 :: Gam0
 
   GamNormWeight = (0.d0, 0.d0)
-
   !--------- bare Gamma --------------------
   do ityp = 1, 6
     Gam0 = weight_meas_Gam(ityp, (/0, 0/))
     Gam0 = Gam0 *weight_Gam0(ityp, (/0, 0/))
     GamNormWeight = GamNormWeight + Gam0*(real(MxT)/Beta)**2.d0
   enddo
+
   return
 END SUBROUTINE calculate_GamNormWeight
 
@@ -33,8 +33,26 @@ SUBROUTINE calculate_Gam1
   integer :: tg(5), tgam1(5), tgam2(5), tgam3(5), tw(5)
   complex*16 :: Gin, Gout, iW, Gam1, Gam2, Gam3
   complex*16 :: weight
+  complex*16 :: FGam(0:MxT-1, 0:MxT-1)
   double precision :: ratio
 
+  !do t1 = 0, MxT-1
+    !G(:, t1) = cdexp(-(0.d0, 1.d0)*pi/(2.d0*MxT)*dble(t1))
+  !enddo
+
+  !W = (0.d0, 0.d0)
+  !W(:,0,0,:) = (1.d0, 0.d0)
+
+  !Gam = (0.d0, 0.d0)
+  !do t1 = 0, MxT-1
+    !do t2 = 0, MxT-1
+      !FGam(t1, t2) = dcmplx((t1*Beta/MxT)**2.d0+(t2*Beta/MxT)**2.d0+1.d0, 0.d0)
+    !enddo
+  !enddo
+  !Gam(1,0,0,:,:) = FGam(:, :)
+  !Gam(2,0,0,:,:) = FGam(:, :)
+  !Gam(5,0,0,:,:) = FGam(:, :)
+  !Gam(6,0,0,:,:) = FGam(:, :)
   
   !================== bold gamma ===============================
   tg(1:4)  = 1;   tgam2(1:4) = 1
@@ -95,27 +113,28 @@ SUBROUTINE calculate_Gam1
   call output_Gam1
 
   !================== bare Gamma ===============================
-  GamOrder1(:,:,:) = (0.d0, 0.d0)
-  do t2 = 0, MxT-1
-    do t1 = 0, MxT-1
+  !GamOrder1(:,:,:) = (0.d0, 0.d0)
+  !do t2 = 0, MxT-1
+    !do t1 = 0, MxT-1
 
-        Gin = weight_G(1, t1)
-        Gout = weight_G(1, t2)
-        Gam1 = weight_Gam0(1, (/0, 0/))
-        Gam2 = weight_Gam0(1, (/0, 0/)) 
-        Gam3 = weight_Gam0(1, (/0, 0/)) 
-        if(t1+t2<MxT) then
-          iW = weight_W(1, (/0, 0/), t1+t2)
-        else 
-          iW = weight_W(1, (/0, 0/), t1+t2-MxT)
-        endif
+        !Gin = weight_G(1, t1)
+        !Gout = weight_G(1, t2)
+        !Gam1 = weight_Gam0(1, (/0, 0/))
+        !Gam2 = weight_Gam0(1, (/0, 0/)) 
+        !Gam3 = weight_Gam0(1, (/0, 0/)) 
+        !if(t1+t2<MxT) then
+          !iW = weight_W(1, (/0, 0/), t1+t2)
+        !else 
+          !iW = weight_W(1, (/0, 0/), t1+t2-MxT)
+        !endif
 
-        weight = Gin *Gout *iW *Gam1 *Gam2 *Gam3
+        !weight = Gin *Gout *iW *Gam1 *Gam2 *Gam3
 
-        GamOrder1(1,t1,t2) = -1.d0* weight
-    enddo
-  enddo
-  call output_Gam1
+        !GamOrder1(1,t1,t2) = -1.d0* weight
+    !enddo
+  !enddo
+
+  !call output_Gam1
 
 END SUBROUTINE calculate_Gam1
 !====================================================================

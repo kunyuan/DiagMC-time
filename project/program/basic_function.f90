@@ -1457,7 +1457,7 @@ SUBROUTINE transfer_Gam0_t(BackForth)
       do it2 = 0, MxT-1
         do it1 = 0, MxT-1
           Gam0PF(:,:,it1,it2) = Gam0PF(:,:,it1,it2)* cdexp(dcmplx(0.d0,Pi*real(it1)/real(MxT)))
-          Gam0PF(:,:,it1,it2) = Gam0PF(:,:,it1,it2)* cdexp(dcmplx(0.d0,Pi*real(it1)/real(MxT)))
+          Gam0PF(:,:,it1,it2) = Gam0PF(:,:,it1,it2)* cdexp(dcmplx(0.d0,Pi*real(it2)/real(MxT)))
         enddo
       enddo
     endif
@@ -1567,7 +1567,7 @@ SUBROUTINE transfer_Gam_t(BackForth)
       do it2 = 0, MxT-1
         do it1 = 0, MxT-1
           Gam(:,:,:,it1,it2) = Gam(:,:,:,it1,it2)* cdexp(dcmplx(0.d0,Pi*real(it1)/real(MxT)))
-          Gam(:,:,:,it1,it2) = Gam(:,:,:,it1,it2)* cdexp(dcmplx(0.d0,Pi*real(it1)/real(MxT)))
+          Gam(:,:,:,it1,it2) = Gam(:,:,:,it1,it2)* cdexp(dcmplx(0.d0,Pi*real(it2)/real(MxT)))
         enddo
       enddo
     endif
@@ -2116,6 +2116,8 @@ SUBROUTINE first_order_diagram
 
   !IsDeltaVertex: 1: delta function(Gam); 0: normal function(Gam)
   IsDeltaVertex(1:4) = 1
+  !IsDeltaVertex(1:4) = 0
+  !IsDeltaVertex(1) = 1
 
   ! the site variables of Gamma 1, 2, 3 and 4
   GRVertex(1, 1:4) = 0;            GRVertex(2, 1:4) = 0
@@ -2147,10 +2149,10 @@ SUBROUTINE first_order_diagram
   WeightLn(3) = weight_wline(StatusLn(3),IsDeltaLn(3),dr0,TVertex(3,NeighLn(2,3))-TVertex(3,NeighLn(1,3)),TypeLn(3))
   WeightLn(6) = weight_wline(StatusLn(6),IsDeltaLn(6),dr0,TVertex(3,NeighLn(2,6))-TVertex(3,NeighLn(1,6)),TypeLn(6))
 
-  WeightVertex(1) = weight_vertex(StatusVertex(1), 1, dr0, 0.d0, 0.d0, TypeVertex(1))
-  WeightVertex(2) = weight_vertex(StatusVertex(2), 1, dr0, 0.d0, 0.d0, TypeVertex(2))
-  WeightVertex(3) = weight_vertex(StatusVertex(3), 1, dr0, 0.d0, 0.d0, TypeVertex(3))
-  WeightVertex(4) = weight_vertex(StatusVertex(4), 1, dr0, 0.d0, 0.d0, TypeVertex(4))
+  WeightVertex(1) = weight_vertex(StatusVertex(1), IsDeltaVertex(1), dr0, 0.d0, 0.d0, TypeVertex(1))
+  WeightVertex(2) = weight_vertex(StatusVertex(2), IsDeltaVertex(2), dr0, 0.d0, 0.d0, TypeVertex(2))
+  WeightVertex(3) = weight_vertex(StatusVertex(3), IsDeltaVertex(3), dr0, 0.d0, 0.d0, TypeVertex(3))
+  WeightVertex(4) = weight_vertex(StatusVertex(4), IsDeltaVertex(4), dr0, 0.d0, 0.d0, TypeVertex(4))
 
 
   !ratio = (1.d0/Beta)**Order *SignFermiLoop
