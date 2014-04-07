@@ -9,12 +9,12 @@ Type: 2
 Lx:   4
 Ly:   4
 Jcp:   1.0
-Beta:  2.0
+Beta:  2
 Order:  1
 Reweight: 1
 Worm/Norm: 0.5 
 ReadFile: 2.00_1_coll
 
-Duplicate:  4
+Duplicate:  2
 IsCluster:  .false.
 %%%%%%%%%%%%%%%%%%%%%%%%%%
