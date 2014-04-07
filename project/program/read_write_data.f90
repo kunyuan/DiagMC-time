@@ -570,6 +570,13 @@ END SUBROUTINE write_GWGamma
 SUBROUTINE write_monte_carlo_data
   implicit none
   integer :: iorder, itopo, ix, iy, ityp, it1, it2
+  double precision :: rgam2, rerr
+  complex*16 :: gam
+
+  gam = GamMC(1, 1, 0, 0, 0, 0)/Z_normal
+  rgam2 = ReGamSqMC(1, 1, 0, 0, 0, 0)/Z_normal
+  rerr = sqrt(abs(rgam2)-(real(gam))**2.d0)/sqrt(Z_normal-1)
+  ratioerr = Error(1)/rerr
 
   !=========== write into files =========================================
   open(104, status="replace", &
@@ -577,7 +584,7 @@ SUBROUTINE write_monte_carlo_data
 
   write(104) Beta, MCOrder, L(1), L(2)
   write(104) imc, GamNorm, GamNormWeight
-  write(104) Z_normal, Quan(1), Norm(1), Error(1)
+  write(104) Z_normal, ratioerr
   do it2 = 0, MxT-1
     do it1 = 0, MxT-1
       do iy = 0, L(2)-1
@@ -614,7 +621,7 @@ SUBROUTINE read_monte_carlo_data
   open(105, status="old", file=trim(title)//"_monte_carlo_data.bin.dat",form="binary")
   read(105,iostat=ios) Beta, MCOrder, L(1), L(2)
   read(105,iostat=ios) imc, GamNorm, GamNormWeight
-  read(105,iostat=ios) Z_normal, Quan(1), Norm(1), Error(1)
+  read(105,iostat=ios) Z_normal, ratioerr
 
   do it2 = 0, MxT-1
     do it1 = 0, MxT-1
@@ -917,7 +924,7 @@ SUBROUTINE output_GamMC
   implicit none
   integer :: i, j, iorder, it1, it2
   double precision :: rerr, ierr, rpercenterr, ipercenterr
-  complex*16 :: gam, gamn, normal, norm_err
+  complex*16 :: gam, gamn, normal 
   double precision :: rgam2, igam2
 
   !open(34, access="append", file=trim(title_mc)//"_Gam_matrix_MC.dat")
@@ -929,7 +936,7 @@ SUBROUTINE output_GamMC
   gam = GamMC(1, 1, 0, 0, 0, 0)/Z_normal
   rgam2 = ReGamSqMC(1, 1, 0, 0, 0, 0)/Z_normal
   rerr = sqrt(abs(rgam2)-(real(gam))**2.d0)/sqrt(Z_normal-1)
-  norm_err = Error(1)/rerr
+  ratioerr = Error(1)/rerr
 
   !norm = GamOrder1(1, 0, 0)*Z_normal/GamMC(1,1,0,0,0,0)
 
@@ -939,7 +946,7 @@ SUBROUTINE output_GamMC
 
   write(35, *) "============================================"
   write(35, *) "Beta", Beta, "L(1), L(2)", L(1), L(2), "Order", MCOrder, "Seed",Seed
-  write(35, *) imc, Z_normal, GamNormWeight, GamNorm, normal, norm_err
+  write(35, *) imc, Z_normal, GamNormWeight, GamNorm, normal, ratioerr
 
   !write(36, *) "============================================"
   !write(36, *) "Beta", Beta, "L(1), L(2)", L(1), L(2), "Order", MCOrder, "Seed",Seed
@@ -976,7 +983,7 @@ SUBROUTINE output_GamMC
 
       rgam2 = ReGamSqMC(iorder,1, 0, 0, it1, it2)/Z_normal
       rerr = sqrt(abs(rgam2)-(real(gam))**2.d0)/sqrt(Z_normal-1)
-      rerr = rerr*norm_err
+      rerr = rerr* ratioerr
 
       if(abs(real(gam))<1.d-30) then
         rpercenterr = 0.d0
@@ -986,7 +993,7 @@ SUBROUTINE output_GamMC
 
       igam2 = ImGamSqMC(iorder,1, 0, 0, it1, it2)/Z_normal
       ierr = sqrt(abs(igam2)-(dimag(gam))**2.d0)/sqrt(Z_normal-1)
-      ierr = ierr*norm_err
+      ierr = ierr* ratioerr
 
       if(abs(dimag(gam))<1.d-30) then
         ipercenterr = 0.d0
