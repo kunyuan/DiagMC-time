@@ -866,6 +866,7 @@ SUBROUTINE output_Quantities
   open(16, access="append", file=trim(title_loop)//"_Sigma.dat")
   open(17, access="append", file=trim(title_loop)//"_Chi_sum.dat")
   open(18, access="append", file=trim(title_loop)//"_Gam.dat")
+  open(19, access="append", file=trim(title_loop)//"_G.dat")
 
   do dy = 0, dL(2)
     do dx = 0, dL(1)
@@ -892,17 +893,19 @@ SUBROUTINE output_Quantities
 
   write(18, *) "============================================"
   write(18, *) "Beta", Beta, "L(1), L(2)", L(1), L(2), "Order", MCOrder
-  write(18, *) "type=1"
   do it = 0, MxT-1
     write(18, '(i5,2x,f20.14,"  +-  ",f20.14)') it, real(Gam(1,0,0,it,it)),dimag(Gam(1,0,0,it,it))
   enddo
   write(18, *)
-
-  write(18, *) "type=3"
-  do it = 0, MxT-1
-    write(18, '(i5,2x,f20.14,"  +-  ",f20.14)') it, real(Gam(3,0,0,it,it)),dimag(Gam(3,0,0,it,it))
-  enddo
   close(18)
+
+  write(19, *) "============================================"
+  write(19, *) "Beta", Beta, "L(1), L(2)", L(1), L(2), "Order", MCOrder
+  do it = 0, MxT-1
+    write(19, '(i5,2x,f20.14,"  +-  ",f20.14)') it, real(G(1,it)),dimag(G(1,it))
+  enddo
+  write(19, *)
+  close(19)
 
 END SUBROUTINE output_Quantities
 
@@ -1091,6 +1094,16 @@ SUBROUTINE output_Gam
   close(105)
 END SUBROUTINE output_Gam
 
+!SUBROUTINE output_test
+  !implicit none
+  !integer :: iorder
+  !open(104, status='replace', file=trim(title_mc)//"_Gam_Order_test.dat")
+  !do iorder = 1, MCOrder
+    !write(104, *) iorder, Quan(iorder+2)/Quan(iorder+1), Error(iorder+2)/Quan(iorder+1)
+  !enddo
+  !write(104, *)
+  !close(104)
+!END SUBROUTINE
 !!================================================================
 !!================================================================
 !!================================================================

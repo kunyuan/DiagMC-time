@@ -51,6 +51,7 @@ PROGRAM MAIN
   !================ irreducibility check ===============================
   CheckG = .true.
   CheckW = .true.
+  !CheckGam = .false.
   CheckGam = .true.
 
   !================ updates frequency   ================================
@@ -61,13 +62,13 @@ PROGRAM MAIN
   Pupdate( 6)  = 1.d0      ! move_worm_along_gline
   Pupdate( 7)  = 1.d0      ! add_interaction
   Pupdate( 8)  = 1.d0      ! remove_interaction
-  !Pupdate(11)  = 1.d0      ! reconnect
-  !Pupdate(12)  = 1.d0      ! change_gline_space
-  !Pupdate(13)  = 1.d0      ! change_wline_space
+  Pupdate(11)  = 1.d0      ! reconnect
+  Pupdate(12)  = 1.d0      ! change_gline_space
+  Pupdate(13)  = 1.d0      ! change_wline_space
   Pupdate(14)  = 1.d0      ! change_Gamma_type
-  Pupdate(15)  = 1.d0      ! move_measuring_index
-  !Pupdate(16)  = 1.d0      ! change_Gamma_time
-  !Pupdate(17)  = 1.d0      ! change_wline_isdelta
+  !Pupdate(15)  = 1.d0      ! move_measuring_index
+  Pupdate(16)  = 1.d0      ! change_Gamma_time
+  Pupdate(17)  = 1.d0      ! change_wline_isdelta
   Pupdate(18)  = 1.d0      ! change_gamma_isdelta
 
   !===============  Test variables ==================================
@@ -228,10 +229,7 @@ SUBROUTINE monte_carlo
 
   call read_GWGamma
   call calculate_GamNormWeight  
-
-  !call output_Quantities
-  !call calculate_Gam1
-  !stop
+  call calculate_Gam1
 
   call initialize_markov
 
