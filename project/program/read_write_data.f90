@@ -156,7 +156,7 @@ SUBROUTINE DRAW
     ENDIF
 
     write(imcstr,'(i10)') int(imc)
-    open(11, file='graph/graph_'//trim(adjustl(imcstr))//'.eps')
+    open(11, file='graph/graph_'//trim(adjustl(title2))//'_'//trim(adjustl(imcstr))//'.eps')
     write(11,*) '%!'
     write(11,*) '%BoundingBox: 0 0 ', x1, y1
     write(11,*) '%%EndComments'
@@ -363,6 +363,7 @@ SUBROUTINE DRAW
     write(11,*) '0 0 0 setrgbcolor'
     write(11,"(f6.1,x,f6.1,x,' M (Gamma info) C')") 520.0,350.0
     ini=350.0-seg
+    ! write Gamma info
     do i=1,NVertex
       Vertex1=VertexKey2Value(i)
       x1=scx*TVertex(3, Vertex1)
@@ -371,9 +372,9 @@ SUBROUTINE DRAW
         write(11,*) '0 1 0 setrgbcolor'
         write(11,777) x1, y1, scy/20.
       endif
-      if(Vertex1==Ira) then
+      if(Vertex1==Ira .and. IsWormPresent) then
         write(11,*) '1 0 0 setrgbcolor'
-      elseif(Vertex1==Masha) then
+      elseif(Vertex1==Masha .and. IsWormPresent) then
         write(11,*) '0 0 1 setrgbcolor'
       else
         write(11,*) '0 0 0 setrgbcolor'
@@ -383,10 +384,11 @@ SUBROUTINE DRAW
       if(Vertex1==MeasureGam) then
         write(11,*) '0 1 0 setrgbcolor'
       endif
-      write(11,802) 500.0,ini,i,TVertex(3, Vertex1), &
-         & GRVertex(1, Vertex1),GRVertex(2, Vertex2)
+      write(11,802) 500.0,ini,Vertex1,TVertex(3, Vertex1), &
+         & GRVertex(1, Vertex1),GRVertex(2, Vertex1)
       ini=ini-seg
     enddo
+    !write G info
     write(11,*) '0 0 0 setrgbcolor'
     write(11,"(f6.1,x,f6.1,x,' M (G info) C')") 530.0,ini
     ini=ini-seg
@@ -399,7 +401,7 @@ SUBROUTINE DRAW
       else
         write(11,*) '0 0 1 setrgbcolor'
       endif
-      write(11,804) 500.0, ini, Vertex2,Vertex1
+      write(11,804) 500.0, ini, iGLn, Vertex2,Vertex1
       ini=ini-seg
     enddo
     write(11,*) '0 0 0 setrgbcolor'
@@ -409,7 +411,7 @@ SUBROUTINE DRAW
       iWLn=WLnKey2Value(i)
       Vertex1=NeighLn(1,iWLn)
       Vertex2=NeighLn(2,iWLn)
-      write(11,805) 500.0, ini, Vertex1,Vertex2
+      write(11,805) 500.0, ini, iWLn, Vertex1,Vertex2
       ini=ini-seg
     enddo
 
@@ -433,8 +435,8 @@ SUBROUTINE DRAW
  801  format (f6.1,x,f6.1,x,' M (',i2,') C')
  802  format (f6.1,x,f6.1,x,' M (',i2,':',f6.3,'; (',i3,',',i3,')) C')
  803  format (f6.1,x,f6.1,x,' M (',A,') C')
- 804  format (f6.1,x,f6.1,x,' M (G: ',i2,' ------>',i2') C')
- 805  format (f6.1,x,f6.1,x,' M (W: ',i2,' <====>',i2') C')
+ 804  format (f6.1,x,f6.1,x,' M (G ',i2,' : ',i2,' --->',i2') C')
+ 805  format (f6.1,x,f6.1,x,' M (W ',i2,' : ',i2,' <=>',i2') C')
  
 END SUBROUTINE DRAW
 

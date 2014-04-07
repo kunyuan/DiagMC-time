@@ -1746,6 +1746,8 @@ SUBROUTINE move_measuring_index
   endif
 
   !------- step4 : weight calculation -------------------
+ !dx = xg-xw;  dy = yg-yw; dtau1 = tau3-tau2; dtau2 = tau1-tau3
+!COMPLEX*16 FUNCTION weight_vertex(stat, isdelta, dr0, dtau1, dtau2, typ)
   tau1 = TVertex(3, iGam)-TVertex(2, iGam)
   tau2 = TVertex(1, iGam)-TVertex(3, iGam)
 !   if(abs(tau1)>1e-8 .or. abs(tau2)>1e-8) then
@@ -1784,9 +1786,9 @@ SUBROUTINE move_measuring_index
   tau = TVertex(2, NeighLn(2, jGout)) - TVertex(1, NeighLn(1, jGout))
   WjGout = weight_gline(statjGout, tau, TypeLn(jGout))
 
-  Anew = WjGam *WjW *WjGin *WjGout *WiGam *WiW *WiGin *WiGout
+  Anew = WjGam*WiGam *WiW *WiGin *WiGout
   Aold = WeightVertex(iGam) *WeightLn(iW) *WeightLn(iGin) *WeightLn(iGout) &
-    & *WeightVertex(jGam) *WeightLn(jW) *WeightLn(jGin) *WeightLn(jGout)
+    & *WeightVertex(jGam)
 
   if(abs(Anew)==0.d0)   return
 
@@ -1796,19 +1798,19 @@ SUBROUTINE move_measuring_index
 !     stop
 !   endif
 
-  if(iGin==jGout) then
-    Anew = Anew/WjGout
-    Aold = Aold/WeightLn(jGout)
+  if(iGin/=jGout) then
+    Anew = Anew*WjGout
+    Aold = Aold*WeightLn(jGout)
   endif
 
-  if(jGin==iGout) then
-    Anew = Anew/WjGin
-    Aold = Aold/WeightLn(jGin)
+  if(jGin/=iGout) then
+    Anew = Anew*WjGin
+    Aold = Aold*WeightLn(jGin)
   endif
 
-  if(iW==jW) then
-    Anew = Anew/WjW
-    Aold = Aold/WeightLn(jW)
+  if(iW/=jW) then
+    Anew = Anew*WjW
+    Aold = Aold*WeightLn(jW)
   endif
 
   call weight_ratio(Pacc, sgn, Anew, Aold)
