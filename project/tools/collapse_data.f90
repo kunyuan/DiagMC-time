@@ -84,7 +84,7 @@ PROGRAM MAIN
 
         read(101) Beta, MCOrder, L(1), L(2)
         read(101,iostat=ios) imctmp, iGamNorm, iGamNormWeight
-        read(101) Ztmp, Quan(1), Norm(1), Error(1)
+        read(101) Ztmp, ratioerr
         do it2 = 0, MxT-1
           do it1 = 0, MxT-1
             do iy = 0, L(2)-1
@@ -138,7 +138,7 @@ PROGRAM MAIN
 
     write(104) Beta, MCOrder, L(1), L(2)
     write(104) imc, GamNorm, GamNormWeight
-    write(104) Z_normal, Quan(1), Norm(1), Error(1)
+    write(104) Z_normal, ratioerr
     do it2 = 0, MxT-1
       do it1 = 0, MxT-1
         do iy = 0, L(2)-1
@@ -167,8 +167,10 @@ PROGRAM MAIN
 
     !=========== write into files =========================================
     open(104, status="replace", file=trim(title_mc)//"_GamMC.dat")
+    write(104, *) Beta, MCOrder, L(1), L(2)
+    write(104, *) imc, GamNorm, GamNormWeight
+    write(104, *) Z_normal, ratioerr
     
-    write(104, *) "Order", 1, "dx = 0, dy = 0"
     do it1 = 0, MxT-1
       it2 =  it1
       gam = GamMC(1, 1, 0, 0, it1, it2)*GamNormWeight/GamNorm

@@ -228,6 +228,7 @@ MODULE vrbls_mc
   double precision   :: Quan(NObs)             ! 1st--#quan.  2nd--#block
   double precision   :: Norm(NObs)
   double precision   :: Error(NObs)
+  double precision   :: ratioerr
   character(len=30),dimension(NObs) :: QuanName
 
   double precision, allocatable :: ObsRecord(:,:)                 ! 1st--#quan.  2nd--#block
