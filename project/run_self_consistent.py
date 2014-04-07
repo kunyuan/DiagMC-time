@@ -20,7 +20,7 @@ def run_loop():
         i=i+1
         logging.info("Loop "+str(i)+" running...")
         try:
-            subprocess.check_output(homedir+"/tools/collapse_data.exe")
+            subprocess.check_output(homedir+"/collapse_data.exe")
         except subprocess.CalledProcessError as e:
             ret=e.returncode
             logging.error('collapse_data.exe return a non-zero value '+str(ret)+', something happened!')
