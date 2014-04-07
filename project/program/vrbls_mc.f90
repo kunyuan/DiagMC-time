@@ -44,6 +44,7 @@ MODULE vrbls_mc
 
   type(logging) :: LogFile
   type(logging) :: LogTerm
+  logical :: isbold
 
   !======================== Input parameter ==============================
   integer          ::  L(2), Vol                ! System size
