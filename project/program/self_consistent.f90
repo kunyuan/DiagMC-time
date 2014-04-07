@@ -401,16 +401,11 @@ SUBROUTINE Gam_mc2matrix_mc
   implicit none
   integer :: iorder, dx, dy, ityp, iloop, it1, it2, typ
   complex*16 :: cgam, normal
-  double precision :: norm_err, rgam2, igam2, rerr, ierr, rpercenterr, ipercenterr
+  double precision :: rgam2, igam2, rerr, ierr, rpercenterr, ipercenterr
 
   call initialize_Gam
 
   normal = GamNormWeight*Z_normal/GamNorm
-
-  cgam = GamMC(1, 1, 0, 0, 0, 0)/Z_normal
-  rgam2 = ReGamSqMC(1, 1, 0, 0, 0, 0)/Z_normal
-  rerr = sqrt(abs(rgam2)-(real(cgam))**2.d0)/sqrt(Z_normal-1)
-  norm_err = Error(1)/rerr
 
   do it2 = 0, MxT-1
     do it1 = 0, MxT-1
@@ -422,7 +417,7 @@ SUBROUTINE Gam_mc2matrix_mc
               cgam = GamMC(iorder,ityp,dx,dy,it1,it2) /Z_normal
               rgam2 = ReGamSqMC(iorder, ityp, dx, dy, it1, it2)/Z_normal
               rerr = sqrt(abs(rgam2)-(real(cgam))**2.d0)/sqrt(Z_normal-1)
-              rerr = rerr*norm_err
+              rerr = rerr* ratioerr
 
               if(abs(real(cgam))<1.d-30) then
                 rpercenterr = 0.d0
@@ -433,7 +428,7 @@ SUBROUTINE Gam_mc2matrix_mc
 
               igam2 = ImGamSqMC(iorder,1, 0, 0, it1, it2)/Z_normal
               ierr = sqrt(abs(igam2)-(dimag(cgam))**2.d0)/sqrt(Z_normal-1)
-              ierr = ierr*norm_err
+              ierr = ierr* ratioerr
 
               if(abs(dimag(cgam))<1.d-30) then
                 ipercenterr = 0.d0
