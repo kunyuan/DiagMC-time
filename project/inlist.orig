@@ -9,12 +9,20 @@ Type: 2
 Lx:   4
 Ly:   4
 Jcp:   1.0
-Beta:  0.9
+<<<<<<< HEAD
+Beta:  2
+=======
+Beta:  0.5
+>>>>>>> f224bb87278c3c42083f8d839ded983f9d8f264e
 Order:  1
 Reweight: 1
 Worm/Norm: 0.5 
-ReadFile: 0.90_1_coll
+ReadFile: 0.50_1_coll
 
+<<<<<<< HEAD
+Duplicate:  2
+=======
 Duplicate:  1
+>>>>>>> f224bb87278c3c42083f8d839ded983f9d8f264e
 IsCluster:  .false.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
