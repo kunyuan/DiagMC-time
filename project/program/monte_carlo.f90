@@ -2409,6 +2409,11 @@ SUBROUTINE update_weight(Anew, Aold)
   implicit none 
   complex*16 :: Anew, Aold
 
+  if(abs(Anew)<=1.e-12)  then
+    call print_config
+    stop
+  endif
+
   WeightCurrent = WeightCurrent *abs(Anew/Aold)
   return
 END SUBROUTINE update_weight

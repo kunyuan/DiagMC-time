@@ -20,8 +20,8 @@ MODULE vrbls_mc
   integer, parameter :: MxK   = 1000000             ! the maximum momentum
   !integer, parameter :: MxOmegaBasis = 2048        ! the maximum omega used in basis
 
-  double precision, parameter :: MxError = 0.25     ! the maximum error for MC
-  integer, parameter          :: MxNblck = 1000000    ! the maximum memory blocks in MC simulations
+  double precision, parameter :: MxError = 1000.0    ! the maximum error for MC
+  integer, parameter          :: MxNblck = 1000000   ! the maximum memory blocks in MC simulations
 
   integer, parameter :: MxOrder =  10               ! the maximum order of the diagram
   integer, parameter :: MxNLn  = 3*MxOrder+3        ! the maximum number of lines
