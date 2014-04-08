@@ -416,7 +416,7 @@ SUBROUTINE create_worm_along_wline
   !------------ step5 : accept the update -----------------------
   ProbProp(Order, 1) = ProbProp(Order, 1) + 1
 
-  if(rn()<=Pacc) then
+  if(rn()<Pacc) then
 
     !-------------- update the diagram info --------------------
     Phase = Phase*sgn
@@ -581,7 +581,7 @@ SUBROUTINE delete_worm_along_wline
 
   ProbProp(Order, 2) = ProbProp(Order, 2) + 1
   !------------ step5 : accept the update -----------------------
-  if(rn()<=Pacc) then
+  if(rn()<Pacc) then
 
     !---------- update the diagram info ----------------
     Phase = Phase*sgn
@@ -700,7 +700,7 @@ SUBROUTINE move_worm_along_wline
 
   !------- step5 : accept the update --------------------
   ProbProp(Order, 5) = ProbProp(Order, 5) + 1
-  if(rn()<=Pacc) then
+  if(rn()<Pacc) then
 
     !------ update diagram info ---------------
     Phase = Phase *sgn
@@ -896,7 +896,7 @@ SUBROUTINE move_worm_along_gline
 
   !------- step5 : accept the update --------------------
   ProbProp(Order, 6) = ProbProp(Order, 6) + 1
-  if(rn()<=Pacc) then
+  if(rn()<Pacc) then
 
     !----- update the diagram info -------------- 
     Phase = Phase *sgn
@@ -1139,7 +1139,7 @@ SUBROUTINE add_interaction
 
   !------------ step5 : accept the update -----------------------
   ProbProp(Order-1, 7) = ProbProp(Order-1, 7) + 1
-  if(rn()<=Pacc) then
+  if(rn()<Pacc) then
 
     !--------------- update the diagram info --------------------
     Phase = Phase *sgn
@@ -1317,7 +1317,7 @@ SUBROUTINE remove_interaction
 
   !------------ step5 : accept the update -----------------------
   ProbProp(Order+1, 8) = ProbProp(Order+1, 8) + 1
-  if(rn()<=Pacc) then
+  if(rn()<Pacc) then
 
     !--------------- update the diagram info --------------------
     Phase = Phase *sgn
@@ -1429,7 +1429,7 @@ SUBROUTINE reconnect
 
   !------- step5 : accept the update --------------------
   ProbProp(Order, 11) = ProbProp(Order, 11) + 1
-  if(rn()<=Pacc) then
+  if(rn()<Pacc) then
 
     !--------------- update the diagram info --------------------
     SignFermiloop=-SignFermiloop
@@ -1520,7 +1520,7 @@ SUBROUTINE change_gline_space
 
   !------- step5 : accept the update --------------------
   ProbProp(Order, 12) = ProbProp(Order, 12) + 1
-  if(rn()<=Pacc) then
+  if(rn()<Pacc) then
 
     !------ update the diagram info -------------------
     Phase = Phase *sgn
@@ -1596,7 +1596,7 @@ SUBROUTINE change_wline_space
 
     !------- step5 : accept the update --------------------
     ProbProp(Order, 13) = ProbProp(Order, 13) + 1
-    if(rn()<=Pacc) then
+    if(rn()<Pacc) then
 
       !------ update the diagram info -------------------
       Phase = Phase *sgn
@@ -1669,7 +1669,7 @@ SUBROUTINE change_Gamma_type
   !------- step5 : accept the update --------------------
   ProbProp(Order, 14) = ProbProp(Order, 14) + 1
 
-  if(rn()<=Pacc) then
+  if(rn()<Pacc) then
 
     !------ update the diagram info -------------------
     Phase = Phase *sgn
@@ -1819,7 +1819,7 @@ SUBROUTINE move_measuring_index
   !------- step5 : accept the update --------------------
   ProbProp(Order, 15) = ProbProp(Order, 15) + 1
 
-  if(rn()<=Pacc) then
+  if(rn()<Pacc) then
 
     !-------- update the diagram info ---------------
     Phase = Phase *sgn
@@ -1945,7 +1945,7 @@ SUBROUTINE change_Gamma_time
   !------- step5 : accept the update --------------------
   ProbProp(Order, 16) = ProbProp(Order, 16) + 1
 
-  if(rn()<=Pacc) then
+  if(rn()<Pacc) then
 
     !------ update the diagram info ---------------------
     Phase = Phase *sgn
@@ -2050,7 +2050,7 @@ SUBROUTINE change_wline_isdelta
   !------- step5 : accept the update --------------------
   ProbProp(Order, 17) = ProbProp(Order, 17) + 1
 
-  if(rn()<=Pacc) then
+  if(rn()<Pacc) then
 
     !------ update the diagram info -------------------
     Phase = Phase *sgn
@@ -2140,7 +2140,7 @@ SUBROUTINE change_gamma_isdelta
   !------- step5 : accept the update --------------------
   ProbProp(Order, 18) = ProbProp(Order, 18) + 1
 
-  if(rn()<=Pacc) then
+  if(rn()<Pacc) then
 
     !------ update the diagram info -------------------
     Phase = Phase *sgn
