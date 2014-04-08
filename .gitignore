@@ -5,6 +5,7 @@ job_*
 *.eps
 *.dat
 *.exe
+*.pyc
 _in_*
 *.tags*
 project/infile
