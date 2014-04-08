@@ -134,6 +134,8 @@ def submit_jobs(para,execute,homedir):
                     else:
                         f.write(" ".join(loop_execute))
                         f.close()
+                        os.system("qsub "+jobfile)
+                        os.system("rm "+jobfile)
                     
                 else: 
                     #print execute,infile
