@@ -5,7 +5,7 @@ import sys
 import StringIO
 
 
-def index(file, separator='###*'):
+def __index(file, separator='###*'):
     index_list = []
     if os.path.exists(file):
         result=subprocess.check_output(['grep', '-ob', separator, file])
@@ -29,7 +29,7 @@ def index(file, separator='###*'):
 
     return index_list, length
 
-def parse_scope(index_list, length,scope=':'):
+def __parse_scope(index_list, length,scope=':'):
     scope_bound_str=scope.split(':')
     if len(scope_bound_str)>2:
         print "Only 2 parameters are allowed in range: {}".format(scope)
@@ -51,6 +51,30 @@ def parse_scope(index_list, length,scope=':'):
             sys.exit()
 
     return scope_bound
+
+def __parse_dim(dimstr):
+    dim=[]
+    dim_name=[]
+    strbuff=dimstr.strip(' \t\n\r')[1:].split(',')
+    for i in range(0,len(strbuff)):
+        elem=strbuff[i].strip(' \t\n\r').split(':')
+        if len(elem)==1:
+            dim.append(int(elem[0]))
+            dim_name.append('X'+str(i-1))
+        elif len(elem)==2:
+            dim.append(int(elem[0]))
+            dim_name.append(elem[1])
+        else:
+            print "Illegal dimensional information: {}".format(dimstr)
+    if len(strbuff)==2:
+        dim_name[0]="X"
+        dim_name[1]="Y"
+    elif len(strbuff)==3:
+        dim_name[0]="X"
+        dim_name[1]="Y"
+        dim_name[2]="Z"
+
+    return dim, dim_name
 
 def read_array(file, scope='-1:', comment='#', separator='###*'):
     '''
@@ -74,8 +98,8 @@ def read_array(file, scope='-1:', comment='#', separator='###*'):
     separator : string, default='###*'
         The string to separate different blocks in the data file
     '''
-    index_list, length=index(file, separator)
-    scope_bound=parse_scope(index_list, length, scope)
+    index_list, length=__index(file, separator)
+    scope_bound=__parse_scope(index_list, length, scope)
     #print scope_bound
     data_block=[]
     f=open(file,'r')
@@ -83,10 +107,9 @@ def read_array(file, scope='-1:', comment='#', separator='###*'):
     for i in range(0,len(scope_bound)):
         f.seek(scope_bound[i][0])
         buff=StringIO.StringIO(f.read(scope_bound[i][1]-scope_bound[i][0]))
-        print buff.readline()
+        buff.readline()
+        dim, dim_name=__parse_dim(buff.readline())
         # strbuff=[e.strip() for e in buff.readline()[1:].split(',')]
-        strbuff=buff.readline().strip(' \t\n\r')[1:]
-        dim=tuple(map(int, strbuff.split(',')))
         a=np.loadtxt(buff,comments=comment)
         if a.shape[1]>2:
             print "At most two numbers in each row!"
