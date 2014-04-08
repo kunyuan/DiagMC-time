@@ -239,6 +239,7 @@ SUBROUTINE markov(MaxSamp)
     if(mod(imc,1.e7)==0) then
       call statistics
       call output_GamMC
+      !call output_test
       call print_status
       call print_config
       call check_config
@@ -2189,7 +2190,7 @@ COMPLEX*16 FUNCTION weight_gline(stat, tau, typ)
   implicit none
   integer :: stat, typ
   double precision :: tau
-  integer :: t
+  integer :: t, flag
 
   t = Floor(tau*MxT/Beta)
 
@@ -2207,7 +2208,30 @@ COMPLEX*16 FUNCTION weight_gline(stat, tau, typ)
   endif
 
   !---------------------- for test --------------------------------------
-  !if(stat >= 0 .and. stat<=1) then
+  !t = Floor(tau*MxT/Beta)
+
+  !flag = 0
+  !if(t<0) then
+    !tau = tau +Beta
+    !flag = 1
+  !endif
+
+  !if(stat == 0) then
+
+    !weight_gline = cdexp(-(0.d0, 1.d0)*pi*tau/(2.d0*Beta))
+    !!weight_gline = dcmplx(Beta-tau, 0.d0)
+    !if(flag==1) then
+      !weight_gline = -1.d0*weight_gline
+    !endif
+
+    !!if(t>=0) then
+      !!weight_gline = weight_meas_G(t)
+      !!!weight_gline = (1.d0, 0.d0)
+    !!else
+      !!weight_gline = -1.d0*weight_meas_G(t)
+      !!!weight_gline = (-1.d0, 0.d0)
+    !!endif
+  !else if(stat==1) then
     !weight_gline = weight_meas_G(t)
   !else
     !call LogFile%WriteStamp('e')
@@ -2257,8 +2281,14 @@ COMPLEX*16 FUNCTION weight_wline(stat, isdelta, dr0, tau, typ)
 
   !---------------------- for test --------------------------------------
   !if(stat >= 0 .and. stat<=3) then
-    !if(isdelta==0) weight_wline = weight_meas_W(dr, t)
-    !if(isdelta==1) weight_wline = weight_meas_W(dr, 0)
+    !if(isdelta==0 .and. dr(1)==0 .and. dr(2)==0) then
+      !weight_wline = weight_meas_W(dr, t)
+    !else 
+      !weight_wline = (0.d0, 0.d0)
+    !endif
+
+    !!if(isdelta==0) weight_wline = weight_meas_W(dr, t)
+    !!if(isdelta==1) weight_wline = weight_meas_W(dr, 0)
   !else
     !call LogFile%WriteStamp('e')
     !call LogFile%WriteLine("The number of update: "+str(iupdate))
@@ -2276,7 +2306,7 @@ END FUNCTION weight_wline
 COMPLEX*16 FUNCTION weight_vertex(stat, isdelta, dr0, dtau1, dtau2, typ)
   implicit none
   integer :: stat, dr(2), t1, t2, typ, isdelta
-  integer :: dr0(2)
+  integer :: dr0(2), flag
   double precision :: weight
   double precision :: dtau1, dtau2
 
@@ -2286,24 +2316,26 @@ COMPLEX*16 FUNCTION weight_vertex(stat, isdelta, dr0, dtau1, dtau2, typ)
   call diff_r(dr0, dr)
 
   if(stat==0) then
-    !----------------- for bold Gamma ------------------------------
-    if(isdelta==0) weight_vertex = weight_Gam(typ, dr, t1, t2)
-    if(isdelta==1) weight_vertex = weight_Gam0(typ, dr)
-
-    !----------------- for bare Gamma ------------------------------
-    !if(isdelta==0) weight_vertex = (0.d0, 0.d0)
-    !if(isdelta==1) weight_vertex = weight_Gam0(typ, dr)
-    !------------------------ end ----------------------------------
+    if(isbold) then
+      !----------------- for bold Gamma ------------------------------
+      if(isdelta==0) weight_vertex = weight_Gam(typ, dr, t1, t2)
+      if(isdelta==1) weight_vertex = weight_Gam0(typ, dr)
+    else
+      !----------------- for bare Gamma ------------------------------
+      if(isdelta==0) weight_vertex = (0.d0, 0.d0)
+      if(isdelta==1) weight_vertex = weight_Gam0(typ, dr)
+    endif
 
   else if(stat==2) then
-    !----------------- for bold Gamma ------------------------------
-    if(isdelta==0) weight_vertex = weight_Gam(typ, dr, t1, t2)
-    if(isdelta==1) weight_vertex = weight_Gam0(typ, dr)
-
-    !----------------- for bare Gamma ------------------------------
-    !if(isdelta==0) weight_vertex = (0.d0, 0.d0)
-    !if(isdelta==1) weight_vertex = weight_Gam0(1, dr)
-    !------------------------ end ----------------------------------
+    if(isbold) then
+      !----------------- for bold Gamma ------------------------------
+      if(isdelta==0) weight_vertex = weight_Gam(typ, dr, t1, t2)
+      if(isdelta==1) weight_vertex = weight_Gam0(typ, dr)
+    else 
+      !----------------- for bare Gamma ------------------------------
+      if(isdelta==0) weight_vertex = (0.d0, 0.d0)
+      if(isdelta==1) weight_vertex = weight_Gam0(typ, dr)
+    endif
 
   else if(stat==1 .or. stat==3) then
     if(isdelta==1) weight_vertex = weight_meas_Gam(typ, dr)
@@ -2316,9 +2348,35 @@ COMPLEX*16 FUNCTION weight_vertex(stat, isdelta, dr0, dtau1, dtau2, typ)
   endif
 
   !---------------------- for test --------------------------------------
-  !if(stat>=0 .and. stat<=3) then
-    !if(isdelta==1)  weight_vertex = weight_meas_Gam(typ, dr)
-    !if(isdelta==0)  weight_vertex = (0.d0, 0.d0)
+  !flag = 0
+  !if(t1<0) then
+    !dtau1 = dtau1 + Beta
+    !flag = flag + 1
+  !endif
+  !if(t2<0) then
+    !dtau2 = dtau2 + Beta
+    !flag = flag + 1
+  !endif
+
+  !if(stat==0 .or. stat==2) then
+    !if(isdelta==1) weight_vertex = weight_meas_Gam(typ, dr)
+    !if(isdelta==0) then
+      !weight_vertex = (0.d0, 0.d0)
+      !if(dr(1)==0 .and. dr(2)==0) then
+        !if(typ==1 .or. typ==2 .or. typ==5 .or. typ==6) then
+          !if(mod(flag, 2)==0) then
+            !weight_vertex = dcmplx(dtau1**2.d0+dtau2**2.d0+1.d0, 0.d0)
+          !else 
+            !weight_vertex = dcmplx(-1.d0*(dtau1**2.d0+dtau2**2.d0+1.d0), 0.d0)
+          !endif
+        !endif
+      !endif
+    !endif
+
+  !else if(stat==1 .or. stat==3) then
+    !if(isdelta==1) weight_vertex = weight_meas_Gam(typ, dr)
+    !if(isdelta==0) weight_vertex = (0.d0, 0.d0)
+
   !else
     !call LogFile%WriteStamp('e')
     !call LogFile%WriteLine("The number of update: "+str(iupdate))
@@ -2460,11 +2518,6 @@ SUBROUTINE measure
     ImGamSqMC(Order, ityp, dx, dy, dt1, dt2 ) = ImGamSqMC(Order, ityp, dx, dy, dt1, dt2) &
       & + (dimag(Phase)/factorM)**2.d0
 
-    if(Order==0 .and. IsDeltaVertex(NeighLn(3-dir, MeaW))==1) then
-      factorM = CoefOfWeight(Order)
-      GamNorm = GamNorm + Phase/factorM
-    endif
-
     !===============  test variables =================================
     Norm(1) = Z_normal
 
@@ -2474,7 +2527,19 @@ SUBROUTINE measure
       endif
     endif
     !================================================================
+    sumt = 0
+    do ikey = 1, NWLn
+      i = WLnKey2Value(ikey)
+      sumt = sumt+ TypeLn(i)
+    enddo
+    if(sumt==NWLn) then
+      Quan(Order+2) = Quan(Order+2) + 1.d0/factorM
+    endif
     !=============================================================
+
+    if(Order==0 .and. IsDeltaVertex(NeighLn(3-dir, MeaW))==1) then
+      GamNorm = GamNorm + Phase/CoefOfWeight(0)
+    endif
 
   endif
 END SUBROUTINE measure
@@ -2502,6 +2567,7 @@ SUBROUTINE statistics
       deallocate(temp)
     endif
 
+    Norm(2:MCOrder+2) = 1.d0
     do i=1,NObs
       if(Norm(i)>1e-6) then
         x=Quan(i)/Norm(i)

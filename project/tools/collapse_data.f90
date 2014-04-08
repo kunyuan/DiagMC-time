@@ -9,7 +9,7 @@ PROGRAM MAIN
     integer :: i, itot, iorder
     integer :: ifile,ios
     integer, parameter :: Mxjobs = 200
-    double precision :: imctmp
+    double precision :: imctmp, Ztmp
     complex*16 :: iGam
     complex*16 :: iGamNorm, iGamNormWeight
     double precision :: iReGamSq
@@ -70,6 +70,7 @@ PROGRAM MAIN
     GamNorm = 0.d0
     imc = 0.d0
     EffectiveSamp=0
+    Z_normal = 0.d0
 
     GamMC(:,:,:,:,:,:) = 0.d0
     ReGamSqMC(:,:,:,:,:,:) = 0.d0
@@ -83,6 +84,7 @@ PROGRAM MAIN
 
         read(101) Beta, MCOrder, L(1), L(2)
         read(101,iostat=ios) imctmp, iGamNorm, iGamNormWeight
+        read(101) Ztmp, ratioerr
         do it2 = 0, MxT-1
           do it1 = 0, MxT-1
             do iy = 0, L(2)-1
@@ -103,6 +105,7 @@ PROGRAM MAIN
       if(ios==0) then
         EffectiveSamp=EffectiveSamp+1
         imc = imc + imctmp
+        Z_normal = Z_normal+Ztmp
         GamNorm = GamNorm + iGamNorm
         GamNormWeight = iGamNormWeight
         GamMC=GamMC+GamTmp
@@ -135,6 +138,7 @@ PROGRAM MAIN
 
     write(104) Beta, MCOrder, L(1), L(2)
     write(104) imc, GamNorm, GamNormWeight
+    write(104) Z_normal, ratioerr
     do it2 = 0, MxT-1
       do it1 = 0, MxT-1
         do iy = 0, L(2)-1
@@ -163,8 +167,10 @@ PROGRAM MAIN
 
     !=========== write into files =========================================
     open(104, status="replace", file=trim(title_mc)//"_GamMC.dat")
+    write(104, *) Beta, MCOrder, L(1), L(2)
+    write(104, *) imc, GamNorm, GamNormWeight
+    write(104, *) Z_normal, ratioerr
     
-    write(104, *) "Order", 1, "dx = 0, dy = 0"
     do it1 = 0, MxT-1
       it2 =  it1
       gam = GamMC(1, 1, 0, 0, it1, it2)*GamNormWeight/GamNorm

@@ -10,6 +10,8 @@ PROGRAM MAIN
   print *, 'L(1), L(2), Ntoss, Nsamp, IsForever, NStep, Jcp, beta, MCOrder, Seed, ISub, InpMC, ID, title'
   read  *,  L(1), L(2), Ntoss, Nsamp, IsForever, NStep, Jcp, beta, MCOrder, Seed, ISub, InpMC, ID, title
 
+  isbold = .true.
+
   logL(:)=dlog(L(:)*1.d0)
   SpatialWeight(:,:)=0.d0
 
@@ -51,7 +53,11 @@ PROGRAM MAIN
   !================ irreducibility check ===============================
   CheckG = .true.
   CheckW = .true.
-  CheckGam = .true.
+  if(isbold) then
+    CheckGam = .true.
+  else
+    CheckGam = .false.
+  endif
 
   !================ updates frequency   ================================
   Pupdate( :)  = 0.d0
@@ -156,16 +162,16 @@ SUBROUTINE self_consistent
     !!-------- update the Gamma matrix with MC data -------
     call Gam_mc2matrix_mc
 
-    !flag = self_consistent_GW(1.d-8)
+    flag = self_consistent_GW(1.d-8)
 
-    !call calculate_Chi
-    !call transfer_Chi_r(-1)
-    !call transfer_Chi_t(-1)
-    !call transfer_Sigma_t(-1)
+    call calculate_Chi
+    call transfer_Chi_r(-1)
+    call transfer_Chi_t(-1)
+    call transfer_Sigma_t(-1)
     call output_Quantities
 
     call write_GWGamma
-    !call update_flag
+    call update_flag
   endif
   return
 END SUBROUTINE self_consistent
@@ -228,10 +234,6 @@ SUBROUTINE monte_carlo
 
   call read_GWGamma
   call calculate_GamNormWeight  
-
-  !call output_Quantities
-  !call calculate_Gam1
-  !stop
 
   call initialize_markov
 
