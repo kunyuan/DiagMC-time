@@ -16,7 +16,7 @@ MODULE vrbls_mc
   !integer, parameter :: MxL(1)  = 8, MxL(2) = 8         ! the largest system
   integer, parameter,dimension(2) :: MxL =(/8,8/)   ! the largest system
   integer, parameter :: MxVol = MxL(1)**D           ! the maximum system volume
-  integer, parameter :: MxT   = 128                 ! the maximum number of time segments
+  integer, parameter :: MxT   =   64                ! the maximum number of time segments
   integer, parameter :: MxK   = 1000000             ! the maximum momentum
   !integer, parameter :: MxOmegaBasis = 2048        ! the maximum omega used in basis
 
@@ -44,6 +44,7 @@ MODULE vrbls_mc
 
   type(logging) :: LogFile
   type(logging) :: LogTerm
+  logical :: isbold
 
   !======================== Input parameter ==============================
   integer          ::  L(2), Vol                ! System size
@@ -227,6 +228,7 @@ MODULE vrbls_mc
   double precision   :: Quan(NObs)             ! 1st--#quan.  2nd--#block
   double precision   :: Norm(NObs)
   double precision   :: Error(NObs)
+  double precision   :: ratioerr
   character(len=30),dimension(NObs) :: QuanName
 
   double precision, allocatable :: ObsRecord(:,:)                 ! 1st--#quan.  2nd--#block

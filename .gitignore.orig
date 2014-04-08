@@ -6,9 +6,13 @@ job_*
 *.eps
 *.dat
 *.exe
+<<<<<<< HEAD
 *.pyc
 _in_*
-*tags*
+*.tags*
+project/infile
+=======
+>>>>>>> f224bb87278c3c42083f8d839ded983f9d8f264e
 *.log
 *.out
 project/graph
@@ -20,3 +24,4 @@ project/outfile/*
 *.conf
 project/tools/mytop.sh
 project/tools/kill_loop.sh
+*tags*
