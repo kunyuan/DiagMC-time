@@ -60,16 +60,27 @@ def __parse_dim(dimstr):
         elem=strbuff[i].strip(' \t\n\r').split(':')
         if len(elem)==1:
             dim.append(int(elem[0]))
-            dim_name.append('X'+str(i-1))
+            if len(strbuff)<=3:
+                if i==0:
+                    dim_name.append("X")
+                elif i==1:
+                    dim_name.append("Y")
+                else:
+                    dim_name.append("Z")
+            else:
+                dim_name.append('X'+str(i-1))
+
         elif len(elem)==2:
-            dim.append(int(elem[0]))
-            dim_name.append(elem[1])
+            dim.append(int(elem[1]))
+            if elem[0].strip(' \t\n\r')=='':
+                dim_name.append('X'+str(i-1))
+            else:
+                dim_name.append(elem[0])
         else:
             print "Illegal dimensional information: {}".format(dimstr)
-    if len(strbuff)==2:
+    if len(strbuff)==1:
         dim_name[0]="X"
-        dim_name[1]="Y"
-    elif len(strbuff)==3:
+    if len(strbuff)==3:
         dim_name[0]="X"
         dim_name[1]="Y"
         dim_name[2]="Z"
