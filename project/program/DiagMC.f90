@@ -168,6 +168,7 @@ SUBROUTINE self_consistent
     call transfer_Chi_r(-1)
     call transfer_Chi_t(-1)
     call transfer_Sigma_t(-1)
+
     call output_Quantities
 
     call write_GWGamma
