@@ -863,65 +863,6 @@ END SUBROUTINE read_monte_carlo_conf
 !!========== PRINT OUT THE DATA FILES ============================
 !!================================================================
 
-SUBROUTINE output_Quantities
-  implicit none
-  integer :: ifile, iorder
-  integer :: omega, omega1, i, ityp, dx, dy
-  integer :: omega2
-  integer :: it1, it2, it
-  double precision :: GGI
-  double precision :: GaR1, GaR2, GaR3
-  double precision :: WWR1, WWR2, WWR3, WWR4
-
-  open(15, access="append", file=trim(title_loop)//"_Chi.dat")
-  open(16, access="append", file=trim(title_loop)//"_Sigma.dat")
-  open(17, access="append", file=trim(title_loop)//"_Chi_sum.dat")
-  open(18, access="append", file=trim(title_loop)//"_Gam.dat")
-  open(19, access="append", file=trim(title_loop)//"_G.dat")
-
-  do dy = 0, dL(2)
-    do dx = 0, dL(1)
-      do it = 0, MxT-1
-        write(15, '(3i4,2x,f20.14,"   +-  ",f20.14)') dx, dy, it, real(Chi(dx, dy, it)),dimag(Chi(dx, dy, it))
-      enddo
-      write(15, *)
-    enddo
-  enddo
-  close(15)
-
-  do it = 0, MxT-1
-    write(16, *) (it+0.5d0)*Beta/MxT, L(1)*L(2)*(MxT/Beta)**2.d0*real(Sigma(it)),  &
-      & L(1)*L(2)*(MxT/Beta)**2.d0*dimag(Sigma(it))
-  enddo
-  close(16)
-
-  write(17, *) "============================================"
-  write(17, *) "Beta", Beta, "L(1), L(2)", L(1), L(2), "Order", MCOrder
-  do it = 0, MxT-1
-    write(17, '(i5,2x,f20.14,"  +-  ",f20.14)') it, real(SUM(Chi(:, :, it))),dimag(SUM(Chi(:, :, it)))
-  enddo
-  close(17)
-
-  write(18, *) "============================================"
-  write(18, *) "Beta", Beta, "L(1), L(2)", L(1), L(2), "Order", MCOrder
-  do it = 0, MxT-1
-    write(18, '(i5,2x,f20.14,"  +-  ",f20.14)') it, real(Gam(1,0,0,it,it)),dimag(Gam(1,0,0,it,it))
-  enddo
-  write(18, *)
-  close(18)
-
-  write(19, *) "============================================"
-  write(19, *) "Beta", Beta, "L(1), L(2)", L(1), L(2), "Order", MCOrder
-  do it = 0, MxT-1
-    write(19, '(i5,2x,f20.14,"  +-  ",f20.14)') it, real(G(1,it)),dimag(G(1,it))
-  enddo
-  write(19, *)
-  close(19)
-
-END SUBROUTINE output_Quantities
-
-
-
 SUBROUTINE output_GamMC
   implicit none
   integer :: i, j, iorder, it1, it2
@@ -929,9 +870,7 @@ SUBROUTINE output_GamMC
   complex*16 :: gam, gamn, normal 
   double precision :: rgam2, igam2
 
-  !open(34, access="append", file=trim(title_mc)//"_Gam_matrix_MC.dat")
   open(35, access="append", file=trim(title_mc)//"_Gam_MC.dat")
-  !open(36, access="append", file=trim(title_mc)//"_Gam_errorbar.dat")
 
   normal = GamNormWeight*Z_normal/GamNorm
 
@@ -940,40 +879,10 @@ SUBROUTINE output_GamMC
   rerr = sqrt(abs(rgam2)-(real(gam))**2.d0)/sqrt(Z_normal-1)
   ratioerr = Error(1)/rerr
 
-  !norm = GamOrder1(1, 0, 0)*Z_normal/GamMC(1,1,0,0,0,0)
-
-  !write(34, *) "============================================"
-  !write(34, *) "Beta", Beta, "L(1), L(2)", L(1), L(2), "Order", MCOrder, "Seed",Seed
-  !write(34, *) imc, Z_normal, GamNormWeight, GamNorm, norm
 
   write(35, *) "============================================"
   write(35, *) "Beta", Beta, "L(1), L(2)", L(1), L(2), "Order", MCOrder, "Seed",Seed
   write(35, *) imc, Z_normal, GamNormWeight, GamNorm, normal, ratioerr
-
-  !write(36, *) "============================================"
-  !write(36, *) "Beta", Beta, "L(1), L(2)", L(1), L(2), "Order", MCOrder, "Seed",Seed
-
-  !write(34, *) "Order 1, dx=0, dy=0, real part"
-  !do it1 = 0, MxT-1
-    !do it2 = 0, MxT-1
-      !gam = GamMC(1, 1, 0, 0, it1, it2)/Z_normal
-      !gamn = gam*norm
-      !write(34, '(f14.8)', advance='no') real(gamn)
-    !enddo
-    !write(34, *) 
-  !enddo
-
-  !write(34, *) "Order 1, dx=0, dy=0, imag part"
-  !do it1 = 0, MxT-1
-    !do it2 = 0, MxT-1
-      !gam = GamMC(1, 1, 0, 0, it1, it2)/Z_normal
-      !gamn = gam*norm
-      !write(34, '(f14.8)', advance='no') dimag(gamn)
-    !enddo
-    !write(34, *) 
-  !enddo
-  !write(34, *) 
-
 
   do iorder = 1, MCOrder
     write(35, *) "Order", iorder
@@ -1005,74 +914,41 @@ SUBROUTINE output_GamMC
 
       write(35, '(i3,2x,i3,E20.10E3,"+/-",f13.6,"%    +i",E20.10E3,"+/-",f13.6,"%")') it1, it2, &
         & real(gamn),rpercenterr, dimag(gamn), ipercenterr
-
-      !if(iorder==1 ) then
-        !if(it1==0) then
-          !write(36, '(i3,2x,i3,E20.10E3,"+/-",f20.16,"    +i",E20.10E3,"+/-",f20.16)') it1, it2, &
-            !& real(gam),rerr, dimag(gam), ierr
-          !write(36, '(i3,2x,i3,E20.10E3,"+/-",f20.16,"    +i",E20.10E3,"+/-",f20.16)') it1, it2, &
-            !& Quan(1)/Norm(1),Error(1), Quan(2)/Norm(1), Error(2)
-          !write(36, *) rerr/Error(1), ierr/Error(2)
-        !endif
-      !endif
     enddo
     write(35, *)
   enddo
 
-  !close(34)
   close(35)
-  !close(36)
 END SUBROUTINE output_GamMC
 
 
-SUBROUTINE output_Gam1
+SUBROUTINE output_Quantities
   implicit none
   integer :: ityp, it1, it2
-  complex*16 :: gam
-
-  open(104, status='replace', file=trim(title_loop)//"_Gam1_matrix.dat")
-  open(105, access='append', file=trim(title_loop)//"_Gam1.dat")
-
-  write(104, *) "Order 1, dx=0, dy=0, real part"
-  do it2 = 0, MxT-1
-    do it1 = 0, MxT-1
-      write(104, '(f14.8)', advance='no')  real(GamOrder1(1, it1, it2))
-    enddo
-    write(104, *)
-  enddo
-
-  write(104, *) "Order 1, dx=0, dy=0, imag part"
-  do it2 = 0, MxT-1
-    do it1 = 0, MxT-1
-      write(104, '(f14.8)', advance='no')  dimag(GamOrder1(1, it1, it2))
-    enddo
-    write(104, *)
-  enddo
-
-  write(105, *) "Order", 1, "dx = 0, dy = 0"
-  do it1 = 0, MxT-1
-    it2 =  it1
-    gam = GamOrder1(1, it1, it2)
-    write(105, '(i3,E20.10E3,"    +i",E20.10E3)') it1, real(gam), dimag(gam)
-  enddo
-  write(105, *)
-
-  close(104)
-  close(105)
-END SUBROUTINE output_Gam1
-
-
-SUBROUTINE output_Gam
-  implicit none
-  integer :: ityp, it1, it2
+  integer :: dx, dy, it
   complex*16 :: gam1
 
-  open(104, status='replace', file=trim(title_mc)//"_Gam_matrix.dat")
-  open(105, status='replace', file=trim(title_mc)//"_Gam.dat")
+  open(104, status='replace', file=trim(title_loop)//"_quantities.dat")
 
-  write(104, *) "##################################"
-  write(104, *) "#", MxT, ",", MxT
-  write(104, *) "#Order 1, dx=0, dy=0, real part"
+  write(104, *) "##################################G"
+  write(104, *) "#tau:", MxT
+  write(104, *) "#Beta", Beta, "L", L(1), L(2), "Order", MCOrder
+  do it1 = 0, MxT-1
+    write(104, *)  real(G(1, it1)), dimag(G(1,it1))
+  enddo
+  write(104, *)
+
+  write(104, *) "##################################W"
+  write(104, *) "#tau:", MxT
+  write(104, *) "#Beta", Beta, "L", L(1), L(2), "Order", MCOrder
+  do it1 = 0, MxT-1
+    write(104, *)  real(W(1, 0, 0, it1)), dimag(W(1, 0, 0, it1))
+  enddo
+  write(104, *)
+
+  write(104, *) "##################################Gamma"
+  write(104, *) "#tau1:", MxT, ",tau2:", MxT
+  write(104, *) "#Beta", Beta, "L", L(1), L(2), "Order", MCOrder
   do it2 = 0, MxT-1
     do it1 = 0, MxT-1
       write(104, *)  real(Gam(1, 0, 0, it1, it2)), dimag(Gam(1, 0, 0, it1, it2))
@@ -1080,17 +956,45 @@ SUBROUTINE output_Gam
   enddo
   write(104, *)
 
-  write(105, *) "Order", 1, "dx = 0, dy = 0"
-  do it1 = 0, MxT-1
-    it2 =  it1 
-    gam1 = Gam(1, 0, 0, it1, it2)
-    write(105, '(i3,E20.10E3,"    +i",E20.10E3)') it1, real(gam1), dimag(gam1)
+  write(104, *) "##################################Chi"
+  write(104, *) "#x:", L(1), ",y:", L(2), ",tau:", MxT
+  write(104, *) "#Beta", Beta, "L", L(1), L(2), "Order", MCOrder
+  do it = 0, MxT-1
+    do dy = 0, L(2)-1
+      do dx = 0, L(1)-1
+        write(104, *) real(Chi(dx, dy, it)),dimag(Chi(dx, dy, it))
+      enddo
+    enddo
   enddo
-  write(105, *)
+
+  write(104, *) "##################################Sigma"
+  write(104, *) "#tau:", MxT
+  write(104, *) "#Beta", Beta, "L", L(1), L(2), "Order", MCOrder
+  do it = 0, MxT-1
+    write(104, *) L(1)*L(2)*(MxT/Beta)**2.d0*real(Sigma(it)),  &
+      & L(1)*L(2)*(MxT/Beta)**2.d0*dimag(Sigma(it))
+  enddo
+
+  write(104, *) "##################################SUMChi"
+  write(104, *) "#tau:", MxT
+  write(104, *) "#Beta", Beta, "L", L(1), L(2), "Order", MCOrder
+  do it = 0, MxT-1
+    write(104, *) real(SUM(Chi(:, :, it))),dimag(SUM(Chi(:, :, it)))
+  enddo
+
+  write(104, *) "##################################Denom"
+  write(104, *) "#px:", L(1), ",py:", L(2), ",omega:", MxT
+  write(104, *) "#Beta", Beta, "L", L(1), L(2), "Order", MCOrder
+  do it = 0, MxT-1
+    do dy = 0, L(2)-1
+      do dx = 0, L(1)-1
+        write(104, *) real(Denom(dx, dy, it)),dimag(Denom(dx, dy, it))
+      enddo
+    enddo
+  enddo
 
   close(104)
-  close(105)
-END SUBROUTINE output_Gam
+END SUBROUTINE output_Quantities
 
 !SUBROUTINE output_test
   !implicit none

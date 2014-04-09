@@ -215,7 +215,8 @@ SUBROUTINE calculate_Chi
   Chi(:,:,:) = 0.d0
   ratio = -1.d0*(real(MxT)/Beta)**2.d0*0.75d0
 
-  Chi(:,:,:) = Polar(:,:,:)/((1.d0,0.d0) -W0PF(:,:,:)*Polar(:,:,:))
+  Denom(:,:,:) = (1.d0, 0.d0) -W0PF(:,:,:)*Polar(:,:,:)
+  Chi(:,:,:) = Polar(:,:,:)/Denom(:,:,:)
 
   do omega = 0, MxT-1
     do py = 0, L(2)-1
@@ -450,7 +451,6 @@ SUBROUTINE Gam_mc2matrix_mc
   Gam(2,:,:,:,:) = Gam(1,:,:,:,:)
   Gam(4,:,:,:,:) = Gam(3,:,:,:,:)
   Gam(6,:,:,:,:) = Gam(5,:,:,:,:)
-  call output_Gam
   
 END SUBROUTINE Gam_mc2matrix_mc
  
