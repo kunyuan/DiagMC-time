@@ -91,6 +91,7 @@ PROGRAM MAIN
   allocate(W0PF(0:L(1)-1, 0:L(2)-1, 0:MxT-1))
   allocate(Gam0PF(0:L(1)-1, 0:L(2)-1, 0:MxT-1, 0:MxT-1))
   allocate(Polar(0:L(1)-1, 0:L(2)-1, 0:MxT-1))
+  allocate(Denom(0:L(1)-1, 0:L(2)-1, 0:MxT-1))
   allocate(Chi(0:L(1)-1, 0:L(2)-1, 0:MxT-1))
 
   allocate(GamMC(0:MCOrder,1:NTypeGam/2, 0:L(1)-1, 0:L(2)-1, 0:MxT-1, 0:MxT-1))
@@ -168,6 +169,7 @@ SUBROUTINE self_consistent
     call transfer_Chi_r(-1)
     call transfer_Chi_t(-1)
     call transfer_Sigma_t(-1)
+
     call output_Quantities
 
     call write_GWGamma

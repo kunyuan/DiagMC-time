@@ -110,7 +110,6 @@ SUBROUTINE calculate_Gam1
   call transfer_Gam_t(-1)
 
   call transfer_GamOrder1_t(-1)
-  call output_Gam1
 
   !================== bare Gamma ===============================
   !GamOrder1(:,:,:) = (0.d0, 0.d0)
@@ -133,8 +132,6 @@ SUBROUTINE calculate_Gam1
         !GamOrder1(1,t1,t2) = -1.d0* weight
     !enddo
   !enddo
-
-  !call output_Gam1
 
 END SUBROUTINE calculate_Gam1
 !====================================================================
