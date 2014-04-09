@@ -12,13 +12,15 @@ ax = fig.gca(projection='3d')
 X = np.arange(0, Beta, 0.50 / N)
 Y = np.arange(0, Beta, 0.50 / N)
 X, Y = np.meshgrid(X, Y)
-Gamt, dim, dim_name = read_data.read_array("./0_0.50_1_Gam_matrix_new.dat")
-print Gamt[0].real.shape
-print X.shape
-print Y.shape
+Gamt, dim_name = read_data.read_array("./0_0.50_1_Gam_matrix_new.dat",["Gamma"])["Gamma"]
+# Gamt, dim_name = read_data.read_array("./0_0.50_1_Gam_matrix_new.dat")["Gamma"]
+# print Gamt
+# print Gamt.shape
+# print dim_name
+# print block_name
 
 surf = ax.plot_surface(
-    X, Y, Gamt[0].real, rstride=1, cstride=1, cmap=cm.coolwarm,
+    X, Y, Gamt.real, rstride=1, cstride=1, cmap=cm.coolwarm,
     linewidth=0, antialiased=False)
 # ax.set_zlim(-1.01, 1.01)
 
