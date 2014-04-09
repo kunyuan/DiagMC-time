@@ -122,6 +122,7 @@ MODULE vrbls_mc
 
   complex(kind=8), allocatable :: Polar(:,:,:)
   complex(kind=8), allocatable :: Chi(:,:,:)
+  complex(kind=8), allocatable :: Denom(:,:,:)
   !=======================================================================
 
   !======================== analytic integration =========================
