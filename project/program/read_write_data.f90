@@ -932,7 +932,7 @@ SUBROUTINE output_Quantities
 
   write(104, *) "##################################G"
   write(104, *) "#tau:", MxT
-  write(104, *) "#Beta", Beta, "L(1), L(2)", L(1), L(2), "Order", MCOrder
+  write(104, *) "#Beta", Beta, "L", L(1), L(2), "Order", MCOrder
   do it1 = 0, MxT-1
     write(104, *)  real(G(1, it1)), dimag(G(1,it1))
   enddo
@@ -940,7 +940,7 @@ SUBROUTINE output_Quantities
 
   write(104, *) "##################################W"
   write(104, *) "#tau:", MxT
-  write(104, *) "#Beta", Beta, "L(1), L(2)", L(1), L(2), "Order", MCOrder
+  write(104, *) "#Beta", Beta, "L", L(1), L(2), "Order", MCOrder
   do it1 = 0, MxT-1
     write(104, *)  real(W(1, 0, 0, it1)), dimag(W(1, 0, 0, it1))
   enddo
@@ -948,7 +948,7 @@ SUBROUTINE output_Quantities
 
   write(104, *) "##################################Gamma"
   write(104, *) "#tau1:", MxT, ",tau2:", MxT
-  write(104, *) "#Beta", Beta, "L(1), L(2)", L(1), L(2), "Order", MCOrder
+  write(104, *) "#Beta", Beta, "L", L(1), L(2), "Order", MCOrder
   do it2 = 0, MxT-1
     do it1 = 0, MxT-1
       write(104, *)  real(Gam(1, 0, 0, it1, it2)), dimag(Gam(1, 0, 0, it1, it2))
@@ -957,11 +957,11 @@ SUBROUTINE output_Quantities
   write(104, *)
 
   write(104, *) "##################################Chi"
-  write(104, *) "#tau:", MxT, ",x:", dL(1)+1, ",y:", dL(2)+1
-  write(104, *) "#Beta", Beta, "L(1), L(2)", L(1), L(2), "Order", MCOrder
-  do dy = 0, dL(2)
-    do dx = 0, dL(1)
-      do it = 0, MxT-1
+  write(104, *) "#x:", L(1), ",y:", L(2), ",tau:", MxT
+  write(104, *) "#Beta", Beta, "L", L(1), L(2), "Order", MCOrder
+  do it = 0, MxT-1
+    do dy = 0, L(2)-1
+      do dx = 0, L(1)-1
         write(104, *) real(Chi(dx, dy, it)),dimag(Chi(dx, dy, it))
       enddo
     enddo
@@ -969,7 +969,7 @@ SUBROUTINE output_Quantities
 
   write(104, *) "##################################Sigma"
   write(104, *) "#tau:", MxT
-  write(104, *) "#Beta", Beta, "L(1), L(2)", L(1), L(2), "Order", MCOrder
+  write(104, *) "#Beta", Beta, "L", L(1), L(2), "Order", MCOrder
   do it = 0, MxT-1
     write(104, *) L(1)*L(2)*(MxT/Beta)**2.d0*real(Sigma(it)),  &
       & L(1)*L(2)*(MxT/Beta)**2.d0*dimag(Sigma(it))
@@ -977,9 +977,20 @@ SUBROUTINE output_Quantities
 
   write(104, *) "##################################SUMChi"
   write(104, *) "#tau:", MxT
-  write(104, *) "#Beta", Beta, "L(1), L(2)", L(1), L(2), "Order", MCOrder
+  write(104, *) "#Beta", Beta, "L", L(1), L(2), "Order", MCOrder
   do it = 0, MxT-1
     write(104, *) real(SUM(Chi(:, :, it))),dimag(SUM(Chi(:, :, it)))
+  enddo
+
+  write(104, *) "##################################Denom"
+  write(104, *) "#px:", L(1), ",py:", L(2), ",omega:", MxT
+  write(104, *) "#Beta", Beta, "L", L(1), L(2), "Order", MCOrder
+  do it = 0, MxT-1
+    do dy = 0, L(2)-1
+      do dx = 0, L(1)-1
+        write(104, *) real(Denom(dx, dy, it)),dimag(Denom(dx, dy, it))
+      enddo
+    enddo
   enddo
 
   close(104)

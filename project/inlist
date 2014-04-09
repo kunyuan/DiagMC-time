@@ -13,7 +13,7 @@ Beta:  1.0
 Order:  2
 Reweight: 1,1
 Worm/Norm: 0.5 
-ReadFile: 1.00_1_coll
+ReadFile: 1.00_2_coll
 
 Duplicate:  2
 IsCluster:  .false.
