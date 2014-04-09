@@ -928,7 +928,7 @@ SUBROUTINE output_Quantities
   integer :: dx, dy, it
   complex*16 :: gam1
 
-  open(104, status='replace', file=trim(title_mc)//"_quantities.dat")
+  open(104, status='replace', file=trim(title_loop)//"_quantities.dat")
 
   write(104, *) "##################################G"
   write(104, *) "#tau:", MxT
