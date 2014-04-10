@@ -64,6 +64,8 @@ SUBROUTINE calculate_Gam1
   tg(5)   = 2;    tgam2(5)   = 4
   tgam1(5) = 5;   tgam3(5)   = 6;        tw(5) = 5
 
+  Gam(:,:,:,:,:) = (0.d0, 0.d0)
+
   call transfer_G_t(1)
   call transfer_W_t(1)
   call transfer_Gam_t(1)
