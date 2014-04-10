@@ -12,9 +12,9 @@ Jcp:   1.0
 Beta:  0.9
 Order:  1
 Reweight: 1
-Worm/Norm: 0.5 
 ReadFile: 0.90_1_coll
+Worm/Norm: 0.5 
 
-Duplicate:  1
+Duplicate:  2
 IsCluster:  .false.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

@@ -134,8 +134,6 @@ SUBROUTINE calculate_Gam1
     !enddo
   !enddo
 
-  !call output_Gam1
-
 END SUBROUTINE calculate_Gam1
 !====================================================================
 

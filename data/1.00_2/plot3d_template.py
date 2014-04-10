@@ -11,8 +11,8 @@ is2d = True
 Beta = 0.5
 N = 64
 
-#tau = np.arange(0, Beta, Beta/N)
-#Gamt, dim_name = read_data.read_array("./0_0.90_1_Gam_matrix.dat",scope="-1:")["Block: 1"]
+tau = np.arange(0, Beta, Beta/N)
+Gamt, dim_name = read_data.read_array("./1.00_quantities.dat",["Gamma"])["Gamma"]
 
 #tau = np.arange(0, Beta, Beta/N)
 #SUMChit, dim_name = read_data.read_array("./1.00_quantities.dat",["SUMChi"])["SUMChi"]
@@ -20,17 +20,12 @@ N = 64
 #tau = np.arange(0, Beta, Beta/N)
 #Denomt, dim_name = read_data.read_array("./1.00_quantities.dat",["Denom"])["Denom"]
 
-tau = np.arange(0, Beta, Beta/N)
-#Sigmat, dim_name = read_data.read_array("./bare_0.50_1_Sigma.dat",["Sigma"])["Sigma"]
-Sigmat, dim_name = read_data.read_array("./bare_0.50_2_Sigma.dat",["Sigma"])["Sigma"]
-#Sigmat, dim_name = read_data.read_array("./1.00_quantities.dat",["Sigma"])["Sigma"]
-
 if is2d==True:
     fig = plt.figure()
 
-    #plt.plot(tau, Gamt.diagonal().real)
-    #plt.xlabel(dim_name[0])
-    #plt.ylabel("diag{Gamma}")
+    plt.plot(tau, Gamt.diagonal().real)
+    plt.xlabel(dim_name[0])
+    plt.ylabel("diag{Gamma}")
 
     #plt.plot(tau, SUMChit.real)
     #plt.xlabel(dim_name[0])
@@ -40,11 +35,11 @@ if is2d==True:
     #plt.xlabel(dim_name[2])
     #plt.ylabel("Denom(0,0)")
 
-    plt.plot(tau, Sigmat.real)
-    plt.xlabel(dim_name[0])
-    plt.ylabel("Sigma")
+    #plt.plot(tau, Sigmat.real)
+    #plt.xlabel(dim_name[0])
+    #plt.ylabel("Sigma")
 
-    plt.savefig("bare_Sigma_0.50_2.pdf")
+    plt.savefig("diag_Gamma.pdf")
     
 else:
     X = np.arange(0, Beta, Beta/N)

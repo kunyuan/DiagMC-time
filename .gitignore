@@ -11,12 +11,13 @@ _in_*
 *tags*
 *.log
 *.out
+*.swp
+*.conf
+
 project/graph
 project/infile
 project/infile/*
 project/outfile
 project/outfile/*
-*.swp
-*.conf
 project/tools/mytop.sh
 project/tools/kill_loop.sh
