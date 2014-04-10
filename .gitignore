@@ -21,4 +21,4 @@ project/outfile/*
 project/tools/mytop.sh
 project/tools/kill_loop.sh
 
-!data/*
+!data
