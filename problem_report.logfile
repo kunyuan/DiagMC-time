@@ -322,6 +322,15 @@ integration and MC are consistent, bold Gamma code is ready to use
 
 ====================================================
 
+19. Re(Sigma) is symmetric or not?
+
+Test example: Order 1
+IsDeltaGamma(:) = 1; IsDeltaW(:) = 0; real weight with 0.9, direct integration
+
+result: 
+
+====================================================
+
 
 ====================================================
 ========== TEST  BY  KUN ===========================
