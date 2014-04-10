@@ -929,7 +929,7 @@ SUBROUTINE output_Gam1
 
   open(104, status='replace', file=trim(title_loop)//"_Gam1.dat")
 
-  write(104, *) "##################################G"
+  write(104, *) "##################################Gamma"
   write(104, *) "#tau1:", MxT, ",tau2:", MxT
   write(104, *) "#Beta", Beta, "L", L(1), L(2), "Order", MCOrder
   do it2 = 0, MxT-1

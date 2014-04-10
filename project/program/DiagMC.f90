@@ -155,9 +155,8 @@ SUBROUTINE self_consistent
     call LogFile%QuickLog("Reading G,W, and Gamma...")
     call read_GWGamma
 
-    call calculate_Gam1
-    call output_Gam1
-    stop
+    !call calculate_Gam1
+    !stop
 
     call LogFile%QuickLog("Reading MC data...")
     call read_monte_carlo_data
@@ -166,6 +165,9 @@ SUBROUTINE self_consistent
 
     !!-------- update the Gamma matrix with MC data -------
     call Gam_mc2matrix_mc
+
+    !call output_Quantities
+    !stop
 
     flag = self_consistent_GW(1.d-8)
 
@@ -176,8 +178,10 @@ SUBROUTINE self_consistent
 
     call output_Quantities
 
-    call write_GWGamma
-    call update_flag
+    call calculate_Gam1
+
+    !call write_GWGamma
+    !call update_flag
   endif
   return
 END SUBROUTINE self_consistent
