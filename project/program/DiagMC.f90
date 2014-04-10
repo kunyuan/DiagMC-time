@@ -155,6 +155,10 @@ SUBROUTINE self_consistent
     call LogFile%QuickLog("Reading G,W, and Gamma...")
     call read_GWGamma
 
+    call calculate_Gam1
+    call output_Gam1
+    stop
+
     call LogFile%QuickLog("Reading MC data...")
     call read_monte_carlo_data
 
