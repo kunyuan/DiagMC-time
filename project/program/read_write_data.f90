@@ -921,6 +921,26 @@ SUBROUTINE output_GamMC
   close(35)
 END SUBROUTINE output_GamMC
 
+SUBROUTINE output_Gam1
+  implicit none
+  integer :: ityp, it1, it2
+  integer :: dx, dy, it
+  complex*16 :: gam1
+
+  open(104, status='replace', file=trim(title_loop)//"_Gam1.dat")
+
+  write(104, *) "##################################G"
+  write(104, *) "#tau1:", MxT, ",tau2:", MxT
+  write(104, *) "#Beta", Beta, "L", L(1), L(2), "Order", MCOrder
+  do it2 = 0, MxT-1
+    do it1 = 0, MxT-1
+      write(104, *)  real(GamOrder1(1, it1, it2)), dimag(GamOrder1(1,it1,it2))
+    enddo
+  enddo
+  write(104, *)
+  return
+END SUBROUTINE output_Gam1
+
 
 SUBROUTINE output_Quantities
   implicit none
