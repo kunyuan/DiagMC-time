@@ -36,23 +36,25 @@ SUBROUTINE calculate_Gam1
   complex*16 :: FGam(0:MxT-1, 0:MxT-1)
   double precision :: ratio
 
-  !do t1 = 0, MxT-1
+  do t1 = 0, MxT-1
     !G(:, t1) = cdexp(-(0.d0, 1.d0)*pi/(2.d0*MxT)*dble(t1))
-  !enddo
+    G(:, t1) = (1.d0, 0.d0)
+  enddo
 
-  !W = (0.d0, 0.d0)
-  !W(:,0,0,:) = (1.d0, 0.d0)
+  W = (0.d0, 0.d0)
+  W(:,0,0,:) = (1.d0, 0.d0)
 
-  !Gam = (0.d0, 0.d0)
-  !do t1 = 0, MxT-1
-    !do t2 = 0, MxT-1
+  Gam = (0.d0, 0.d0)
+  do t1 = 0, MxT-1
+    do t2 = 0, MxT-1
       !FGam(t1, t2) = dcmplx((t1*Beta/MxT)**2.d0+(t2*Beta/MxT)**2.d0+1.d0, 0.d0)
-    !enddo
-  !enddo
-  !Gam(1,0,0,:,:) = FGam(:, :)
-  !Gam(2,0,0,:,:) = FGam(:, :)
-  !Gam(5,0,0,:,:) = FGam(:, :)
-  !Gam(6,0,0,:,:) = FGam(:, :)
+      FGam(t1, t2) = (1.d0, 0.d0)
+    enddo
+  enddo
+  Gam(1,0,0,:,:) = FGam(:, :)
+  Gam(2,0,0,:,:) = FGam(:, :)
+  Gam(5,0,0,:,:) = FGam(:, :)
+  Gam(6,0,0,:,:) = FGam(:, :)
   
   !================== bold gamma ===============================
   tg(1:4)  = 1;   tgam2(1:4) = 1

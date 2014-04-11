@@ -66,7 +66,7 @@ PROGRAM MAIN
   Pupdate(12)  = 1.d0      ! change_gline_space
   Pupdate(13)  = 1.d0      ! change_wline_space
   Pupdate(14)  = 1.d0      ! change_Gamma_type
-  Pupdate(15)  = 1.d0      ! move_measuring_index
+  !Pupdate(15)  = 1.d0      ! move_measuring_index
   Pupdate(16)  = 1.d0      ! change_Gamma_time
   Pupdate(17)  = 1.d0      ! change_wline_isdelta
   Pupdate(18)  = 1.d0      ! change_gamma_isdelta
@@ -165,7 +165,7 @@ SUBROUTINE self_consistent
     !call transfer_Sigma_t(-1)
     call output_Quantities
 
-    call write_GWGamma
+    !call write_GWGamma
     !call update_flag
   endif
   return
@@ -225,11 +225,11 @@ SUBROUTINE monte_carlo
   integer :: isamp, iblck, mc_version
   double precision :: WR, GamR
 
-  call LogFile%QuickLog("Initializing monte carlo...")
+  !call LogFile%QuickLog("Initializing monte carlo...")
+  !call read_GWGamma
 
-  call read_GWGamma
-  call calculate_GamNormWeight  
   call calculate_Gam1
+  call calculate_GamNormWeight  
 
   call initialize_markov
 
