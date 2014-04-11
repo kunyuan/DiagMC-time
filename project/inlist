@@ -1,0 +1,29 @@
+IsForever: .true.
+Sample: 1000000
+Sweep:  10
+Toss:  1000
+###########################################################################
+IsLoad: 0
+#self consistent loop: 0: start from G0,W0,Gamma0 to calculate G1, W1, Gamma0
+#                      1: read MC data from ReadFile to calculate G, W, Gamma
+#monte carlo:          0: start from the initialization diagram
+#                      1: read the old MC data and continue 
+#for monte carlo, both 0 and 1 will read data file from G,W,Gamma
+##########################################################################
+Type: 2
+#1: self consist loop; 2: monte carlo; 3: numerical integration; 
+#4: output data without self consist loop; 5: test
+##########################################################################
+
+Lx:   4
+Ly:   4
+Jcp:   1.0
+Beta:  0.5
+Order:  1
+Reweight: 1
+ReadFile: 0.90_1_coll
+Worm/Norm: 0.5 
+
+Duplicate:  3
+IsCluster:  .false.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
