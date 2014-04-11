@@ -47,7 +47,7 @@ def check_status():
         sys.exit()
     #os.system("clear")
     for elemp in proclist:
-        if elemp[0].poll()!=None:
+        if elemp[0].poll() is not None:
             proclist.remove(elemp)
             logging.info("Job "+str(elemp[1])+" is ended!")
             print "Job "+str(elemp[1])+" is ended..."
@@ -58,9 +58,9 @@ def submit_jobs(para,execute,homedir):
     outfilepath=homedir+"/outfile"
     topstr="top -p"
 
-    if(os.path.exists(infilepath)!=True):
+    if(os.path.exists(infilepath) is not True):
         os.system("mkdir "+infilepath)
-    if(os.path.exists(outfilepath)!=True):
+    if(os.path.exists(outfilepath) is not True):
         os.system("mkdir "+outfilepath)
     filelist=[int(elem.split('_')[-1]) for elem in os.listdir(infilepath)]
     filelist.sort()
@@ -79,13 +79,13 @@ def submit_jobs(para,execute,homedir):
                 start=0
 
             for j in range(start,int(para["Duplicate"][0])):
-                if j==-1: # when turn on self consisitent loop
+                if j==-1:  # when turn on self consisitent loop
                     pid=0
                 else:
                     lastnum+=1
                     pid=lastnum  #the unique id and random number seed for job
                     pass
-                
+
                 infile="_in_"+str(pid)
                 outfile="out_"+str(pid)+".txt"
                 jobfile="_job_"+str(pid)+".sh"
@@ -136,8 +136,8 @@ def submit_jobs(para,execute,homedir):
                         f.close()
                         os.system("qsub "+jobfile)
                         os.system("rm "+jobfile)
-                    
-                else: 
+
+                else:
                     #print execute,infile
                     while True:
                         #print "proc:"+str(len(proclist))
@@ -163,14 +163,14 @@ def submit_jobs(para,execute,homedir):
                             topstr=topstr+str(p.pid)+","
                             f=open("./mytop.sh","w")
                             f.write(topstr[:-1])
-                            f.close()                            
+                            f.close()
                             os.system("chmod +x ./mytop.sh")
                             if j==-1:
                                 f=open("./kill_loop.sh","w")
                                 f.write("kill -9 "+str(p.pid))
                                 f.close()
                                 os.system("chmod +x ./kill_loop.sh")
-                            
+
                             logging.info("Job "+str(pid)+" is started...")
                             logging.info("input:\n"+stri)
                             print "Job "+str(pid)+" is started..."
@@ -200,7 +200,7 @@ inlist=open(homedir+"/inlist","r")
 para=para_init()
 for eachline in inlist:
     eachline=eachline.lstrip(' ').rstrip(last)
-    
+
     if eachline=="":
         continue
     if eachline[0]=='%' and para["Sample"]!=0:
@@ -236,7 +236,7 @@ for eachline in inlist:
             logging.error("I don't understand '"+eachline+"'!")
             continue
         # parse list parameter
-        if para.has_key(key):
+        if key in para:
             try:
                 para[key]=[elem.lstrip(' ').rstrip(' ') for elem in value.split(',')]
             except ValueError:
