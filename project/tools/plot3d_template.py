@@ -8,7 +8,7 @@ import read_data
 is2d = True
 #is2d = False
 
-Beta = 0.5
+Beta = 0.9
 N = 64
 
 tau = np.arange(0, Beta, Beta/N)

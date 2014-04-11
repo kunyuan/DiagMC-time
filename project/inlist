@@ -10,7 +10,7 @@ IsLoad: 0
 #                      1: read the old MC data and continue 
 #for monte carlo, both 0 and 1 will read data file from G,W,Gamma
 ##########################################################################
-Type: 2
+Type: 4
 #1: self consist loop; 2: monte carlo; 3: numerical integration; 
 #4: output data without self consist loop; 5: test
 ##########################################################################
@@ -24,6 +24,6 @@ Reweight: 1
 ReadFile: 0.90_1_coll
 Worm/Norm: 0.5 
 
-Duplicate:  3
+Duplicate:  1
 IsCluster:  .false.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
