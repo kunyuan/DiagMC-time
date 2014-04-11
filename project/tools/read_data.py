@@ -35,7 +35,7 @@ def __index(file, comment='#', separator='^[[:blank:]]*###*'):
 
     return index_list, name_list, length
 
-def __parse_scope(index_list, name_list, length,scope='-1:'):
+def __parse_scope(index_list, name_list, length,scope=':'):
     scope_bound_str=scope.split(':')
     if len(scope_bound_str)>2:
         print "Only 2 parameters are allowed in range: {}".format(scope)
@@ -103,7 +103,7 @@ def __read_one_block(f,bound,comment='#'):
         a.dtype=complex
     return a.reshape(dim,order='F'),dim_name
 
-def read_array(file, name=[], scope='-1:',
+def read_array(file, name=[], scope=':',
                comment='#', separator='^[[:blank:]]*###*'):
     '''
     Return: a dict of data blocks as {block_name:[block,dim_info],...}
@@ -121,7 +121,7 @@ def read_array(file, name=[], scope='-1:',
     name : list of string
         It contains a block name list to extract from the file
 
-    scope : string with format 'int:int', default='-1:'
+    scope : string with format 'int:int', default=':'
         The blocks range needed to read, as the index in list
     !!!! scope argument will be active only if you didn't pass any name list to name argument!!!
 

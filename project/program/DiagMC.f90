@@ -156,6 +156,8 @@ subroutine just_output
 
   call LogFile%QuickLog("Reading MC data...")
   call read_monte_carlo_data
+  
+  call Gam_mc2matrix_mc
 
   call LogFile%QuickLog("Reading Done!...")
   call output_Quantities
