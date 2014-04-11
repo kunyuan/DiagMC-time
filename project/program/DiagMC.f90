@@ -35,6 +35,12 @@ PROGRAM MAIN
     call LogFile%Initial(trim(title_mc)//".log","job."//trim(adjustl(title2)))
     call LogTerm%Initial('*',"job."//trim(adjustl(title2)))
   else if(ISub==3) then
+    call LogFile%Initial("project.log","integral")
+    call LogTerm%Initial('*','integral')
+  else if(ISub==4) then
+    call LogFile%Initial("project.log","output")
+    call LogTerm%Initial('*','output')
+  else if(ISub==5) then
     call LogFile%Initial('*','test')
     call LogTerm%Initial('*','test')
   endif
@@ -119,6 +125,10 @@ PROGRAM MAIN
     close(10)
     call monte_carlo
   else if(ISub==3) then
+    call numerical_integeration
+  else if(ISub==4) then
+    call just_output
+  else if(ISub==5) then
     call test_subroutine
   endif
 
@@ -131,6 +141,25 @@ INCLUDE "analytic_integration.f90"
 INCLUDE "read_write_data.f90"
 
 
+subroutine numerical_integeration
+  implicit none
+  call LogFile%QuickLog("Reading G,W, and Gamma...")
+  call read_GWGamma
+
+  call calculate_Gam1
+end subroutine
+
+subroutine just_output
+  implicit none
+  call LogFile%QuickLog("Reading G,W, and Gamma...")
+  call read_GWGamma
+
+  call LogFile%QuickLog("Reading MC data...")
+  call read_monte_carlo_data
+
+  call LogFile%QuickLog("Reading Done!...")
+  call output_Quantities
+end subroutine just_output
 
 SUBROUTINE self_consistent
   implicit none
@@ -155,8 +184,6 @@ SUBROUTINE self_consistent
     call LogFile%QuickLog("Reading G,W, and Gamma...")
     call read_GWGamma
 
-    !call calculate_Gam1
-    !stop
 
     call LogFile%QuickLog("Reading MC data...")
     call read_monte_carlo_data
@@ -165,9 +192,6 @@ SUBROUTINE self_consistent
 
     !!-------- update the Gamma matrix with MC data -------
     call Gam_mc2matrix_mc
-
-    !call output_Quantities
-    !stop
 
     flag = self_consistent_GW(1.d-8)
 
@@ -178,10 +202,8 @@ SUBROUTINE self_consistent
 
     call output_Quantities
 
-    call calculate_Gam1
-
-    !call write_GWGamma
-    !call update_flag
+    call write_GWGamma
+    call update_flag
   endif
   return
 END SUBROUTINE self_consistent
