@@ -18,7 +18,7 @@ Type: 2
 Lx:   4
 Ly:   4
 Jcp:   1.0
-Beta:  0.9
+Beta:  0.5
 Order:  1
 Reweight: 1
 ReadFile: 0.90_1_coll
