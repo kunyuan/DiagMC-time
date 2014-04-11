@@ -8,7 +8,7 @@ import logging
 
 #IsCluster=True
 IsCluster=False
-TurnOnSelfConsist=False
+TurnOnLoop=False
 cpu=4
 #sourcedir="."
 execute="./gamma3.exe"
@@ -73,12 +73,7 @@ def submit_jobs(para,execute,homedir):
     for belem in para["Beta"]:
         for jelem in para["Jcp"]:
 
-            if TurnOnSelfConsist:
-                start=-1
-            else:
-                start=0
-
-            for j in range(start,int(para["Duplicate"][0])):
+            for j in range(-1,int(para["Duplicate"][0])):
                 if j==-1:  # when turn on self consisitent loop
                     pid=0
                 else:
@@ -101,8 +96,8 @@ def submit_jobs(para,execute,homedir):
                 item.append(para["Order"][0])
                 item.append(str(-int(random.random()*2**30)))   #Seed
                 if j==-1:  # when turn on self consisitent loop
-                    item.append(str(1))
-                    item.append(str(1))
+                    item.append(LoopStr1)
+                    item.append(LoopStr2)
                 else:
                     item.append(para["Type"][0])
                     item.append(para["IsLoad"][0])
@@ -131,7 +126,7 @@ def submit_jobs(para,execute,homedir):
                         f.close()
                         os.system("qsub "+jobfile)
                         os.system("rm "+jobfile)
-                    else:
+                    elif TurnOnLoop:
                         f.write(" ".join(loop_execute))
                         f.close()
                         os.system("qsub "+jobfile)
@@ -150,12 +145,14 @@ def submit_jobs(para,execute,homedir):
                             f=open(homedir+"/all_input.log","a")
                             f.write(stri)
                             f.close()
+                            if j==-1 and TurnOnLoop is False:
+                                break
                             f=open(infilepath+"/"+infile,"r")
                             g=open(outfilepath+"/"+outfile,"a")
                             if j>=0:
                                 p=subprocess.Popen(execute,stdin=f,stdout=g)
                                 proclist.append((p,pid))
-                            else:
+                            elif TurnOnLoop:
                                 p=subprocess.Popen(loop_execute,stdin=f,stdout=g)
                                 loop_proc.append(p)
                             f.close()
@@ -165,15 +162,15 @@ def submit_jobs(para,execute,homedir):
                             f.write(topstr[:-1])
                             f.close()
                             os.system("chmod +x ./mytop.sh")
-                            if j==-1:
+                            if j==-1 and TurnOnLoop:
                                 f=open("./kill_loop.sh","w")
                                 f.write("kill -9 "+str(p.pid))
                                 f.close()
                                 os.system("chmod +x ./kill_loop.sh")
 
-                            logging.info("Job "+str(pid)+" is started...")
+                            logging.info("job "+str(pid)+" is started...")
                             logging.info("input:\n"+stri)
-                            print "Job "+str(pid)+" is started..."
+                            print "job "+str(pid)+" is started..."
                             break
 
     return
@@ -182,11 +179,19 @@ if len(sys.argv)>1:
     if sys.argv[1]=='l' or sys.argv[1]=='-l':
         logging.info("Self consistent loop is automatically started!")
         print "Self consistent loop is automatically started!"
-        TurnOnSelfConsist=True
+        TurnOnLoop=True
+        LoopStr1="1"
+        LoopStr2="1"
+    if sys.argv[1]=='o' or sys.argv[1]=='-o':
+        logging.info("Output loop is automatically started!")
+        print "Output loop is automatically started!"
+        TurnOnLoop=True
+        LoopStr1="4"
+        LoopStr2="0"
 else:
     logging.info("Please take care of Self consistent loop by yourself!")
     print "Please take care of Self consistent loop by yourself!"
-    TurnOnSelfConsist=False
+    TurnOnLoop=False
 
 
 inlist=open(homedir+"/inlist","r")
@@ -252,8 +257,8 @@ while True:
     if len(proclist)!=0:
         check_status()
     else:
-        #print TurnOnSelfConsist,loop_proc
-        if TurnOnSelfConsist and len(loop_proc)!=0:
+        #print TurnOnLoop,loop_proc
+        if TurnOnLoop and len(loop_proc)!=0:
             loop_proc[0].kill()
             logging.info("Loop daemon is killed.")
             print "Loop daemon is killed."

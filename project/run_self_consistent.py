@@ -11,7 +11,7 @@ def run_loop():
     interval=300
     #title = "0.50_2"
     #time.sleep(300)
-    logging.info("Self Consistent Loop daemon started!")
+    logging.info("Loop daemon started!")
     #logging.info(title+" is the target!")
     i=0
     flag = "0"
@@ -20,7 +20,7 @@ def run_loop():
         i=i+1
         logging.info("Loop "+str(i)+" running...")
         try:
-            output = subprocess.Popen([homedir+"/collapse_data.exe"], stdout=subprocess.PIPE).communicate()[0]
+            subprocess.Popen([homedir+"/collapse_data.exe"], stdout=subprocess.PIPE).communicate()[0]
         except subprocess.CalledProcessError as e:
             ret=e.returncode
             logging.error('collapse_data.exe return a non-zero value '+str(ret)+', something happened!')
@@ -32,21 +32,15 @@ def run_loop():
                 flag = open("stop.inp", "r").readline().lstrip().rstrip()
                 #logging.info("flag: "+flag)
             except:
-                logging.error('self_consistent error')
+                logging.error('loop error')
 
         logging.info("Loop "+str(i)+" done!")
         logging.info("Sleeping...")
         time.sleep(interval)
-        logging.info("Self Consistent Loop daemon ended!")
+        logging.info("Loop daemon ended!")
     pass
 
 # if __name__=="__main__":
 print "Start loop..."
 run_loop()
     # pass
-
-
-    
-
-
-
