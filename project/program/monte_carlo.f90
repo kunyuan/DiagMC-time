@@ -2340,8 +2340,8 @@ COMPLEX*16 FUNCTION weight_vertex(stat, isdelta, dr0, dtau1, dtau2, typ)
     endif
 
   else if(stat==1 .or. stat==3) then
-    if(isdelta==1) weight_vertex = weight_meas_Gam(typ, dr)
     if(isdelta==0) weight_vertex = (0.d0, 0.d0)
+    if(isdelta==1) weight_vertex = weight_meas_Gam(typ, dr)
   else
     call LogFile%WriteStamp('e')
     call LogFile%WriteLine("The number of update: "+str(iupdate))
