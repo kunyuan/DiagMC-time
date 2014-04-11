@@ -2206,6 +2206,40 @@ COMPLEX*16 FUNCTION weight_gline(stat, tau, typ)
     call print_config
     stop
   endif
+
+  !---------------------- for test --------------------------------------
+  !t = Floor(tau*MxT/Beta)
+
+  !flag = 0
+  !if(t<0) then
+    !tau = tau +Beta
+    !flag = 1
+  !endif
+
+  !if(stat == 0) then
+
+    !!weight_gline = cdexp(-(0.d0, 1.d0)*pi*tau/(2.d0*Beta))
+    !weight_gline = (1.d0, 0.d0)
+    !!weight_gline = dcmplx(Beta-tau, 0.d0)
+    !if(flag==1) then
+      !weight_gline = -1.d0*weight_gline
+    !endif
+
+    !!if(t>=0) then
+      !!weight_gline = weight_meas_G(t)
+      !!!weight_gline = (1.d0, 0.d0)
+    !!else
+      !!weight_gline = -1.d0*weight_meas_G(t)
+      !!!weight_gline = (-1.d0, 0.d0)
+    !!endif
+  !else if(stat==1) then
+    !weight_gline = weight_meas_G(t)
+  !else
+    !call LogFile%WriteStamp('e')
+    !call LogFile%WriteLine("The number of update: "+str(iupdate))
+    !call LogFile%WriteLine("line status error!"+str(stat))
+    !stop
+  !endif
   !------------------------ end -----------------------------------------
 
   return
@@ -2308,13 +2342,51 @@ COMPLEX*16 FUNCTION weight_vertex(stat, isdelta, dr0, dtau1, dtau2, typ)
   else if(stat==1 .or. stat==3) then
     if(isdelta==1) weight_vertex = weight_meas_Gam(typ, dr)
     if(isdelta==0) weight_vertex = (0.d0, 0.d0)
-
   else
     call LogFile%WriteStamp('e')
     call LogFile%WriteLine("The number of update: "+str(iupdate))
     call LogFile%WriteLine("vertex status error!"+str(stat))
     stop
   endif
+
+  !---------------------- for test --------------------------------------
+  !flag = 0
+  !if(t1<0) then
+    !dtau1 = dtau1 + Beta
+    !flag = flag + 1
+  !endif
+  !if(t2<0) then
+    !dtau2 = dtau2 + Beta
+    !flag = flag + 1
+  !endif
+
+  !if(stat==0 .or. stat==2) then
+    !if(isdelta==1) weight_vertex = weight_meas_Gam(typ, dr)
+    !if(isdelta==0) then
+      !weight_vertex = (0.d0, 0.d0)
+      !if(dr(1)==0 .and. dr(2)==0) then
+        !if(typ==1 .or. typ==2 .or. typ==5 .or. typ==6) then
+          !if(mod(flag, 2)==0) then
+            !!weight_vertex = dcmplx(dtau1**2.d0+dtau2**2.d0+1.d0, 0.d0)
+            !weight_vertex = (1.d0, 0.d0)
+          !else 
+            !!weight_vertex = dcmplx(-1.d0*(dtau1**2.d0+dtau2**2.d0+1.d0), 0.d0)
+            !weight_vertex = (-1.d0, 0.d0)
+          !endif
+        !endif
+      !endif
+    !endif
+
+  !else if(stat==1 .or. stat==3) then
+    !if(isdelta==1) weight_vertex = weight_meas_Gam(typ, dr)
+    !if(isdelta==0) weight_vertex = (0.d0, 0.d0)
+
+  !else
+    !call LogFile%WriteStamp('e')
+    !call LogFile%WriteLine("The number of update: "+str(iupdate))
+    !call LogFile%WriteLine("vertex status error!"+str(stat))
+    !stop
+  !endif
   !------------------------ end -----------------------------------------
   return
 END FUNCTION weight_vertex
