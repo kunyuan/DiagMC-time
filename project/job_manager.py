@@ -175,6 +175,8 @@ def submit_jobs(para,execute,homedir):
 
     return
 
+LoopStr1="1"
+LoopStr2="1"
 if len(sys.argv)>1:
     if sys.argv[1]=='l' or sys.argv[1]=='-l':
         logging.info("Self consistent loop is automatically started!")

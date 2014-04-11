@@ -390,7 +390,7 @@ COMPLEX*16 FUNCTION weight_Gam(typ1, dr, t1, t2)
   else if(t1>=0 .and. t2<0) then
     weight_Gam = -Gam(typ1, dr(1), dr(2), t1, t2+MxT)
   else
-    weight_Gam = -Gam(typ1, dr(1), dr(2), t1+MxT, t2+MxT)
+    weight_Gam = Gam(typ1, dr(1), dr(2), t1+MxT, t2+MxT)
   endif
 END FUNCTION weight_Gam
 

@@ -2208,37 +2208,38 @@ COMPLEX*16 FUNCTION weight_gline(stat, tau, typ)
   endif
 
   !---------------------- for test --------------------------------------
-  !t = Floor(tau*MxT/Beta)
 
-  !flag = 0
-  !if(t<0) then
-    !tau = tau +Beta
-    !flag = 1
-  !endif
+!   t = Floor(tau*MxT/Beta)
 
-  !if(stat == 0) then
+!   flag = 0
+!   if(t<0) then
+!     tau = tau +Beta
+!     flag = 1
+!   endif
 
-    !weight_gline = cdexp(-(0.d0, 1.d0)*pi*tau/(2.d0*Beta))
-    !!weight_gline = dcmplx(Beta-tau, 0.d0)
-    !if(flag==1) then
-      !weight_gline = -1.d0*weight_gline
-    !endif
+!   if(stat == 0) then
 
-    !!if(t>=0) then
-      !!weight_gline = weight_meas_G(t)
-      !!!weight_gline = (1.d0, 0.d0)
-    !!else
-      !!weight_gline = -1.d0*weight_meas_G(t)
-      !!!weight_gline = (-1.d0, 0.d0)
-    !!endif
-  !else if(stat==1) then
-    !weight_gline = weight_meas_G(t)
-  !else
-    !call LogFile%WriteStamp('e')
-    !call LogFile%WriteLine("The number of update: "+str(iupdate))
-    !call LogFile%WriteLine("line status error!"+str(stat))
-    !stop
-  !endif
+!     weight_gline = cdexp(-(0.d0, 1.d0)*pi*tau/(2.d0*Beta))
+!     !weight_gline = dcmplx(Beta-tau, 0.d0)
+!     if(flag==1) then
+!       weight_gline = -1.d0*weight_gline
+!     endif
+
+!     !if(t>=0) then
+!       !weight_gline = weight_meas_G(t)
+!       !!weight_gline = (1.d0, 0.d0)
+!     !else
+!       !weight_gline = -1.d0*weight_meas_G(t)
+!       !!weight_gline = (-1.d0, 0.d0)
+!     !endif
+!   else if(stat==1) then
+!     weight_gline = weight_meas_G(t)
+!   else
+!     call LogFile%WriteStamp('e')
+!     call LogFile%WriteLine("The number of update: "+str(iupdate))
+!     call LogFile%WriteLine("line status error!"+str(stat))
+!     stop
+!   endif
   !------------------------ end -----------------------------------------
 
   return
@@ -2247,6 +2248,7 @@ END FUNCTION weight_gline
 
 
 !-------- the weight of a wline -------------------------
+
 ! dx = x2-x1;  dy = y2- y1; tau = tau2-tau1
 COMPLEX*16 FUNCTION weight_wline(stat, isdelta, dr0, tau, typ)
   implicit none
