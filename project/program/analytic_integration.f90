@@ -37,8 +37,8 @@ SUBROUTINE calculate_Gam1
   double precision :: ratio
 
   do t1 = 0, MxT-1
-    !G(:, t1) = cdexp(-(0.d0, 1.d0)*pi/(2.d0*MxT)*dble(t1))
-    G(:, t1) = (1.d0, 0.d0)
+    G(:, t1) = cdexp(-(0.d0, 1.d0)*pi/(2.d0*MxT)*dble(t1))
+    !G(:, t1) = (1.d0, 0.d0)
   enddo
 
   W = (0.d0, 0.d0)
@@ -47,8 +47,8 @@ SUBROUTINE calculate_Gam1
   Gam = (0.d0, 0.d0)
   do t1 = 0, MxT-1
     do t2 = 0, MxT-1
-      !FGam(t1, t2) = dcmplx((t1*Beta/MxT)**2.d0+(t2*Beta/MxT)**2.d0+1.d0, 0.d0)
-      FGam(t1, t2) = (1.d0, 0.d0)
+      FGam(t1, t2) = dcmplx((t1*Beta/MxT)**2.d0+(t2*Beta/MxT)**2.d0+1.d0, 0.d0)
+      !FGam(t1, t2) = (1.d0, 0.d0)
     enddo
   enddo
   Gam(1,0,0,:,:) = FGam(:, :)
