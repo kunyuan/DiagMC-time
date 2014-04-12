@@ -287,8 +287,9 @@ SUBROUTINE monte_carlo
   integer :: isamp, iblck, mc_version
   double precision :: WR, GamR
 
-  call LogFile%QuickLog("Initializing monte carlo...")
+  !call LogFile%QuickLog("Initializing monte carlo...")
   !call read_GWGamma
+
   call calculate_Gam1
 
   call calculate_GamNormWeight
@@ -336,7 +337,8 @@ SUBROUTINE monte_carlo
     GamNorm = (0.d0, 0.d0)
     TestData(:)=0.d0
 
-    mc_version = 0
+    call read_flag
+    mc_version = file_version
 
   else if(IsLoad) then
 
