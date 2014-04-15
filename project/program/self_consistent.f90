@@ -337,15 +337,13 @@ COMPLEX*16 FUNCTION weight_Gam0(typ, dr)
   integer, intent(in)  :: dr(2), typ
   double precision :: ratio
 
+  weight_Gam0 = (0.d0, 0.d0)
+
   if(dr(1)>=0 .and. dr(1)<L(1) .and. dr(2)>=0 .and. dr(2)<L(2)) then
     if(dr(1)==0.and.dr(2)==0) then
       if(typ==1 .or. typ==2 .or. typ==5 .or. typ==6) then
         weight_Gam0 = (1.d0, 0.d0)
-      else
-        weight_Gam0 = (0.d0, 0.d0)
       endif
-    else
-      weight_Gam0 = (0.d0, 0.d0)
     endif
   else
     call logFile%QuickLog("Weight_Gam"//str(dr(1))//str(dr(2))//"dx, dy bigger than system size!")
@@ -439,7 +437,6 @@ SUBROUTINE Gam_mc2matrix_mc
               if(ipercenterr>MxError)  cycle
 
               typ = 2*(ityp-1)+1
-
               Gam(typ,dx,dy,it1,it2) = Gam(typ,dx,dy,it1,it2)+ cgam*normal
             enddo
           enddo

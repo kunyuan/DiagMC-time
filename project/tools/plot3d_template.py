@@ -13,8 +13,9 @@ N = 64
 
 tau = np.arange(0, Beta, Beta/N)
 #Gamt, dim_name = read_data.read_array("./0.90_Gam1.dat",scope="-1:")["Gamma"]
-Gam0t, dim_name = read_data.read_array("./../0.90_Gam1.dat")["Gamma"]
-Gamt, dim_name = read_data.read_array("./../0.90_quantities.dat")["Gamma"]
+
+Gam0t, dim_name = read_data.read_array("./../0.90_Gam1.dat")["Gamma5"]
+Gamt, dim_name = read_data.read_array("./../0.90_quantities.dat")["Gamma5"]
 
 #tau = np.arange(0, Beta, Beta/N)
 #SUMChit, dim_name = read_data.read_array("./1.00_quantities.dat",["SUMChi"])["SUMChi"]
@@ -29,9 +30,7 @@ tau = np.arange(0, Beta, Beta/N)
 
 if is2d is True:
     fig = plt.figure()
-
     plt.plot(tau, Gamt.diagonal().real, 'r', tau, Gam0t.diagonal().real,'b')
-    # plt.plot(tau, Gamt.diagonal().real, 'r')
     plt.xlabel(dim_name[0])
     plt.ylabel("diag{Gamma}")
 
