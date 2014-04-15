@@ -165,8 +165,8 @@ INCLUDE "read_write_data.f90"
 
 subroutine numerical_integeration
   implicit none
-  call LogFile%QuickLog("Reading G,W, and Gamma...")
-  call read_GWGamma
+  !call LogFile%QuickLog("Reading G,W, and Gamma...")
+  !call read_GWGamma
 
   call calculate_Gam1
 end subroutine
