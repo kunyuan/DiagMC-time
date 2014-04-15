@@ -152,21 +152,22 @@ def submit_jobs(para,execute,homedir):
                             if j>=0:
                                 p=subprocess.Popen(execute,stdin=f,stdout=g)
                                 proclist.append((p,pid))
-                            elif TurnOnLoop:
-                                p=subprocess.Popen(loop_execute,stdin=f,stdout=g)
-                                loop_proc.append(p)
-                            f.close()
-                            g.close()
-                            topstr=topstr+str(p.pid)+","
-                            f=open("./mytop.sh","w")
-                            f.write(topstr[:-1])
-                            f.close()
-                            os.system("chmod +x ./mytop.sh")
-                            if j==-1 and TurnOnLoop:
-                                f=open("./kill_loop.sh","w")
-                                f.write("kill -9 "+str(p.pid))
+                            #elif TurnOnLoop:
+                                #p=subprocess.Popen(loop_execute,stdin=f,stdout=g)
+                                #loop_proc.append(p)
+
                                 f.close()
-                                os.system("chmod +x ./kill_loop.sh")
+                                g.close()
+                                topstr=topstr+str(p.pid)+","
+                            #f=open("./mytop.sh","w")
+                            #f.write(topstr[:-1])
+                            #f.close()
+                            #os.system("chmod +x ./mytop.sh")
+                            #if j==-1 and TurnOnLoop:
+                                #f=open("./kill_loop.sh","w")
+                                #f.write("kill -9 "+str(p.pid))
+                                #f.close()
+                                #os.system("chmod +x ./kill_loop.sh")
 
                             logging.info("job "+str(pid)+" is started...")
                             logging.info("input:\n"+stri)

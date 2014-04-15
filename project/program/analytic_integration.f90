@@ -37,36 +37,48 @@ SUBROUTINE calculate_Gam1
   double precision :: ratio
 
   do t1 = 0, MxT-1
-    G(:, t1) = cdexp(-(0.d0, 1.d0)*pi/(2.d0*MxT)*dble(t1))
-    !G(:, t1) = (1.d0, 0.d0)
+    !G(:, t1) = cdexp((0.d0, 1.d0)*pi*real(t1)/(2.d0*MxT))/(1.d0, 1.d0)
+    G(:, t1) = (1.d0, 0.d0)
   enddo
 
+  !W = (0.d0, 0.d0)
+  !W(:,0,0,:) = (1.d0, 0.d0)
+
   W = (0.d0, 0.d0)
-  W(:,0,0,:) = (1.d0, 0.d0)
+  W(1,0,0,:) = (1.d0, 0.d0)
+  W(3,0,0,:) = (-1.d0, 0.d0)
+  W(5,0,0,:) = (2.d0, 0.d0)
+
+  W(2,0,0,:) = W(1,0,0,:)
+  W(4,0,0,:) = W(3,0,0,:)
+  W(6,0,0,:) = W(5,0,0,:)
 
   Gam = (0.d0, 0.d0)
   do t1 = 0, MxT-1
     do t2 = 0, MxT-1
-      FGam(t1, t2) = dcmplx((t1*Beta/MxT)**2.d0+(t2*Beta/MxT)**2.d0+1.d0, 0.d0)
-      !FGam(t1, t2) = (1.d0, 0.d0)
+      !FGam(t1, t2) = dcmplx((t1*Beta/MxT)**2.d0+(t2*Beta/MxT)**2.d0+1.d0, 0.d0)
+      FGam(t1, t2) = (1.d0, 0.d0)
     enddo
   enddo
   Gam(1,0,0,:,:) = FGam(:, :)
   Gam(2,0,0,:,:) = FGam(:, :)
+  Gam(3,0,0,:,:) = FGam(:, :)
+  Gam(4,0,0,:,:) = FGam(:, :)
   Gam(5,0,0,:,:) = FGam(:, :)
   Gam(6,0,0,:,:) = FGam(:, :)
+
+
+  !call read_GWGamma
   
   !================== bold gamma ===============================
   tg(1:4)  = 1;   tgam2(1:4) = 1
   tgam1(1) = 1;   tgam3(1)   = 1;        tw(1) = 1
-  tgam1(4) = 3;   tgam3(4)   = 3;        tw(2) = 2
+  tgam1(4) = 3;   tgam3(4)   = 3;        tw(4) = 2
   tgam1(3) = 1;   tgam3(3)   = 3;        tw(3) = 3
-  tgam1(2) = 3;   tgam3(2)   = 1;        tw(4) = 4
+  tgam1(2) = 3;   tgam3(2)   = 1;        tw(2) = 4
 
   tg(5)   = 2;    tgam2(5)   = 4
   tgam1(5) = 5;   tgam3(5)   = 6;        tw(5) = 5
-
-  Gam(:,:,:,:,:) = (0.d0, 0.d0)
 
   call transfer_G_t(1)
   call transfer_W_t(1)
@@ -99,7 +111,8 @@ SUBROUTINE calculate_Gam1
 
           weight = Gin *Gout *iW *Gam1 *Gam2 *Gam3
 
-          GamOrder1(1,omega1, omega2)=GamOrder1(1, omega1, omega2)+d_times_cd(ratio, weight)
+          !GamOrder1(1,omega1, omega2)=GamOrder1(1, omega1, omega2)+d_times_cd(ratio, weight)
+          GamOrder1(ityp,omega1, omega2)=GamOrder1(ityp, omega1, omega2)+d_times_cd(ratio, weight)
         enddo
       enddo
 
