@@ -143,8 +143,8 @@ INCLUDE "read_write_data.f90"
 
 subroutine numerical_integeration
   implicit none
-  call LogFile%QuickLog("Reading G,W, and Gamma...")
-  call read_GWGamma
+  !call LogFile%QuickLog("Reading G,W, and Gamma...")
+  !call read_GWGamma
 
   call calculate_Gam1
 end subroutine
@@ -168,7 +168,6 @@ SUBROUTINE self_consistent
   integer :: iloop
   logical :: flag
 
-  !------- read the G, W, and Gamma  -------------------
   if(InpMC==0) then
 
     flag = self_consistent_GW(1.d-8)

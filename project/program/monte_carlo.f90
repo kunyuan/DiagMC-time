@@ -2193,47 +2193,47 @@ COMPLEX*16 FUNCTION weight_gline(stat, tau, typ)
   double precision :: tau
   integer :: t, flag
 
-  !t = Floor(tau*MxT/Beta)
-
-  !if(stat == 0) then
-    !weight_gline = weight_G(typ, t)
-  !else if(stat == 1) then
-    !!  Have measuring vertex around
-    !weight_gline = weight_meas_G(t)
-  !else
-    !call LogFile%WriteStamp('e')
-    !call LogFile%WriteLine("The number of update: "+str(iupdate))
-    !call LogFile%WriteLine("line status error!"+str(stat))
-    !call print_config
-    !stop
-  !endif
-
-  !---------------------- for test --------------------------------------
   t = Floor(tau*MxT/Beta)
 
-  flag = 0
-  if(t<0) then
-    tau = tau +Beta
-    flag = 1
-  endif
-
   if(stat == 0) then
-
-    weight_gline = cdexp(-(0.d0, 1.d0)*pi*tau/(2.d0*Beta))
-    !weight_gline = (1.d0, 0.d0)
-    !weight_gline = dcmplx(Beta-tau, 0.d0)
-    if(flag==1) then
-      weight_gline = -1.d0*weight_gline
-    endif
-
-  else if(stat==1) then
+    weight_gline = weight_G(typ, t)
+  else if(stat == 1) then
+    !  Have measuring vertex around
     weight_gline = weight_meas_G(t)
   else
     call LogFile%WriteStamp('e')
     call LogFile%WriteLine("The number of update: "+str(iupdate))
     call LogFile%WriteLine("line status error!"+str(stat))
+    call print_config
     stop
   endif
+
+  !---------------------- for test --------------------------------------
+  !t = Floor(tau*MxT/Beta)
+
+  !flag = 0
+  !if(t<0) then
+    !tau = tau +Beta
+    !flag = 1
+  !endif
+
+  !if(stat == 0) then
+
+    !!weight_gline = cdexp(-(0.d0, 1.d0)*pi*tau/(2.d0*Beta))
+    !weight_gline = (1.d0, 0.d0)
+    !!weight_gline = dcmplx(Beta-tau, 0.d0)
+    !if(flag==1) then
+      !weight_gline = -1.d0*weight_gline
+    !endif
+
+  !else if(stat==1) then
+    !weight_gline = weight_meas_G(t)
+  !else
+    !call LogFile%WriteStamp('e')
+    !call LogFile%WriteLine("The number of update: "+str(iupdate))
+    !call LogFile%WriteLine("line status error!"+str(stat))
+    !stop
+  !endif
   !------------------------ end -----------------------------------------
 
   return
@@ -2256,41 +2256,41 @@ COMPLEX*16 FUNCTION weight_wline(stat, isdelta, dr0, tau, typ)
 
   call diff_r(dr0, dr)
 
-  !if(stat == 0) then
-    !if(isdelta==0) weight_wline = weight_W(typ, dr, t)
-    !if(isdelta==1) weight_wline = weight_W0(typ, dr)
-  !else if(stat == 2) then
-    !! Have Ira or Masha around 
-    !if(isdelta==0) weight_wline = weight_W(1, dr, t)
-    !if(isdelta==1) weight_wline = weight_W0(1, dr)
-  !else if(stat == 1 .or. stat==3) then
-    !!  Have measuring vertex around
-    !if(isdelta==0) weight_wline = weight_meas_W(dr, t)
-    !if(isdelta==1) weight_wline = (0.d0, 0.d0)
-  !else
-    !call LogFile%WriteStamp('e')
-    !call LogFile%WriteLine("The number of update: "+str(iupdate))
-    !call LogFile%WriteLine("line status error!"+str(stat))
-    !call print_config
-    !stop
-  !endif
-
-  !---------------------- for test --------------------------------------
-  if(stat >= 0 .and. stat<=3) then
-    if(isdelta==0 .and. dr(1)==0 .and. dr(2)==0) then
-      weight_wline = weight_meas_W(dr, t)
-    else 
-      weight_wline = (0.d0, 0.d0)
-    endif
-
-    !if(isdelta==0) weight_wline = weight_meas_W(dr, t)
-    !if(isdelta==1) weight_wline = weight_meas_W(dr, 0)
+  if(stat == 0) then
+    if(isdelta==0) weight_wline = weight_W(typ, dr, t)
+    if(isdelta==1) weight_wline = weight_W0(typ, dr)
+  else if(stat == 2) then
+    ! Have Ira or Masha around 
+    if(isdelta==0) weight_wline = weight_W(1, dr, t)
+    if(isdelta==1) weight_wline = weight_W0(1, dr)
+  else if(stat == 1 .or. stat==3) then
+    !  Have measuring vertex around
+    if(isdelta==0) weight_wline = weight_meas_W(dr, t)
+    if(isdelta==1) weight_wline = (0.d0, 0.d0)
   else
     call LogFile%WriteStamp('e')
     call LogFile%WriteLine("The number of update: "+str(iupdate))
     call LogFile%WriteLine("line status error!"+str(stat))
+    call print_config
     stop
   endif
+
+  !---------------------- for test --------------------------------------
+  !if(stat >= 0 .and. stat<=3) then
+    !if(isdelta==0 .and. dr(1)==0 .and. dr(2)==0) then
+      !weight_wline = weight_meas_W(dr, t)
+    !else 
+      !weight_wline = (0.d0, 0.d0)
+    !endif
+
+    !!if(isdelta==0) weight_wline = weight_meas_W(dr, t)
+    !!if(isdelta==1) weight_wline = weight_meas_W(dr, 0)
+  !else
+    !call LogFile%WriteStamp('e')
+    !call LogFile%WriteLine("The number of update: "+str(iupdate))
+    !call LogFile%WriteLine("line status error!"+str(stat))
+    !stop
+  !endif
   !------------------------ end -----------------------------------------
 
   return
@@ -2311,76 +2311,76 @@ COMPLEX*16 FUNCTION weight_vertex(stat, isdelta, dr0, dtau1, dtau2, typ)
 
   call diff_r(dr0, dr)
 
-  !if(stat==0) then
-    !if(isbold) then
-      !!----------------- for bold Gamma ------------------------------
-      !if(isdelta==0) weight_vertex = weight_Gam(typ, dr, t1, t2)
-      !if(isdelta==1) weight_vertex = weight_Gam0(typ, dr)
-    !else
-      !!----------------- for bare Gamma ------------------------------
-      !if(isdelta==0) weight_vertex = (0.d0, 0.d0)
-      !if(isdelta==1) weight_vertex = weight_Gam0(typ, dr)
-    !endif
+  if(stat==0) then
+    if(isbold) then
+      !----------------- for bold Gamma ------------------------------
+      if(isdelta==0) weight_vertex = weight_Gam(typ, dr, t1, t2)
+      if(isdelta==1) weight_vertex = weight_Gam0(typ, dr)
+    else
+      !----------------- for bare Gamma ------------------------------
+      if(isdelta==0) weight_vertex = (0.d0, 0.d0)
+      if(isdelta==1) weight_vertex = weight_Gam0(typ, dr)
+    endif
 
-  !else if(stat==2) then
-    !if(isbold) then
-      !!----------------- for bold Gamma ------------------------------
-      !if(isdelta==0) weight_vertex = weight_Gam(typ, dr, t1, t2)
-      !if(isdelta==1) weight_vertex = weight_Gam0(typ, dr)
-    !else 
-      !!----------------- for bare Gamma ------------------------------
-      !if(isdelta==0) weight_vertex = (0.d0, 0.d0)
-      !if(isdelta==1) weight_vertex = weight_Gam0(typ, dr)
-    !endif
-
-  !else if(stat==1 .or. stat==3) then
-    !if(isdelta==1) weight_vertex = weight_meas_Gam(typ, dr)
-    !if(isdelta==0) weight_vertex = (0.d0, 0.d0)
-  !else
-    !call LogFile%WriteStamp('e')
-    !call LogFile%WriteLine("The number of update: "+str(iupdate))
-    !call LogFile%WriteLine("vertex status error!"+str(stat))
-    !stop
-  !endif
-
-  !---------------------- for test --------------------------------------
-  flag = 0
-  if(t1<0) then
-    dtau1 = dtau1 + Beta
-    flag = flag + 1
-  endif
-  if(t2<0) then
-    dtau2 = dtau2 + Beta
-    flag = flag + 1
-  endif
-
-  if(stat==0 .or. stat==2) then
-    if(isdelta==1) weight_vertex = weight_meas_Gam(typ, dr)
-    if(isdelta==0) then
-      weight_vertex = (0.d0, 0.d0)
-      if(dr(1)==0 .and. dr(2)==0) then
-        if(typ==1 .or. typ==2 .or. typ==5 .or. typ==6) then
-          if(mod(flag, 2)==0) then
-            weight_vertex = dcmplx(dtau1**2.d0+dtau2**2.d0+1.d0, 0.d0)
-            !weight_vertex = (1.d0, 0.d0)
-          else 
-            weight_vertex = dcmplx(-1.d0*(dtau1**2.d0+dtau2**2.d0+1.d0), 0.d0)
-            !weight_vertex = (-1.d0, 0.d0)
-          endif
-        endif
-      endif
+  else if(stat==2) then
+    if(isbold) then
+      !----------------- for bold Gamma ------------------------------
+      if(isdelta==0) weight_vertex = weight_Gam(typ, dr, t1, t2)
+      if(isdelta==1) weight_vertex = weight_Gam0(typ, dr)
+    else 
+      !----------------- for bare Gamma ------------------------------
+      if(isdelta==0) weight_vertex = (0.d0, 0.d0)
+      if(isdelta==1) weight_vertex = weight_Gam0(typ, dr)
     endif
 
   else if(stat==1 .or. stat==3) then
     if(isdelta==1) weight_vertex = weight_meas_Gam(typ, dr)
     if(isdelta==0) weight_vertex = (0.d0, 0.d0)
-
   else
     call LogFile%WriteStamp('e')
     call LogFile%WriteLine("The number of update: "+str(iupdate))
     call LogFile%WriteLine("vertex status error!"+str(stat))
     stop
   endif
+
+  !---------------------- for test --------------------------------------
+  !flag = 0
+  !if(t1<0) then
+    !dtau1 = dtau1 + Beta
+    !flag = flag + 1
+  !endif
+  !if(t2<0) then
+    !dtau2 = dtau2 + Beta
+    !flag = flag + 1
+  !endif
+
+  !if(stat==0 .or. stat==2) then
+    !if(isdelta==1) weight_vertex = weight_meas_Gam(typ, dr)
+    !if(isdelta==0) then
+      !weight_vertex = (0.d0, 0.d0)
+      !if(dr(1)==0 .and. dr(2)==0) then
+        !if(typ==1 .or. typ==2 .or. typ==5 .or. typ==6) then
+          !if(mod(flag, 2)==0) then
+            !!weight_vertex = dcmplx(dtau1**2.d0+dtau2**2.d0+1.d0, 0.d0)
+            !weight_vertex = (1.d0, 0.d0)
+          !else 
+            !!weight_vertex = dcmplx(-1.d0*(dtau1**2.d0+dtau2**2.d0+1.d0), 0.d0)
+            !weight_vertex = (-1.d0, 0.d0)
+          !endif
+        !endif
+      !endif
+    !endif
+
+  !else if(stat==1 .or. stat==3) then
+    !if(isdelta==1) weight_vertex = weight_meas_Gam(typ, dr)
+    !if(isdelta==0) weight_vertex = (0.d0, 0.d0)
+
+  !else
+    !call LogFile%WriteStamp('e')
+    !call LogFile%WriteLine("The number of update: "+str(iupdate))
+    !call LogFile%WriteLine("vertex status error!"+str(stat))
+    !stop
+  !endif
   !------------------------ end -----------------------------------------
   return
 END FUNCTION weight_vertex
@@ -2425,7 +2425,7 @@ END SUBROUTINE update_weight
 !!=======================================================================
 SUBROUTINE measure
   implicit none
-  integer :: i, iln,iGam,jGam
+  integer :: i, iln,iGam,jGam, iW
   integer :: flag, it
   integer :: spg, spw
   integer :: ityp, nloop
@@ -2479,14 +2479,6 @@ SUBROUTINE measure
       typ = TypeSp2Gam(2,2,spw,spw)
     endif
 
-    if(typ==1 .or. typ==2) then
-      ityp = 1
-    else if(typ==3 .or. typ==4) then
-      ityp = 2
-    else if(typ==5 .or. typ==6) then
-      ityp = 3
-    endif
-
     !----- find the space and time variables for Gamma -------
     rg = GRVertex(:, MeasureGam)
     rw = WRVertex(:, NeighLn(3-dir, MeaW))
@@ -2512,14 +2504,54 @@ SUBROUTINE measure
     endif
 
     factorM = factorM *CoefOfSymmetry(dx, dy)* CoefOfWeight(Order) *abs(WeightVertex(MeasureGam))
-    !------------------- accumulation -------------------------------------------------------
+    !================= accumulation ===================================
+    if(Order==0 .and. IsDeltaVertex(NeighLn(3-dir, MeaW))==1) then
+      GamNorm = GamNorm + Phase/CoefOfWeight(0)
+    endif
 
-    GamMC(Order, ityp, dx, dy, dt1, dt2) = GamMC(Order, ityp, dx, dy, dt1, dt2) &
-      & + Phase/factorM
-    ReGamSqMC(Order, ityp, dx, dy, dt1, dt2 ) = ReGamSqMC(Order, ityp, dx, dy, dt1, dt2) &
-      & + (real(Phase)/factorM)**2.d0
-    ImGamSqMC(Order, ityp, dx, dy, dt1, dt2 ) = ImGamSqMC(Order, ityp, dx, dy, dt1, dt2) &
-      & + (dimag(Phase)/factorM)**2.d0
+    if(Order==1 .and. typ==1) then
+      iW = NeighVertex(3, NeighLn(2, MeaGin))
+      sumt = 0
+      do ikey = 1, NVertex
+        i = VertexKey2Value(ikey)
+        sumt = sumt + TypeVertex(i)
+      enddo
+      if(TypeVertex(NeighLn(3-dir, MeaW))==4) then
+        ityp=2
+      else if(sumt==NVertex) then
+        ityp=1
+      !if(TypeLn(iW)==2) then
+        !ityp=3    !Gamma4
+      !else if(TypeLn(iW)==3) then
+        !ityp=2    !Gamma3
+      !else if(TypeLn(iW)==4) then
+        !ityp=1    !Gamma2
+      else 
+        return
+      endif
+    
+      GamMC(Order, ityp, dx, dy, dt1, dt2) = GamMC(Order, ityp, dx, dy, dt1, dt2) &
+        & + Phase*2.d0/factorM
+      ReGamSqMC(Order, ityp, dx, dy, dt1, dt2 ) = ReGamSqMC(Order, ityp, dx, dy, dt1, dt2) &
+        & + (real(Phase)*2.d0/factorM)**2.d0
+      ImGamSqMC(Order, ityp, dx, dy, dt1, dt2 ) = ImGamSqMC(Order, ityp, dx, dy, dt1, dt2) &
+        & + (dimag(Phase)*2.d0/factorM)**2.d0
+    endif
+
+    !if(typ==1 .or. typ==2) then
+      !ityp = 1
+    !else if(typ==3 .or. typ==4) then
+      !ityp = 2
+    !else if(typ==5 .or. typ==6) then
+      !ityp = 3
+    !endif
+
+    !GamMC(Order, ityp, dx, dy, dt1, dt2) = GamMC(Order, ityp, dx, dy, dt1, dt2) &
+      !& + Phase/factorM
+    !ReGamSqMC(Order, ityp, dx, dy, dt1, dt2 ) = ReGamSqMC(Order, ityp, dx, dy, dt1, dt2) &
+      !& + (real(Phase)/factorM)**2.d0
+    !ImGamSqMC(Order, ityp, dx, dy, dt1, dt2 ) = ImGamSqMC(Order, ityp, dx, dy, dt1, dt2) &
+      !& + (dimag(Phase)/factorM)**2.d0
 
     !===============  test variables =================================
     Norm(1) = Z_normal
@@ -2539,10 +2571,6 @@ SUBROUTINE measure
       Quan(Order+2) = Quan(Order+2) + 1.d0/factorM
     endif
     !=============================================================
-
-    if(Order==0 .and. IsDeltaVertex(NeighLn(3-dir, MeaW))==1) then
-      GamNorm = GamNorm + Phase/CoefOfWeight(0)
-    endif
 
   endif
 END SUBROUTINE measure
