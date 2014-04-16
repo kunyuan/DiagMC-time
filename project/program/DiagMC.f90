@@ -77,7 +77,7 @@ PROGRAM MAIN
   Pupdate(12)  = 1.d0      ! change_gline_space
   Pupdate(13)  = 1.d0      ! change_wline_space
   Pupdate(14)  = 1.d0      ! change_Gamma_type
-  Pupdate(15)  = 1.d0      ! move_measuring_index
+  !Pupdate(15)  = 1.d0      ! move_measuring_index
   Pupdate(16)  = 1.d0      ! change_Gamma_time
   Pupdate(17)  = 1.d0      ! change_wline_isdelta
   Pupdate(18)  = 1.d0      ! change_gamma_isdelta
@@ -143,16 +143,16 @@ INCLUDE "read_write_data.f90"
 
 subroutine numerical_integeration
   implicit none
-  !call LogFile%QuickLog("Reading G,W, and Gamma...")
-  !call read_GWGamma
+  call LogFile%QuickLog("Reading G,W, and Gamma...")
+  call read_GWGamma
 
   call calculate_Gam1
 end subroutine
 
 subroutine just_output
   implicit none
-  !call LogFile%QuickLog("Reading G,W, and Gamma...")
-  !call read_GWGamma
+  call LogFile%QuickLog("Reading G,W, and Gamma...")
+  call read_GWGamma
 
   call LogFile%QuickLog("Reading MC data...")
   call read_monte_carlo_data
@@ -263,8 +263,8 @@ SUBROUTINE monte_carlo
   integer :: isamp, iblck, mc_version
   double precision :: WR, GamR
 
-  !call LogFile%QuickLog("Initializing monte carlo...")
-  !call read_GWGamma
+  call LogFile%QuickLog("Initializing monte carlo...")
+  call read_GWGamma
 
   call calculate_Gam1
 
@@ -306,6 +306,7 @@ SUBROUTINE monte_carlo
     GamOrder(:) = 0.d0
     GamWormOrder(:) = 0.d0
 
+    !Gamtyp(:,:,:) = (0.d0, 0.d0)
     GamMC(:,:,:,:,:,:) = (0.d0, 0.d0)
     ReGamSqMC(:,:,:,:,:,:) = 0.d0
     ImGamSqMC(:,:,:,:,:,:) = 0.d0

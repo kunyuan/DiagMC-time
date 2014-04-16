@@ -465,31 +465,31 @@ SUBROUTINE read_GWGamma
   integer :: ix, iy, ityp, it1, it2, ios
   logical :: alive
 
-  !inquire(file=trim(title_loop)//"_G_file.dat",exist=alive)
-  !if(.not. alive) then
-    !call LogFile%QuickLog("There is no G file yet!",'e')
-    !stop -1
-  !endif
+  inquire(file=trim(title_loop)//"_G_file.dat",exist=alive)
+  if(.not. alive) then
+    call LogFile%QuickLog("There is no G file yet!",'e')
+    stop -1
+  endif
   inquire(file=trim(title_loop)//"_W_file.dat",exist=alive)
   if(.not. alive) then
     call LogFile%QuickLog("There is no W file yet!",'e')
     stop -1
   endif
-  !inquire(file=trim(title_loop)//"_Gamma_file.dat",exist=alive)
-  !if(.not. alive) then
-    !call LogFile%QuickLog("There is no Gamma file yet!",'e')
-    !stop -1
-  !endif
+  inquire(file=trim(title_loop)//"_Gamma_file.dat",exist=alive)
+  if(.not. alive) then
+    call LogFile%QuickLog("There is no Gamma file yet!",'e')
+    stop -1
+  endif
 
-  !open(100, status="old", file=trim(title_loop)//"_G_file.dat")
+  open(100, status="old", file=trim(title_loop)//"_G_file.dat")
   open(101, status="old", file=trim(title_loop)//"_W_file.dat")
-  !open(102, status="old", file=trim(title_loop)//"_Gamma_file.dat")
+  open(102, status="old", file=trim(title_loop)//"_Gamma_file.dat")
 
-  !do it1 = 0, MxT-1
-    !do ityp = 1, NTypeG
-      !read(100, *,iostat=ios) G(ityp, it1)
-    !enddo
-  !enddo
+  do it1 = 0, MxT-1
+    do ityp = 1, NTypeG
+      read(100, *,iostat=ios) G(ityp, it1)
+    enddo
+  enddo
 
   do it1 = 0, MxT-1
     do iy = 0, L(2)-1
@@ -501,25 +501,25 @@ SUBROUTINE read_GWGamma
     enddo
   enddo
 
-  !do it2 = 0, MxT-1
-    !do it1 = 0, MxT-1
-      !do iy = 0, L(2)-1
-        !do ix = 0, L(1)-1
-          !do ityp = 1, NTypeGam
-            !read(102, *,iostat=ios) Gam(ityp, ix, iy, it1, it2)
-          !enddo
-        !enddo
-      !enddo
-    !enddo
-  !enddo
+  do it2 = 0, MxT-1
+    do it1 = 0, MxT-1
+      do iy = 0, L(2)-1
+        do ix = 0, L(1)-1
+          do ityp = 1, NTypeGam
+            read(102, *,iostat=ios) Gam(ityp, ix, iy, it1, it2)
+          enddo
+        enddo
+      enddo
+    enddo
+  enddo
   if(ios/=0) then
     call LogFile%QuickLog("Failed to read G,W or Gamma information!",'e')
     stop -1
   endif
 
-  !close(100)
+  close(100)
   close(101)
-  !close(102)
+  close(102)
   return
 END SUBROUTINE read_GWGamma
 
@@ -930,7 +930,7 @@ SUBROUTINE output_Gam1
 
   open(104, status='replace', file=trim(title_loop)//"_Gam1.dat")
 
-  write(104, *) "##################################Gamma1"
+  write(104, *) "##################################Gamma"
   write(104, *) "#tau1:", MxT, ",tau2:", MxT
   write(104, *) "#Beta", Beta, "L", L(1), L(2), "Order", MCOrder
   do it2 = 0, MxT-1
@@ -940,47 +940,35 @@ SUBROUTINE output_Gam1
   enddo
   write(104, *)
 
-  write(104, *) "##################################Gamma2"
-  write(104, *) "#tau1:", MxT, ",tau2:", MxT
-  write(104, *) "#Beta", Beta, "L", L(1), L(2), "Order", MCOrder
-  do it2 = 0, MxT-1
-    do it1 = 0, MxT-1
-      write(104, *)  real(GamOrder1(2, it1, it2)), dimag(GamOrder1(2,it1,it2))
-    enddo
-  enddo
-  write(104, *)
-
-  write(104, *) "##################################Gamma3"
-  write(104, *) "#tau1:", MxT, ",tau2:", MxT
-  write(104, *) "#Beta", Beta, "L", L(1), L(2), "Order", MCOrder
-  do it2 = 0, MxT-1
-    do it1 = 0, MxT-1
-      write(104, *)  real(GamOrder1(3, it1, it2)), dimag(GamOrder1(3,it1,it2))
-    enddo
-  enddo
-  write(104, *)
-
-  write(104, *) "##################################Gamma4"
-  write(104, *) "#tau1:", MxT, ",tau2:", MxT
-  write(104, *) "#Beta", Beta, "L", L(1), L(2), "Order", MCOrder
-  do it2 = 0, MxT-1
-    do it1 = 0, MxT-1
-      write(104, *)  real(GamOrder1(4, it1, it2)), dimag(GamOrder1(4,it1,it2))
-    enddo
-  enddo
-  write(104, *)
-
-  write(104, *) "##################################Gamma5"
-  write(104, *) "#tau1:", MxT, ",tau2:", MxT
-  write(104, *) "#Beta", Beta, "L", L(1), L(2), "Order", MCOrder
-  do it2 = 0, MxT-1
-    do it1 = 0, MxT-1
-      write(104, *)  real(GamOrder1(5, it1, it2)), dimag(GamOrder1(5,it1,it2))
-    enddo
-  enddo
-  write(104, *)
+  close(104)
   return
 END SUBROUTINE output_Gam1
+
+
+
+SUBROUTINE output_GamMC_typ
+  implicit none
+  integer :: ityp, it1, it2
+  double precision :: normal
+
+  normal = GamNormWeight/GamNorm
+  open(104, status='replace', file=trim(title_mc)//"_Gam_typ.dat")
+
+  do ityp=1, 5
+    write(104, *) "##################################Gamma",trim(adjustl(str(ityp)))
+    write(104, *) "#tau1:", MxT, ",tau2:", MxT
+    write(104, *) "#Beta", Beta, "L", L(1), L(2), "Order", MCOrder
+    do it2 = 0, MxT-1
+      do it1 = 0, MxT-1
+        write(104, *)  normal*real(Gamtyp(ityp, it1, it2)),  &
+          & normal*dimag(Gamtyp(ityp,it1,it2))
+      enddo
+    enddo
+    write(104, *)
+  enddo
+  close(104)
+  return
+END SUBROUTINE output_GamMC_typ
 
 
 SUBROUTINE output_Quantities
@@ -991,27 +979,15 @@ SUBROUTINE output_Quantities
 
   open(104, status='replace', file=trim(title_loop)//"_quantities.dat")
 
-  do ityp = 1, 3
-    write(104, *) "##################################Gamma",trim(adjustl(str(ityp)))
-    write(104, *) "#tau1:", MxT, ",tau2:", MxT
-    write(104, *) "#Beta", Beta, "L", L(1), L(2), "Order", MCOrder
-    do it2 = 0, MxT-1
-      do it1 = 0, MxT-1
-        write(104, *)  real(Gam(ityp, 0, 0, it1, it2)), dimag(Gam(ityp, 0, 0, it1, it2))
-      enddo
+  write(104, *) "##################################Gamma"
+  write(104, *) "#tau1:", MxT, ",tau2:", MxT
+  write(104, *) "#Beta", Beta, "L", L(1), L(2), "Order", MCOrder
+  do it2 = 0, MxT-1
+    do it1 = 0, MxT-1
+      write(104, *)  real(Gam(1, 0, 0, it1, it2)), dimag(Gam(1, 0, 0, it1, it2))
     enddo
-    write(104, *)
   enddo
-
-  !write(104, *) "##################################Gamma5"
-  !write(104, *) "#tau1:", MxT, ",tau2:", MxT
-  !write(104, *) "#Beta", Beta, "L", L(1), L(2), "Order", MCOrder
-  !do it2 = 0, MxT-1
-    !do it1 = 0, MxT-1
-      !write(104, *)  real(Gam(2, 0, 0, it1, it2)), dimag(Gam(2, 0, 0, it1, it2))
-    !enddo
-  !enddo
-  !write(104, *)
+  write(104, *)
 
   write(104, *) "##################################G"
   write(104, *) "#tau:", MxT
