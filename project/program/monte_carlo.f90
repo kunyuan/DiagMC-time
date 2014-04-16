@@ -768,7 +768,8 @@ SUBROUTINE move_worm_along_gline
   if(IsWormPresent .eqv. .false.)   return
 
   !------- step2 : propose a new config -----------------
-  iGam = Ira;  iW = NeighVertex(3, iGam)
+  iGam = Ira
+  iW = NeighVertex(3, iGam)
   dir = Floor(rn()*2.d0) + 1
   GLn = NeighVertex(dir, iGam)
   jGam = NeighLn(dir, GLn);    jW = NeighVertex(3, jGam)
@@ -814,21 +815,19 @@ SUBROUTINE move_worm_along_gline
   typG = 3 - TypeLn(GLn)
 
   if(SpInVertex(dir, iGam)==TypeLn(GLn)) then
-    !spiGam(dir) = 3- SpInVertex(dir, iGam)
     spiGam(dir) = typG
     spiGam(3-dir) = SpInVertex(3-dir, iGam)
   else
-    spiGam(dir) = SpInVertex(dir, iGam)
-    spiGam(3-dir) = 3 - SpInVertex(3-dir, iGam)
+    kLn(GLn) = kGold
+    return
   endif
 
   if(SpInVertex(3-dir, jGam)==TypeLn(GLn)) then
-    !spjGam(3-dir) = 3- SpInVertex(3-dir, jGam)
     spjGam(3-dir) = typG
     spjGam(dir) = SpInVertex(dir, jGam)
   else
-    spjGam(3-dir) = SpInVertex(3-dir, jGam)
-    spjGam(dir) = 3 - SpInVertex(dir, jGam)
+    kLn(GLn) = kGold
+    return
   endif
 
   if(dir == 1) then
@@ -1628,7 +1627,7 @@ SUBROUTINE change_Gamma_type
   complex*16 :: WGam, WW, Anew, Aold, sgn
 
   !------- step1 : check if worm is present -------------
-  if(IsWormPresent .eqv. .true.)    return
+  !if(IsWormPresent .eqv. .true.)    return
 
   !------- step2 : propose a new config -----------------
   iGam = generate_vertex()
@@ -2263,7 +2262,7 @@ COMPLEX*16 FUNCTION weight_wline(stat, isdelta, dr0, tau, typ)
     if(isdelta==0) weight_wline = weight_W(1, dr, t)
     if(isdelta==1) weight_wline = weight_W0(1, dr)
   else if(stat == 1 .or. stat==3) then
-    !  Have measuring vertex around
+    ! Have measuring vertex around
     if(isdelta==0) weight_wline = weight_meas_W(dr, t)
     if(isdelta==1) weight_wline = (0.d0, 0.d0)
   else
@@ -2517,54 +2516,49 @@ SUBROUTINE measure
       GamNorm = GamNorm + Phase/CoefOfWeight(0)
     endif
 
-    if(Order==1 .and. typ==1) then
-      iW = NeighVertex(3, NeighLn(2, MeaGin))
-      if(IsDeltaVertex(NeighLn(1, iW))==1) return
-      if(IsDeltaVertex(NeighLn(2, iW))==1) return
-      if(IsDeltaVertex(NeighLn(3-dir, MeaW))==1) return
+    !if(Order==1 .and. typ==1) then
+      !iW = NeighVertex(3, NeighLn(2, MeaGin))
+      !if(IsDeltaVertex(NeighLn(1, iW))==1) return
+      !if(IsDeltaVertex(NeighLn(2, iW))==1) return
+      !if(IsDeltaVertex(NeighLn(3-dir, MeaW))==1) return
 
-      sumt = 0
-      do ikey = 1, NVertex
-        i = VertexKey2Value(ikey)
-        sumt = sumt + TypeVertex(i)
-      enddo
-
-      if(TypeLn(iW)==1) then
-        ityp=1    !Gamma1
-      else if(TypeVertex(NeighLn(2,MeaGin))==3 .and. TypeVertex(NeighLn(1,MeaGout))==1) then
-        ityp=2    !Gamma2
-      else if(TypeVertex(NeighLn(2,MeaGin))==1 .and. TypeVertex(NeighLn(1,MeaGout))==3) then
-        ityp=3    !Gamma3
-      !if(TypeLn(iW)==2) then
-        !ityp=1    !Gamma4
+      !if(TypeLn(iW)==1) then
+        !ityp=1    !Gamma1
+      !else if(TypeLn(iW)==2) then
+        !ityp=4    !Gamma4
+      !else if(TypeVertex(NeighLn(2,MeaGin))==3 .and. TypeVertex(NeighLn(1,MeaGout))==1) then
+        !ityp=2    !Gamma2
+      !else if(TypeVertex(NeighLn(2,MeaGin))==1 .and. TypeVertex(NeighLn(1,MeaGout))==3) then
+        !ityp=3    !Gamma3
       !else if(TypeVertex(NeighLn(3-dir, MeaW))==4) then
-        !ityp=2    !Gamma5
-      else 
-        return
-      endif
-    
-      GamMC(Order, ityp, dx, dy, dt1, dt2) = GamMC(Order, ityp, dx, dy, dt1, dt2) &
-        & + Phase*2.d0/factorM
-      ReGamSqMC(Order, ityp, dx, dy, dt1, dt2 ) = ReGamSqMC(Order, ityp, dx, dy, dt1, dt2) &
-        & + (real(Phase)*2.d0/factorM)**2.d0
-      ImGamSqMC(Order, ityp, dx, dy, dt1, dt2 ) = ImGamSqMC(Order, ityp, dx, dy, dt1, dt2) &
-        & + (dimag(Phase)*2.d0/factorM)**2.d0
-    endif
+        !ityp=5    !Gamma5
+      !else 
+        !call LogFile%QuickLog("typ wrong in measure!")
+        !call print_config
+        !stop
+      !endif
+      !if(dx/=0 .or. dy/=0) then
+        !call LogFile%QuickLog("dr wrong in measure!")
+        !stop
+      !endif
 
-    !if(typ==1 .or. typ==2) then
-      !ityp = 1
-    !else if(typ==3 .or. typ==4) then
-      !ityp = 2
-    !else if(typ==5 .or. typ==6) then
-      !ityp = 3
+      !Gamtyp(ityp, dt1, dt2) = Gamtyp(ityp, dt1, dt2) + Phase*2.d0/factorM
     !endif
 
-    !GamMC(Order, ityp, dx, dy, dt1, dt2) = GamMC(Order, ityp, dx, dy, dt1, dt2) &
-      !& + Phase/factorM
-    !ReGamSqMC(Order, ityp, dx, dy, dt1, dt2 ) = ReGamSqMC(Order, ityp, dx, dy, dt1, dt2) &
-      !& + (real(Phase)/factorM)**2.d0
-    !ImGamSqMC(Order, ityp, dx, dy, dt1, dt2 ) = ImGamSqMC(Order, ityp, dx, dy, dt1, dt2) &
-      !& + (dimag(Phase)/factorM)**2.d0
+    if(typ==1 .or. typ==2) then
+      ityp = 1
+    else if(typ==3 .or. typ==4) then
+      ityp = 2
+    else if(typ==5 .or. typ==6) then
+      ityp = 3
+    endif
+
+    GamMC(Order, ityp, dx, dy, dt1, dt2) = GamMC(Order, ityp, dx, dy, dt1, dt2) &
+      & + Phase/factorM
+    ReGamSqMC(Order, ityp, dx, dy, dt1, dt2 ) = ReGamSqMC(Order, ityp, dx, dy, dt1, dt2) &
+      & + (real(Phase)/factorM)**2.d0
+    ImGamSqMC(Order, ityp, dx, dy, dt1, dt2 ) = ImGamSqMC(Order, ityp, dx, dy, dt1, dt2) &
+      & + (dimag(Phase)/factorM)**2.d0
 
     !===============  test variables =================================
     Norm(1) = Z_normal
