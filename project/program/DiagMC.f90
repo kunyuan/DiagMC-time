@@ -5,21 +5,43 @@ PROGRAM MAIN
   USE logging_module
   USE vrbls_mc
   implicit none
-  integer :: InpMC, it, i, ISub,ID
+  integer :: it, i, ISub,ID
+  logical :: IsLoad
+  character(len=100) :: infile
 
-  print *, 'L(1), L(2), Ntoss, Nsamp, IsForever, NStep, Jcp, beta, MCOrder, Seed, ISub, InpMC, ID, title'
-  read  *,  L(1), L(2), Ntoss, Nsamp, IsForever, NStep, Jcp, beta, MCOrder, Seed, ISub, InpMC, ID, title
+  print *, "Please give me the input file path: "
+  read(*,'(A)') infile
+  open(100,file=trim(adjustl(infile)))
+  write(*,*) "Opened!"
+  read(100,*) ID
+  read(100,*) L(1)
+  read(100,*) L(2)
+  read(100,*) Jcp
+  read(100,*) Beta
+  read(100,*) MCOrder
+  read(100,*) IsLoad
+  read(100,*) ISub
+  if(ISub==2) then
+    read(100,*) IsForever
+    read(100,*) Ntoss
+    read(100,*) Nsamp
+    read(100,*) Nstep
+    read(100,*) Seed
+    !read(100,*) title
+    read(100,*) CoefOfWorm
+    CoefOfWeight(0) = 1.d0
+    read(100,*) CoefOfWeight(1:MCOrder)
+  elseif(ISub==1 .or. ISub==3) then
+    read(100,*) title
+  endif
+
+  close(100)
 
   isbold = .true.
 
   logL(:)=dlog(L(:)*1.d0)
   SpatialWeight(:,:)=0.d0
 
-  CoefOfWeight(0) = 1.d0
-  do i = 1, MCOrder
-    read *, CoefOfWeight(i)
-  enddo
-  read *, CoefOfWorm
 
   write(title_loop, '(f5.2)') beta
   write(title1, '(i2)')  MCOrder
@@ -151,6 +173,7 @@ end subroutine
 
 subroutine just_output
   implicit none
+  call LogFile%QuickLog("Just output something!")
   call LogFile%QuickLog("Reading G,W, and Gamma...")
   call read_GWGamma
 
@@ -169,7 +192,7 @@ SUBROUTINE self_consistent
   logical :: flag
 
   !------- read the G, W, and Gamma  -------------------
-  if(InpMC==0) then
+  if(IsLoad==.false.) then
 
     flag = self_consistent_GW(1.d-8)
 
@@ -181,7 +204,7 @@ SUBROUTINE self_consistent
 
     call write_GWGamma
     !!!======================================================================
-  else if(InpMC==1) then
+  else if(IsLoad) then
 
     call LogFile%QuickLog("Reading G,W, and Gamma...")
     call read_GWGamma
@@ -275,7 +298,7 @@ SUBROUTINE monte_carlo
 
   QuanName(1) = "(1st-Gamma(0,0))"
 
-  if(InpMC==0) then
+  if(IsLoad==.false.) then
 
     call LogFile%QuickLog("Start Thermalization ...")
 
@@ -313,7 +336,7 @@ SUBROUTINE monte_carlo
 
     mc_version = 0
 
-  else if(InpMC==1) then
+  else if(IsLoad) then
 
     !------- read the configuration and MC data from previous simulation --
     call LogFile%QuickLog("Reading the previous MC data...")
