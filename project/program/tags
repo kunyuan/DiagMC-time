@@ -28,6 +28,7 @@
 803	read_write_data.f90	/^ 803  format (f6.1,x,f6.1,x,' M (',A,') C')$/;"	l	language:Fortran	subroutine:DRAW	file:
 804	read_write_data.f90	/^ 804  format (f6.1,x,f6.1,x,' M (G ',i2,' : ',i2,' --->',i2') C')$/;"	l	language:Fortran	subroutine:DRAW	file:
 805	read_write_data.f90	/^ 805  format (f6.1,x,f6.1,x,' M (W ',i2,' : ',i2,' <=>',i2') C')$/;"	l	language:Fortran	subroutine:DRAW	file:
+BalenceCheck	vrbls_mc.f90	/^  double precision :: BalenceCheck(/;"	v	language:Fortran	module:vrbls_mc
 Beta	vrbls_mc.f90	/^  double precision ::  Beta /;"	v	language:Fortran	module:vrbls_mc
 CheckG	vrbls_mc.f90	/^  logical          ::  CheckG,/;"	v	language:Fortran	module:vrbls_mc
 CheckGam	vrbls_mc.f90	/^  logical          ::  CheckG, CheckW, CheckGam /;"	v	language:Fortran	module:vrbls_mc

@@ -767,17 +767,20 @@ SUBROUTINE move_worm_along_gline
   if(IsWormPresent .eqv. .false.)   return
 
   !------- step2 : propose a new config -----------------
-  iGam = Ira;  iW = NeighVertex(3, iGam)
+  iGam = Ira
+  iW = NeighVertex(3, iGam)
   dir = Floor(rn()*2.d0) + 1
   GLn = NeighVertex(dir, iGam)
-  jGam = NeighLn(dir, GLn);    jW = NeighVertex(3, jGam)
+  jGam = NeighLn(dir, GLn)
+  jW = NeighVertex(3, jGam)
   if(jGam==Masha .or. jGam==Ira)    return
 
-  if(dir==1) then
-    if(SpinMasha+TypeLn(GLn)==0 .or. SpinMasha+TypeLn(GLn)==3)  return
-  else 
-    if(SpinMasha+TypeLn(GLn)==-1 .or. SpinMasha+TypeLn(GLn)==4) return
-  endif
+  !if(dir==1) then
+    !if(SpinMasha+TypeLn(GLn)==0 .or. SpinMasha+TypeLn(GLn)==3)  return
+  !else 
+    !if(SpinMasha+TypeLn(GLn)==-1 .or. SpinMasha+TypeLn(GLn)==4) return
+  !endif
+  if(SpinMasha/=2*get_G_spin(TypeLn(GLn))) return
   
   kGold = kLn(GLn)
   kLn(GLn) = add_k(kGold, (-1)**(dir+1) *kMasha)
@@ -940,6 +943,18 @@ SUBROUTINE move_worm_along_gline
     return
   endif
 END SUBROUTINE move_worm_along_gline
+
+integer :: FUNCTION get_G_spin(TypeG)
+  implicit none
+  integer :: TypeG
+  if(TypeG==1) then
+    get_G_spin=-1
+  else
+    get_G_spin=1
+  endif
+  return
+end FUNCTION
+
 !-----------------------------------------------------------
 
 
@@ -1641,7 +1656,7 @@ SUBROUTINE change_Gamma_type
     typGam = TypeVertex(iGam)+2
   else if(TypeVertex(iGam)==3 .or. TypeVertex(iGam)==4) then
     typGam = TypeVertex(iGam)-2
-  else 
+  else
     return
   endif
 
@@ -1670,6 +1685,12 @@ SUBROUTINE change_Gamma_type
   ProbProp(Order, 14) = ProbProp(Order, 14) + 1
 
   if(rn()<Pacc) then
+
+    if(TypeVertex(iGam)==1 .or. TypeVertex(iGam)==2) then
+      BalenceCheck(Order,1,1)=BalenceCheck(Order,1,1)+1.d0
+    else if(TypeVertex(iGam)==3 .or. TypeVertex(iGam)==4) then
+      BalenceCheck(Order,1,2)=BalenceCheck(Order,1,2)+1.d0
+    endif
 
     !------ update the diagram info -------------------
     Phase = Phase *sgn
@@ -2449,6 +2470,18 @@ SUBROUTINE measure
   endif
   !=============================================================
   if(.not. IsWormPresent) then
+    !do ikey=1,NVertex
+
+      !i=VertexKey2Value(ikey)
+      !!call LogFile%QuickLog(str(TypeVertex(i)))
+
+      !if(TypeVertex(i)==3 .or. TypeVertex(i)==4) then
+        !call LogFile%QuickLog("Oops, type 3 and type 4 is there!")
+        !call print_config
+        !stop
+      !endif
+    !enddo
+
     !===========  Measure in normal space  ==========================
     Z_normal=Z_normal+1.d0
     GamOrder(Order) = GamOrder(Order) + 1.d0

@@ -213,6 +213,7 @@ MODULE vrbls_mc
 
   double precision :: ProbProp(0:MxOrder, Nupdate)
   double precision :: ProbAcc(0:MxOrder, Nupdate)
+  double precision :: BalenceCheck(0:MxOrder,Nupdate,3)  ! a function of the check balence
 
   !------------ hashtable for irreducibility ------------------------------------
   integer, dimension(-MxK:MxK) ::  Hash4G     ! hashtable for k in G

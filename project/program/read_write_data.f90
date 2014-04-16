@@ -68,6 +68,15 @@ SUBROUTINE print_status
         endif
       enddo
     enddo
+
+    call LogFile%WriteLine("------------------------------------------------")
+    do iorder = 0, MCOrder
+      call LogFile%WriteLine("Order"+str(iorder))
+      BalenceCheck(iorder,1,3)=(BalenceCheck(iorder,1,1)-BalenceCheck(iorder,1,2))/BalenceCheck(iorder,1,1)/sqrt(2.d0)
+      write(logstr, '(A,3f17.5)') "Gamma Type 1,2 <==> 3,4:",BalenceCheck(iorder,1,:)
+      call LogFile%WriteLine(logstr)
+    enddo
+
 END SUBROUTINE print_status
 
 !====================================================================
