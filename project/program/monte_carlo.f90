@@ -818,6 +818,7 @@ SUBROUTINE move_worm_along_gline
     spiGam(dir) = typG
     spiGam(3-dir) = SpInVertex(3-dir, iGam)
   else
+    !!!!---for 3 and 4 ------------------
     kLn(GLn) = kGold
     return
   endif
@@ -826,6 +827,7 @@ SUBROUTINE move_worm_along_gline
     spjGam(3-dir) = typG
     spjGam(dir) = SpInVertex(dir, jGam)
   else
+    !!!!---for 3 and 4 ------------------
     kLn(GLn) = kGold
     return
   endif
@@ -2332,15 +2334,6 @@ COMPLEX*16 FUNCTION weight_vertex(stat, isdelta, dr0, dtau1, dtau2, typ)
     endif
 
   else if(stat==1 .or. stat==3) then
-    !if(isbold) then
-      !!----------------- for bold Gamma ------------------------------
-      !if(isdelta==0) weight_vertex = weight_meas_Gam(typ, dr, t1, t2)
-      !if(isdelta==1) weight_vertex = weight_meas_Gam0(typ, dr)
-    !else 
-      !!----------------- for bare Gamma ------------------------------
-      !if(isdelta==0) weight_vertex = (0.d0, 0.d0)
-      !if(isdelta==1) weight_vertex = weight_meas_Gam0(typ, dr)
-    !endif
     if(isdelta==0) weight_vertex = (0.d0, 0.d0)
     if(isdelta==1) weight_vertex = weight_meas_Gam0(typ, dr)
   else
@@ -2486,6 +2479,14 @@ SUBROUTINE measure
       typ = TypeSp2Gam(2,2,spw,spw)
     endif
 
+    if(typ==1 .or. typ==2) then
+      ityp = 1
+    else if(typ==3 .or. typ==4) then
+      ityp = 2
+    else if(typ==5 .or. typ==6) then
+      ityp = 3
+    endif
+
     !----- find the space and time variables for Gamma -------
     rg = GRVertex(:, MeasureGam)
     rw = WRVertex(:, NeighLn(3-dir, MeaW))
@@ -2514,43 +2515,6 @@ SUBROUTINE measure
     !================= accumulation ===================================
     if(Order==0 .and. IsDeltaVertex(NeighLn(3-dir, MeaW))==1) then
       GamNorm = GamNorm + Phase/CoefOfWeight(0)
-    endif
-
-    !if(Order==1 .and. typ==1) then
-      !iW = NeighVertex(3, NeighLn(2, MeaGin))
-      !if(IsDeltaVertex(NeighLn(1, iW))==1) return
-      !if(IsDeltaVertex(NeighLn(2, iW))==1) return
-      !if(IsDeltaVertex(NeighLn(3-dir, MeaW))==1) return
-
-      !if(TypeLn(iW)==1) then
-        !ityp=1    !Gamma1
-      !else if(TypeLn(iW)==2) then
-        !ityp=4    !Gamma4
-      !else if(TypeVertex(NeighLn(2,MeaGin))==3 .and. TypeVertex(NeighLn(1,MeaGout))==1) then
-        !ityp=2    !Gamma2
-      !else if(TypeVertex(NeighLn(2,MeaGin))==1 .and. TypeVertex(NeighLn(1,MeaGout))==3) then
-        !ityp=3    !Gamma3
-      !else if(TypeVertex(NeighLn(3-dir, MeaW))==4) then
-        !ityp=5    !Gamma5
-      !else 
-        !call LogFile%QuickLog("typ wrong in measure!")
-        !call print_config
-        !stop
-      !endif
-      !if(dx/=0 .or. dy/=0) then
-        !call LogFile%QuickLog("dr wrong in measure!")
-        !stop
-      !endif
-
-      !Gamtyp(ityp, dt1, dt2) = Gamtyp(ityp, dt1, dt2) + Phase*2.d0/factorM
-    !endif
-
-    if(typ==1 .or. typ==2) then
-      ityp = 1
-    else if(typ==3 .or. typ==4) then
-      ityp = 2
-    else if(typ==5 .or. typ==6) then
-      ityp = 3
     endif
 
     GamMC(Order, ityp, dx, dy, dt1, dt2) = GamMC(Order, ityp, dx, dy, dt1, dt2) &
