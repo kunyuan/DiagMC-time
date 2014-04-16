@@ -19,5 +19,3 @@ project/infile
 project/infile/*
 project/outfile
 project/outfile/*
-project/tools/mytop.sh
-project/tools/kill_loop.sh
