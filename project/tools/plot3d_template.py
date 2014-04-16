@@ -8,14 +8,47 @@ import read_data
 is2d = True
 #is2d = False
 
-Beta = 0.9
+Beta = 0.90
 N = 64
 
 tau = np.arange(0, Beta, Beta/N)
-#Gamt, dim_name = read_data.read_array("./0.90_Gam1.dat",scope="-1:")["Gamma"]
 
-Gam0t, dim_name = read_data.read_array("./../0.90_Gam1.dat")["Gamma3"]
-Gamt, dim_name = read_data.read_array("./../0.90_quantities.dat")["Gamma3"]
+GamInt, dim_name = read_data.read_array("./../0.90_Gam1.dat")["Gamma"]
+GamMC, dim_name = read_data.read_array("./../0.90_quantities.dat")["Gamma"]
+
+#Gamma = []
+#G = read_data.read_array("./../1.00_Gam1.dat")
+#Gamma.append(G)
+
+#G = read_data.read_array("./../1_1.00_1_Gam_typ.dat")
+#Gamma.append(G)
+#G = read_data.read_array("./../2_1.00_1_Gam_typ.dat")
+#Gamma.append(G)
+#G = read_data.read_array("./../3_1.00_1_Gam_typ.dat")
+#Gamma.append(G)
+#G = read_data.read_array("./../4_1.00_1_Gam_typ.dat")
+#Gamma.append(G)
+
+#filename = ["Gamma1", "Gamma2", "Gamma3", "Gamma4", "Gamma5"]
+
+#GamMC = []
+#GamInt = []
+#for i in range(5):
+    #G0, dim_name = Gamma[0][filename[i]]
+    #GamInt.append(G0)
+
+    #Gamt=[]
+    #Gt, dim_name = Gamma[1][filename[i]]
+    #Gamt.append(Gt)
+    #Gt, dim_name = Gamma[2][filename[i]]
+    #Gamt.append(Gt)
+    #Gt, dim_name = Gamma[3][filename[i]]
+    #Gamt.append(Gt)
+    #Gt, dim_name = Gamma[4][filename[i]]
+    #Gamt.append(Gt)
+
+    #mGamt = (Gamt[0]+Gamt[1]+Gamt[2]+Gamt[3])/4.0
+    #GamMC.append(mGamt)
 
 #tau = np.arange(0, Beta, Beta/N)
 #SUMChit, dim_name = read_data.read_array("./1.00_quantities.dat",["SUMChi"])["SUMChi"]
@@ -30,7 +63,12 @@ tau = np.arange(0, Beta, Beta/N)
 
 if is2d is True:
     fig = plt.figure()
-    plt.plot(tau, Gamt.diagonal().real, 'r', tau, Gam0t.diagonal().real,'b')
+    plt.plot(tau, GamMC.diagonal().real, 'r', 
+            #tau, GamMC[1].diagonal().real, 'r', 
+            #tau, GamMC[2].diagonal().real,'b', 
+            #tau, GamMC[3].diagonal().real, 'b*',
+            #tau, GamMC[4].diagonal().real,'g--', 
+            tau, GamInt.diagonal().real, 'b')
     plt.xlabel(dim_name[0])
     plt.ylabel("diag{Gamma}")
 
