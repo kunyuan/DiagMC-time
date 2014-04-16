@@ -3,13 +3,12 @@
 !_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
 !_TAG_PROGRAM_NAME	Exuberant Ctags	//
 !_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
-!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+!_TAG_PROGRAM_VERSION	5.8	//
 10	monte_carlo_old.f90	/^  10 format(' Line:',i2,2x,'kind:',i2,2x,'type:',i2,2x,'k:',i8,2x,'omega:',i6,2x,'stat:',i2, 2x,&$/;"	l	subroutine:print_config	file:
 10	read_write_data.f90	/^  10 format(' Line:',i2,2x,'kind:',i2,2x,'isdelta:',i2,2x,'type:',i2,2x,'k:',i8,2x,'stat:',i2, 2x,&$/;"	l	subroutine:print_config	file:
 100	basic_function.f90	/^100 J = 1$/;"	l	subroutine:SFFTEU	file:
 101	basic_function.f90	/^101    K = N \/ 2$/;"	l	subroutine:SFFTEU	file:
-101	mylib/mylib.f90	/^101 format('[job]','[',A,']','[',A,']:')$/;"	l	subroutine:write_stamp	file:
-101	mylib/mylib.f90	/^101 format('[job]','[',A,']','[',A,']:',A)$/;"	l	subroutine:write_log	file:
+101	mylib/mylib.f90	/^101 format('[',A,']','[',A,']','[',A,']:')$/;"	l	subroutine:write_stamp	file:
 102	basic_function.f90	/^102    if ( K .ge. J ) goto 103$/;"	l	subroutine:SFFTEU	file:
 103	basic_function.f90	/^103    J = J + K$/;"	l	subroutine:SFFTEU	file:
 12	monte_carlo_old.f90	/^  12 format('Gamma:',i2,2x,'type:',i2,2x,'typein:',i2,2x,'typeout:',i2,2x,'gr:(',i4,i4,'), wr:(',i4,i4,')',&$/;"	l	subroutine:print_config	file:
@@ -27,22 +26,19 @@
 801	read_write_data.f90	/^ 801  format (f6.1,x,f6.1,x,' M (',i2,') C')$/;"	l	subroutine:DRAW	file:
 802	read_write_data.f90	/^ 802  format (f6.1,x,f6.1,x,' M (',i2,':',f6.3,'; (',i3,',',i3,')) C')$/;"	l	subroutine:DRAW	file:
 803	read_write_data.f90	/^ 803  format (f6.1,x,f6.1,x,' M (',A,') C')$/;"	l	subroutine:DRAW	file:
-804	read_write_data.f90	/^ 804  format (f6.1,x,f6.1,x,' M (G: ',i2,' ------>',i2') C')$/;"	l	subroutine:DRAW	file:
-805	read_write_data.f90	/^ 805  format (f6.1,x,f6.1,x,' M (W: ',i2,' <====>',i2') C')$/;"	l	subroutine:DRAW	file:
-Add	mylib/mylib.f90	/^  subroutine Add(/;"	s	module:logging_module
-AddLine	mylib/mylib.f90	/^  subroutine AddLine(/;"	s	module:logging_module
+804	read_write_data.f90	/^ 804  format (f6.1,x,f6.1,x,' M (G ',i2,' : ',i2,' --->',i2') C')$/;"	l	subroutine:DRAW	file:
+805	read_write_data.f90	/^ 805  format (f6.1,x,f6.1,x,' M (W ',i2,' : ',i2,' <=>',i2') C')$/;"	l	subroutine:DRAW	file:
 Beta	vrbls_mc.f90	/^  double precision ::  Beta /;"	v	module:vrbls_mc
 CheckG	vrbls_mc.f90	/^  logical          ::  CheckG,/;"	v	module:vrbls_mc
 CheckGam	vrbls_mc.f90	/^  logical          ::  CheckG, CheckW, CheckGam /;"	v	module:vrbls_mc
 CheckW	vrbls_mc.f90	/^  logical          ::  CheckG, CheckW,/;"	v	module:vrbls_mc
 Chi	vrbls_mc.f90	/^  complex(kind=8), allocatable :: Chi(/;"	v	module:vrbls_mc
-ClearContent	mylib/mylib.f90	/^  subroutine ClearContent(/;"	s	module:logging_module
 CoefOfSymmetry	vrbls_mc.f90	/^  double precision :: CoefOfSymmetry(/;"	v	module:vrbls_mc
 CoefOfWeight	vrbls_mc.f90	/^  double precision :: CoefOfWeight(/;"	v	module:vrbls_mc
 CoefOfWorm	vrbls_mc.f90	/^  double precision :: CoefOfWorm$/;"	v	module:vrbls_mc
-Content	mylib/mylib.f90	/^    character(len=1024) :: Content=/;"	k	type:logging
 D	vrbls_mc.f90	/^  integer, parameter :: D /;"	v	module:vrbls_mc
 DRAW	read_write_data.f90	/^SUBROUTINE DRAW$/;"	s
+Denom	vrbls_mc.f90	/^  complex(kind=8), allocatable :: Denom(/;"	v	module:vrbls_mc
 DirecVertex	vrbls_mc.f90	/^  integer, dimension(MxNVertex) :: DirecVertex /;"	v	module:vrbls_mc
 ERSTAT	monte_carlo.f90	/^subroutine ERSTAT(/;"	s
 Error	vrbls_mc.f90	/^  double precision   :: Error(/;"	v	module:vrbls_mc
@@ -67,7 +63,6 @@ Gam_mc2matrix_mc	self_consistent.f90	/^SUBROUTINE Gam_mc2matrix_mc$/;"	s
 Hash4G	vrbls_mc.f90	/^  integer, dimension(-MxK:MxK) ::  Hash4G /;"	v	module:vrbls_mc
 Hash4W	vrbls_mc.f90	/^  integer, dimension(0:MxK) ::     Hash4W /;"	v	module:vrbls_mc
 ImGamSqMC	vrbls_mc.f90	/^  double precision, allocatable :: ImGamSqMC(/;"	v	module:vrbls_mc
-Init	mylib/mylib.f90	/^  subroutine Init(/;"	s	module:logging_module
 Ira	vrbls_mc.f90	/^  integer          :: Ira,/;"	v	module:vrbls_mc
 IsDeltaLn	vrbls_mc.f90	/^  integer, dimension(MxNLn) :: IsDeltaLn /;"	v	module:vrbls_mc
 IsDeltaVertex	vrbls_mc.f90	/^  integer, dimension(MxNLn) :: IsDeltaVertex /;"	v	module:vrbls_mc
@@ -85,14 +80,13 @@ Is_reducible_W_Gam	basic_function.f90	/^LOGICAL FUNCTION Is_reducible_W_Gam(/;"	
 Is_reducible_W_Gamma	monte_carlo_old.f90	/^LOGICAL FUNCTION Is_reducible_W_Gamma(/;"	f
 Jcp	vrbls_mc.f90	/^  double precision ::  Jcp /;"	v	module:vrbls_mc
 KindLn	vrbls_mc.f90	/^  integer, dimension(MxNLn) :: KindLn /;"	v	module:vrbls_mc
-L	vrbls_mc.f90	/^  integer          ::  Lx/;"	v	module:vrbls_mc
+L	vrbls_mc.f90	/^  integer          ::  L(/;"	v	module:vrbls_mc
 Level	mylib/mylib.f90	/^    integer :: Level=/;"	k	type:logging
 LevelName	mylib/mylib.f90	/^  character(len=10),parameter :: LevelName(/;"	v	module:logging_module
 LnValue2Key	vrbls_mc.f90	/^  integer, dimension(MxNLn) ::  LnValue2Key /;"	v	module:vrbls_mc
 LogFile	vrbls_mc.f90	/^  type(logging) :: LogFile$/;"	v	module:vrbls_mc
 LogTerm	vrbls_mc.f90	/^  type(logging) :: LogTerm$/;"	v	module:vrbls_mc
-Lx	vrbls_mc.f90	/^  integer          ::  Lx,/;"	v	module:vrbls_mc
-Ly	vrbls_mc.f90	/^  integer          ::  Lx, Ly,/;"	v	module:vrbls_mc
+MAIN	test.f90	/^PROGRAM MAIN$/;"	p
 MCOrder	vrbls_mc.f90	/^  integer          ::  MCOrder /;"	v	module:vrbls_mc
 Masha	vrbls_mc.f90	/^  integer          :: Ira, Masha /;"	v	module:vrbls_mc
 MaxStat	vrbls_mc.f90	/^  integer          :: MaxStat$/;"	v	module:vrbls_mc
@@ -101,8 +95,7 @@ Mnint	vrbls_mc.f90	/^  integer, parameter          :: Mnint /;"	v	module:vrbls_m
 Mu	vrbls_mc.f90	/^  double precision ::  Mu(/;"	v	module:vrbls_mc
 MxError	vrbls_mc.f90	/^  double precision, parameter :: MxError /;"	v	module:vrbls_mc
 MxK	vrbls_mc.f90	/^  integer, parameter :: MxK /;"	v	module:vrbls_mc
-MxLx	vrbls_mc.f90	/^  integer, parameter :: MxLx /;"	v	module:vrbls_mc
-MxLy	vrbls_mc.f90	/^  integer, parameter :: MxLx  = 8, MxLy /;"	v	module:vrbls_mc
+MxL	vrbls_mc.f90	/^  integer, parameter,dimension(2) :: MxL /;"	v	module:vrbls_mc
 MxNGLn	vrbls_mc.f90	/^  integer, parameter :: MxNGLn /;"	v	module:vrbls_mc
 MxNLn	vrbls_mc.f90	/^  integer, parameter :: MxNLn /;"	v	module:vrbls_mc
 MxNVertex	vrbls_mc.f90	/^  integer, parameter :: MxNVertex /;"	v	module:vrbls_mc
@@ -144,7 +137,6 @@ QuanName	vrbls_mc.f90	/^  character(len=30),dimension(NObs) :: QuanName$/;"	v	mo
 ReGamSqMC	vrbls_mc.f90	/^  double precision, allocatable :: ReGamSqMC(/;"	v	module:vrbls_mc
 SFFTEU	basic_function.f90	/^subroutine SFFTEU(/;"	s
 Seed	vrbls_mc.f90	/^  integer                      :: Seed /;"	v	module:vrbls_mc
-SetFilename	mylib/mylib.f90	/^  subroutine SetFilename(/;"	s	module:logging_module
 Sigma	vrbls_mc.f90	/^  complex(kind=8) :: Sigma(/;"	v	module:vrbls_mc
 SignFermiLoop	vrbls_mc.f90	/^  integer          :: SignFermiLoop /;"	v	module:vrbls_mc
 SpInVertex	vrbls_mc.f90	/^  integer, dimension(2,MxNVertex) :: SpInVertex /;"	v	module:vrbls_mc
@@ -157,13 +149,15 @@ TVertex	vrbls_mc.f90	/^  double precision, dimension(3, MxNVertex) :: TVertex!/;
 TailLn	vrbls_mc.f90	/^  integer                    :: TailLn /;"	v	module:vrbls_mc
 TailVertex	vrbls_mc.f90	/^  integer                      :: TailVertex /;"	v	module:vrbls_mc
 TestData	vrbls_mc.f90	/^  double precision,dimension(0:20)  :: TestData$/;"	v	module:vrbls_mc
+Title	mylib/mylib.f90	/^    character(len=32) :: Title=/;"	k	type:logging
 TypeGam2W	vrbls_mc.f90	/^  integer, dimension(6,6)   :: TypeGam2W$/;"	v	module:vrbls_mc
 TypeLn	vrbls_mc.f90	/^  integer, dimension(MxNLn) :: TypeLn /;"	v	module:vrbls_mc
 TypeSp2Gam	vrbls_mc.f90	/^  integer, dimension(2,2,2,2) :: TypeSp2Gam$/;"	v	module:vrbls_mc
 TypeVertex	vrbls_mc.f90	/^  integer, dimension(MxNVertex) :: TypeVertex /;"	v	module:vrbls_mc
 VertexKey2Value	vrbls_mc.f90	/^  integer, dimension(MxNVertex):: VertexKey2Value /;"	v	module:vrbls_mc
 VertexValue2Key	vrbls_mc.f90	/^  integer, dimension(MxNVertex):: VertexValue2Key /;"	v	module:vrbls_mc
-Vol	vrbls_mc.f90	/^  integer          ::  Lx, Ly, L(2), Vol /;"	v	module:vrbls_mc
+Vol	vrbls_mc.f90	/^  integer          ::  L(2), Vol /;"	v	module:vrbls_mc
+W	test.f90	/^  double precision :: W$/;"	v	program:MAIN
 W	vrbls_mc.f90	/^  complex(kind=8), allocatable :: W(/;"	v	module:vrbls_mc
 W0PF	vrbls_mc.f90	/^  complex(kind=8), allocatable :: W0PF(/;"	v	module:vrbls_mc
 WLnKey2Value	vrbls_mc.f90	/^  integer, dimension(MxNWLn) :: WLnKey2Value /;"	v	module:vrbls_mc
@@ -172,7 +166,6 @@ WeightCurrent	vrbls_mc.f90	/^  double precision :: WeightCurrent /;"	v	module:vr
 WeightLn	vrbls_mc.f90	/^  COMPLEX*16, dimension(MxNLn) :: WeightLn /;"	v	module:vrbls_mc
 WeightVertex	vrbls_mc.f90	/^  COMPLEX*16, dimension(MxNVertex) :: WeightVertex /;"	v	module:vrbls_mc
 WeightWorm	vrbls_mc.f90	/^  double precision :: WeightWorm /;"	v	module:vrbls_mc
-WriteClose	mylib/mylib.f90	/^  subroutine WriteClose(/;"	s	module:logging_module
 WriteLine	mylib/mylib.f90	/^  subroutine WriteLine(/;"	s	module:logging_module
 Z_normal	vrbls_mc.f90	/^  double precision :: Z_normal$/;"	v	module:vrbls_mc
 Z_worm	vrbls_mc.f90	/^  double precision :: Z_worm$/;"	v	module:vrbls_mc
@@ -218,8 +211,7 @@ check_weight	check_conf.f90	/^SUBROUTINE check_weight$/;"	s
 create_worm_along_gline	monte_carlo_old.f90	/^SUBROUTINE create_worm_along_gline$/;"	s
 create_worm_along_wline	monte_carlo.f90	/^SUBROUTINE create_worm_along_wline$/;"	s
 create_worm_along_wline	monte_carlo_old.f90	/^SUBROUTINE create_worm_along_wline$/;"	s
-dLx	vrbls_mc.f90	/^  integer          ::  dLx,/;"	v	module:vrbls_mc
-dLy	vrbls_mc.f90	/^  integer          ::  dLx, dLy$/;"	v	module:vrbls_mc
+dL	vrbls_mc.f90	/^  integer          ::  dL(/;"	v	module:vrbls_mc
 d_times_cd	basic_function.f90	/^COMPLEX*16 FUNCTION d_times_cd(/;"	f
 date	vrbls_mc.f90	/^  character( 8)         :: date$/;"	v	module:vrbls_mc
 def_conf	monte_carlo_old.f90	/^subroutine def_conf$/;"	s
@@ -245,8 +237,8 @@ delete_mea_stat	monte_carlo_old.f90	/^INTEGER FUNCTION delete_mea_stat(/;"	f
 delete_worm_along_gline	monte_carlo_old.f90	/^SUBROUTINE delete_worm_along_gline$/;"	s
 delete_worm_along_wline	monte_carlo.f90	/^SUBROUTINE delete_worm_along_wline$/;"	s
 delete_worm_along_wline	monte_carlo_old.f90	/^SUBROUTINE delete_worm_along_wline$/;"	s
-diff_x	basic_function.f90	/^INTEGER FUNCTION diff_x(/;"	f
-diff_y	basic_function.f90	/^INTEGER FUNCTION diff_y(/;"	f
+diff_r	basic_function.f90	/^SUBROUTINE diff_r(/;"	s
+dr	test.f90	/^  integer, dimension(2) :: dr$/;"	v	program:MAIN
 file_version	vrbls_mc.f90	/^  integer:: file_version$/;"	v	module:vrbls_mc
 find_config	monte_carlo_old.f90	/^INTEGER FUNCTION find_config(/;"	f
 first_order_diagram	basic_function.f90	/^SUBROUTINE first_order_diagram$/;"	s
@@ -264,6 +256,9 @@ ifd1	vrbls_mc.f90	/^  integer, parameter           :: len1=9689,    ifd1=/;"	v	m
 ifd2	vrbls_mc.f90	/^  integer, parameter           :: len2=127,     ifd2=/;"	v	module:vrbls_mc
 imc	vrbls_mc.f90	/^  double precision :: imc /;"	v	module:vrbls_mc
 imeasure	vrbls_mc.f90	/^  double precision :: imeasure$/;"	v	module:vrbls_mc
+init_char	mylib/mylib.f90	/^  subroutine init_char(/;"	s	module:logging_module
+init_null	mylib/mylib.f90	/^  subroutine init_null(/;"	s	module:logging_module
+init_num	mylib/mylib.f90	/^  subroutine init_num(/;"	s	module:logging_module
 initialize_G	self_consistent.f90	/^SUBROUTINE initialize_G$/;"	s
 initialize_G0F	self_consistent.f90	/^SUBROUTINE initialize_G0F$/;"	s
 initialize_Gam	self_consistent.f90	/^SUBROUTINE initialize_Gam$/;"	s
@@ -287,7 +282,9 @@ ir2	vrbls_mc.f90	/^  integer, dimension(1:len2)   :: ir2$/;"	v	module:vrbls_mc
 irn	vrbls_mc.f90	/^  integer, dimension(1:mxrn)   :: irn(/;"	v	module:vrbls_mc
 is_topo_1	monte_carlo_old.f90	/^LOGICAL FUNCTION is_topo_1(/;"	f
 is_topo_2	monte_carlo_old.f90	/^LOGICAL FUNCTION is_topo_2(/;"	f
+isbold	vrbls_mc.f90	/^  logical :: isbold$/;"	v	module:vrbls_mc
 iupdate	vrbls_mc.f90	/^  integer          :: iupdate /;"	v	module:vrbls_mc
+just_output	DiagMC.f90	/^subroutine just_output$/;"	s
 kLn	vrbls_mc.f90	/^  integer, dimension(MxNLn) :: kLn /;"	v	module:vrbls_mc
 kMasha	vrbls_mc.f90	/^  integer          :: kMasha /;"	v	module:vrbls_mc
 len1	vrbls_mc.f90	/^  integer, parameter           :: len1=/;"	v	module:vrbls_mc
@@ -315,7 +312,7 @@ mul2	vrbls_mc.f90	/^  integer, parameter           :: mod2=2796203, mul2=/;"	v	m
 mult	vrbls_mc.f90	/^  integer, parameter           :: mult=/;"	v	module:vrbls_mc
 mxrn	vrbls_mc.f90	/^  integer, parameter           :: mxrn /;"	v	module:vrbls_mc
 nrannr	vrbls_mc.f90	/^  integer                      :: nrannr /;"	v	module:vrbls_mc
-output_Gam	read_write_data.f90	/^SUBROUTINE output_Gam$/;"	s
+numerical_integeration	DiagMC.f90	/^subroutine numerical_integeration$/;"	s
 output_Gam1	read_write_data.f90	/^SUBROUTINE output_Gam1$/;"	s
 output_GamMC	read_write_data.f90	/^SUBROUTINE output_GamMC$/;"	s
 output_Quantities	read_write_data.f90	/^SUBROUTINE output_Quantities$/;"	s
@@ -330,6 +327,7 @@ prt	vrbls_mc.f90	/^  logical :: prt$/;"	v	module:vrbls_mc
 quicklog_char	mylib/mylib.f90	/^  subroutine quicklog_char(/;"	s	module:logging_module
 quicklog_null	mylib/mylib.f90	/^  subroutine quicklog_null(/;"	s	module:logging_module
 quicklog_num	mylib/mylib.f90	/^  subroutine quicklog_num(/;"	s	module:logging_module
+ratioerr	vrbls_mc.f90	/^  double precision   :: ratioerr$/;"	v	module:vrbls_mc
 read_GWGamma	read_write_data.f90	/^SUBROUTINE read_GWGamma$/;"	s
 read_flag	DiagMC.f90	/^SUBROUTINE read_flag$/;"	s
 read_monte_carlo_conf	read_write_data.f90	/^SUBROUTINE read_monte_carlo_conf$/;"	s
@@ -352,7 +350,6 @@ shift_gline_in_space	monte_carlo_old.f90	/^SUBROUTINE shift_gline_in_space$/;"	s
 shift_wline_in_space	monte_carlo_old.f90	/^SUBROUTINE shift_wline_in_space$/;"	s
 site_num	read_write_data.f90	/^INTEGER FUNCTION site_num(/;"	f
 statistics	monte_carlo.f90	/^SUBROUTINE statistics$/;"	s
-status	mylib/mylib.f90	/^    logical :: status=/;"	k	type:logging
 str_double	mylib/mylib.f90	/^  function str_double(/;"	f	module:string_basic
 str_double_complex	mylib/mylib.f90	/^  function str_double_complex(/;"	f	module:string_basic
 str_int	mylib/mylib.f90	/^  function str_int(/;"	f	module:string_basic
@@ -382,11 +379,14 @@ transfer_Chi_r	basic_function.f90	/^SUBROUTINE transfer_Chi_r(/;"	s
 transfer_Chi_t	basic_function.f90	/^SUBROUTINE transfer_Chi_t(/;"	s
 transfer_G0	basic_function.f90	/^SUBROUTINE transfer_G0(/;"	s
 transfer_G_t	basic_function.f90	/^SUBROUTINE transfer_G_t(/;"	s
-transfer_Gam0	basic_function.f90	/^SUBROUTINE transfer_Gam0(/;"	s
+transfer_Gam0_r	basic_function.f90	/^SUBROUTINE transfer_Gam0_r(/;"	s
+transfer_Gam0_t	basic_function.f90	/^SUBROUTINE transfer_Gam0_t(/;"	s
+transfer_GamOrder1_t	basic_function.f90	/^SUBROUTINE transfer_GamOrder1_t(/;"	s
 transfer_Gam_r	basic_function.f90	/^SUBROUTINE transfer_Gam_r(/;"	s
 transfer_Gam_t	basic_function.f90	/^SUBROUTINE transfer_Gam_t(/;"	s
 transfer_Sigma_t	basic_function.f90	/^SUBROUTINE transfer_Sigma_t(/;"	s
-transfer_W0	basic_function.f90	/^SUBROUTINE transfer_W0(/;"	s
+transfer_W0_r	basic_function.f90	/^SUBROUTINE transfer_W0_r(/;"	s
+transfer_W0_t	basic_function.f90	/^SUBROUTINE transfer_W0_t(/;"	s
 transfer_W_r	basic_function.f90	/^SUBROUTINE transfer_W_r(/;"	s
 transfer_W_t	basic_function.f90	/^SUBROUTINE transfer_W_t(/;"	s
 transfer_r	basic_function.f90	/^SUBROUTINE transfer_r(/;"	s
@@ -412,6 +412,7 @@ weight_G0	self_consistent.f90	/^Complex*16 FUNCTION weight_G0(/;"	f
 weight_Gam	self_consistent.f90	/^COMPLEX*16 FUNCTION weight_Gam(/;"	f
 weight_Gam0	self_consistent.f90	/^COMPLEX*16 FUNCTION weight_Gam0(/;"	f
 weight_W	self_consistent.f90	/^COMPLEX*16 FUNCTION weight_W(/;"	f
+weight_W	test.f90	/^double precision function weight_W(/;"	f	program:MAIN
 weight_W0	self_consistent.f90	/^Complex*16 FUNCTION weight_W0(/;"	f
 weight_gline	monte_carlo.f90	/^COMPLEX*16 FUNCTION weight_gline(/;"	f
 weight_line	monte_carlo_old.f90	/^DOUBLE PRECISION FUNCTION weight_line(/;"	f
@@ -426,9 +427,6 @@ weight_wline	monte_carlo.f90	/^COMPLEX*16 FUNCTION weight_wline(/;"	f
 weight_worm	basic_function.f90	/^DOUBLE PRECISION FUNCTION weight_worm(/;"	f
 wline_stat	basic_function.f90	/^INTEGER FUNCTION wline_stat(/;"	f
 write_GWGamma	read_write_data.f90	/^SUBROUTINE write_GWGamma$/;"	s
-write_log	mylib/mylib.f90	/^  subroutine write_log(/;"	s	module:logging_module
-write_log_char	mylib/mylib.f90	/^  subroutine write_log_char(/;"	s	module:logging_module
-write_log_num	mylib/mylib.f90	/^  subroutine write_log_num(/;"	s	module:logging_module
 write_monte_carlo_conf	read_write_data.f90	/^SUBROUTINE write_monte_carlo_conf$/;"	s
 write_monte_carlo_data	read_write_data.f90	/^SUBROUTINE write_monte_carlo_data$/;"	s
 write_stamp	mylib/mylib.f90	/^  subroutine write_stamp(/;"	s	module:logging_module
