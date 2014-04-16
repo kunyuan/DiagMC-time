@@ -380,7 +380,7 @@ COMPLEX*16 FUNCTION weight_Gam(typ1, dr, t1, t2)
   implicit none
   integer, intent(in)  :: dr(2), t1, t2, typ1
   double precision :: GaR
-  
+
   if(t1>=0 .and. t2>=0) then
     weight_Gam = Gam(typ1, dr(1), dr(2), t1, t2)
   else if(t1<0 .and. t2>=0) then
@@ -415,33 +415,29 @@ SUBROUTINE Gam_mc2matrix_mc
 
               cgam = GamMC(iorder,ityp,dx,dy,it1,it2) /Z_normal
 
-              !rgam2 = ReGamSqMC(iorder, ityp, dx, dy, it1, it2)/Z_normal
-              !rerr = sqrt(abs(rgam2)-(real(cgam))**2.d0)/sqrt(Z_normal-1)
-              !rerr = rerr* ratioerr
+              rgam2 = ReGamSqMC(iorder, ityp, dx, dy, it1, it2)/Z_normal
+              rerr = sqrt(abs(rgam2)-(real(cgam))**2.d0)/sqrt(Z_normal-1)
+              rerr = rerr* ratioerr
 
-              !if(abs(real(cgam))<1.d-30) then
-                !rpercenterr = 0.d0
-              !else
-                !rpercenterr = rerr/abs(real(cgam))
-              !endif
-              !if(rpercenterr>MxError)  cycle
+              if(abs(real(cgam))<1.d-30) then
+                rpercenterr = 0.d0
+              else
+                rpercenterr = rerr/abs(real(cgam))
+              endif
+              if(rpercenterr>MxError)  cycle
 
-              !igam2 = ImGamSqMC(iorder,1, 0, 0, it1, it2)/Z_normal
-              !ierr = sqrt(abs(igam2)-(dimag(cgam))**2.d0)/sqrt(Z_normal-1)
-              !ierr = ierr* ratioerr
+              igam2 = ImGamSqMC(iorder,1, 0, 0, it1, it2)/Z_normal
+              ierr = sqrt(abs(igam2)-(dimag(cgam))**2.d0)/sqrt(Z_normal-1)
+              ierr = ierr* ratioerr
 
-              !if(abs(dimag(cgam))<1.d-30) then
-                !ipercenterr = 0.d0
-              !else
-                !ipercenterr = ierr/abs(dimag(cgam))
-              !endif
-              !if(ipercenterr>MxError)  cycle
+              if(abs(dimag(cgam))<1.d-30) then
+                ipercenterr = 0.d0
+              else
+                ipercenterr = ierr/abs(dimag(cgam))
+              endif
+              if(ipercenterr>MxError)  cycle
 
-              !typ = 2*(ityp-1)+1
-              !Gam(typ,dx,dy,it1,it2) = Gam(typ,dx,dy,it1,it2)+ cgam*normal
-
-
-              typ=ityp
+              typ = 2*(ityp-1)+1
               Gam(typ,dx,dy,it1,it2) = Gam(typ,dx,dy,it1,it2)+ cgam*normal
             enddo
           enddo
@@ -450,9 +446,9 @@ SUBROUTINE Gam_mc2matrix_mc
     enddo
   enddo
 
-  !Gam(2,:,:,:,:) = Gam(1,:,:,:,:)
-  !Gam(4,:,:,:,:) = Gam(3,:,:,:,:)
-  !Gam(6,:,:,:,:) = Gam(5,:,:,:,:)
+  Gam(2,:,:,:,:) = Gam(1,:,:,:,:)
+  Gam(4,:,:,:,:) = Gam(3,:,:,:,:)
+  Gam(6,:,:,:,:) = Gam(5,:,:,:,:)
   
 END SUBROUTINE Gam_mc2matrix_mc
  
