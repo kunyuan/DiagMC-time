@@ -76,7 +76,6 @@ def check_status():
 
 def submit_job(job_atom):
     '''submit a job to cluster or your own computer'''
-    #topstr = "top -p"
 
     if(os.path.exists(INFILEPATH) is not True):
         os.system("mkdir "+INFILEPATH)
@@ -120,18 +119,6 @@ def submit_job(job_atom):
             proc = subprocess.Popen(shellstr, shell=True)
             if job_atom.keep_cpu_busy:
                 PROCLIST.append((proc, job_atom))
-
-            #topstr = topstr+str(proc.pid)+","
-
-            #f_temp = open("./tools/mytop.sh","w")
-            #f_temp.write(topstr[:-1])
-            #f_temp.close()
-            #os.system("chmod +x ./tools/mytop.sh")
-            #if job_atom.keep_cpu_busy is False:
-                #f_temp = open("./tools/kill_loop.sh","a")
-                #f_temp.write("kill -9 "+str(proc.pid))
-                #f_temp.close()
-                #os.system("chmod +x ./tools/kill_loop.sh")
 
             logging.info(job_atom.get_job_name()+" is started...")
             logging.info("input:\n"+job_atom.input_str)
