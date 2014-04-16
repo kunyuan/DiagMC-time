@@ -328,6 +328,8 @@ Test example: Order 1
 IsDeltaGamma(:) = 1; IsDeltaW(:) = 0; real weight with 0.9, direct integration
 
 result: 
+find a bug in the self-consistent loop: weight_Gam and MC: move_worm_along_gline; 
+the Gamma and Sigma should be exactly symmetric according to particel-hole symmetry
 
 ====================================================
 
