@@ -14,8 +14,8 @@ N = 64
 tau = np.arange(0, Beta, Beta/N)
 #Gamt, dim_name = read_data.read_array("./0.90_Gam1.dat",scope="-1:")["Gamma"]
 
-Gam0t, dim_name = read_data.read_array("./../0.90_Gam1.dat")["Gamma5"]
-Gamt, dim_name = read_data.read_array("./../0.90_quantities.dat")["Gamma5"]
+Gam0t, dim_name = read_data.read_array("./../0.90_Gam1.dat")["Gamma3"]
+Gamt, dim_name = read_data.read_array("./../0.90_quantities.dat")["Gamma3"]
 
 #tau = np.arange(0, Beta, Beta/N)
 #SUMChit, dim_name = read_data.read_array("./1.00_quantities.dat",["SUMChi"])["SUMChi"]
