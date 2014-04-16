@@ -1922,8 +1922,8 @@ SUBROUTINE change_Gamma_time
     tau2 = 0
   endif
 
-  WGam = weight_vertex(StatusVertex(iGam),IsDeltaVertex(iGam),GRVertex(:, iGam)-WRVertex(:, iGam), &
-    & tau1, tau2, TypeVertex(iGam))
+  WGam = weight_vertex(StatusVertex(iGam),IsDeltaVertex(iGam),GRVertex(:,iGam) &
+    & -WRVertex(:,iGam), tau1, tau2, TypeVertex(iGam))
 
   if(isdelta==0) then
     if(dir==1 .or. dir==2) then
@@ -2115,9 +2115,8 @@ SUBROUTINE change_gamma_isdelta
   !------- step2 : propose a new config -----------------
   iGam = generate_vertex()
   if(iGam==MeasureGam)  return
+  if(TypeVertex(iGam)==3 .or. TypeVertex(iGam)==4)  return
    
-  !backforth = Floor(rn()*2.d0)
-  !if(backforth/=IsDeltaVertex(iGam))  return
   backforth = IsDeltaVertex(iGam)
 
   iGin = NeighVertex(1, iGam)
@@ -2356,7 +2355,7 @@ COMPLEX*16 FUNCTION weight_vertex(stat, isdelta, dr0, dtau1, dtau2, typ)
 
   else if(stat==1 .or. stat==3) then
     if(isdelta==0) weight_vertex = (0.d0, 0.d0)
-    if(isdelta==1) weight_vertex = weight_meas_Gam(typ, dr)
+    if(isdelta==1) weight_vertex = weight_meas_Gam0(typ, dr)
   else
     call LogFile%WriteStamp('e')
     call LogFile%WriteLine("The number of update: "+str(iupdate))
@@ -2544,21 +2543,26 @@ SUBROUTINE measure
 
     if(Order==1 .and. typ==1) then
       iW = NeighVertex(3, NeighLn(2, MeaGin))
+      if(IsDeltaVertex(NeighLn(1, iW))==1) return
+      if(IsDeltaVertex(NeighLn(2, iW))==1) return
+      if(IsDeltaVertex(NeighLn(3-dir, MeaW))==1) return
+
       sumt = 0
       do ikey = 1, NVertex
         i = VertexKey2Value(ikey)
         sumt = sumt + TypeVertex(i)
       enddo
-      if(TypeVertex(NeighLn(3-dir, MeaW))==4) then
-        ityp=2
-      else if(sumt==NVertex) then
-        ityp=1
+
+      if(TypeLn(iW)==1) then
+        ityp=1    !Gamma1
+      else if(TypeVertex(NeighLn(2,MeaGin))==3 .and. TypeVertex(NeighLn(1,MeaGout))==1) then
+        ityp=2    !Gamma2
+      else if(TypeVertex(NeighLn(2,MeaGin))==1 .and. TypeVertex(NeighLn(1,MeaGout))==3) then
+        ityp=3    !Gamma3
       !if(TypeLn(iW)==2) then
-        !ityp=3    !Gamma4
-      !else if(TypeLn(iW)==3) then
-        !ityp=2    !Gamma3
-      !else if(TypeLn(iW)==4) then
-        !ityp=1    !Gamma2
+        !ityp=1    !Gamma4
+      !else if(TypeVertex(NeighLn(3-dir, MeaW))==4) then
+        !ityp=2    !Gamma5
       else 
         return
       endif

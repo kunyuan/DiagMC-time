@@ -1000,28 +1000,27 @@ SUBROUTINE output_Quantities
 
   open(104, status='replace', file=trim(title_loop)//"_quantities.dat")
 
-  !do ityp = 1, 3
-  !write(104, *) "##################################Gamma",trim(adjustl(str(ityp+1)))
-  write(104, *) "##################################Gamma1"
-  write(104, *) "#tau1:", MxT, ",tau2:", MxT
-  write(104, *) "#Beta", Beta, "L", L(1), L(2), "Order", MCOrder
-  do it2 = 0, MxT-1
-    do it1 = 0, MxT-1
-      write(104, *)  real(Gam(1, 0, 0, it1, it2)), dimag(Gam(1, 0, 0, it1, it2))
+  do ityp = 1, 3
+    write(104, *) "##################################Gamma",trim(adjustl(str(ityp)))
+    write(104, *) "#tau1:", MxT, ",tau2:", MxT
+    write(104, *) "#Beta", Beta, "L", L(1), L(2), "Order", MCOrder
+    do it2 = 0, MxT-1
+      do it1 = 0, MxT-1
+        write(104, *)  real(Gam(ityp, 0, 0, it1, it2)), dimag(Gam(ityp, 0, 0, it1, it2))
+      enddo
     enddo
+    write(104, *)
   enddo
-  write(104, *)
 
-  write(104, *) "##################################Gamma5"
-  write(104, *) "#tau1:", MxT, ",tau2:", MxT
-  write(104, *) "#Beta", Beta, "L", L(1), L(2), "Order", MCOrder
-  do it2 = 0, MxT-1
-    do it1 = 0, MxT-1
-      write(104, *)  real(Gam(2, 0, 0, it1, it2)), dimag(Gam(2, 0, 0, it1, it2))
-    enddo
-  enddo
-  write(104, *)
+  !write(104, *) "##################################Gamma5"
+  !write(104, *) "#tau1:", MxT, ",tau2:", MxT
+  !write(104, *) "#Beta", Beta, "L", L(1), L(2), "Order", MCOrder
+  !do it2 = 0, MxT-1
+    !do it1 = 0, MxT-1
+      !write(104, *)  real(Gam(2, 0, 0, it1, it2)), dimag(Gam(2, 0, 0, it1, it2))
+    !enddo
   !enddo
+  !write(104, *)
 
   write(104, *) "##################################G"
   write(104, *) "#tau:", MxT

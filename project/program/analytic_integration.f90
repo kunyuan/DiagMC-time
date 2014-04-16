@@ -15,7 +15,7 @@ SUBROUTINE calculate_GamNormWeight
   GamNormWeight = (0.d0, 0.d0)
   !--------- bare Gamma --------------------
   do ityp = 1, 6
-    Gam0 = weight_meas_Gam(ityp, (/0, 0/))
+    Gam0 = weight_meas_Gam0(ityp, (/0, 0/))
     Gam0 = Gam0 *weight_Gam0(ityp, (/0, 0/))
     GamNormWeight = GamNormWeight + Gam0*(real(MxT)/Beta)**2.d0
   enddo
@@ -46,8 +46,8 @@ SUBROUTINE calculate_Gam1
 
   W = (0.d0, 0.d0)
   W(1,0,0,:) = (1.d0, 0.d0)
-  W(3,0,0,:) = (-1.d0, 0.d0)
-  W(5,0,0,:) = (2.d0, 0.d0)
+  W(3,0,0,:) = (1.d0, 0.d0)
+  W(5,0,0,:) = (1.d0, 0.d0)
 
   W(2,0,0,:) = W(1,0,0,:)
   W(4,0,0,:) = W(3,0,0,:)
@@ -57,7 +57,7 @@ SUBROUTINE calculate_Gam1
   do t1 = 0, MxT-1
     do t2 = 0, MxT-1
       !FGam(t1, t2) = dcmplx((t1*Beta/MxT)**2.d0+(t2*Beta/MxT)**2.d0+1.d0, 0.d0)
-      FGam(t1, t2) = (1.d0, 0.d0)
+      FGam(t1, t2) = (10.d0, 0.d0)
     enddo
   enddo
   Gam(1,0,0,:,:) = FGam(:, :)
@@ -84,8 +84,8 @@ SUBROUTINE calculate_Gam1
   call transfer_W_t(1)
   call transfer_Gam_t(1)
 
-  call transfer_Gam0_r(-1)
-  call plus_minus_Gam0(1)
+  !call transfer_Gam0_r(-1)
+  !call plus_minus_Gam0(1)
 
   ratio = -1.d0/MxT *(Beta/MxT)**6.d0
 
@@ -119,8 +119,8 @@ SUBROUTINE calculate_Gam1
     enddo
   enddo
 
-  call plus_minus_Gam0(-1)
-  call transfer_Gam0_r(1)
+  !call plus_minus_Gam0(-1)
+  !call transfer_Gam0_r(1)
 
   call transfer_G_t(-1)
   call transfer_W_t(-1)
