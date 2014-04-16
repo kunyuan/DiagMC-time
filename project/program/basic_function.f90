@@ -38,20 +38,29 @@ complex*16 FUNCTION weight_meas_W(dr, t1)
   return
 END FUNCTION weight_meas_W
 
-complex*16 FUNCTION weight_meas_Gam(ityp, dr)
+complex*16 FUNCTION weight_meas_Gam(ityp, dr, t1, t2)
   implicit none
-  integer, intent(in)  :: dr(2), ityp
+  integer, intent(in)  :: dr(2), ityp, t1, t2
 
   weight_meas_Gam = (0.d0, 0.d0)
   if(dr(1)==0 .and. dr(2)==0) then
-    if(ityp ==1 .or. ityp == 2) then
-      weight_meas_Gam = (1.d0, 0.d0)
-    else if(ityp == 5 .or. ityp == 6) then
-      weight_meas_Gam = (1.d0, 0.d0)
-    endif
+    weight_meas_Gam = (1.d0, 0.d0)
   endif
   return
 END FUNCTION weight_meas_Gam
+
+complex*16 FUNCTION weight_meas_Gam0(ityp, dr)
+  implicit none
+  integer, intent(in)  :: dr(2), ityp
+
+  weight_meas_Gam0 = (0.d0, 0.d0)
+  if(dr(1)==0 .and. dr(2)==0) then
+    if(ityp==1 .or. ityp==2 .or. ityp==5 .or. ityp==6) then
+      weight_meas_Gam0 = (1.d0, 0.d0)
+    endif
+  endif
+  return
+END FUNCTION weight_meas_Gam0
 
 
 
