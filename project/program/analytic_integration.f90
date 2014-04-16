@@ -64,8 +64,6 @@ SUBROUTINE calculate_Gam1
   !Gam(6,0,0,:,:) = FGam(:, :)
 
 
-  call read_GWGamma
-  
   !================== bold gamma ===============================
   tg(1:4)  = 1;   tgam2(1:4) = 1
   tgam1(1) = 1;   tgam3(1)   = 1;        tw(1) = 1

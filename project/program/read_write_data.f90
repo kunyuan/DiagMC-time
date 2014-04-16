@@ -955,31 +955,6 @@ END SUBROUTINE output_Gam1
 
 
 
-SUBROUTINE output_GamMC_typ
-  implicit none
-  integer :: ityp, it1, it2
-  double precision :: normal
-
-  normal = GamNormWeight/GamNorm
-  open(104, status='replace', file=trim(title_mc)//"_Gam_typ.dat")
-
-  do ityp=1, 5
-    write(104, *) "##################################Gamma",trim(adjustl(str(ityp)))
-    write(104, *) "#tau1:", MxT, ",tau2:", MxT
-    write(104, *) "#Beta", Beta, "L", L(1), L(2), "Order", MCOrder
-    do it2 = 0, MxT-1
-      do it1 = 0, MxT-1
-        write(104, *)  normal*real(Gamtyp(ityp, it1, it2)),  &
-          & normal*dimag(Gamtyp(ityp,it1,it2))
-      enddo
-    enddo
-    write(104, *)
-  enddo
-  close(104)
-  return
-END SUBROUTINE output_GamMC_typ
-
-
 SUBROUTINE output_Quantities
   implicit none
   integer :: ityp, it1, it2
