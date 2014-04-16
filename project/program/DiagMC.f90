@@ -304,6 +304,7 @@ SUBROUTINE monte_carlo
 
     ProbProp(:,:) = 0.d0
     ProbAcc(:,:) = 0.d0
+    BalenceCheck(:,:,:)=0.d0
 
     !-------- throw away some configurations to thermalize -----------
     IsToss=.true.
