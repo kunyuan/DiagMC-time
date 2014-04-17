@@ -776,12 +776,12 @@ SUBROUTINE move_worm_along_gline
   jW = NeighVertex(3, jGam)
   if(jGam==Masha .or. jGam==Ira)    return
 
-  !if(dir==1) then
-    !if(SpinMasha+TypeLn(GLn)==0 .or. SpinMasha+TypeLn(GLn)==3)  return
-  !else 
-    !if(SpinMasha+TypeLn(GLn)==-1 .or. SpinMasha+TypeLn(GLn)==4) return
-  !endif
-  if(SpinMasha/=2*get_G_spin(TypeLn(GLn))) return
+  if(dir==1) then
+    if(SpinMasha+TypeLn(GLn)==0 .or. SpinMasha+TypeLn(GLn)==3)  return
+  else 
+    if(SpinMasha+TypeLn(GLn)==-1 .or. SpinMasha+TypeLn(GLn)==4) return
+  endif
+  !if(SpinMasha/=2*get_G_spin(TypeLn(GLn))) return
   
   kGold = kLn(GLn)
   kLn(GLn) = add_k(kGold, (-1)**(dir+1) *kMasha)
@@ -945,16 +945,16 @@ SUBROUTINE move_worm_along_gline
   endif
 END SUBROUTINE move_worm_along_gline
 
-integer FUNCTION get_G_spin(TypeG)
-  implicit none
-  integer :: TypeG
-  if(TypeG==1) then
-    get_G_spin=-1
-  else
-    get_G_spin=1
-  endif
-  return
-end FUNCTION
+!integer FUNCTION get_G_spin(TypeG)
+  !implicit none
+  !integer :: TypeG
+  !if(TypeG==1) then
+    !get_G_spin=-1
+  !else
+    !get_G_spin=1
+  !endif
+  !return
+!end FUNCTION
 
 !-----------------------------------------------------------
 
