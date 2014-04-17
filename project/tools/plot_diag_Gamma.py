@@ -11,11 +11,12 @@ is2d = True
 Beta = 0.90
 N = 64
 
+tau = np.arange(0, Beta, Beta/N)
 GamInt, dim_name = read_data.read_array("./../0.90_Gam1.dat")["Gamma"]
 GamMC, dim_name = read_data.read_array("./../0.90_quantities.dat")["Gamma"]
 
+
 if is2d is True:
-    tau = np.arange(0, Beta, Beta/N)
     fig = plt.figure()
     plt.plot(tau, GamMC.diagonal().real, 'r', 
             tau, GamInt.diagonal().real, 'b')
@@ -29,7 +30,6 @@ else:
     X = np.arange(0, Beta, Beta/N)
     Y = np.arange(0, Beta, Beta/N)
     X, Y = np.meshgrid(X, Y)
-
     fig = plt.figure()
     ax = fig.gca(projection='3d')
 
