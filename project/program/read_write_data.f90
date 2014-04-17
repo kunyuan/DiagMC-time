@@ -521,6 +521,7 @@ SUBROUTINE read_GWGamma
       enddo
     enddo
   enddo
+
   if(ios/=0) then
     call LogFile%QuickLog("Failed to read G,W or Gamma information!",'e')
     stop -1

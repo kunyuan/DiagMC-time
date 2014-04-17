@@ -945,7 +945,7 @@ SUBROUTINE move_worm_along_gline
   endif
 END SUBROUTINE move_worm_along_gline
 
-integer :: FUNCTION get_G_spin(TypeG)
+integer FUNCTION get_G_spin(TypeG)
   implicit none
   integer :: TypeG
   if(TypeG==1) then

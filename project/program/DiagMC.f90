@@ -31,7 +31,7 @@ PROGRAM MAIN
     read(100,*) CoefOfWorm
     CoefOfWeight(0) = 1.d0
     read(100,*) CoefOfWeight(1:MCOrder)
-  elseif(ISub==1 .or. ISub==3) then
+  elseif(ISub==1 .or. ISub==4) then
     read(100,*) title
   endif
 
