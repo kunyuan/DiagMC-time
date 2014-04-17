@@ -138,7 +138,7 @@ class JobIntegration(Job):
     '''job subclass for numerical integration jobs'''
     def __init__(self, para):
         Job.__init__(self, para)
-        self.keep_cpu_busy = False
+        self.keep_cpu_busy = True
         self.para["Type: NI"] = 3
         self.name = "NI"
 
