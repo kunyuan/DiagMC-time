@@ -9,7 +9,7 @@ TO_DO = []
 # monte carlo job defintion
 TO_DO.append(job.JobMonteCarlo({
     "__Execute" : "./gamma3.exe",
-    "__Duplicate" : 0,
+    "__Duplicate" : 4,
     "__IsCluster" : False,
     "__AutoRun" : True,
     "IsForever" : True,
@@ -45,7 +45,7 @@ TO_DO.append(job.JobConsistLoop({
 # output loop job definition
 TO_DO.append(job.JobOutputLoop({   
     "__Execute" : ["python", "./run_loop.py"],
-    "__Duplicate" : 0,
+    "__Duplicate" : 1,
     "__IsCluster" : False,
     "__AutoRun" : True,
     "IsLoad" : True,
@@ -60,7 +60,7 @@ TO_DO.append(job.JobOutputLoop({
 # output numerical integration job definition
 TO_DO.append(job.JobIntegration({   
     "__Execute" : ["./gamma3.exe"],
-    "__Duplicate" : 1,
+    "__Duplicate" : 0,
     "__IsCluster" : False,
     "__AutoRun" : True,
     "IsLoad" : False,
