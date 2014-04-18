@@ -11,6 +11,7 @@ PROGRAM MAIN
 
   print *, "Please give me the input file path: "
   read(*,'(A)') infile
+  !infile="/home/kun/project/DiagMC-time/project/infile/_in_MC_2"
   open(100,file=trim(adjustl(infile)))
   write(*,*) "Opened!"
   read(100,*) ID
@@ -22,7 +23,6 @@ PROGRAM MAIN
   read(100,*) IsLoad
   read(100,*) ISub
   if(ISub==2) then
-    read(100,*) IsForever
     read(100,*) Ntoss
     read(100,*) Nsamp
     read(100,*) Nstep
@@ -284,7 +284,7 @@ END FUNCTION self_consistent_GW
 
 SUBROUTINE monte_carlo
   implicit none
-  integer :: isamp, iblck, mc_version
+  integer :: mc_version
   double precision :: WR, GamR
 
   call LogFile%QuickLog("Initializing monte carlo...")
@@ -308,8 +308,7 @@ SUBROUTINE monte_carlo
     BalenceCheck(:,:,:)=0.d0
 
     !-------- throw away some configurations to thermalize -----------
-    IsToss=.true.
-    call markov(Ntoss)
+    call markov(.true.)
 
     call LogFile%QuickLog("Thermalization done!")
 
@@ -354,8 +353,7 @@ SUBROUTINE monte_carlo
 
   call LogFile%QuickLog("Running MC Simulations...")
 
-  IsToss=.false.
-  call markov(Nsamp)
+  call markov(.false.)
 
   call time_elapse
   t_simu = t_elap
