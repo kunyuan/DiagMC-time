@@ -10,7 +10,7 @@ TO_DO = []
 TO_DO.append(job.JobMonteCarlo({
     "__Execute" : "./gamma3.exe",
     "__Duplicate" : 4,
-    "__IsCluster" : True,
+    "__IsCluster" : False,
     "__AutoRun" : True,
     "IsForever" : True,
     "Sample" : 1000000,
@@ -31,7 +31,7 @@ TO_DO.append(job.JobMonteCarlo({
 TO_DO.append(job.JobConsistLoop({   
     "__Execute" : ["python", "./run_loop.py"],
     "__Duplicate" : 0,
-    "__IsCluster" : True,
+    "__IsCluster" : False,
     "__AutoRun" : True,
     "IsLoad" : True,
     "Lx" :  4,
@@ -46,7 +46,7 @@ TO_DO.append(job.JobConsistLoop({
 TO_DO.append(job.JobOutputLoop({   
     "__Execute" : ["python", "./run_loop.py"],
     "__Duplicate" : 1,
-    "__IsCluster" : True,
+    "__IsCluster" : False,
     "__AutoRun" : True,
     "IsLoad" : True,
     "Lx" :  4,
@@ -61,7 +61,7 @@ TO_DO.append(job.JobOutputLoop({
 TO_DO.append(job.JobIntegration({   
     "__Execute" : ["./gamma3.exe"],
     "__Duplicate" : 0,
-    "__IsCluster" : True,
+    "__IsCluster" : False,
     "__AutoRun" : True,
     "IsLoad" : False,
     "Lx" :  4,

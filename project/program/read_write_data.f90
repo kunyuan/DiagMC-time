@@ -11,7 +11,6 @@ SUBROUTINE print_status
     integer :: iorder,i
     character*30 :: updatename(Nupdate)
 
-
     call LogFile%WriteStamp()
     call LogFile%WriteLine("MC steps:"+str(imc))
     call time_elapse
@@ -72,7 +71,8 @@ SUBROUTINE print_status
     call LogFile%WriteLine("------------------------------------------------")
     do iorder = 0, MCOrder
       call LogFile%WriteLine("Order"+str(iorder))
-      BalenceCheck(iorder,1,3)=(BalenceCheck(iorder,1,1)-BalenceCheck(iorder,1,2))/BalenceCheck(iorder,1,1)/sqrt(2.d0)
+      BalenceCheck(iorder,1,3)=(BalenceCheck(iorder,1,1)-BalenceCheck(iorder,1,2)) &
+        & /sqrt(BalenceCheck(iorder,1,1))
       write(logstr, '(A,3f17.5)') "Gamma Type 1,2 <==> 3,4:",BalenceCheck(iorder,1,:)
       call LogFile%WriteLine(logstr)
     enddo

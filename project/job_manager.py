@@ -37,7 +37,7 @@ class JobAtom():
 
     def get_job_name(self):
         '''get the name of JobAtom object'''
-        return "Job({}).{}".format(self.name, self.pid)
+        return "Job({0}).{1}".format(self.name, self.pid)
 
 def construct_job_queue(to_do):
     '''construct JobAtom queue from Job class '''
@@ -85,17 +85,17 @@ def submit_job(job_atom):
     homedir = os.getcwd()
     jobname = homedir.split("/")[-1]+"."+job_atom.name
 
-    infile = INFILEPATH+"/_in_{}_{}".format(job_atom.name, job_atom.pid)
-    outfile = OUTFILEPATH+"/out_{}_{}.txt".format(
+    infile = INFILEPATH+"/_in_{0}_{1}".format(job_atom.name, job_atom.pid)
+    outfile = OUTFILEPATH+"/out_{0}_{1}.txt".format(
         job_atom.name, job_atom.pid)
-    jobfile = os.path.abspath("./_job_{}_{}.sh".format(
+    jobfile = os.path.abspath("./_job_{0}_{1}.sh".format(
         job_atom.name, job_atom.pid))
     #write input file into ./infile folder
     f_job = open(infile,"w")
     f_job.write(job_atom.input_str)
     f_job.close()
     f_allinput = open(os.path.abspath("./all_input.log"),"a")
-    f_allinput.write("Job ID: {}, Job name: {}\n".format(
+    f_allinput.write("Job ID: {0}, Job name: {1}\n".format(
             job_atom.pid, job_atom.name))
     f_allinput.write(job_atom.input_str)
     f_allinput.close()
@@ -110,7 +110,7 @@ def submit_job(job_atom):
         if job_atom.auto_run:
             os.system("qsub "+jobfile)
             os.system("rm "+jobfile)
-            logging.info(job_atom.get_job_name+" submitted!")
+            logging.info(job_atom.get_job_name()+" submitted!")
         else:
             print "You have to run "+job_atom.get_job_name()+" by yourself!"
     else:
@@ -122,7 +122,7 @@ def submit_job(job_atom):
 
             logging.info(job_atom.get_job_name()+" is started...")
             logging.info("input:\n"+job_atom.input_str)
-            logging.info("PID:{}\n".format(proc.pid))
+            logging.info("PID:{0}\n".format(proc.pid))
             print job_atom.get_job_name()+" is started..."
         else:
             print "You have to run "+job_atom.get_job_name()+" by yourself!"
