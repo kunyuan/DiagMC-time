@@ -216,7 +216,7 @@ SUBROUTINE DRAW
     write(11,*) '0 0 0 setrgbcolor'
     write(tempstr, *) "Beta: ",beta,"    L(1): ",L(1),"       L(2): ",L(2)
     write(11,803) 0.,ini,tempstr
-    write(tempstr,*)  "Jcp: ",Jcp," Seed: ",Seed
+    write(tempstr,*)  "J1: ",J1," J2: ",J2," Seed: ",Seed
     ini=ini-seg
     write(11,803) 0.,ini,tempstr
     write(tempstr, *) "imc: ",imc," Is Worm Here:", IsWormPresent
@@ -936,7 +936,7 @@ SUBROUTINE output_GamMC
 
 
   write(35, *) "============================================"
-  write(35, *) "Beta", Beta, "L(1), L(2)", L(1), L(2), "Order", MCOrder, "Seed",Seed
+  write(35, *) "Beta", Beta, "J2", J2, "L(1), L(2)", L(1), L(2), "Order", MCOrder, "Seed",Seed
   write(35, *) imc, Z_normal, GamNormWeight, GamNorm, normal, ratioerr
 
   !do iorder = 1, MCOrder
@@ -987,7 +987,7 @@ SUBROUTINE output_Gam1
 
   write(104, *) "##################################Gamma"
   write(104, *) "#tau1:", MxT, ",tau2:", MxT
-  write(104, *) "#Beta", Beta, "L", L(1), L(2), "Order", MCOrder
+  write(104, *) "#Beta", Beta,"J2", J2,  "L", L(1), L(2), "Order", MCOrder
   do it2 = 0, MxT-1
     do it1 = 0, MxT-1
       write(104, *)  real(GamOrder1(1, it1, it2)), dimag(GamOrder1(1,it1,it2))
@@ -1044,7 +1044,7 @@ SUBROUTINE output_Quantities
 
   write(104, *) "##################################Gamma"
   write(104, *) "#tau1:", MxT, ",tau2:", MxT
-  write(104, *) "#Beta", Beta, "L", L(1), L(2), "Order", MCOrder
+  write(104, *) "#Beta", Beta,"J2", J2,  "L", L(1), L(2), "Order", MCOrder
   do it2 = 0, MxT-1
     do it1 = 0, MxT-1
       write(104, *)  real(Gam(1, 0, 0, it1, it2)), dimag(Gam(1, 0, 0, it1, it2))
@@ -1119,7 +1119,7 @@ SUBROUTINE output_Quantities
 
   write(104, *) "##################################G"
   write(104, *) "#tau:", MxT
-  write(104, *) "#Beta", Beta, "L", L(1), L(2), "Order", MCOrder
+  write(104, *) "#Beta", Beta,"J2", J2,  "L", L(1), L(2), "Order", MCOrder
   do it1 = 0, MxT-1
     write(104, *)  real(G(1, it1)), dimag(G(1,it1))
   enddo
@@ -1127,7 +1127,7 @@ SUBROUTINE output_Quantities
 
   write(104, *) "##################################W"
   write(104, *) "#x:", L(1), ",y:", L(2), ",tau:", MxT
-  write(104, *) "#Beta", Beta, "L", L(1), L(2), "Order", MCOrder
+  write(104, *) "#Beta", Beta,"J2", J2,  "L", L(1), L(2), "Order", MCOrder
   do it1 = 0, MxT-1
     do dy = 0, L(2)-1
       do dx = 0, L(1)-1
@@ -1140,7 +1140,7 @@ SUBROUTINE output_Quantities
 
   write(104, *) "##################################Chi"
   write(104, *) "#x:", L(1), ",y:", L(2)
-  write(104, *) "#Beta", Beta, "L", L(1), L(2), "Order", MCOrder
+  write(104, *) "#Beta", Beta,"J2", J2,  "Order", MCOrder
   ratio = 1.d0/dble(MxT)
   do dy = 0, L(2)-1
     do dx = 0, L(1)-1
@@ -1150,7 +1150,7 @@ SUBROUTINE output_Quantities
 
   write(104, *) "##################################Sigma"
   write(104, *) "#tau:", MxT
-  write(104, *) "#Beta", Beta, "L", L(1), L(2), "Order", MCOrder
+  write(104, *) "#Beta", Beta,"J2", J2,  "L", L(1), L(2), "Order", MCOrder
   do it = 0, MxT-1
     write(104, *) L(1)*L(2)*(MxT/Beta)**2.d0*real(Sigma(it)),  &
       & L(1)*L(2)*(MxT/Beta)**2.d0*dimag(Sigma(it))
@@ -1158,14 +1158,14 @@ SUBROUTINE output_Quantities
 
   write(104, *) "##################################SUMChi"
   write(104, *) "#tau:", MxT
-  write(104, *) "#Beta", Beta, "L", L(1), L(2), "Order", MCOrder
+  write(104, *) "#Beta", Beta,"J2", J2,  "L", L(1), L(2), "Order", MCOrder
   do it = 0, MxT-1
     write(104, *) real(SUM(Chi(:, :, it))),dimag(SUM(Chi(:, :, it)))
   enddo
 
   write(104, *) "##################################Denom"
   write(104, *) "#px:", L(1), ",py:", L(2), ",omega:", MxT
-  write(104, *) "#Beta", Beta, "L", L(1), L(2), "Order", MCOrder
+  write(104, *) "#Beta", Beta,"J2", J2,  "L", L(1), L(2), "Order", MCOrder
   do it = 0, MxT-1
     do dy = 0, L(2)-1
       do dx = 0, L(1)-1
