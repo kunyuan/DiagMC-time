@@ -95,7 +95,6 @@ class JobMonteCarlo(Job):
     def to_string(self, pid=0):
         input_str = Job.to_string(self, pid)
         input_str += self.key_to_string("Type: MC")
-        input_str += self.key_to_string("IsForever")
         input_str += self.key_to_string("Toss")
         input_str += self.key_to_string("Sample")
         input_str += self.key_to_string("Sweep")
