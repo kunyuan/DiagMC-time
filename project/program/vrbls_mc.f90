@@ -33,6 +33,8 @@ MODULE vrbls_mc
 
   character*128 :: title1
   character*128 :: title2
+  character*128 :: title3
+  character*128 :: title4
   character*128 :: title_loop
   character*128 :: title_mc
   character*128 :: title
@@ -50,7 +52,7 @@ MODULE vrbls_mc
   integer          ::  L(2), Vol                ! System size
   double precision  ::  logL(2)
   integer          ::  dL(2)
-  double precision ::  Jcp                        ! interaction
+  double precision ::  J1, J2                     ! interaction
   double precision ::  Mu(2)                      ! Chem. potential for spin down & up
   double precision ::  Beta                       ! inverse temperature
   integer          ::  MCOrder                    ! the max order for Gamma in MC
