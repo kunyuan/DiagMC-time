@@ -45,7 +45,7 @@ TO_DO.append(job.JobConsistLoop({
 # output loop job definition
 TO_DO.append(job.JobOutputLoop({   
     "__Execute" : ["python", "./run_loop.py"],
-    "__Duplicate" : 0,
+    "__Duplicate" : 1,
     "__IsCluster" : False,
     "__AutoRun" : True,
     "IsLoad" : True,
