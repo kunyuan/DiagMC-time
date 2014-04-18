@@ -1,0 +1,485 @@
+!_TAG_FILE_FORMAT	2	/extended format; --format=1 will not append ;" to lines/
+!_TAG_FILE_SORTED	1	/0=unsorted, 1=sorted, 2=foldcase/
+!_TAG_PROGRAM_AUTHOR	Darren Hiebert	/dhiebert@users.sourceforge.net/
+!_TAG_PROGRAM_NAME	Exuberant Ctags	//
+!_TAG_PROGRAM_URL	http://ctags.sourceforge.net	/official site/
+!_TAG_PROGRAM_VERSION	5.9~svn20110310	//
+10	read_write_data.f90	/^  10 format(' Line:',i2,2x,'kind:',i2,2x,'isdelta:',i2,2x,'type:',i2,2x,'k:',i8,2x,'stat:',i2, 2x,&$/;"	l	language:Fortran	subroutine:print_config	file:
+100	basic_function.f90	/^100 J = 1$/;"	l	language:Fortran	subroutine:SFFTEU	file:
+100	test/fourier.f90	/^100 J = 1$/;"	l	language:Fortran	subroutine:SFFTEU	file:
+101	basic_function.f90	/^101    K = N \/ 2$/;"	l	language:Fortran	subroutine:SFFTEU	file:
+101	mylib/mylib.f90	/^101 format('[',A,']','[',A,']','[',A,']:')$/;"	l	language:Fortran	subroutine:write_stamp	file:
+101	test/fourier.f90	/^101    K = N \/ 2$/;"	l	language:Fortran	subroutine:SFFTEU	file:
+102	basic_function.f90	/^102    if ( K .ge. J ) goto 103$/;"	l	language:Fortran	subroutine:SFFTEU	file:
+102	test/fourier.f90	/^102    if ( K .ge. J ) goto 103$/;"	l	language:Fortran	subroutine:SFFTEU	file:
+103	basic_function.f90	/^103    J = J + K$/;"	l	language:Fortran	subroutine:SFFTEU	file:
+103	test/fourier.f90	/^103    J = J + K$/;"	l	language:Fortran	subroutine:SFFTEU	file:
+12	read_write_data.f90	/^  12 format('Gamma:',i2,2x,'isdelta:',i2,2x,'type:',i2,2x,'typein:',i2,2x,'typeout:',i2,2x,&$/;"	l	language:Fortran	subroutine:print_config	file:
+40	basic_function.f90	/^40        do I0 = IS, N-1, ID$/;"	l	language:Fortran	subroutine:SFFTEU	file:
+40	test/fourier.f90	/^40        do I0 = IS, N-1, ID$/;"	l	language:Fortran	subroutine:SFFTEU	file:
+50	basic_function.f90	/^50  do I0 = IS, N, ID$/;"	l	language:Fortran	subroutine:SFFTEU	file:
+50	test/fourier.f90	/^50  do I0 = IS, N, ID$/;"	l	language:Fortran	subroutine:SFFTEU	file:
+777	read_write_data.f90	/^ 777  format ('Nsolid ',f6.1,x,f6.1,x,f9.3,' Y')$/;"	l	language:Fortran	subroutine:DRAW	file:
+778	read_write_data.f90	/^ 778  format ('N ',f6.1,x,f6.1,x,' M')$/;"	l	language:Fortran	subroutine:DRAW	file:
+779	read_write_data.f90	/^ 779  format (     f6.1,x,f6.1,x,' L')$/;"	l	language:Fortran	subroutine:DRAW	file:
+780	read_write_data.f90	/^ 780  format ('Nsolid ',f6.1,x,f6.1,x,f9.3,' YL')$/;"	l	language:Fortran	subroutine:DRAW	file:
+781	read_write_data.f90	/^ 781  format ('Nsolid ',f6.1,x,f6.1,x,f6.1,x,f6.1,x,f6.1,' Y45')$/;"	l	language:Fortran	subroutine:DRAW	file:
+790	read_write_data.f90	/^ 790  format ('Nsolid ',f6.1,x,f6.1,x,f6.1,x,f6.1,x,' ahead')$/;"	l	language:Fortran	subroutine:DRAW	file:
+791	read_write_data.f90	/^ 791  format ('Ndashed ',f6.1,x,f6.1,x,f6.1,x,f6.1,x,f6.1,' Y45')$/;"	l	language:Fortran	subroutine:DRAW	file:
+792	read_write_data.f90	/^ 792  format ('Ndashed ',f6.1,x,f6.1,x,f9.3,' YL')$/;"	l	language:Fortran	subroutine:DRAW	file:
+801	read_write_data.f90	/^ 801  format (f6.1,x,f6.1,x,' M (',i2,') C')$/;"	l	language:Fortran	subroutine:DRAW	file:
+802	read_write_data.f90	/^ 802  format (f6.1,x,f6.1,x,' M (',i2,':',f6.3,'; (',i3,',',i3,')) C')$/;"	l	language:Fortran	subroutine:DRAW	file:
+803	read_write_data.f90	/^ 803  format (f6.1,x,f6.1,x,' M (',A,') C')$/;"	l	language:Fortran	subroutine:DRAW	file:
+804	read_write_data.f90	/^ 804  format (f6.1,x,f6.1,x,' M (G ',i2,' : ',i2,' --->',i2') C')$/;"	l	language:Fortran	subroutine:DRAW	file:
+805	read_write_data.f90	/^ 805  format (f6.1,x,f6.1,x,' M (W ',i2,' : ',i2,' <=>',i2') C')$/;"	l	language:Fortran	subroutine:DRAW	file:
+BalenceCheck	vrbls_mc.f90	/^  double precision :: BalenceCheck(/;"	v	language:Fortran	module:vrbls_mc
+BasisOrder	vrbls_mc.f90	/^  integer, parameter :: BasisOrder=/;"	v	language:Fortran	module:vrbls_mc
+BasisOrderGam	vrbls_mc.f90	/^  integer, parameter :: BasisOrderGam=/;"	v	language:Fortran	module:vrbls_mc
+Beta	vrbls_mc.f90	/^  double precision ::  Beta /;"	v	language:Fortran	module:vrbls_mc
+CHECK_G	vrbls_mc.f90	/^  logical, parameter  ::  CHECK_G=/;"	v	language:Fortran	module:vrbls_mc
+CHECK_GAM	vrbls_mc.f90	/^  logical, parameter  ::  CHECK_GAM=/;"	v	language:Fortran	module:vrbls_mc
+CHECK_W	vrbls_mc.f90	/^  logical, parameter  ::  CHECK_W=/;"	v	language:Fortran	module:vrbls_mc
+Chi	vrbls_mc.f90	/^  complex(kind=8), allocatable :: Chi(/;"	v	language:Fortran	module:vrbls_mc
+CoefG	vrbls_mc.f90	/^  double precision, dimension(0:BasisOrder, 1:Nbasis, 1:NbinG) :: CoefG$/;"	v	language:Fortran	module:vrbls_mc
+CoefGam	vrbls_mc.f90	/^  double precision, dimension(0:BasisOrder,0:BasisOrder,1:NbasisGam,1:NbinGam) :: CoefGam$/;"	v	language:Fortran	module:vrbls_mc
+CoefOfSymmetry	vrbls_mc.f90	/^  double precision :: CoefOfSymmetry(/;"	v	language:Fortran	module:vrbls_mc
+CoefOfWeight	vrbls_mc.f90	/^  double precision :: CoefOfWeight(/;"	v	language:Fortran	module:vrbls_mc
+CoefOfWorm	vrbls_mc.f90	/^  double precision :: CoefOfWorm$/;"	v	language:Fortran	module:vrbls_mc
+CoefW	vrbls_mc.f90	/^  double precision, dimension(0:BasisOrder, 1:Nbasis, 1:NbinW) :: CoefW$/;"	v	language:Fortran	module:vrbls_mc
+D	vrbls_mc.f90	/^  integer, parameter :: D /;"	v	language:Fortran	module:vrbls_mc
+DEBUG	vrbls_mc.f90	/^  logical, parameter  ::  DEBUG=/;"	v	language:Fortran	module:vrbls_mc
+DRAW	read_write_data.f90	/^SUBROUTINE DRAW$/;"	s	language:Fortran
+Denom	vrbls_mc.f90	/^  complex(kind=8), allocatable :: Denom(/;"	v	language:Fortran	module:vrbls_mc
+DirecVertex	vrbls_mc.f90	/^  integer, dimension(MxNVertex) :: DirecVertex /;"	v	language:Fortran	module:vrbls_mc
+ERSTAT	monte_carlo.f90	/^subroutine ERSTAT(/;"	s	language:Fortran
+Error	vrbls_mc.f90	/^  double precision   :: Error(/;"	v	language:Fortran	module:vrbls_mc
+FFT_r	basic_function.f90	/^SUBROUTINE FFT_r(/;"	s	language:Fortran
+FFT_r	test/fourier.f90	/^SUBROUTINE FFT_r(/;"	s	language:Fortran	program:MAIN
+FFT_shift_omega_double	basic_function.f90	/^SUBROUTINE FFT_shift_omega_double(/;"	s	language:Fortran
+FFT_shift_omega_double	test/fourier.f90	/^SUBROUTINE FFT_shift_omega_double(/;"	s	language:Fortran	program:MAIN
+FFT_shift_omega_single	basic_function.f90	/^SUBROUTINE FFT_shift_omega_single(/;"	s	language:Fortran
+FFT_shift_omega_single	test/fourier.f90	/^SUBROUTINE FFT_shift_omega_single(/;"	s	language:Fortran	program:MAIN
+FFT_shift_t_double	basic_function.f90	/^SUBROUTINE FFT_shift_t_double(/;"	s	language:Fortran
+FFT_shift_t_double	test/fourier.f90	/^SUBROUTINE FFT_shift_t_double(/;"	s	language:Fortran	program:MAIN
+FFT_shift_t_single	basic_function.f90	/^SUBROUTINE FFT_shift_t_single(/;"	s	language:Fortran
+FFT_shift_t_single	test/fourier.f90	/^SUBROUTINE FFT_shift_t_single(/;"	s	language:Fortran	program:MAIN
+FFT_tau_double	basic_function.f90	/^SUBROUTINE FFT_tau_double(/;"	s	language:Fortran
+FFT_tau_double	test/fourier.f90	/^SUBROUTINE FFT_tau_double(/;"	s	language:Fortran	program:MAIN
+FFT_tau_single	basic_function.f90	/^SUBROUTINE FFT_tau_single(/;"	s	language:Fortran
+FFT_tau_single	test/fourier.f90	/^SUBROUTINE FFT_tau_single(/;"	s	language:Fortran	program:MAIN
+FileName	mylib/mylib.f90	/^    character(len=256) :: FileName=/;"	k	language:Fortran	type:logging
+FromG	vrbls_mc.f90	/^  integer, dimension(1:NbinG) :: FromG,/;"	v	language:Fortran	module:vrbls_mc
+FromGamT1	vrbls_mc.f90	/^  integer, dimension(1:NbinGam) :: FromGamT1,/;"	v	language:Fortran	module:vrbls_mc
+FromGamT2	vrbls_mc.f90	/^  integer, dimension(0:MxT-1, 1:NbinGam) :: FromGamT2,/;"	v	language:Fortran	module:vrbls_mc
+FromW	vrbls_mc.f90	/^  integer, dimension(1:NbinW) :: FromW,/;"	v	language:Fortran	module:vrbls_mc
+Fupdate	vrbls_mc.f90	/^  double precision :: Fupdate(/;"	v	language:Fortran	module:vrbls_mc
+G	vrbls_mc.f90	/^  complex(kind=8) :: G(/;"	v	language:Fortran	module:vrbls_mc
+G0F	vrbls_mc.f90	/^  complex(kind=8) :: G0F(/;"	v	language:Fortran	module:vrbls_mc
+GLnKey2Value	vrbls_mc.f90	/^  integer, dimension(MxNGLn) :: GLnKey2Value /;"	v	language:Fortran	module:vrbls_mc
+GRVertex	vrbls_mc.f90	/^  integer, dimension(2, MxNVertex) :: GRVertex /;"	v	language:Fortran	module:vrbls_mc
+Gam	vrbls_mc.f90	/^  complex(kind=8), allocatable :: Gam(/;"	v	language:Fortran	module:vrbls_mc
+Gam0PF	vrbls_mc.f90	/^  complex(kind=8), allocatable :: Gam0PF(/;"	v	language:Fortran	module:vrbls_mc
+GamBasis	vrbls_mc.f90	/^  complex*16, allocatable :: GamBasis(/;"	v	language:Fortran	module:vrbls_mc
+GamMC	vrbls_mc.f90	/^  complex*16, allocatable :: GamMC(/;"	v	language:Fortran	module:vrbls_mc
+GamNorm	vrbls_mc.f90	/^  complex*16 :: GamNorm,/;"	v	language:Fortran	module:vrbls_mc
+GamNormWeight	vrbls_mc.f90	/^  complex*16 :: GamNorm, GamNormWeight /;"	v	language:Fortran	module:vrbls_mc
+GamOrder	vrbls_mc.f90	/^  double precision :: GamOrder(/;"	v	language:Fortran	module:vrbls_mc
+GamOrder1	vrbls_mc.f90	/^  complex(kind=8) :: GamOrder1(/;"	v	language:Fortran	module:vrbls_mc
+GamWormOrder	vrbls_mc.f90	/^  double precision :: GamWormOrder(/;"	v	language:Fortran	module:vrbls_mc
+Gam_mc2matrix_mc	self_consistent.f90	/^SUBROUTINE Gam_mc2matrix_mc$/;"	s	language:Fortran
+HEAVY_DEBUG	vrbls_mc.f90	/^  logical, parameter  ::  HEAVY_DEBUG=/;"	v	language:Fortran	module:vrbls_mc
+Hash4G	vrbls_mc.f90	/^  integer, dimension(-MxK:MxK) ::  Hash4G /;"	v	language:Fortran	module:vrbls_mc
+Hash4W	vrbls_mc.f90	/^  integer, dimension(0:MxK) ::     Hash4W /;"	v	language:Fortran	module:vrbls_mc
+IS_BOLD	vrbls_mc.f90	/^  logical, parameter  ::  IS_BOLD=/;"	v	language:Fortran	module:vrbls_mc
+ImGamSqBasis	vrbls_mc.f90	/^  double precision, allocatable :: ImGamSqBasis(/;"	v	language:Fortran	module:vrbls_mc
+ImGamSqMC	vrbls_mc.f90	/^  double precision, allocatable :: ImGamSqMC(/;"	v	language:Fortran	module:vrbls_mc
+Ira	vrbls_mc.f90	/^  integer          :: Ira,/;"	v	language:Fortran	module:vrbls_mc
+IsBasis2D	vrbls_mc.f90	/^  logical, dimension(1:NbinGam) :: IsBasis2D$/;"	v	language:Fortran	module:vrbls_mc
+IsDeltaLn	vrbls_mc.f90	/^  integer, dimension(MxNLn) :: IsDeltaLn /;"	v	language:Fortran	module:vrbls_mc
+IsDeltaVertex	vrbls_mc.f90	/^  integer, dimension(MxNLn) :: IsDeltaVertex /;"	v	language:Fortran	module:vrbls_mc
+IsWormPresent	vrbls_mc.f90	/^  logical          :: IsWormPresent /;"	v	language:Fortran	module:vrbls_mc
+Is_k_valid	basic_function.f90	/^LOGICAL FUNCTION Is_k_valid(/;"	f	language:Fortran
+Is_k_valid_for_G	basic_function.f90	/^LOGICAL FUNCTION Is_k_valid_for_G(/;"	f	language:Fortran
+Is_k_valid_for_W	basic_function.f90	/^LOGICAL FUNCTION Is_k_valid_for_W(/;"	f	language:Fortran
+Is_reducible_G_Gam_one_side	basic_function.f90	/^LOGICAL FUNCTION Is_reducible_G_Gam_one_side(/;"	f	language:Fortran
+Is_reducible_W_Gam	basic_function.f90	/^LOGICAL FUNCTION Is_reducible_W_Gam(/;"	f	language:Fortran
+Is_reducible_W_Gam_both_side	basic_function.f90	/^LOGICAL FUNCTION Is_reducible_W_Gam_both_side(/;"	f	language:Fortran
+Is_reducible_W_Gam_one_side	basic_function.f90	/^LOGICAL FUNCTION Is_reducible_W_Gam_one_side(/;"	f	language:Fortran
+Is_reducible_add_interaction	basic_function.f90	/^LOGICAL FUNCTION Is_reducible_add_interaction(/;"	f	language:Fortran
+J1	vrbls_mc.f90	/^  double precision ::  J1,/;"	v	language:Fortran	module:vrbls_mc
+J2	vrbls_mc.f90	/^  double precision ::  J1, J2 /;"	v	language:Fortran	module:vrbls_mc
+KindLn	vrbls_mc.f90	/^  integer, dimension(MxNLn) :: KindLn /;"	v	language:Fortran	module:vrbls_mc
+L	vrbls_mc.f90	/^  integer          ::  L(/;"	v	language:Fortran	module:vrbls_mc
+Level	mylib/mylib.f90	/^    integer :: Level=/;"	k	language:Fortran	type:logging
+LevelName	mylib/mylib.f90	/^  character(len=10),parameter :: LevelName(/;"	v	language:Fortran	module:logging_module
+LnValue2Key	vrbls_mc.f90	/^  integer, dimension(MxNLn) ::  LnValue2Key /;"	v	language:Fortran	module:vrbls_mc
+LogFile	vrbls_mc.f90	/^  type(logging) :: LogFile$/;"	v	language:Fortran	module:vrbls_mc
+LogTerm	vrbls_mc.f90	/^  type(logging) :: LogTerm$/;"	v	language:Fortran	module:vrbls_mc
+MAIN	test/fourier.f90	/^PROGRAM MAIN$/;"	p	language:Fortran
+MCOrder	vrbls_mc.f90	/^  integer          ::  MCOrder /;"	v	language:Fortran	module:vrbls_mc
+Masha	vrbls_mc.f90	/^  integer          :: Ira, Masha /;"	v	language:Fortran	module:vrbls_mc
+MaxStat	vrbls_mc.f90	/^  integer          :: MaxStat$/;"	v	language:Fortran	module:vrbls_mc
+MeasureGam	vrbls_mc.f90	/^  integer          :: MeasureGam /;"	v	language:Fortran	module:vrbls_mc
+Mnint	vrbls_mc.f90	/^  integer, parameter          :: Mnint /;"	v	language:Fortran	module:vrbls_mc
+Mu	vrbls_mc.f90	/^  double precision ::  Mu(/;"	v	language:Fortran	module:vrbls_mc
+MxError	vrbls_mc.f90	/^  double precision, parameter :: MxError /;"	v	language:Fortran	module:vrbls_mc
+MxK	vrbls_mc.f90	/^  integer, parameter :: MxK /;"	v	language:Fortran	module:vrbls_mc
+MxL	vrbls_mc.f90	/^  integer, parameter,dimension(2) :: MxL /;"	v	language:Fortran	module:vrbls_mc
+MxNGLn	vrbls_mc.f90	/^  integer, parameter :: MxNGLn /;"	v	language:Fortran	module:vrbls_mc
+MxNLn	vrbls_mc.f90	/^  integer, parameter :: MxNLn /;"	v	language:Fortran	module:vrbls_mc
+MxNVertex	vrbls_mc.f90	/^  integer, parameter :: MxNVertex /;"	v	language:Fortran	module:vrbls_mc
+MxNWLn	vrbls_mc.f90	/^  integer, parameter :: MxNWLn /;"	v	language:Fortran	module:vrbls_mc
+MxNblck	vrbls_mc.f90	/^  integer, parameter          :: MxNblck /;"	v	language:Fortran	module:vrbls_mc
+MxOrder	vrbls_mc.f90	/^  integer, parameter :: MxOrder /;"	v	language:Fortran	module:vrbls_mc
+MxT	vrbls_mc.f90	/^  integer, parameter :: MxT /;"	v	language:Fortran	module:vrbls_mc
+MxVol	vrbls_mc.f90	/^  integer, parameter :: MxVol /;"	v	language:Fortran	module:vrbls_mc
+Mxint	vrbls_mc.f90	/^  integer, parameter          :: Mxint /;"	v	language:Fortran	module:vrbls_mc
+NGLn	vrbls_mc.f90	/^  integer          :: NGLn,/;"	v	language:Fortran	module:vrbls_mc
+NObs	vrbls_mc.f90	/^  integer, parameter :: NObs /;"	v	language:Fortran	module:vrbls_mc
+NSamp	vrbls_mc.f90	/^  integer          :: NSamp /;"	v	language:Fortran	module:vrbls_mc
+NStep	vrbls_mc.f90	/^  integer          :: NStep /;"	v	language:Fortran	module:vrbls_mc
+NToss	vrbls_mc.f90	/^  integer          :: NToss /;"	v	language:Fortran	module:vrbls_mc
+NTypeChi	vrbls_mc.f90	/^  integer, parameter :: NTypeChi /;"	v	language:Fortran	module:vrbls_mc
+NTypeG	vrbls_mc.f90	/^  integer, parameter :: NTypeG /;"	v	language:Fortran	module:vrbls_mc
+NTypeGam	vrbls_mc.f90	/^  integer, parameter :: NTypeGam /;"	v	language:Fortran	module:vrbls_mc
+NTypeW	vrbls_mc.f90	/^  integer, parameter :: NTypeW /;"	v	language:Fortran	module:vrbls_mc
+NVertex	vrbls_mc.f90	/^  integer          :: NGLn, NWLn, NVertex /;"	v	language:Fortran	module:vrbls_mc
+NWLn	vrbls_mc.f90	/^  integer          :: NGLn, NWLn,/;"	v	language:Fortran	module:vrbls_mc
+Nbasis	vrbls_mc.f90	/^  integer, parameter :: Nbasis=/;"	v	language:Fortran	module:vrbls_mc
+NbasisGam	vrbls_mc.f90	/^  integer, parameter :: NbasisGam=/;"	v	language:Fortran	module:vrbls_mc
+NbinG	vrbls_mc.f90	/^  integer, parameter :: NbinG=/;"	v	language:Fortran	module:vrbls_mc
+NbinGam	vrbls_mc.f90	/^  integer, parameter :: NbinGam=/;"	v	language:Fortran	module:vrbls_mc
+NbinW	vrbls_mc.f90	/^  integer, parameter :: NbinW=/;"	v	language:Fortran	module:vrbls_mc
+NeighLn	vrbls_mc.f90	/^  integer, dimension(2,MxNLn) :: NeighLn /;"	v	language:Fortran	module:vrbls_mc
+NeighVertex	vrbls_mc.f90	/^  integer, dimension(3,MxNVertex) :: NeighVertex /;"	v	language:Fortran	module:vrbls_mc
+NextLn	vrbls_mc.f90	/^  integer, dimension(MxNLn)  :: NextLn$/;"	v	language:Fortran	module:vrbls_mc
+NextVertex	vrbls_mc.f90	/^  integer, dimension(MxNVertex):: NextVertex$/;"	v	language:Fortran	module:vrbls_mc
+Norm	vrbls_mc.f90	/^  double precision   :: Norm(/;"	v	language:Fortran	module:vrbls_mc
+Nupdate	vrbls_mc.f90	/^  integer, parameter :: Nupdate /;"	v	language:Fortran	module:vrbls_mc
+ObsRecord	vrbls_mc.f90	/^  double precision, allocatable :: ObsRecord(/;"	v	language:Fortran	module:vrbls_mc
+Order	vrbls_mc.f90	/^  integer          :: Order /;"	v	language:Fortran	module:vrbls_mc
+Phase	vrbls_mc.f90	/^  COMPLEX*16       :: Phase /;"	v	language:Fortran	module:vrbls_mc
+Pi	vrbls_mc.f90	/^  double precision, parameter :: Pi /;"	v	language:Fortran	module:vrbls_mc
+Pi2	vrbls_mc.f90	/^  double precision, parameter :: Pi2 /;"	v	language:Fortran	module:vrbls_mc
+Pi4	vrbls_mc.f90	/^  double precision, parameter :: Pi4 /;"	v	language:Fortran	module:vrbls_mc
+Polar	vrbls_mc.f90	/^  complex(kind=8), allocatable :: Polar(/;"	v	language:Fortran	module:vrbls_mc
+Polynomial	vrbls_mc.f90	/^  double precision, dimension(0:BasisOrder, 1:Nbasis) :: Polynomial$/;"	v	language:Fortran	module:vrbls_mc
+PolynomialGam	vrbls_mc.f90	/^  double precision, dimension(0:BasisOrderGam,0:BasisOrderGam,1:NbasisGam) :: PolynomialGam$/;"	v	language:Fortran	module:vrbls_mc
+ProbAcc	vrbls_mc.f90	/^  double precision :: ProbAcc(/;"	v	language:Fortran	module:vrbls_mc
+ProbProp	vrbls_mc.f90	/^  double precision :: ProbProp(/;"	v	language:Fortran	module:vrbls_mc
+Pupdate	vrbls_mc.f90	/^  double precision :: Pupdate(/;"	v	language:Fortran	module:vrbls_mc
+Quan	vrbls_mc.f90	/^  double precision   :: Quan(/;"	v	language:Fortran	module:vrbls_mc
+QuanName	vrbls_mc.f90	/^  character(len=30),dimension(0:NObs-1) :: QuanName$/;"	v	language:Fortran	module:vrbls_mc
+ReGamSqBasis	vrbls_mc.f90	/^  double precision, allocatable :: ReGamSqBasis(/;"	v	language:Fortran	module:vrbls_mc
+ReGamSqMC	vrbls_mc.f90	/^  double precision, allocatable :: ReGamSqMC(/;"	v	language:Fortran	module:vrbls_mc
+SFFTEU	basic_function.f90	/^subroutine SFFTEU(/;"	s	language:Fortran
+SFFTEU	test/fourier.f90	/^subroutine SFFTEU(/;"	s	language:Fortran	program:MAIN
+Seed	vrbls_mc.f90	/^  integer                      :: Seed /;"	v	language:Fortran	module:vrbls_mc
+Sigma	vrbls_mc.f90	/^  complex(kind=8) :: Sigma(/;"	v	language:Fortran	module:vrbls_mc
+SignFermiLoop	vrbls_mc.f90	/^  integer          :: SignFermiLoop /;"	v	language:Fortran	module:vrbls_mc
+SpInVertex	vrbls_mc.f90	/^  integer, dimension(2,MxNVertex) :: SpInVertex /;"	v	language:Fortran	module:vrbls_mc
+SpatialWeight	vrbls_mc.f90	/^  double precision :: SpatialWeight(/;"	v	language:Fortran	module:vrbls_mc
+SpinMasha	vrbls_mc.f90	/^  integer          :: SpinMasha /;"	v	language:Fortran	module:vrbls_mc
+StatNum	vrbls_mc.f90	/^  integer          :: StatNum$/;"	v	language:Fortran	module:vrbls_mc
+StatusLn	vrbls_mc.f90	/^  integer, dimension(MxNLn) :: StatusLn /;"	v	language:Fortran	module:vrbls_mc
+StatusVertex	vrbls_mc.f90	/^  integer, dimension(MxNVertex):: StatusVertex /;"	v	language:Fortran	module:vrbls_mc
+TVertex	vrbls_mc.f90	/^  double precision, dimension(3, MxNVertex) :: TVertex!/;"	v	language:Fortran	module:vrbls_mc
+TailLn	vrbls_mc.f90	/^  integer                    :: TailLn /;"	v	language:Fortran	module:vrbls_mc
+TailVertex	vrbls_mc.f90	/^  integer                      :: TailVertex /;"	v	language:Fortran	module:vrbls_mc
+TestData	vrbls_mc.f90	/^  double precision,dimension(0:20)  :: TestData$/;"	v	language:Fortran	module:vrbls_mc
+TimeRatio	vrbls_mc.f90	/^  double precision :: TimeRatio(/;"	v	language:Fortran	module:vrbls_mc
+Title	mylib/mylib.f90	/^    character(len=32) :: Title=/;"	k	language:Fortran	type:logging
+ToG	vrbls_mc.f90	/^  integer, dimension(1:NbinG) :: FromG, ToG$/;"	v	language:Fortran	module:vrbls_mc
+ToGamT1	vrbls_mc.f90	/^  integer, dimension(1:NbinGam) :: FromGamT1, ToGamT1$/;"	v	language:Fortran	module:vrbls_mc
+ToGamT2	vrbls_mc.f90	/^  integer, dimension(0:MxT-1, 1:NbinGam) :: FromGamT2, ToGamT2$/;"	v	language:Fortran	module:vrbls_mc
+ToW	vrbls_mc.f90	/^  integer, dimension(1:NbinW) :: FromW, ToW$/;"	v	language:Fortran	module:vrbls_mc
+TypeGam2W	vrbls_mc.f90	/^  integer, dimension(6,6)   :: TypeGam2W$/;"	v	language:Fortran	module:vrbls_mc
+TypeLn	vrbls_mc.f90	/^  integer, dimension(MxNLn) :: TypeLn /;"	v	language:Fortran	module:vrbls_mc
+TypeSp2Gam	vrbls_mc.f90	/^  integer, dimension(2,2,2,2) :: TypeSp2Gam$/;"	v	language:Fortran	module:vrbls_mc
+TypeVertex	vrbls_mc.f90	/^  integer, dimension(MxNVertex) :: TypeVertex /;"	v	language:Fortran	module:vrbls_mc
+VertexKey2Value	vrbls_mc.f90	/^  integer, dimension(MxNVertex):: VertexKey2Value /;"	v	language:Fortran	module:vrbls_mc
+VertexValue2Key	vrbls_mc.f90	/^  integer, dimension(MxNVertex):: VertexValue2Key /;"	v	language:Fortran	module:vrbls_mc
+Vol	vrbls_mc.f90	/^  integer          ::  L(2), Vol /;"	v	language:Fortran	module:vrbls_mc
+W	vrbls_mc.f90	/^  complex(kind=8), allocatable :: W(/;"	v	language:Fortran	module:vrbls_mc
+W0PF	vrbls_mc.f90	/^  complex(kind=8), allocatable :: W0PF(/;"	v	language:Fortran	module:vrbls_mc
+WLnKey2Value	vrbls_mc.f90	/^  integer, dimension(MxNWLn) :: WLnKey2Value /;"	v	language:Fortran	module:vrbls_mc
+WRVertex	vrbls_mc.f90	/^  integer, dimension(2, MxNVertex) :: WRVertex /;"	v	language:Fortran	module:vrbls_mc
+WeightCurrent	vrbls_mc.f90	/^  double precision :: WeightCurrent /;"	v	language:Fortran	module:vrbls_mc
+WeightLn	vrbls_mc.f90	/^  COMPLEX*16, dimension(MxNLn) :: WeightLn /;"	v	language:Fortran	module:vrbls_mc
+WeightVertex	vrbls_mc.f90	/^  COMPLEX*16, dimension(MxNVertex) :: WeightVertex /;"	v	language:Fortran	module:vrbls_mc
+WeightWorm	vrbls_mc.f90	/^  double precision :: WeightWorm /;"	v	language:Fortran	module:vrbls_mc
+WriteLine	mylib/mylib.f90	/^  subroutine WriteLine(/;"	s	language:Fortran	module:logging_module
+Z_normal	vrbls_mc.f90	/^  double precision :: Z_normal$/;"	v	language:Fortran	module:vrbls_mc
+Z_worm	vrbls_mc.f90	/^  double precision :: Z_worm$/;"	v	language:Fortran	module:vrbls_mc
+a	test/main.f90	/^      integer :: a$/;"	v	language:Fortran	program:main
+add_Hash4G	basic_function.f90	/^SUBROUTINE add_Hash4G(/;"	s	language:Fortran
+add_Hash4W	basic_function.f90	/^SUBROUTINE add_Hash4W(/;"	s	language:Fortran
+add_interaction	monte_carlo.f90	/^SUBROUTINE add_interaction$/;"	s	language:Fortran
+add_ira_stat	basic_function.f90	/^INTEGER FUNCTION add_ira_stat(/;"	f	language:Fortran
+add_k	basic_function.f90	/^INTEGER FUNCTION add_k(/;"	f	language:Fortran
+add_mea_stat	basic_function.f90	/^INTEGER FUNCTION add_mea_stat(/;"	f	language:Fortran
+add_str	mylib/mylib.f90	/^  function add_str(/;"	f	language:Fortran	module:string_basic
+amax	vrbls_mc.f90	/^	DOUBLE PRECISION :: amax,/;"	v	language:Fortran	module:vrbls_mc
+amin	vrbls_mc.f90	/^	DOUBLE PRECISION :: amax, tmax, amin,/;"	v	language:Fortran	module:vrbls_mc
+calculate_Chi	self_consistent.f90	/^SUBROUTINE calculate_Chi$/;"	s	language:Fortran
+calculate_Denom	self_consistent.f90	/^SUBROUTINE calculate_Denom$/;"	s	language:Fortran
+calculate_G	self_consistent.f90	/^SUBROUTINE calculate_G$/;"	s	language:Fortran
+calculate_Gam1	analytic_integration.f90	/^SUBROUTINE calculate_Gam1$/;"	s	language:Fortran
+calculate_GamNormWeight	analytic_integration.f90	/^SUBROUTINE calculate_GamNormWeight$/;"	s	language:Fortran
+calculate_Polar	self_consistent.f90	/^SUBROUTINE calculate_Polar$/;"	s	language:Fortran
+calculate_Sigma	self_consistent.f90	/^SUBROUTINE calculate_Sigma$/;"	s	language:Fortran
+calculate_W	self_consistent.f90	/^SUBROUTINE calculate_W$/;"	s	language:Fortran
+calculate_basis	fitting.f90	/^SUBROUTINE calculate_basis(/;"	s	language:Fortran
+calculate_basis_GWGam	fitting.f90	/^SUBROUTINE calculate_basis_GWGam$/;"	s	language:Fortran
+calculate_basis_Gamma_2D	fitting.f90	/^SUBROUTINE calculate_basis_Gamma_2D(/;"	s	language:Fortran
+change_Gamma_time	monte_carlo.f90	/^SUBROUTINE change_Gamma_time$/;"	s	language:Fortran
+change_Gamma_type	monte_carlo.f90	/^SUBROUTINE change_Gamma_type$/;"	s	language:Fortran
+change_gamma_isdelta	monte_carlo.f90	/^SUBROUTINE change_gamma_isdelta$/;"	s	language:Fortran
+change_gline_space	monte_carlo.f90	/^SUBROUTINE change_gline_space$/;"	s	language:Fortran
+change_wline_isdelta	monte_carlo.f90	/^SUBROUTINE change_wline_isdelta$/;"	s	language:Fortran
+change_wline_space	monte_carlo.f90	/^SUBROUTINE change_wline_space$/;"	s	language:Fortran
+check_config	check_conf.f90	/^SUBROUTINE check_config$/;"	s	language:Fortran
+check_irreducibility	check_conf.f90	/^SUBROUTINE check_irreducibility$/;"	s	language:Fortran
+check_isdelta	check_conf.f90	/^SUBROUTINE check_isdelta$/;"	s	language:Fortran
+check_k_conserve	check_conf.f90	/^SUBROUTINE check_k_conserve$/;"	s	language:Fortran
+check_site	check_conf.f90	/^SUBROUTINE check_site$/;"	s	language:Fortran
+check_stat	check_conf.f90	/^SUBROUTINE check_stat$/;"	s	language:Fortran
+check_time	check_conf.f90	/^SUBROUTINE check_time$/;"	s	language:Fortran
+check_topo	check_conf.f90	/^SUBROUTINE check_topo$/;"	s	language:Fortran
+check_type	check_conf.f90	/^SUBROUTINE check_type$/;"	s	language:Fortran
+check_weight	check_conf.f90	/^SUBROUTINE check_weight$/;"	s	language:Fortran
+create_worm_along_wline	monte_carlo.f90	/^SUBROUTINE create_worm_along_wline$/;"	s	language:Fortran
+dL	vrbls_mc.f90	/^  integer          ::  dL(/;"	v	language:Fortran	module:vrbls_mc
+d_times_cd	basic_function.f90	/^COMPLEX*16 FUNCTION d_times_cd(/;"	f	language:Fortran
+date	vrbls_mc.f90	/^  character( 8)         :: date$/;"	v	language:Fortran	module:vrbls_mc
+def_diagram	monte_carlo.f90	/^SUBROUTINE def_diagram$/;"	s	language:Fortran
+def_prob	monte_carlo.f90	/^SUBROUTINE def_prob$/;"	s	language:Fortran
+def_spatial_weight	monte_carlo.f90	/^SUBROUTINE def_spatial_weight$/;"	s	language:Fortran
+def_spin	monte_carlo.f90	/^SUBROUTINE def_spin$/;"	s	language:Fortran
+def_symmetry	basic_function.f90	/^SUBROUTINE def_symmetry$/;"	s	language:Fortran
+delete_Hash4G	basic_function.f90	/^SUBROUTINE delete_Hash4G(/;"	s	language:Fortran
+delete_Hash4W	basic_function.f90	/^SUBROUTINE delete_Hash4W(/;"	s	language:Fortran
+delete_gamma	basic_function.f90	/^SUBROUTINE delete_gamma(/;"	s	language:Fortran
+delete_ira_stat	basic_function.f90	/^INTEGER FUNCTION delete_ira_stat(/;"	f	language:Fortran
+delete_line	basic_function.f90	/^SUBROUTINE delete_line(/;"	s	language:Fortran
+delete_mea_stat	basic_function.f90	/^INTEGER FUNCTION delete_mea_stat(/;"	f	language:Fortran
+delete_worm_along_wline	monte_carlo.f90	/^SUBROUTINE delete_worm_along_wline$/;"	s	language:Fortran
+diff_r	basic_function.f90	/^SUBROUTINE diff_r(/;"	s	language:Fortran
+file_version	vrbls_mc.f90	/^  integer:: file_version$/;"	v	language:Fortran	module:vrbls_mc
+first_order_diagram	basic_function.f90	/^SUBROUTINE first_order_diagram$/;"	s	language:Fortran
+first_order_diagram_with_bubble	basic_function.f90	/^SUBROUTINE first_order_diagram_with_bubble$/;"	s	language:Fortran
+flip_typ_G	monte_carlo.f90	/^INTEGER FUNCTION flip_typ_G(/;"	f	language:Fortran
+flip_typ_Vertex	monte_carlo.f90	/^SUBROUTINE flip_typ_Vertex(/;"	s	language:Fortran
+g_a	test/global.f90	/^  integer :: g_a=/;"	v	language:Fortran	module:global
+generate_gline	basic_function.f90	/^INTEGER FUNCTION generate_gline(/;"	f	language:Fortran
+generate_k	basic_function.f90	/^INTEGER FUNCTION generate_k(/;"	f	language:Fortran
+generate_tau	basic_function.f90	/^DOUBLE PRECISION FUNCTION generate_tau(/;"	f	language:Fortran
+generate_vertex	basic_function.f90	/^INTEGER FUNCTION generate_vertex(/;"	f	language:Fortran
+generate_wline	basic_function.f90	/^INTEGER FUNCTION generate_wline(/;"	f	language:Fortran
+generate_xy	basic_function.f90	/^SUBROUTINE generate_xy(/;"	s	language:Fortran
+get_bin_G	fitting.f90	/^INTEGER FUNCTION get_bin_G(/;"	f	language:Fortran
+get_bin_Gam	fitting.f90	/^INTEGER FUNCTION get_bin_Gam(/;"	f	language:Fortran
+get_bin_W	fitting.f90	/^INTEGER FUNCTION get_bin_W(/;"	f	language:Fortran
+get_polynomial	fitting.f90	/^DOUBLE PRECISION FUNCTION get_polynomial(/;"	f	language:Fortran
+get_polynomial_Gam	fitting.f90	/^DOUBLE PRECISION FUNCTION get_polynomial_Gam(/;"	f	language:Fortran
+get_spin_G	monte_carlo.f90	/^INTEGER FUNCTION get_spin_G(/;"	f	language:Fortran
+get_spin_Vertex	monte_carlo.f90	/^SUBROUTINE get_spin_Vertex(/;"	s	language:Fortran
+get_typW_from_Vertex	monte_carlo.f90	/^INTEGER FUNCTION get_typW_from_Vertex(/;"	f	language:Fortran
+gline_stat	basic_function.f90	/^INTEGER FUNCTION gline_stat(/;"	f	language:Fortran
+global	test/global.f90	/^module global$/;"	m	language:Fortran
+h_curr	vrbls_mc.f90	/^  integer               :: h_prev, h_curr$/;"	v	language:Fortran	module:vrbls_mc
+h_prev	vrbls_mc.f90	/^  integer               :: h_prev,/;"	v	language:Fortran	module:vrbls_mc
+ifd1	vrbls_mc.f90	/^  integer, parameter           :: len1=9689,    ifd1=/;"	v	language:Fortran	module:vrbls_mc
+ifd2	vrbls_mc.f90	/^  integer, parameter           :: len2=127,     ifd2=/;"	v	language:Fortran	module:vrbls_mc
+imc	vrbls_mc.f90	/^  double precision :: imc /;"	v	language:Fortran	module:vrbls_mc
+imeasure	vrbls_mc.f90	/^  double precision :: imeasure$/;"	v	language:Fortran	module:vrbls_mc
+init_char	mylib/mylib.f90	/^  subroutine init_char(/;"	s	language:Fortran	module:logging_module
+init_null	mylib/mylib.f90	/^  subroutine init_null(/;"	s	language:Fortran	module:logging_module
+init_num	mylib/mylib.f90	/^  subroutine init_num(/;"	s	language:Fortran	module:logging_module
+initialize_G	self_consistent.f90	/^SUBROUTINE initialize_G$/;"	s	language:Fortran
+initialize_G0F	self_consistent.f90	/^SUBROUTINE initialize_G0F$/;"	s	language:Fortran
+initialize_Gam	self_consistent.f90	/^SUBROUTINE initialize_Gam$/;"	s	language:Fortran
+initialize_Gam0PF	self_consistent.f90	/^SUBROUTINE initialize_Gam0PF$/;"	s	language:Fortran
+initialize_W	self_consistent.f90	/^SUBROUTINE initialize_W$/;"	s	language:Fortran
+initialize_W0PF	self_consistent.f90	/^SUBROUTINE initialize_W0PF$/;"	s	language:Fortran
+initialize_bins	fitting.f90	/^SUBROUTINE initialize_bins$/;"	s	language:Fortran
+initialize_markov	monte_carlo.f90	/^SUBROUTINE initialize_markov$/;"	s	language:Fortran
+initialize_polynomials	fitting.f90	/^SUBROUTINE initialize_polynomials$/;"	s	language:Fortran
+initialize_self_consistent	self_consistent.f90	/^SUBROUTINE initialize_self_consistent$/;"	s	language:Fortran
+insert_gamma	basic_function.f90	/^SUBROUTINE insert_gamma(/;"	s	language:Fortran
+insert_line	basic_function.f90	/^SUBROUTINE insert_line(/;"	s	language:Fortran
+inxt1	vrbls_mc.f90	/^  integer, dimension(1:len1)   :: inxt1$/;"	v	language:Fortran	module:vrbls_mc
+inxt2	vrbls_mc.f90	/^  integer, dimension(1:len2)   :: inxt2$/;"	v	language:Fortran	module:vrbls_mc
+ipnf1	vrbls_mc.f90	/^  integer                      :: ipnt1, ipnf1$/;"	v	language:Fortran	module:vrbls_mc
+ipnf2	vrbls_mc.f90	/^  integer                      :: ipnt2, ipnf2$/;"	v	language:Fortran	module:vrbls_mc
+ipnt1	vrbls_mc.f90	/^  integer                      :: ipnt1,/;"	v	language:Fortran	module:vrbls_mc
+ipnt2	vrbls_mc.f90	/^  integer                      :: ipnt2,/;"	v	language:Fortran	module:vrbls_mc
+ir1	vrbls_mc.f90	/^  integer, dimension(1:len1)   :: ir1$/;"	v	language:Fortran	module:vrbls_mc
+ir2	vrbls_mc.f90	/^  integer, dimension(1:len2)   :: ir2$/;"	v	language:Fortran	module:vrbls_mc
+irn	vrbls_mc.f90	/^  integer, dimension(1:mxrn)   :: irn(/;"	v	language:Fortran	module:vrbls_mc
+is_connected	check_conf.f90	/^logical FUNCTION is_connected(/;"	f	language:Fortran
+is_mea_near_Gamma	basic_function.f90	/^logical FUNCTION is_mea_near_Gamma(/;"	f	language:Fortran
+is_mea_near_W	basic_function.f90	/^logical FUNCTION is_mea_near_W(/;"	f	language:Fortran
+is_mea_worm_near_G	basic_function.f90	/^logical FUNCTION is_mea_worm_near_G(/;"	f	language:Fortran
+is_worm_near_Gamma	basic_function.f90	/^logical FUNCTION is_worm_near_Gamma(/;"	f	language:Fortran
+is_worm_near_W	basic_function.f90	/^logical FUNCTION is_worm_near_W(/;"	f	language:Fortran
+is_worm_nearby	monte_carlo.f90	/^LOGICAL FUNCTION is_worm_nearby(/;"	f	language:Fortran
+it	test/fourier.f90	/^  integer :: it,/;"	v	language:Fortran	program:MAIN
+it1	test/fourier.f90	/^  integer :: it, it1,/;"	v	language:Fortran	program:MAIN
+it2	test/fourier.f90	/^  integer :: it, it1, it2,/;"	v	language:Fortran	program:MAIN
+ityp	test/fourier.f90	/^  integer :: it, it1, it2, ityp$/;"	v	language:Fortran	program:MAIN
+iupdate	vrbls_mc.f90	/^  integer          :: iupdate /;"	v	language:Fortran	module:vrbls_mc
+just_output	DiagMC.f90	/^SUBROUTINE just_output$/;"	s	language:Fortran
+kLn	vrbls_mc.f90	/^  integer, dimension(MxNLn) :: kLn /;"	v	language:Fortran	module:vrbls_mc
+kMasha	vrbls_mc.f90	/^  integer          :: kMasha /;"	v	language:Fortran	module:vrbls_mc
+len1	vrbls_mc.f90	/^  integer, parameter           :: len1=/;"	v	language:Fortran	module:vrbls_mc
+len2	vrbls_mc.f90	/^  integer, parameter           :: len2=/;"	v	language:Fortran	module:vrbls_mc
+logL	vrbls_mc.f90	/^  double precision  ::  logL(/;"	v	language:Fortran	module:vrbls_mc
+logging	mylib/mylib.f90	/^  type :: logging$/;"	t	language:Fortran	module:logging_module
+logging_module	mylib/mylib.f90	/^module logging_module$/;"	m	language:Fortran
+logstr	vrbls_mc.f90	/^  character*128 :: logstr$/;"	v	language:Fortran	module:vrbls_mc
+macheps	vrbls_mc.f90	/^  double precision, parameter :: macheps /;"	v	language:Fortran	module:vrbls_mc
+main	test/main.f90	/^program main$/;"	p	language:Fortran
+markov	monte_carlo.f90	/^SUBROUTINE markov(/;"	s	language:Fortran
+mc_version	vrbls_mc.f90	/^  integer:: mc_version$/;"	v	language:Fortran	module:vrbls_mc
+measure	monte_carlo.f90	/^SUBROUTINE measure$/;"	s	language:Fortran
+mod2	vrbls_mc.f90	/^  integer, parameter           :: mod2=/;"	v	language:Fortran	module:vrbls_mc
+monte_carlo	DiagMC.f90	/^SUBROUTINE monte_carlo$/;"	s	language:Fortran
+move_measuring_index	monte_carlo.f90	/^SUBROUTINE move_measuring_index$/;"	s	language:Fortran
+move_worm_along_gline	monte_carlo.f90	/^SUBROUTINE move_worm_along_gline$/;"	s	language:Fortran
+move_worm_along_gline_test	monte_carlo.f90	/^SUBROUTINE move_worm_along_gline_test$/;"	s	language:Fortran
+move_worm_along_wline	monte_carlo.f90	/^SUBROUTINE move_worm_along_wline$/;"	s	language:Fortran
+mul2	vrbls_mc.f90	/^  integer, parameter           :: mod2=2796203, mul2=/;"	v	language:Fortran	module:vrbls_mc
+mult	vrbls_mc.f90	/^  integer, parameter           :: mult=/;"	v	language:Fortran	module:vrbls_mc
+mxrn	vrbls_mc.f90	/^  integer, parameter           :: mxrn /;"	v	language:Fortran	module:vrbls_mc
+nrannr	vrbls_mc.f90	/^  integer                      :: nrannr /;"	v	language:Fortran	module:vrbls_mc
+numerical_integeration	DiagMC.f90	/^subroutine numerical_integeration$/;"	s	language:Fortran
+output_G	test/fourier.f90	/^SUBROUTINE output_G(/;"	s	language:Fortran	program:MAIN
+output_Gam0	test/fourier.f90	/^SUBROUTINE output_Gam0(/;"	s	language:Fortran	program:MAIN
+output_Gam1	read_write_data.f90	/^SUBROUTINE output_Gam1$/;"	s	language:Fortran
+output_GamMC	read_write_data.f90	/^SUBROUTINE output_GamMC$/;"	s	language:Fortran
+output_Quantities	read_write_data.f90	/^SUBROUTINE output_Quantities$/;"	s	language:Fortran
+output_test	read_write_data.f90	/^SUBROUTINE output_test$/;"	s	language:Fortran
+plus_minus_Gam0	self_consistent.f90	/^SUBROUTINE plus_minus_Gam0(/;"	s	language:Fortran
+plus_minus_W0	self_consistent.f90	/^SUBROUTINE plus_minus_W0(/;"	s	language:Fortran
+print_config	read_write_data.f90	/^SUBROUTINE print_config$/;"	s	language:Fortran
+print_status	read_write_data.f90	/^SUBROUTINE print_status$/;"	s	language:Fortran
+prob_tau	basic_function.f90	/^DOUBLE PRECISION FUNCTION prob_tau(/;"	f	language:Fortran
+projector	fitting.f90	/^DOUBLE PRECISION FUNCTION projector(/;"	f	language:Fortran
+projector_Gam	fitting.f90	/^DOUBLE PRECISION FUNCTION projector_Gam(/;"	f	language:Fortran
+prt	vrbls_mc.f90	/^  logical :: prt$/;"	v	language:Fortran	module:vrbls_mc
+quicklog_char	mylib/mylib.f90	/^  subroutine quicklog_char(/;"	s	language:Fortran	module:logging_module
+quicklog_null	mylib/mylib.f90	/^  subroutine quicklog_null(/;"	s	language:Fortran	module:logging_module
+quicklog_num	mylib/mylib.f90	/^  subroutine quicklog_num(/;"	s	language:Fortran	module:logging_module
+ratio	test/fourier.f90	/^  double precision :: ratio$/;"	v	language:Fortran	program:MAIN
+ratioerr	vrbls_mc.f90	/^  double precision   :: ratioerr$/;"	v	language:Fortran	module:vrbls_mc
+read_GWGamma	read_write_data.f90	/^SUBROUTINE read_GWGamma$/;"	s	language:Fortran
+read_flag	DiagMC.f90	/^SUBROUTINE read_flag$/;"	s	language:Fortran
+read_monte_carlo_conf	read_write_data.f90	/^SUBROUTINE read_monte_carlo_conf$/;"	s	language:Fortran
+read_monte_carlo_data	read_write_data.f90	/^SUBROUTINE read_monte_carlo_data$/;"	s	language:Fortran
+reconnect	monte_carlo.f90	/^SUBROUTINE reconnect$/;"	s	language:Fortran
+remove_interaction	monte_carlo.f90	/^SUBROUTINE remove_interaction$/;"	s	language:Fortran
+rn	basic_function.f90	/^DOUBLE PRECISION FUNCTION rn(/;"	f	language:Fortran
+second_order_diagram	basic_function.f90	/^SUBROUTINE second_order_diagram$/;"	s	language:Fortran
+self_consistent	DiagMC.f90	/^SUBROUTINE self_consistent$/;"	s	language:Fortran
+self_consistent_GW	DiagMC.f90	/^LOGICAL FUNCTION self_consistent_GW(/;"	f	language:Fortran
+set_RNG	basic_function.f90	/^SUBROUTINE set_RNG$/;"	s	language:Fortran
+set_level_char	mylib/mylib.f90	/^  subroutine set_level_char(/;"	s	language:Fortran	module:logging_module
+set_level_null	mylib/mylib.f90	/^  subroutine set_level_null(/;"	s	language:Fortran	module:logging_module
+set_level_num	mylib/mylib.f90	/^  subroutine set_level_num(/;"	s	language:Fortran	module:logging_module
+set_time_elapse	basic_function.f90	/^SUBROUTINE set_time_elapse$/;"	s	language:Fortran
+site_num	read_write_data.f90	/^INTEGER FUNCTION site_num(/;"	f	language:Fortran
+statistics	monte_carlo.f90	/^SUBROUTINE statistics$/;"	s	language:Fortran
+str_double	mylib/mylib.f90	/^  function str_double(/;"	f	language:Fortran	module:string_basic
+str_double_complex	mylib/mylib.f90	/^  function str_double_complex(/;"	f	language:Fortran	module:string_basic
+str_int	mylib/mylib.f90	/^  function str_int(/;"	f	language:Fortran	module:string_basic
+str_logic	mylib/mylib.f90	/^  function str_logic(/;"	f	language:Fortran	module:string_basic
+string_basic	mylib/mylib.f90	/^module string_basic$/;"	m	language:Fortran
+switch_ira_and_masha	monte_carlo.f90	/^SUBROUTINE switch_ira_and_masha$/;"	s	language:Fortran
+t_curr	vrbls_mc.f90	/^  double precision      :: t_prev, t_curr,/;"	v	language:Fortran	module:vrbls_mc
+t_elap	vrbls_mc.f90	/^  double precision      :: t_prev, t_curr, t_elap$/;"	v	language:Fortran	module:vrbls_mc
+t_init	vrbls_mc.f90	/^  double precision      :: t_init,/;"	v	language:Fortran	module:vrbls_mc
+t_meas	vrbls_mc.f90	/^  double precision      :: t_init, t_simu, t_meas,/;"	v	language:Fortran	module:vrbls_mc
+t_prev	vrbls_mc.f90	/^  double precision      :: t_prev,/;"	v	language:Fortran	module:vrbls_mc
+t_simu	vrbls_mc.f90	/^  double precision      :: t_init, t_simu,/;"	v	language:Fortran	module:vrbls_mc
+t_toss	vrbls_mc.f90	/^  double precision      :: t_init, t_simu, t_meas, t_toss$/;"	v	language:Fortran	module:vrbls_mc
+test_basis	fitting.f90	/^SUBROUTINE test_basis(/;"	s	language:Fortran
+test_basis_Gam	fitting.f90	/^SUBROUTINE test_basis_Gam(/;"	s	language:Fortran
+test_subroutine	DiagMC.f90	/^SUBROUTINE test_subroutine$/;"	s	language:Fortran
+time	vrbls_mc.f90	/^  character(10)         :: time$/;"	v	language:Fortran	module:vrbls_mc
+time_elapse	basic_function.f90	/^SUBROUTINE time_elapse$/;"	s	language:Fortran
+title	vrbls_mc.f90	/^  character*128 :: title$/;"	v	language:Fortran	module:vrbls_mc
+title1	vrbls_mc.f90	/^  character*128 :: title1$/;"	v	language:Fortran	module:vrbls_mc
+title2	vrbls_mc.f90	/^  character*128 :: title2$/;"	v	language:Fortran	module:vrbls_mc
+title3	vrbls_mc.f90	/^  character*128 :: title3$/;"	v	language:Fortran	module:vrbls_mc
+title4	vrbls_mc.f90	/^  character*128 :: title4$/;"	v	language:Fortran	module:vrbls_mc
+title_loop	vrbls_mc.f90	/^  character*128 :: title_loop$/;"	v	language:Fortran	module:vrbls_mc
+title_loop_log	vrbls_mc.f90	/^  character*128 :: title_loop_log$/;"	v	language:Fortran	module:vrbls_mc
+title_mc	vrbls_mc.f90	/^  character*128 :: title_mc$/;"	v	language:Fortran	module:vrbls_mc
+tm32	vrbls_mc.f90	/^  double precision, parameter :: tm32 /;"	v	language:Fortran	module:vrbls_mc
+tmax	vrbls_mc.f90	/^	DOUBLE PRECISION :: amax, tmax,/;"	v	language:Fortran	module:vrbls_mc
+tmin	vrbls_mc.f90	/^	DOUBLE PRECISION :: amax, tmax, amin, tmin$/;"	v	language:Fortran	module:vrbls_mc
+transfer_Chi_r	basic_function.f90	/^SUBROUTINE transfer_Chi_r(/;"	s	language:Fortran
+transfer_Chi_t	basic_function.f90	/^SUBROUTINE transfer_Chi_t(/;"	s	language:Fortran
+transfer_G0	basic_function.f90	/^SUBROUTINE transfer_G0(/;"	s	language:Fortran
+transfer_G_t	basic_function.f90	/^SUBROUTINE transfer_G_t(/;"	s	language:Fortran
+transfer_G_t	test/fourier.f90	/^SUBROUTINE transfer_G_t(/;"	s	language:Fortran	program:MAIN
+transfer_Gam0_r	basic_function.f90	/^SUBROUTINE transfer_Gam0_r(/;"	s	language:Fortran
+transfer_Gam0_r	test/fourier.f90	/^SUBROUTINE transfer_Gam0_r(/;"	s	language:Fortran	program:MAIN
+transfer_Gam0_t	basic_function.f90	/^SUBROUTINE transfer_Gam0_t(/;"	s	language:Fortran
+transfer_Gam0_t	test/fourier.f90	/^SUBROUTINE transfer_Gam0_t(/;"	s	language:Fortran	program:MAIN
+transfer_GamOrder1_t	basic_function.f90	/^SUBROUTINE transfer_GamOrder1_t(/;"	s	language:Fortran
+transfer_Gam_r	basic_function.f90	/^SUBROUTINE transfer_Gam_r(/;"	s	language:Fortran
+transfer_Gam_r	test/fourier.f90	/^SUBROUTINE transfer_Gam_r(/;"	s	language:Fortran	program:MAIN
+transfer_Gam_t	basic_function.f90	/^SUBROUTINE transfer_Gam_t(/;"	s	language:Fortran
+transfer_Gam_t	test/fourier.f90	/^SUBROUTINE transfer_Gam_t(/;"	s	language:Fortran	program:MAIN
+transfer_Sigma_t	basic_function.f90	/^SUBROUTINE transfer_Sigma_t(/;"	s	language:Fortran
+transfer_W0_r	basic_function.f90	/^SUBROUTINE transfer_W0_r(/;"	s	language:Fortran
+transfer_W0_r	test/fourier.f90	/^SUBROUTINE transfer_W0_r(/;"	s	language:Fortran	program:MAIN
+transfer_W0_t	basic_function.f90	/^SUBROUTINE transfer_W0_t(/;"	s	language:Fortran
+transfer_W0_t	test/fourier.f90	/^SUBROUTINE transfer_W0_t(/;"	s	language:Fortran	program:MAIN
+transfer_W_r	basic_function.f90	/^SUBROUTINE transfer_W_r(/;"	s	language:Fortran
+transfer_W_r	test/fourier.f90	/^SUBROUTINE transfer_W_r(/;"	s	language:Fortran	program:MAIN
+transfer_W_t	basic_function.f90	/^SUBROUTINE transfer_W_t(/;"	s	language:Fortran
+transfer_W_t	test/fourier.f90	/^SUBROUTINE transfer_W_t(/;"	s	language:Fortran	program:MAIN
+transfer_r	basic_function.f90	/^SUBROUTINE transfer_r(/;"	s	language:Fortran
+transfer_r	test/fourier.f90	/^SUBROUTINE transfer_r(/;"	s	language:Fortran	program:MAIN
+transfer_t	basic_function.f90	/^SUBROUTINE transfer_t(/;"	s	language:Fortran
+transfer_t	test/fourier.f90	/^SUBROUTINE transfer_t(/;"	s	language:Fortran	program:MAIN
+tval	vrbls_mc.f90	/^  integer, dimension(8) :: tval$/;"	v	language:Fortran	module:vrbls_mc
+undo_delete_gamma	basic_function.f90	/^SUBROUTINE undo_delete_gamma(/;"	s	language:Fortran
+undo_delete_line	basic_function.f90	/^SUBROUTINE undo_delete_line(/;"	s	language:Fortran
+undo_insert_line	basic_function.f90	/^SUBROUTINE undo_insert_line(/;"	s	language:Fortran
+undo_update_line	basic_function.f90	/^SUBROUTINE undo_update_line(/;"	s	language:Fortran
+update_Hash4G	basic_function.f90	/^SUBROUTINE update_Hash4G(/;"	s	language:Fortran
+update_Hash4W	basic_function.f90	/^SUBROUTINE update_Hash4W(/;"	s	language:Fortran
+update_WeightCurrent	basic_function.f90	/^SUBROUTINE update_WeightCurrent$/;"	s	language:Fortran
+update_flag	DiagMC.f90	/^SUBROUTINE update_flag$/;"	s	language:Fortran
+update_line	basic_function.f90	/^SUBROUTINE update_line(/;"	s	language:Fortran
+update_weight	monte_carlo.f90	/^SUBROUTINE update_weight(/;"	s	language:Fortran
+vrbls_mc	vrbls_mc.f90	/^MODULE vrbls_mc$/;"	m	language:Fortran
+weight_G	basic_function.f90	/^COMPLEX*16 FUNCTION weight_G(/;"	f	language:Fortran
+weight_G0	basic_function.f90	/^Complex*16 FUNCTION weight_G0(/;"	f	language:Fortran
+weight_G0	test/fourier.f90	/^Complex*16 FUNCTION weight_G0(/;"	f	language:Fortran	program:MAIN
+weight_Gam	basic_function.f90	/^COMPLEX*16 FUNCTION weight_Gam(/;"	f	language:Fortran
+weight_Gam0	basic_function.f90	/^COMPLEX*16 FUNCTION weight_Gam0(/;"	f	language:Fortran
+weight_W	basic_function.f90	/^COMPLEX*16 FUNCTION weight_W(/;"	f	language:Fortran
+weight_W0	basic_function.f90	/^Complex*16 FUNCTION weight_W0(/;"	f	language:Fortran
+weight_basis	fitting.f90	/^DOUBLE PRECISION FUNCTION weight_basis(/;"	f	language:Fortran
+weight_basis_Gam	fitting.f90	/^DOUBLE PRECISION FUNCTION weight_basis_Gam(/;"	f	language:Fortran
+weight_gline	basic_function.f90	/^COMPLEX*16 FUNCTION weight_gline(/;"	f	language:Fortran
+weight_meas_G	basic_function.f90	/^complex*16 FUNCTION weight_meas_G(/;"	f	language:Fortran
+weight_meas_Gam0	basic_function.f90	/^complex*16 FUNCTION weight_meas_Gam0(/;"	f	language:Fortran
+weight_meas_W	basic_function.f90	/^complex*16 FUNCTION weight_meas_W(/;"	f	language:Fortran
+weight_ratio	monte_carlo.f90	/^SUBROUTINE weight_ratio(/;"	s	language:Fortran
+weight_vertex	basic_function.f90	/^COMPLEX*16 FUNCTION weight_vertex(/;"	f	language:Fortran
+weight_wline	basic_function.f90	/^COMPLEX*16 FUNCTION weight_wline(/;"	f	language:Fortran
+weight_worm	basic_function.f90	/^DOUBLE PRECISION FUNCTION weight_worm(/;"	f	language:Fortran
+wline_stat	basic_function.f90	/^INTEGER FUNCTION wline_stat(/;"	f	language:Fortran
+write_GWGamma	read_write_data.f90	/^SUBROUTINE write_GWGamma$/;"	s	language:Fortran
+write_monte_carlo_conf	read_write_data.f90	/^SUBROUTINE write_monte_carlo_conf$/;"	s	language:Fortran
+write_monte_carlo_data	read_write_data.f90	/^SUBROUTINE write_monte_carlo_data$/;"	s	language:Fortran
+write_stamp	mylib/mylib.f90	/^  subroutine write_stamp(/;"	s	language:Fortran	module:logging_module
+write_stamp_char	mylib/mylib.f90	/^  subroutine write_stamp_char(/;"	s	language:Fortran	module:logging_module
+write_stamp_num	mylib/mylib.f90	/^  subroutine write_stamp_num(/;"	s	language:Fortran	module:logging_module
+zone	vrbls_mc.f90	/^  character(5 )         :: zone$/;"	v	language:Fortran	module:vrbls_mc
