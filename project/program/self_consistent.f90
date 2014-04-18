@@ -63,15 +63,21 @@ END SUBROUTINE initialize_G0F
 !!------- Initialization of W0 in monmentum and frequency ----------
 SUBROUTINE initialize_W0PF
   implicit none
-  double precision :: ratio
+  double precision :: ratio1, ratio2
 
   W0PF(:,:,:) = (0.d0, 0.d0)
-  ratio = 0.25d0*Jcp*real(MxT)/Beta
 
-  W0PF(1,      0, 0) = dcmplx(ratio, 0.d0)
-  W0PF(L(1)-1, 0, 0) = dcmplx(ratio, 0.d0)
-  W0PF(0,      1, 0) = dcmplx(ratio, 0.d0)
-  W0PF(0, L(2)-1, 0) = dcmplx(ratio, 0.d0)
+  ratio1 = 0.25d0*J1*real(MxT)/Beta
+  W0PF(1,      0, 0) = dcmplx(ratio1, 0.d0)
+  W0PF(L(1)-1, 0, 0) = dcmplx(ratio1, 0.d0)
+  W0PF(0,      1, 0) = dcmplx(ratio1, 0.d0)
+  W0PF(0, L(2)-1, 0) = dcmplx(ratio1, 0.d0)
+
+  ratio2 = 0.25d0*J2*real(MxT)/Beta
+  W0PF(1,           1, 0) = dcmplx(ratio2, 0.d0)
+  W0PF(L(1)-1,      1, 0) = dcmplx(ratio2, 0.d0)
+  W0PF(1,      L(2)-1, 0) = dcmplx(ratio2, 0.d0)
+  W0PF(L(1)-1, L(2)-1, 0) = dcmplx(ratio2, 0.d0)
 
   call transfer_W0_r(1)
   call transfer_W0_t(1)
