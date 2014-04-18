@@ -151,8 +151,6 @@ MODULE vrbls_mc
   integer          :: NSamp             ! # total MC steps
   integer          :: NToss             ! # MC steps for toss
   integer          :: NStep             ! # MC steps for one measurement
-  logical          :: IsToss
-  logical          :: IsForever
 
   !------------ basic variables for a diagram --------------------------
   integer          :: Order             ! order of the simulating diagram 
