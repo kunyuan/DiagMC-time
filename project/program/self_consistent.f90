@@ -63,15 +63,21 @@ END SUBROUTINE initialize_G0F
 !!------- Initialization of W0 in monmentum and frequency ----------
 SUBROUTINE initialize_W0PF
   implicit none
-  double precision :: ratio
+  double precision :: ratio1, ratio2
 
   W0PF(:,:,:) = (0.d0, 0.d0)
-  ratio = 0.25d0*Jcp*real(MxT)/Beta
 
-  W0PF(1,    0, 0) = dcmplx(ratio, 0.d0)
-  W0PF(L(1)-1, 0, 0) = dcmplx(ratio, 0.d0)
-  W0PF(0,    1, 0) = dcmplx(ratio, 0.d0)
-  W0PF(0, L(2)-1, 0) = dcmplx(ratio, 0.d0)
+  ratio1 = 0.25d0*J1*real(MxT)/Beta
+  W0PF(1,      0, 0) = dcmplx(ratio1, 0.d0)
+  W0PF(L(1)-1, 0, 0) = dcmplx(ratio1, 0.d0)
+  W0PF(0,      1, 0) = dcmplx(ratio1, 0.d0)
+  W0PF(0, L(2)-1, 0) = dcmplx(ratio1, 0.d0)
+
+  ratio2 = 0.25d0*J2*real(MxT)/Beta
+  W0PF(1,           1, 0) = dcmplx(ratio2, 0.d0)
+  W0PF(L(1)-1,      1, 0) = dcmplx(ratio2, 0.d0)
+  W0PF(1,      L(2)-1, 0) = dcmplx(ratio2, 0.d0)
+  W0PF(L(1)-1, L(2)-1, 0) = dcmplx(ratio2, 0.d0)
 
   call transfer_W0_r(1)
   call transfer_W0_t(1)
@@ -304,9 +310,6 @@ Complex*16 FUNCTION weight_W0(typ, dr)
   implicit none
   integer, intent(in) :: dr(2), typ
   integer :: dx1, dy1
-  double precision :: ratio
-
-  ratio = Jcp
 
   dx1 = dr(1);       dy1 = dr(2)
   if(dx1>=0  .and. dx1<L(1) .and. dy1>=0 .and. dy1<L(2)) then
@@ -317,11 +320,19 @@ Complex*16 FUNCTION weight_W0(typ, dr)
 
     if((dx1==1.and.dy1==0).or.(dx1==0.and.dy1==1)) then
       if(typ ==1 .or. typ == 2) then
-        weight_W0 = dcmplx(0.25d0*ratio, 0.d0)
+        weight_W0 = dcmplx(0.25d0*J1, 0.d0)
       else if(typ == 3 .or. typ == 4) then
-        weight_W0 = dcmplx(-0.25d0*ratio, 0.d0)
+        weight_W0 = dcmplx(-0.25d0*J1, 0.d0)
       else if(typ == 5 .or. typ == 6) then
-        weight_W0 = dcmplx(0.5d0*ratio, 0.d0)
+        weight_W0 = dcmplx(0.5d0*J1, 0.d0)
+      endif
+    else if(dx1==1 .and. dy1==1) then
+      if(typ ==1 .or. typ == 2) then
+        weight_W0 = dcmplx(0.25d0*J2, 0.d0)
+      else if(typ == 3 .or. typ == 4) then
+        weight_W0 = dcmplx(-0.25d0*J2, 0.d0)
+      else if(typ == 5 .or. typ == 6) then
+        weight_W0 = dcmplx(0.5d0*J2, 0.d0)
       endif
     endif
   else

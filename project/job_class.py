@@ -65,7 +65,8 @@ class Job:
         input_str = self.key_to_string("pid")
         input_str += self.key_to_string("Lx")
         input_str += self.key_to_string("Ly")
-        input_str += self.key_to_string("Jcp")
+        input_str += self.key_to_string("J1")
+        input_str += self.key_to_string("J2")
         input_str += self.key_to_string("Beta")
         input_str += self.key_to_string("Order")
         input_str += self.key_to_string("IsLoad")
@@ -160,7 +161,8 @@ if __name__ == "__main__":
         "Type" : 2,
         "Lx" :  4,
         "Ly" :  4,
-        "Jcp" :  1.0,
+        "J1" :  1.0,
+        "J2" :  0.4,
         "Beta" :  0.9,
         "Order" :  2,
         "Reweight" : [1,5],

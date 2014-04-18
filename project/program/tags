@@ -73,7 +73,8 @@ Is_reducible_G	basic_function.f90	/^LOGICAL FUNCTION Is_reducible_G(/;"	f	langua
 Is_reducible_G_Gam	basic_function.f90	/^LOGICAL FUNCTION Is_reducible_G_Gam(/;"	f	language:Fortran
 Is_reducible_W	basic_function.f90	/^LOGICAL FUNCTION Is_reducible_W(/;"	f	language:Fortran
 Is_reducible_W_Gam	basic_function.f90	/^LOGICAL FUNCTION Is_reducible_W_Gam(/;"	f	language:Fortran
-Jcp	vrbls_mc.f90	/^  double precision ::  Jcp /;"	v	language:Fortran	module:vrbls_mc
+J1	vrbls_mc.f90	/^  double precision ::  J1,/;"	v	language:Fortran	module:vrbls_mc
+J2	vrbls_mc.f90	/^  double precision ::  J1, J2 /;"	v	language:Fortran	module:vrbls_mc
 KindLn	vrbls_mc.f90	/^  integer, dimension(MxNLn) :: KindLn /;"	v	language:Fortran	module:vrbls_mc
 L	vrbls_mc.f90	/^  integer          ::  L(/;"	v	language:Fortran	module:vrbls_mc
 Level	mylib/mylib.f90	/^    integer :: Level=/;"	k	language:Fortran	type:logging
@@ -323,6 +324,8 @@ time_elapse	basic_function.f90	/^SUBROUTINE time_elapse$/;"	s	language:Fortran
 title	vrbls_mc.f90	/^  character*128 :: title$/;"	v	language:Fortran	module:vrbls_mc
 title1	vrbls_mc.f90	/^  character*128 :: title1$/;"	v	language:Fortran	module:vrbls_mc
 title2	vrbls_mc.f90	/^  character*128 :: title2$/;"	v	language:Fortran	module:vrbls_mc
+title3	vrbls_mc.f90	/^  character*128 :: title3$/;"	v	language:Fortran	module:vrbls_mc
+title4	vrbls_mc.f90	/^  character*128 :: title4$/;"	v	language:Fortran	module:vrbls_mc
 title_loop	vrbls_mc.f90	/^  character*128 :: title_loop$/;"	v	language:Fortran	module:vrbls_mc
 title_loop_log	vrbls_mc.f90	/^  character*128 :: title_loop_log$/;"	v	language:Fortran	module:vrbls_mc
 title_mc	vrbls_mc.f90	/^  character*128 :: title_mc$/;"	v	language:Fortran	module:vrbls_mc
