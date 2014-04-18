@@ -149,94 +149,105 @@ END SUBROUTINE def_diagram
 !========================= UPDATES =====================================
 !=======================================================================
 
-SUBROUTINE markov(MaxSamp)
+SUBROUTINE markov(IsToss)
   implicit none
-  integer :: iflag, istep,isamp,i,MaxSamp,seg
+  integer :: istep,isamp,i,MaxSamp,iblck
   double precision :: nr,x
+  logical :: IsToss
 
-  if(IsToss .or. .not. IsForever) then
-    seg=1
-  else
-    seg=0
-  endif
-
-  isamp=0
+  iblck=0
   mc_version = 0
+  if(IsToss) then
+    MaxSamp = Ntoss
+  else
+    MaxSamp = Nsamp
+  endif
 
   call LogFile%QuickLog("Starting Markov...")
   call check_weight
 
-  do while(isamp<=MaxSamp)
-    isamp=isamp+seg
+  do while(.true.)
+    iblck = iblck +1
+    do isamp = 1, MaxSamp
+      do istep=1, Nstep
+        imc = imc + 1.0
 
-    if(IsWormPresent .and. rn()<0.50) call switch_ira_and_masha
+        if(IsWormPresent .and. rn()<0.50) call switch_ira_and_masha
 
-    nr=rn()
-    if(nr<Fupdate(1)) then
-      iupdate = 1
-      call create_worm_along_wline          
-    else if(nr<Fupdate(2)) then
-      iupdate = 2
-      call delete_worm_along_wline                       
-    else if(nr<Fupdate(3)) then
-      iupdate = 3
-      !call create_worm_along_gline  
-    else if(nr<Fupdate(4)) then
-      iupdate = 4
-      !call delete_worm_along_gline  
-    else if(nr<Fupdate(5)) then
-      iupdate = 5
-      call move_worm_along_wline             
-    else if(nr<Fupdate(6)) then
-      iupdate = 6
-      call move_worm_along_gline              
-    else if(nr<Fupdate(7)) then
-      iupdate = 7
-      call add_interaction                  
-    else if(nr<Fupdate(8)) then
-      iupdate = 8
-      call remove_interaction             
-    else if(nr<Fupdate(9)) then
-      iupdate = 9
-      !call add_interaction_cross              
-    else if(nr<Fupdate(10)) then
-      iupdate = 10
-      !call remove_interaction_cross                  
-    else if(nr<Fupdate(11)) then
-      iupdate = 11
-      call reconnect                      
-    else if(nr<Fupdate(12)) then
-      iupdate = 12
-      call change_gline_space          
-    else if(nr<Fupdate(13)) then
-      iupdate = 13
-      call change_wline_space         
-    else if(nr<Fupdate(14)) then
-      iupdate = 14
-      call change_Gamma_type     
-    else if(nr<Fupdate(15)) then
-      iupdate = 15
-      call move_measuring_index       
-    else if(nr<Fupdate(16)) then
-      iupdate = 16
-      call change_Gamma_time        
-    else if(nr<Fupdate(17)) then
-      iupdate = 17
-      call change_wline_isdelta       
-    else if(nr<Fupdate(18)) then
-      iupdate = 18
-      call change_Gamma_isdelta       
-    endif
+        nr=rn()
+        if(nr<Fupdate(1)) then
+          iupdate = 1
+          call create_worm_along_wline          
+        else if(nr<Fupdate(2)) then
+          iupdate = 2
+          call delete_worm_along_wline                       
+        else if(nr<Fupdate(3)) then
+          iupdate = 3
+          !call create_worm_along_gline  
+        else if(nr<Fupdate(4)) then
+          iupdate = 4
+          !call delete_worm_along_gline  
+        else if(nr<Fupdate(5)) then
+          iupdate = 5
+          call move_worm_along_wline             
+        else if(nr<Fupdate(6)) then
+          iupdate = 6
+          call move_worm_along_gline              
+        else if(nr<Fupdate(7)) then
+          iupdate = 7
+          call add_interaction                  
+        else if(nr<Fupdate(8)) then
+          iupdate = 8
+          call remove_interaction             
+        else if(nr<Fupdate(9)) then
+          iupdate = 9
+          !call add_interaction_cross              
+        else if(nr<Fupdate(10)) then
+          iupdate = 10
+          !call remove_interaction_cross                  
+        else if(nr<Fupdate(11)) then
+          iupdate = 11
+          call reconnect                      
+        else if(nr<Fupdate(12)) then
+          iupdate = 12
+          call change_gline_space          
+        else if(nr<Fupdate(13)) then
+          iupdate = 13
+          call change_wline_space         
+        else if(nr<Fupdate(14)) then
+          iupdate = 14
+          call change_Gamma_type     
+        else if(nr<Fupdate(15)) then
+          iupdate = 15
+          call move_measuring_index       
+        else if(nr<Fupdate(16)) then
+          iupdate = 16
+          call change_Gamma_time        
+        else if(nr<Fupdate(17)) then
+          iupdate = 17
+          call change_wline_isdelta       
+        else if(nr<Fupdate(18)) then
+          iupdate = 18
+          call change_Gamma_isdelta       
+        endif
 
-    imc = imc + 1.0
+      enddo
+
+      if( .not. IsToss) call measure
+
+    enddo 
+
+    if(IsToss .and. iblck==1)return
+
     !if(imc>100000000.d0 .and. imc<=110000000.d0) then
       !call print_config
       !call check_config
     !endif
 
-    if(mod(imc,Nstep*1.d0)==0 .and. .not. IsToss) call measure
 
-    if(mod(imc,1.e7)==0) then
+    !========================== REWEIGHTING =========================
+    if(mod(iblck, 50)==0) then
+
       call statistics
       call output_GamMC
       !call output_test
@@ -247,6 +258,7 @@ SUBROUTINE markov(MaxSamp)
       call LogFile%QuickLog("Check if there is a new G,W data...")
 
       call read_flag
+
       if(mc_version/=file_version) then
         call LogFile%QuickLog(str(mc_version)+', '+str(file_version))
         call LogFile%QuickLog("Updating G, W, and Gamma...")
@@ -255,10 +267,7 @@ SUBROUTINE markov(MaxSamp)
         call update_WeightCurrent
         mc_version = file_version
       endif
-    endif
 
-    !========================== REWEIGHTING =========================
-    if(mod(imc,1.e8)==0) then
       call LogFile%WriteStamp()
       call LogFile%WriteLine("Reweighting order of diagrams...")
 
@@ -273,14 +282,14 @@ SUBROUTINE markov(MaxSamp)
 
       call LogFile%WriteLine("Reweighting is done!")
 
-      if(imc<=2.e8) then
+      if(iblck <= 50) then
         GamWormOrder=0.d0
         GamOrder=0.d0
       endif
     endif
     !================================================================
 
-    if(mod(imc,5.e8)==0) then
+    if(mod(iblck,500)==0) then
       call LogFile%QuickLog("Writing data and configuration...")
 
       !call statistics
@@ -290,7 +299,10 @@ SUBROUTINE markov(MaxSamp)
       call LogFile%QuickLog("Writing data and configuration done!")
     endif
 
-
+    if(iblck>Mxint) then
+      call LogFile%QuickLog("Block number:"+str(Mxint)+" achieved! Code stops.")
+      stop
+    endif
   enddo
 END SUBROUTINE markov
 

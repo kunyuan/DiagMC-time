@@ -9,7 +9,11 @@ TO_DO = []
 # monte carlo job defintion
 TO_DO.append(job.JobMonteCarlo({
     "__Execute" : "./gamma3.exe",
+<<<<<<< HEAD
     "__Duplicate" : 4,
+=======
+    "__Duplicate" : 1,
+>>>>>>> dev-kun
     "__IsCluster" : False,
     "__AutoRun" : True,
     "Sample" : 10000000,
