@@ -65,8 +65,6 @@ ImGamSqMC	vrbls_mc.f90	/^  double precision, allocatable :: ImGamSqMC(/;"	v	lang
 Ira	vrbls_mc.f90	/^  integer          :: Ira,/;"	v	language:Fortran	module:vrbls_mc
 IsDeltaLn	vrbls_mc.f90	/^  integer, dimension(MxNLn) :: IsDeltaLn /;"	v	language:Fortran	module:vrbls_mc
 IsDeltaVertex	vrbls_mc.f90	/^  integer, dimension(MxNLn) :: IsDeltaVertex /;"	v	language:Fortran	module:vrbls_mc
-IsForever	vrbls_mc.f90	/^  logical          :: IsForever$/;"	v	language:Fortran	module:vrbls_mc
-IsToss	vrbls_mc.f90	/^  logical          :: IsToss$/;"	v	language:Fortran	module:vrbls_mc
 IsWormPresent	vrbls_mc.f90	/^  logical          :: IsWormPresent /;"	v	language:Fortran	module:vrbls_mc
 Is_k_valid	basic_function.f90	/^LOGICAL FUNCTION Is_k_valid(/;"	f	language:Fortran
 Is_reducible_G	basic_function.f90	/^LOGICAL FUNCTION Is_reducible_G(/;"	f	language:Fortran
