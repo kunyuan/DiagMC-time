@@ -278,6 +278,8 @@ SUBROUTINE markov(IsToss)
 
       do i=0,MCOrder
         call LogFile%WriteLine('Order'+str(i)+' :'+str(CoefOfWeight(i)))
+        call LogFile%WriteLine('     worm: '+str(GamWormOrder(i)))
+        call LogFile%WriteLine('     phycical: '+str(GamOrder(i)))
       enddo
 
       call LogFile%WriteLine("Reweighting is done!")
