@@ -12,7 +12,7 @@ TO_DO.append(job.JobMonteCarlo({
     "__Duplicate" : 3,
     "__IsCluster" : False,
     "__AutoRun" : True,
-    "Sample" : 10000000,
+    "Sample" : 500000,
     "Sweep" : 10,
     "Toss" : 1000,
     "IsLoad" : False,
@@ -29,9 +29,9 @@ TO_DO.append(job.JobMonteCarlo({
 # self consist loop job definition
 TO_DO.append(job.JobConsistLoop({   
     "__Execute" : ["python", "./run_loop.py"],
-    "__Duplicate" : 0,
+    "__Duplicate" : 1,
     "__IsCluster" : False,
-    "__AutoRun" : True,
+    "__AutoRun" : True, 
     "IsLoad" : True,
     "Lx" :  4,
     "Ly" :  4,
