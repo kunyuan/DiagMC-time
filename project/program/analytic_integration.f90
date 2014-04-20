@@ -34,7 +34,7 @@ SUBROUTINE calculate_Gam1
   complex*16 :: Gin, Gout, iW, Gam1, Gam2, Gam3
   complex*16 :: weight
   complex*16 :: FGam(0:MxT-1, 0:MxT-1)
-  double precision :: ratio
+  DOUble precision :: ratio
 
   !do t1 = 0, MxT-1
     !!G(:, t1) = cdexp((0.d0, 1.d0)*pi*real(t1)/(2.d0*MxT))/(1.d0, 1.d0)

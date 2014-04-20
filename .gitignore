@@ -6,16 +6,15 @@
 *.dat
 *.exe
 *.pyc
-_in_*
-*tags*
+**_in_*
 *.log
 *.out
 *.swp
 *.conf
+*tags
 
 project/graph
 project/infile
 project/infile/*
 project/outfile
 project/outfile/*
-project/program/*tags*

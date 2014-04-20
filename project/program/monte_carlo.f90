@@ -280,6 +280,8 @@ SUBROUTINE markov(IsToss)
 
       do i=0,MCOrder
         call LogFile%WriteLine('Order'+str(i)+' :'+str(CoefOfWeight(i)))
+        call LogFile%WriteLine('     worm: '+str(GamWormOrder(i)))
+        call LogFile%WriteLine('     phycical: '+str(GamOrder(i)))
       enddo
 
       call LogFile%WriteLine("Reweighting is done!")
@@ -769,6 +771,7 @@ END SUBROUTINE move_worm_along_wline
 SUBROUTINE move_worm_along_gline
   implicit none
   integer :: dir, kGold, flag, dr(2)
+  double precision :: Ppro
   integer :: iGam, jGam, iW, jW, GLn
   integer :: vertex1, vertex2
   integer :: typG, typiGam, typjGam, typiW
@@ -790,12 +793,11 @@ SUBROUTINE move_worm_along_gline
   jW = NeighVertex(3, jGam)
   if(jGam==Masha .or. jGam==Ira)    return
 
-  !if(dir==1) then
-    !if(SpinMasha+TypeLn(GLn)==0 .or. SpinMasha+TypeLn(GLn)==3)  return
-  !else 
-    !if(SpinMasha+TypeLn(GLn)==-1 .or. SpinMasha+TypeLn(GLn)==4) return
-  !endif
-  if(SpinMasha/=2*get_G_spin(TypeLn(GLn))) return
+  if(dir==1) then
+    if(SpinMasha+TypeLn(GLn)==0 .or. SpinMasha+TypeLn(GLn)==3)  return
+  else 
+    if(SpinMasha+TypeLn(GLn)==-1 .or. SpinMasha+TypeLn(GLn)==4) return
+  endif
   
   kGold = kLn(GLn)
   kLn(GLn) = add_k(kGold, (-1)**(dir+1) *kMasha)
@@ -830,22 +832,48 @@ SUBROUTINE move_worm_along_gline
 
   typG = 3 - TypeLn(GLn)
 
-  if(SpInVertex(dir, iGam)==TypeLn(GLn)) then
-    spiGam(dir) = typG
+  if(TypeVertex(iGam)==1 .or. TypeVertex(iGam)==2) then
+    Ppro = 2.d0
+
+    spiGam(dir) = 3-SpInVertex(dir, iGam)
     spiGam(3-dir) = SpInVertex(3-dir, iGam)
-  else
-    !!!!---for 3 and 4 ------------------
-    kLn(GLn) = kGold
-    return
+  else if(TypeVertex(iGam)==3 .or. TypeVertex(iGam)==4) then
+    Ppro = 2.d0
+
+    spiGam(dir) = SpInVertex(dir, iGam)
+    spiGam(3-dir) = 3-SpInVertex(3-dir, iGam)
+  else if(TypeVertex(iGam)==5 .or. TypeVertex(iGam)==6) then
+    Ppro = 0.5d0
+
+    if(rn()<0.5d0) then
+      spiGam(dir) = 3-SpInVertex(dir, iGam)
+      spiGam(3-dir) = SpInVertex(3-dir, iGam)
+    else
+      spiGam(dir) = SpInVertex(dir, iGam)
+      spiGam(3-dir) = 3-SpInVertex(3-dir, iGam)
+    endif
   endif
 
-  if(SpInVertex(3-dir, jGam)==TypeLn(GLn)) then
-    spjGam(3-dir) = typG
+  if(TypeVertex(jGam)==1 .or. TypeVertex(jGam)==2) then
+    Ppro = Ppro*2.d0
+
+    spjGam(3-dir) = 3-SpInVertex(3-dir, jGam)
     spjGam(dir) = SpInVertex(dir, jGam)
-  else
-    !!!!---for 3 and 4 ------------------
-    kLn(GLn) = kGold
-    return
+  else if(TypeVertex(jGam)==3 .or. TypeVertex(jGam)==4) then
+    Ppro = Ppro*2.d0
+
+    spjGam(3-dir) = SpInVertex(3-dir, jGam)
+    spjGam(dir) = 3-SpInVertex(dir, jGam)
+  else if(TypeVertex(jGam)==5 .or. TypeVertex(jGam)==6) then
+    Ppro = Ppro*0.5d0
+
+    if(rn()<0.5d0) then
+      spjGam(3-dir) = 3-SpInVertex(3-dir, jGam)
+      spjGam(dir) = SpInVertex(dir, jGam)
+    else
+      spjGam(3-dir) = SpInVertex(3-dir, jGam)
+      spjGam(dir) = 3-SpInVertex(dir, jGam)
+    endif
   endif
 
   if(dir == 1) then
@@ -910,7 +938,7 @@ SUBROUTINE move_worm_along_gline
 
   call weight_ratio(Pacc, sgn, Anew, Aold)
 
-  Pacc = Pacc *WWorm/WeightWorm
+  Pacc = Pacc *WWorm/WeightWorm/Ppro
 
   !------- step5 : accept the update --------------------
   ProbProp(Order, 6) = ProbProp(Order, 6) + 1
@@ -958,18 +986,6 @@ SUBROUTINE move_worm_along_gline
     return
   endif
 END SUBROUTINE move_worm_along_gline
-
-integer FUNCTION get_G_spin(TypeG)
-  implicit none
-  integer :: TypeG
-  if(TypeG==1) then
-    get_G_spin=-1
-  else
-    get_G_spin=1
-  endif
-  return
-end FUNCTION
-
 !-----------------------------------------------------------
 
 
@@ -1657,7 +1673,7 @@ SUBROUTINE change_Gamma_type
   complex*16 :: WGam, WW, Anew, Aold, sgn
 
   !------- step1 : check if worm is present -------------
-  !if(IsWormPresent .eqv. .true.)    return
+  if(IsWormPresent .eqv. .true.)    return
 
   !------- step2 : propose a new config -----------------
   iGam = generate_vertex()
