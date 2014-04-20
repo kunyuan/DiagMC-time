@@ -88,9 +88,6 @@ class JobMonteCarlo(Job):
         if para["Order"] is not len(para["Reweight"]):
             print "The Reweight numbers should be equal to Order!"
             return False
-        if type(para["IsForever"]) is not bool:
-            print "IsForever should be a bool!"
-            return False
 
     def to_string(self, pid=0):
         input_str = Job.to_string(self, pid)
