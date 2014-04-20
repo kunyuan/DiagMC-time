@@ -1,9 +1,9 @@
+import read_data
 import numpy as np
 from mpl_toolkits.mplot3d import Axes3D
 from matplotlib import cm
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
 import matplotlib.pyplot as plt
-import read_data
 
 is2d = True
 #is2d = False
@@ -12,33 +12,35 @@ Beta = 0.90
 N = 64
 
 tau = np.arange(0, Beta, Beta/N)
-#GamInt, dim_name = read_data.read_array("./../0.90_Gam1.dat")["Gamma"]
-Gamma=[]
-GamMC, dim_name = read_data.read_array("./../data/bare_0.90_1_quantities.dat")["Gamma"]
-Gamma.append(GamMC)
-GamMC, dim_name = read_data.read_array("./../data/bare_0.90_2_quantities.dat")["Gamma"]
-Gamma.append(GamMC)
-GamMC, dim_name = read_data.read_array("./../data/bare_0.90_3_quantities.dat")["Gamma"]
-Gamma.append(GamMC)
-GamMC, dim_name = read_data.read_array("./../data/bare_0.90_4_quantities.dat")["Gamma"]
-Gamma.append(GamMC)
 
+BareChi=[]
+Chi,dim_name=read_data.read_array("./bare_0.90_2_Chi_sum.dat")["SUMChi"]
+BareChi.append(Chi)
+Chi,dim_name=read_data.read_array("./bare_0.90_3_Chi_sum.dat")["SUMChi"]
+BareChi.append(Chi)
+Chi,dim_name=read_data.read_array("./bare_0.90_4_Chi_sum.dat")["SUMChi"]
+BareChi.append(Chi)
+
+BoldChi=[]
+Chi,dim_name=read_data.read_array("../data/bold_0.90_2_quantities.dat")["SUMChi"]
+BoldChi.append(Chi)
+Chi,dim_name=read_data.read_array("../data/bold_0.90_3_quantities.dat")["SUMChi"]
+BoldChi.append(Chi)
+Chi,dim_name=read_data.read_array("../data/bold_0.90_4_quantities.dat")["SUMChi"]
+BoldChi.append(Chi)
 
 if is2d is True:
     fig = plt.figure()
-    #plt.plot(tau, GamMC.diagonal().real, 'r', 
-            #tau, GamInt.diagonal().real, 'b')
     plt.plot(
-            tau, Gamma[0].diagonal().real, 'r',
-            tau, Gamma[1].diagonal().real, 'b',
-            tau, Gamma[2].diagonal().real, 'g',
-            tau, Gamma[3].diagonal().real, 'r--'
-            )
-
+            tau, BareChi[0].real, 'r',
+            tau, BoldChi[0].real, 'b',
+            tau, BareChi[1].real, 'r*',
+            tau, BoldChi[1].real, 'b*',
+            tau, BareChi[2].real, 'ro',
+            tau, BoldChi[2].real, 'bo')
     plt.xlabel(dim_name[0])
-    plt.ylabel("diag{Gamma}")
+    plt.ylabel("sum{Chi(r)}")
 
-    # plt.savefig("0.90_Gamma.pdf")
     plt.show()
 
 else:
