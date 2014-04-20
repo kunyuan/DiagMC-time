@@ -36,9 +36,9 @@ TO_DO.append(job.JobMonteCarlo(mc_dict))
 # self consist loop job definition
 sc_dict={
     "__Execute" : ["python", "./run_loop.py"],
-    "__Duplicate" : 0,
+    "__Duplicate" : 1,
     "__IsCluster" : False,
-    "__AutoRun" : True,
+    "__AutoRun" : True, 
     "IsLoad" : True,
     "ReadFile" : "0.90_1_coll",
     }
