@@ -231,6 +231,8 @@ SUBROUTINE markov(IsToss)
           call change_Gamma_isdelta       
         endif
 
+        call check_config
+
       enddo
 
       if( .not. IsToss) call measure
@@ -289,7 +291,7 @@ SUBROUTINE markov(IsToss)
     endif
     !================================================================
 
-    if(mod(iblck,500)==0) then
+    if(mod(iblck,100)==0) then
       call LogFile%QuickLog("Writing data and configuration...")
 
       !call statistics
