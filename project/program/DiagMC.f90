@@ -9,34 +9,28 @@ PROGRAM MAIN
   logical :: IsLoad
   character(len=100) :: infile
 
-  print *, "Please give me the input file path: "
-  read(*,'(A)') infile
-  !infile="/home/kun/project/DiagMC-time/project/infile/_in_MC_2"
-  open(100,file=trim(adjustl(infile)))
-  write(*,*) "Opened!"
-  read(100,*) ID
-  read(100,*) L(1)
-  read(100,*) L(2)
-  read(100,*) Jcp
-  read(100,*) Beta
-  read(100,*) MCOrder
-  read(100,*) IsLoad
-  read(100,*) ISub
+  read(*,*) ID
+  read(*,*) L(1)
+  read(*,*) L(2)
+  read(*,*) Jcp
+  read(*,*) Beta
+  read(*,*) MCOrder
+  read(*,*) IsLoad
+  read(*,*) ISub
   if(ISub==2) then
-    read(100,*) Ntoss
-    read(100,*) Nsamp
-    read(100,*) Nstep
-    read(100,*) Seed
+    read(*,*) Ntoss
+    read(*,*) Nsamp
+    read(*,*) Nstep
+    read(*,*) Seed
     !read(100,*) title
-    read(100,*) CoefOfWorm
+    read(*,*) CoefOfWorm
     CoefOfWeight(0) = 1.d0
-    read(100,*) CoefOfWeight(1:MCOrder)
+    read(*,*) CoefOfWeight(1:MCOrder)
   elseif(ISub==1 .or. ISub==4) then
-    read(100,*) title
+    read(*,*) title
   endif
 
-  close(100)
-  write(*, *) ID,L(1),L(2),Jcp,Beta,MCOrder, IsLoad,ISub,Ntoss,Nsamp,Nstep,Seed,CoefOfWorm,CoefOfWeight(:)
+  write(*,*) title
 
   isbold = .true.
 
