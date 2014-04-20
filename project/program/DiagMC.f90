@@ -36,6 +36,7 @@ PROGRAM MAIN
   endif
 
   close(100)
+  write(*, *) ID,L(1),L(2),Jcp,Beta,MCOrder, IsLoad,ISub,Ntoss,Nsamp,Nstep,Seed,CoefOfWorm,CoefOfWeight(:)
 
   isbold = .true.
 

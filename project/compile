@@ -9,7 +9,7 @@ target2="./collapse_data.exe"
 if [ -n "$1" ]
 then
   if [ $1 = "-g" ] || [ $1 = "g" ]; then
-      $compilor $sourcecode1 -O3 -o $target1 -g -debug -no_pie
+      $compilor $sourcecode1 -o $target1 -g -debug -no_pie
       $compilor $sourcecode2 -o $target2 -g -no_pie
       echo "Debug version done!"
   #elif []
