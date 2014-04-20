@@ -79,7 +79,6 @@ LevelName	mylib/mylib.f90	/^  character(len=10),parameter :: LevelName(/;"	v	lan
 LnValue2Key	vrbls_mc.f90	/^  integer, dimension(MxNLn) ::  LnValue2Key /;"	v	language:Fortran	module:vrbls_mc
 LogFile	vrbls_mc.f90	/^  type(logging) :: LogFile$/;"	v	language:Fortran	module:vrbls_mc
 LogTerm	vrbls_mc.f90	/^  type(logging) :: LogTerm$/;"	v	language:Fortran	module:vrbls_mc
-MAIN	test.f90	/^PROGRAM MAIN$/;"	p	language:Fortran
 MCOrder	vrbls_mc.f90	/^  integer          ::  MCOrder /;"	v	language:Fortran	module:vrbls_mc
 Masha	vrbls_mc.f90	/^  integer          :: Ira, Masha /;"	v	language:Fortran	module:vrbls_mc
 MaxStat	vrbls_mc.f90	/^  integer          :: MaxStat$/;"	v	language:Fortran	module:vrbls_mc
@@ -150,7 +149,6 @@ TypeVertex	vrbls_mc.f90	/^  integer, dimension(MxNVertex) :: TypeVertex /;"	v	la
 VertexKey2Value	vrbls_mc.f90	/^  integer, dimension(MxNVertex):: VertexKey2Value /;"	v	language:Fortran	module:vrbls_mc
 VertexValue2Key	vrbls_mc.f90	/^  integer, dimension(MxNVertex):: VertexValue2Key /;"	v	language:Fortran	module:vrbls_mc
 Vol	vrbls_mc.f90	/^  integer          ::  L(2), Vol /;"	v	language:Fortran	module:vrbls_mc
-W	test.f90	/^  double precision :: W$/;"	v	language:Fortran	program:MAIN
 W	vrbls_mc.f90	/^  complex(kind=8), allocatable :: W(/;"	v	language:Fortran	module:vrbls_mc
 W0PF	vrbls_mc.f90	/^  complex(kind=8), allocatable :: W0PF(/;"	v	language:Fortran	module:vrbls_mc
 WLnKey2Value	vrbls_mc.f90	/^  integer, dimension(MxNWLn) :: WLnKey2Value /;"	v	language:Fortran	module:vrbls_mc
@@ -211,7 +209,6 @@ delete_line	basic_function.f90	/^SUBROUTINE delete_line(/;"	s	language:Fortran
 delete_mea_stat	basic_function.f90	/^INTEGER FUNCTION delete_mea_stat(/;"	f	language:Fortran
 delete_worm_along_wline	monte_carlo.f90	/^SUBROUTINE delete_worm_along_wline$/;"	s	language:Fortran
 diff_r	basic_function.f90	/^SUBROUTINE diff_r(/;"	s	language:Fortran
-dr	test.f90	/^  integer, dimension(2) :: dr$/;"	v	language:Fortran	program:MAIN
 file_version	vrbls_mc.f90	/^  integer:: file_version$/;"	v	language:Fortran	module:vrbls_mc
 first_order_diagram	basic_function.f90	/^SUBROUTINE first_order_diagram$/;"	s	language:Fortran
 first_order_diagram_with_bubble	basic_function.f90	/^SUBROUTINE first_order_diagram_with_bubble$/;"	s	language:Fortran
@@ -221,7 +218,6 @@ generate_tau	basic_function.f90	/^DOUBLE PRECISION FUNCTION generate_tau(/;"	f	l
 generate_vertex	basic_function.f90	/^INTEGER FUNCTION generate_vertex(/;"	f	language:Fortran
 generate_wline	basic_function.f90	/^INTEGER FUNCTION generate_wline(/;"	f	language:Fortran
 generate_xy	basic_function.f90	/^SUBROUTINE generate_xy(/;"	s	language:Fortran
-get_G_spin	monte_carlo.f90	/^integer FUNCTION get_G_spin(/;"	f	language:Fortran
 gline_stat	basic_function.f90	/^INTEGER FUNCTION gline_stat(/;"	f	language:Fortran
 h_curr	vrbls_mc.f90	/^  integer               :: h_prev, h_curr$/;"	v	language:Fortran	module:vrbls_mc
 h_prev	vrbls_mc.f90	/^  integer               :: h_prev,/;"	v	language:Fortran	module:vrbls_mc
@@ -362,7 +358,6 @@ weight_G0	self_consistent.f90	/^Complex*16 FUNCTION weight_G0(/;"	f	language:For
 weight_Gam	self_consistent.f90	/^COMPLEX*16 FUNCTION weight_Gam(/;"	f	language:Fortran
 weight_Gam0	self_consistent.f90	/^COMPLEX*16 FUNCTION weight_Gam0(/;"	f	language:Fortran
 weight_W	self_consistent.f90	/^COMPLEX*16 FUNCTION weight_W(/;"	f	language:Fortran
-weight_W	test.f90	/^double precision function weight_W(/;"	f	language:Fortran	program:MAIN
 weight_W0	self_consistent.f90	/^Complex*16 FUNCTION weight_W0(/;"	f	language:Fortran
 weight_gline	monte_carlo.f90	/^COMPLEX*16 FUNCTION weight_gline(/;"	f	language:Fortran
 weight_meas_G	basic_function.f90	/^complex*16 FUNCTION weight_meas_G(/;"	f	language:Fortran
