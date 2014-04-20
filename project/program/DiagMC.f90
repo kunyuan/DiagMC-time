@@ -228,8 +228,8 @@ SUBROUTINE self_consistent
 
     call output_Quantities
 
-    call write_GWGamma
     call update_flag
+    call write_GWGamma
   endif
   return
 END SUBROUTINE self_consistent
@@ -290,7 +290,6 @@ SUBROUTINE monte_carlo
 
   call LogFile%QuickLog("Initializing monte carlo...")
   call read_GWGamma
-
   call calculate_Gam1
 
   call calculate_GamNormWeight
@@ -366,23 +365,42 @@ END SUBROUTINE monte_carlo
 
 SUBROUTINE read_flag
   implicit none
-  open(11, status="old", file="loop.inp")
+  integer :: ios
+
+  open(11, status="old", iostat=ios, file="loop.inp")
   read(11, *) file_version
   close(11)
+
+  if(ios/=0) then
+    call LogFile%QuickLog(str(ios)+"Fail to read the loop number, continue to MC!")
+    return
+  endif
+
   return
 END SUBROUTINE read_flag
 
 
 SUBROUTINE update_flag
   implicit none
+  integer :: ios 
 
-  open(11, status="old", file="loop.inp")
+  open(11, status="old", iostat=ios, file="loop.inp")
   read(11, *) file_version
   close(11)
 
-  open(12, status="replace", file="loop.inp")
+  if(ios/=0) then
+    call LogFile%QuickLog(str(ios)+"Fail to read the loop number in loop.inp!")
+    return
+  endif
+
+  open(12, status="replace", iostat=ios, file="loop.inp")
   write(12, *) file_version+1
   close(12)
+
+  if(ios/=0) then
+    call LogFile%QuickLog(str(ios)+"Fail to write the loop number to loop.inp!")
+    return
+  endif
   return
 END SUBROUTINE update_flag
 

@@ -48,16 +48,16 @@ class Job:
         '''change a key in the parameter dictionary into a string'''
         if type(self.para[key])==bool:
             if self.para[key]:
-                return ".true.    #{}\n".format(key)
+                return ".true.    #{0}\n".format(key)
             else:
-                return ".false.    #{}\n".format(key)
+                return ".false.    #{0}\n".format(key)
         elif type(self.para[key])==str:
             return self.para[key]+"\n"
         elif type(self.para[key])==list:
-            return "{}    #{}\n".format(",".join([str(elem)
+            return "{0}    #{1}\n".format(",".join([str(elem)
                                  for elem in self.para[key]]), key)
         else:
-            return "{}    #{}\n".format(self.para[key], key)
+            return "{0}    #{1}\n".format(self.para[key], key)
 
     def to_string(self, pid=0):
         '''output the corresponding string of the job class'''

@@ -11,7 +11,6 @@ SUBROUTINE print_status
     integer :: iorder,i
     character*30 :: updatename(Nupdate)
 
-
     call LogFile%WriteStamp()
     call LogFile%WriteLine("MC steps:"+str(imc))
     call time_elapse
@@ -72,7 +71,8 @@ SUBROUTINE print_status
     call LogFile%WriteLine("------------------------------------------------")
     do iorder = 0, MCOrder
       call LogFile%WriteLine("Order"+str(iorder))
-      BalenceCheck(iorder,1,3)=(BalenceCheck(iorder,1,1)-BalenceCheck(iorder,1,2))/BalenceCheck(iorder,1,1)/sqrt(2.d0)
+      BalenceCheck(iorder,1,3)=(BalenceCheck(iorder,1,1)-BalenceCheck(iorder,1,2)) &
+        & /sqrt(BalenceCheck(iorder,1,1))
       write(logstr, '(A,3f17.5)') "Gamma Type 1,2 <==> 3,4:",BalenceCheck(iorder,1,:)
       call LogFile%WriteLine(logstr)
     enddo
@@ -958,9 +958,10 @@ END SUBROUTINE output_Gam1
 
 SUBROUTINE output_Quantities
   implicit none
-  integer :: ityp, it1, it2
+  integer :: ityp, it1, it2, iorder
   integer :: dx, dy, it
   complex*16 :: gam1
+  double precision :: normal
 
   open(104, status='replace', file=trim(title_loop)//"_quantities.dat")
 
@@ -973,6 +974,21 @@ SUBROUTINE output_Quantities
     enddo
   enddo
   write(104, *)
+
+  normal = GamNormWeight/GamNorm
+  do iorder = 1, MCOrder
+    write(104, *) "##################################Gamma",trim(adjustl(str(iorder)))
+    write(104, *) "#tau1:", MxT, ",tau2:", MxT
+    write(104, *) "#Beta", Beta, "L", L(1), L(2), "Order", MCOrder
+    do it2 = 0, MxT-1
+      do it1 = 0, MxT-1
+        write(104, *)  real(GamMC(iorder, 1, 0, 0, it1, it2))*normal &
+          & , dimag(GamMC(iorder, 1, 0, 0, it1, it2))*normal
+      enddo
+    enddo
+    write(104, *)
+  enddo
+
 
   write(104, *) "##################################G"
   write(104, *) "#tau:", MxT
