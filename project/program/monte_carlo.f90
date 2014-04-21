@@ -248,7 +248,7 @@ SUBROUTINE markov(IsToss)
 
 
     !========================== REWEIGHTING =========================
-    if(mod(iblck, 50)==0) then
+    if(mod(iblck, 10)==0) then
 
       call statistics
       call output_GamMC
@@ -286,14 +286,14 @@ SUBROUTINE markov(IsToss)
 
       call LogFile%WriteLine("Reweighting is done!")
 
-      if(iblck <= 50) then
+      if(iblck <= 10) then
         GamWormOrder=0.d0
         GamOrder=0.d0
       endif
     endif
     !================================================================
 
-    if(mod(iblck,100)==0) then
+    if(mod(iblck,30)==0) then
       call LogFile%QuickLog("Writing data and configuration...")
 
       !call statistics
