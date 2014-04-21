@@ -283,8 +283,9 @@ SUBROUTINE monte_carlo
   double precision :: WR, GamR
 
   call LogFile%QuickLog("Initializing monte carlo...")
-  call read_GWGamma
-  call calculate_Gam1
+
+  !call read_GWGamma
+  !call calculate_Gam1
 
   call calculate_GamNormWeight
 
