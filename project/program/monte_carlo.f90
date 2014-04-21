@@ -2245,20 +2245,20 @@ COMPLEX*16 FUNCTION weight_gline(stat, tau, typ)
 
   t = Floor(tau*MxT/Beta)
 
-  if(stat == 0) then
-    weight_gline = weight_G(typ, t)
-  else if(stat == 1) then
-    !  Have measuring vertex around
-    weight_gline = weight_meas_G(t)
-  else
-    call LogFile%WriteStamp('e')
-    call LogFile%WriteLine("The number of update: "+str(iupdate))
-    call LogFile%WriteLine("line status error!"+str(stat))
-    call print_config
-    stop
-  endif
+  !if(stat == 0) then
+    !weight_gline = weight_G(typ, t)
+  !else if(stat == 1) then
+    !!  Have measuring vertex around
+    !weight_gline = weight_meas_G(t)
+  !else
+    !call LogFile%WriteStamp('e')
+    !call LogFile%WriteLine("The number of update: "+str(iupdate))
+    !call LogFile%WriteLine("line status error!"+str(stat))
+    !call print_config
+    !stop
+  !endif
 
-  !---------------------- for test --------------------------------------
+  !---------------------- test1: fake function ------------------------------
   !t = Floor(tau*MxT/Beta)
 
   !flag = 0
@@ -2284,6 +2284,16 @@ COMPLEX*16 FUNCTION weight_gline(stat, tau, typ)
     !call LogFile%WriteLine("line status error!"+str(stat))
     !stop
   !endif
+
+  !---------------------- test2: uniform function -----------------------
+  if(stat==0 .or. stat==1) then
+    weight_gline = weight_meas_G(t)
+  else
+    call LogFile%WriteStamp('e')
+    call LogFile%WriteLine("The number of update: "+str(iupdate))
+    call LogFile%WriteLine("line status error!"+str(stat))
+    stop
+  endif
   !------------------------ end -----------------------------------------
 
   return
@@ -2303,29 +2313,28 @@ COMPLEX*16 FUNCTION weight_wline(stat, isdelta, dr0, tau, typ)
   integer :: t
 
   t = Floor(tau*MxT/Beta)
-
   call diff_r(dr0, dr)
 
-  if(stat == 0) then
-    if(isdelta==0) weight_wline = weight_W(typ, dr, t)
-    if(isdelta==1) weight_wline = weight_W0(typ, dr)
-  else if(stat == 2) then
-    ! Have Ira or Masha around 
-    if(isdelta==0) weight_wline = weight_W(1, dr, t)
-    if(isdelta==1) weight_wline = weight_W0(1, dr)
-  else if(stat == 1 .or. stat==3) then
-    ! Have measuring vertex around
-    if(isdelta==0) weight_wline = weight_meas_W(dr, t)
-    if(isdelta==1) weight_wline = (0.d0, 0.d0)
-  else
-    call LogFile%WriteStamp('e')
-    call LogFile%WriteLine("The number of update: "+str(iupdate))
-    call LogFile%WriteLine("line status error!"+str(stat))
-    call print_config
-    stop
-  endif
+  !if(stat == 0) then
+    !if(isdelta==0) weight_wline = weight_W(typ, dr, t)
+    !if(isdelta==1) weight_wline = weight_W0(typ, dr)
+  !else if(stat == 2) then
+    !! Have Ira or Masha around 
+    !if(isdelta==0) weight_wline = weight_W(1, dr, t)
+    !if(isdelta==1) weight_wline = weight_W0(1, dr)
+  !else if(stat == 1 .or. stat==3) then
+    !! Have measuring vertex around
+    !if(isdelta==0) weight_wline = weight_meas_W(dr, t)
+    !if(isdelta==1) weight_wline = (0.d0, 0.d0)
+  !else
+    !call LogFile%WriteStamp('e')
+    !call LogFile%WriteLine("The number of update: "+str(iupdate))
+    !call LogFile%WriteLine("line status error!"+str(stat))
+    !call print_config
+    !stop
+  !endif
 
-  !---------------------- for test --------------------------------------
+  !---------------------- test1: fake function ----------------------------
   !if(stat >= 0 .and. stat<=3) then
     !if(isdelta==0 .and. dr(1)==0 .and. dr(2)==0) then
       !weight_wline = weight_meas_W(dr, t)
@@ -2341,6 +2350,21 @@ COMPLEX*16 FUNCTION weight_wline(stat, isdelta, dr0, tau, typ)
     !call LogFile%WriteLine("line status error!"+str(stat))
     !stop
   !endif
+
+  !---------------------- test2: uniform function ----------------------------
+  if(stat >= 0 .and. stat<=3) then
+    if(isdelta==0 .and. dr(1)==0 .and. dr(2)==0) then
+      weight_wline = weight_meas_W(dr, t)
+    else 
+      weight_wline = (0.d0, 0.d0)
+    endif
+
+  else
+    call LogFile%WriteStamp('e')
+    call LogFile%WriteLine("The number of update: "+str(iupdate))
+    call LogFile%WriteLine("line status error!"+str(stat))
+    stop
+  endif
   !------------------------ end -----------------------------------------
 
   return
@@ -2361,39 +2385,39 @@ COMPLEX*16 FUNCTION weight_vertex(stat, isdelta, dr0, dtau1, dtau2, typ)
 
   call diff_r(dr0, dr)
 
-  if(stat==0) then
-    if(isbold) then
-      !----------------- for bold Gamma ------------------------------
-      if(isdelta==0) weight_vertex = weight_Gam(typ, dr, t1, t2)
-      if(isdelta==1) weight_vertex = weight_Gam0(typ, dr)
-    else
-      !----------------- for bare Gamma ------------------------------
-      if(isdelta==0) weight_vertex = (0.d0, 0.d0)
-      if(isdelta==1) weight_vertex = weight_Gam0(typ, dr)
-    endif
+  !if(stat==0) then
+    !if(isbold) then
+      !!----------------- for bold Gamma ------------------------------
+      !if(isdelta==0) weight_vertex = weight_Gam(typ, dr, t1, t2)
+      !if(isdelta==1) weight_vertex = weight_Gam0(typ, dr)
+    !else
+      !!----------------- for bare Gamma ------------------------------
+      !if(isdelta==0) weight_vertex = (0.d0, 0.d0)
+      !if(isdelta==1) weight_vertex = weight_Gam0(typ, dr)
+    !endif
 
-  else if(stat==2) then
-    if(isbold) then
-      !----------------- for bold Gamma ------------------------------
-      if(isdelta==0) weight_vertex = weight_Gam(typ, dr, t1, t2)
-      if(isdelta==1) weight_vertex = weight_Gam0(typ, dr)
-    else 
-      !----------------- for bare Gamma ------------------------------
-      if(isdelta==0) weight_vertex = (0.d0, 0.d0)
-      if(isdelta==1) weight_vertex = weight_Gam0(typ, dr)
-    endif
+  !else if(stat==2) then
+    !if(isbold) then
+      !!----------------- for bold Gamma ------------------------------
+      !if(isdelta==0) weight_vertex = weight_Gam(typ, dr, t1, t2)
+      !if(isdelta==1) weight_vertex = weight_Gam0(typ, dr)
+    !else 
+      !!----------------- for bare Gamma ------------------------------
+      !if(isdelta==0) weight_vertex = (0.d0, 0.d0)
+      !if(isdelta==1) weight_vertex = weight_Gam0(typ, dr)
+    !endif
 
-  else if(stat==1 .or. stat==3) then
-    if(isdelta==0) weight_vertex = (0.d0, 0.d0)
-    if(isdelta==1) weight_vertex = weight_meas_Gam0(typ, dr)
-  else
-    call LogFile%WriteStamp('e')
-    call LogFile%WriteLine("The number of update: "+str(iupdate))
-    call LogFile%WriteLine("vertex status error!"+str(stat))
-    stop
-  endif
+  !else if(stat==1 .or. stat==3) then
+    !if(isdelta==0) weight_vertex = (0.d0, 0.d0)
+    !if(isdelta==1) weight_vertex = weight_meas_Gam0(typ, dr)
+  !else
+    !call LogFile%WriteStamp('e')
+    !call LogFile%WriteLine("The number of update: "+str(iupdate))
+    !call LogFile%WriteLine("vertex status error!"+str(stat))
+    !stop
+  !endif
 
-  !---------------------- for test --------------------------------------
+  !---------------------- test1: fake function -----------------------------------
   !flag = 0
   !if(t1<0) then
     !dtau1 = dtau1 + Beta
@@ -2405,12 +2429,12 @@ COMPLEX*16 FUNCTION weight_vertex(stat, isdelta, dr0, dtau1, dtau2, typ)
   !endif
 
   !if(stat==0 .or. stat==2) then
-    !if(isdelta==1) weight_vertex = weight_meas_Gam(typ, dr)
+    !if(isdelta==1) weight_vertex = weight_meas_Gam0(typ, dr)
     !if(isdelta==0) then
       !weight_vertex = (0.d0, 0.d0)
       !if(dr(1)==0 .and. dr(2)==0) then
         !if(typ==1 .or. typ==2 .or. typ==5 .or. typ==6) then
-          !if(mod(flag, 2)==0) then
+          !if(mod(flag, 2)==0) the
             !weight_vertex = dcmplx(dtau1**2.d0+dtau2**2.d0+1.d0, 0.d0)
             !!weight_vertex = (1.d0, 0.d0)
           !else 
@@ -2422,7 +2446,7 @@ COMPLEX*16 FUNCTION weight_vertex(stat, isdelta, dr0, dtau1, dtau2, typ)
     !endif
 
   !else if(stat==1 .or. stat==3) then
-    !if(isdelta==1) weight_vertex = weight_meas_Gam(typ, dr)
+    !if(isdelta==1) weight_vertex = weight_meas_Gam0(typ, dr)
     !if(isdelta==0) weight_vertex = (0.d0, 0.d0)
 
   !else
@@ -2431,6 +2455,18 @@ COMPLEX*16 FUNCTION weight_vertex(stat, isdelta, dr0, dtau1, dtau2, typ)
     !call LogFile%WriteLine("vertex status error!"+str(stat))
     !stop
   !endif
+
+  !---------------------- test2: uniform function ---------------------
+  if(stat>=0 .and. stat<=3) then
+    if(isdelta==1) weight_vertex = weight_meas_Gam0(typ, dr)
+    if(isdelta==0) weight_vertex = (0.d0, 0.d0)
+
+  else
+    call LogFile%WriteStamp('e')
+    call LogFile%WriteLine("The number of update: "+str(iupdate))
+    call LogFile%WriteLine("vertex status error!"+str(stat))
+    stop
+  endif
   !------------------------ end -----------------------------------------
   return
 END FUNCTION weight_vertex
