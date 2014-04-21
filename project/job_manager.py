@@ -30,6 +30,7 @@ class JobAtom():
         else:
             print "Jobs.execute should be a list or str!"
 
+        self.direct_input = bundle.direct_input
         self.is_cluster = bundle.is_cluster
         self.auto_run = bundle.auto_run
         self.keep_cpu_busy = bundle.keep_cpu_busy
@@ -109,7 +110,10 @@ def submit_job(job_atom):
         fjob.write("#PBS -o "+homedir+"/Output\n")
         fjob.write("#PBS -e "+homedir+"/Error\n")
         fjob.write("cd "+homedir+"\n")
-        fjob.write(job_atom.execute+"<"+infile)
+        if job_atom.direct_input:
+            fjob.write(job_atom.execute+"<"+infile)
+        else:
+            fjob.write("echo "+infile+" | "+job_atom.execute)
         fjob.close()
         if job_atom.auto_run:
             os.system("qsub "+jobfile)
@@ -119,7 +123,11 @@ def submit_job(job_atom):
             print "You have to run "+job_atom.get_job_name()+" by yourself!"
     else:
         if job_atom.auto_run:
-            shellstr = "exec "+job_atom.execute+" < "+infile+" >> "+outfile
+            if job_atom.direct_input:
+                shellstr = "exec "+job_atom.execute+" < "+infile+" >> "+outfile
+            else:
+                shellstr = "exec echo "+infile+" | "+job_atom.execute+" >> "+outfile
+                print shellstr
             proc = subprocess.Popen(shellstr, shell=True)
             if job_atom.keep_cpu_busy:
                 PROCLIST.append((proc, job_atom))
