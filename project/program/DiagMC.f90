@@ -168,9 +168,9 @@ end subroutine
 
 subroutine just_output
   implicit none
-  call LogFile%QuickLog("Just output something!")
-  call LogFile%QuickLog("Reading G,W, and Gamma...")
-  call read_GWGamma
+  !call LogFile%QuickLog("Just output something!")
+  !call LogFile%QuickLog("Reading G,W, and Gamma...")
+  !call read_GWGamma
 
   call LogFile%QuickLog("Reading MC data...")
   call read_monte_carlo_data
@@ -283,8 +283,8 @@ SUBROUTINE monte_carlo
   double precision :: WR, GamR
 
   call LogFile%QuickLog("Initializing monte carlo...")
+  call read_GWGamma
 
-  !call read_GWGamma
   !call calculate_Gam1
 
   call calculate_GamNormWeight

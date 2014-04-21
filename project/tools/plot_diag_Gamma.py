@@ -12,7 +12,7 @@ Beta = 0.90
 N = 64
 
 tau = np.arange(0, Beta, Beta/N)
-GamInt, dim_name = read_data.read_array("./../0.90_Gam1.dat")["Gamma"]
+#GamInt, dim_name = read_data.read_array("./../0.90_Gam1.dat")["Gamma"]
 
 GamMC, dim_name = read_data.read_array("./../0.90_quantities.dat")["Gamma"]
 #Gamma.append(GamMC)
@@ -27,8 +27,10 @@ GamMC, dim_name = read_data.read_array("./../0.90_quantities.dat")["Gamma"]
 
 if is2d is True:
     fig = plt.figure()
-    plt.plot(tau, GamMC.diagonal().real, 'r', 
-            tau, GamInt.diagonal().real, 'b')
+    plt.plot(
+            tau, GamMC.diagonal().real, 'r', 
+            #tau, GamInt.diagonal().real, 'b',
+            )
     #plt.plot(
             #tau, Gamma[0].diagonal().real, 'r',
             #tau, Gamma[1].diagonal().real, 'b',
