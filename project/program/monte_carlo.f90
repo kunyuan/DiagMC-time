@@ -231,7 +231,7 @@ SUBROUTINE markov(IsToss)
           call change_Gamma_isdelta       
         endif
 
-        !call check_config
+        call check_irreducibility
 
       enddo
 
@@ -1192,9 +1192,9 @@ SUBROUTINE add_interaction
 
     !--------------- update k and omega -------------------------
     kMasha = kM
-    call add_Hash4G(kIA)
-    call add_Hash4G(kMB)
-    call add_Hash4W(q)
+    call add_Hash4G(kIA,GIC)
+    call add_Hash4G(kMB,GMD)
+    call add_Hash4W(q, WAB)
 
     !--------------- update the status of elements --------------
     StatusLn(GIC) = statAC
@@ -1370,8 +1370,8 @@ SUBROUTINE remove_interaction
 
     !--------------- update k -----------------------------------
     kMasha = kM
-    call delete_Hash4G(kIA)
-    call delete_Hash4G(kMB)
+    call delete_Hash4G(kIA, GIA)
+    call delete_Hash4G(kMB, GMB)
 
     !--------------- update the status of elements --------------
     StatusLn(GAC) = statIC

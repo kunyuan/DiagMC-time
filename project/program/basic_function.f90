@@ -632,66 +632,35 @@ END FUNCTION generate_vertex
 
 
 !!=======================================================================
-!!================= IRREDUCIBILITY CHECK ================================
+!!================= Hash Table operations     ===========================
 !!=======================================================================
 
 !-------- update G Hash table -----------------------------------
 SUBROUTINE update_Hash4G(oldk, newk)
+  !the newk and oldk is alway about the same G,
+  !PLEASE MAKE SURE THAT!!!
+  !ALSO MAKE SURE Hash4G(newk)==0 BEFORE CALL THIS SUBROUTINE
   implicit none
   integer, intent(in) :: oldk, newk
 
-  if(Hash4G(oldk)==1) then
-    Hash4G(oldk)=0
-  else
-    if(CheckG) then
-      call LogFile%WriteStamp('e')
-      call LogFile%WriteLine("Oops, update_Hash4G found a bug!")
-      call LogFile%WriteLine("IsWormPresent:"+str(IsWormPresent)+", update number:"+str(iupdate))
-      call LogFile%WriteLine("G Hash table for old k"+str(oldk)+" is not 1!!"+str(Hash4G(oldk)))
-      call print_config
-      stop
-    endif
-  endif
-
-  if(Hash4G(newk)==0) then
-    Hash4G(newk)=1
-  else
-    if(CheckG) then
-      call LogFile%WriteStamp('e')
-      call LogFile%WriteLine("Oops, update_Hash4G found a bug!")
-      call LogFile%WriteLine("IsWormPresent:"+str(IsWormPresent)+", update number:"+str(iupdate))
-      call LogFile%WriteLine("G Hash table for new k"+str(newk)+" is not 0!!"+str(Hash4G(newk)))
-      call print_config
-      stop
-    endif
-  endif
+  Hash4G(newk)=Hash4G(oldk)
+  Hash4G(oldk)=0
 
   return
 END SUBROUTINE update_Hash4G
 
-SUBROUTINE add_Hash4G(newk)
+SUBROUTINE add_Hash4G(newk, GLn)
   implicit none
-  integer, intent(in) :: newk
+  integer, intent(in) :: newk, GLn
+  !MAKE SURE Hash4G(newk)==0 BEFORE CALL THIS SUBROUTINE
 
-  if(Hash4G(newk)==0) then
-    Hash4G(newk)=1
-  else
-    if(CheckG) then
-      call LogFile%WriteStamp('e')
-      call LogFile%WriteLine("Oops, add_Hash4G found a bug!")
-      call LogFile%WriteLine("IsWormPresent:"+str(IsWormPresent)+", update number:"+str(iupdate))
-      call LogFile%WriteLine("G Hash table for new k"+str(newk)+" is not 0!!"+str(Hash4G(newk)))
-      call print_config
-      stop
-    endif
-  endif
-  return
+  Hash4G(newk)=GLn
 END SUBROUTINE add_Hash4G
 
-SUBROUTINE delete_Hash4G(oldk)
+SUBROUTINE delete_Hash4G(oldk, GLn)
   implicit none
-  integer, intent(in) :: oldk
-  if(Hash4G(oldk)==1) then
+  integer, intent(in) :: oldk, GLn
+  if(Hash4G(oldk)==GLn) then
     Hash4G(oldk)=0
   else
     if(CheckG) then
@@ -712,72 +681,35 @@ SUBROUTINE update_Hash4W(oldk, newk)
   implicit none
   integer, intent(in) :: oldk, newk
   integer :: aoldk, anewk
+  !COME ON, MAKE SURE Hash4W(aoldk)==0 BEFORE YOU CALL IT
   aoldk = abs(oldk)
   anewk = abs(newk)
-
-  if(Hash4W(aoldk)==1) then
-    Hash4W(aoldk)=0
-  else
-    if(CheckW) then
-      call LogFile%WriteStamp('e')
-      call LogFile%WriteLine("Oops, update_Hash4W found a bug!")
-      call LogFile%WriteLine("IsWormPresent:"+str(IsWormPresent)+", update number:"+str(iupdate))
-      call LogFile%WriteLine("W Hash table for old k"+str(aoldk)+" is not 1!!"+str(Hash4W(aoldk)))
-      call print_config
-      stop
-    endif
-  endif
-
-  if(Hash4W(anewk)==0) then
-    Hash4W(anewk)=1
-  else
-    if(CheckW) then
-      call LogFile%WriteStamp('e')
-      call LogFile%WriteLine("Oops, update_Hash4W found a bug!")
-      call LogFile%WriteLine("IsWormPresent:"+str(IsWormPresent)+", update number:"+str(iupdate))
-      call LogFile%WriteLine("W Hash table for new k"+str(anewk)+" is not 0!!"+str(Hash4W(anewk)))
-      call print_config
-      stop
-    endif
-  endif
+  Hash4W(anewk)=Hash4W(aoldk)
+  Hash4W(aoldk)=0
   return
 END SUBROUTINE update_Hash4W
 
-SUBROUTINE add_Hash4W(newk)
+SUBROUTINE add_Hash4W(newk, WLn)
   implicit none
-  integer, intent(in) :: newk
+  integer, intent(in) :: newk, WLn
   integer :: anewk
-
   anewk = abs(newk)
-
-  if(Hash4W(anewk)==0) then
-    Hash4W(anewk)=1
-  else
-    if(CheckW) then
-      call LogFile%WriteStamp('e')
-      call LogFile%WriteLine("Oops, add_Hash4W found a bug!")
-      call LogFile%WriteLine("IsWormPresent:"+str(IsWormPresent)+", update number:"+str(iupdate))
-      call LogFile%WriteLine("W Hash table for new k"+str(anewk)+" is not 0!!"+str(Hash4W(anewk)))
-      call print_config
-      stop
-    endif
-  endif
-  return
+  Hash4W(anewk)=WLn
 END SUBROUTINE add_Hash4W
 
-SUBROUTINE delete_Hash4W(oldk)
+SUBROUTINE delete_Hash4W(oldk, WLn)
   implicit none
-  integer, intent(in) :: oldk
+  integer, intent(in) :: oldk, WLn
   integer :: aoldk
 
   aoldk = abs(oldk)
 
-  if(Hash4W(aoldk)==1) then
+  if(Hash4W(aoldk)==WLn) then
     Hash4W(aoldk)=0
   else
-    if(CheckW) then
+    if(CheckG) then
       call LogFile%WriteStamp('e')
-      call LogFile%WriteLine("Oops, delete_Hash4W found a bug!")
+      call LogFile%WriteLine("Oops, delete_Hash4G found a bug!")
       call LogFile%WriteLine("IsWormPresent:"+str(IsWormPresent)+", update number:"+str(iupdate))
       call LogFile%WriteLine("W Hash table for old k"+str(aoldk)+" is not 1!!"+str(Hash4W(aoldk)))
       call print_config
@@ -788,8 +720,22 @@ SUBROUTINE delete_Hash4W(oldk)
 END SUBROUTINE delete_Hash4W
 
 
+!!=======================================================================
+!!================= IRREDUCIBILITY CHECK ================================
+!!=======================================================================
+
 
 !--------- check the irreducibility for G -----------------------
+LOGICAL FUNCTION Is_k_valid_for_G(k)
+  implicit none
+  integer,intent(in) :: k
+  if(CheckG .and. Hash4G(k)/=0) then
+    Is_k_valid_for_G=.false.
+  else
+    Is_k_valid_for_G=.true.
+  endif
+END FUNCTION
+
 LOGICAL FUNCTION Is_reducible_G(GLn)
   implicit none
   integer, intent(in) :: GLn
@@ -800,16 +746,9 @@ LOGICAL FUNCTION Is_reducible_G(GLn)
 
   newk = kLn(GLn)
 
-  if(Hash4G(newk)==1) then
+  if(Hash4G(newk)/=0) then
     Is_reducible_G = .true.
     return
-  else if(Hash4G(newk)/=0) then
-    call LogFile%WriteStamp('e')
-    call LogFile%WriteLine("Oops, Is_reducible_G found a bug!")
-    call LogFile%WriteLine("IsWormPresent:"+str(IsWormPresent)+", update number:"+str(iupdate))
-    call LogFile%WriteLine("G Hash table for new k"+str(newk)+" is not 0 or 1!!"+str(Hash4G(newk)))
-    call print_config
-    stop
   endif
     
   return
@@ -842,6 +781,7 @@ LOGICAL FUNCTION Is_reducible_G_Gam(GLn)
       !& abs(add_k(newk,-kG))==abs(kLn(W2))) then
       !call LogFile%QuickLog(str(newk)+str(kG)+str(kLn(W1))+str(kLn(W2))+" imc:"+str(imc))
       !stop
+      !continue
       !cycle !! rule out the neighbor wlines of newk
     !endif
     nnk1 = kLn(NeighVertex(3, NeighLn(1, nG)))
@@ -849,7 +789,7 @@ LOGICAL FUNCTION Is_reducible_G_Gam(GLn)
     if(abs(add_k(newk, -kG))==abs(nnk1) .or. &
       & abs(add_k(newk, -kG))==abs(nnk2)) cycle !! rule out the neighbor wlines of neighbor of newk
 
-    if(Hash4W(abs(add_k(newk,-kG)))==1) then
+    if(Hash4W(abs(add_k(newk,-kG)))/=0) then
       Is_reducible_G_Gam = .true.
     endif
   enddo
@@ -857,10 +797,20 @@ LOGICAL FUNCTION Is_reducible_G_Gam(GLn)
   return
 END FUNCTION Is_reducible_G_Gam
 
-
-
-
 !--------- check the irreducibility for W -----------------------
+
+LOGICAL FUNCTION Is_k_valid_for_W(k)
+  implicit none
+  integer,intent(in) :: k
+  integer :: ak
+  ak=abs(k)
+  if(CheckW .and. (ak==0 .or. Hash4W(ak)/=0)) then
+    Is_k_valid_for_W=.false.
+  else
+    Is_k_valid_for_W=.true.
+  endif
+END FUNCTION
+
 LOGICAL FUNCTION Is_reducible_W(WLn)
   implicit none
   integer, intent(in) :: WLn
@@ -875,16 +825,9 @@ LOGICAL FUNCTION Is_reducible_W(WLn)
     return
   endif
 
-  if(Hash4W(absk)==1) then
+  if(Hash4W(absk)/=0) then
     Is_reducible_W = .true.
     return
-  else if(Hash4W(absk)/=0) then
-    call LogFile%WriteStamp('e')
-    call LogFile%WriteLine("Oops, Is_reducible_W found a bug!")
-    call LogFile%WriteLine("IsWormPresent:"+str(IsWormPresent)+", update number:"+str(iupdate))
-    call LogFile%WriteLine("W Hash table for new k"+str(absk)+" is not 0 or 1!!"+str(Hash4W(absk)))
-    call print_config
-    stop
   endif
 
   return
@@ -1199,7 +1142,7 @@ SUBROUTINE delete_line(occline, knd)
   if(knd==1) then
     !call delete_Hash4G(kLn(occline))
   else
-    call delete_Hash4W(kLn(occline))
+    call delete_Hash4W(kLn(occline), occline)
   endif
 
   if(StatusLn(occline)==-1) then
@@ -1262,7 +1205,7 @@ SUBROUTINE undo_delete_line(newline, knd, stat)
     NWLn = NWLn + 1
     WLnKey2Value(NWLn) = newline
     LnValue2Key(newline) = NWLn
-    call add_Hash4W(kLn(newline))
+    call add_Hash4W(kLn(newline), newline)
   endif
   return
 END SUBROUTINE undo_delete_line
