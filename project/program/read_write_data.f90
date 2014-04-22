@@ -522,9 +522,21 @@ SUBROUTINE read_GWGamma
     enddo
   enddo
 
-  if(ios/=0) then
-    call LogFile%QuickLog("Failed to read G,W or Gamma information!",'e')
-    stop -1
+  if(ISub==2) then
+    if(ios/=0) then
+      call LogFile%QuickLog("Failed to read G,W or Gamma information!",'e')
+    else 
+      call update_WeightCurrent
+      mc_version = file_version
+    endif
+  else 
+    if(ios/=0) then
+      call LogFile%QuickLog("Failed to read G,W or Gamma information!",'e')
+      close(100)
+      close(101)
+      close(102)
+      stop -1
+    endif
   endif
 
   close(100)
@@ -1047,16 +1059,25 @@ SUBROUTINE output_Quantities
   close(104)
 END SUBROUTINE output_Quantities
 
-!SUBROUTINE output_test
-  !implicit none
-  !integer :: iorder
+SUBROUTINE output_test
+  implicit none
+  integer :: iorder
   !open(104, status='replace', file=trim(title_mc)//"_Gam_Order_test.dat")
-  !do iorder = 1, MCOrder
-    !write(104, *) iorder, Quan(iorder+2)/Quan(iorder+1), Error(iorder+2)/Quan(iorder+1)
-  !enddo
-  !write(104, *)
-  !close(104)
-!END SUBROUTINE
+  open(104, access='append', file=trim(title_mc)//"_Gam_Order_test.dat")
+  do iorder = 1, MCOrder
+    write(104, *) iorder, Quan(iorder+2)/Quan(2), Error(iorder+2)/Quan(2)
+  enddo
+  write(104, *)
+
+  write(104, *) "Type 1,2 <==> 3,4"
+  do iorder = 0, MCOrder
+    BalenceCheck(iorder,1,3)=(BalenceCheck(iorder,1,1)-BalenceCheck(iorder,1,2)) &
+      & /sqrt(BalenceCheck(iorder,1,1))
+    write(104, '(i3,3f17.5)') iorder, BalenceCheck(iorder,1,:)
+  enddo
+  write(104, *)
+  close(104)
+END SUBROUTINE
 !!================================================================
 !!================================================================
 !!================================================================
