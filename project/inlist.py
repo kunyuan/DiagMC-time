@@ -11,19 +11,19 @@ com_dict={
     "Lx" :  4,
     "Ly" :  4,
     "Jcp" :  1.0,
-    "Beta" :  0.9,
-    "Order" :  4,
+    "Beta" :  1.0,
+    "Order" :  3,
     }
 
 
 # monte carlo job defintion
 mc_dict={
     "__Execute" : "./gamma3.exe",
-    "__Duplicate" : 3,
+    "__Duplicate" : 1,
     "__IsCluster" : False,
     "__AutoRun" : True,
     "IsLoad" : False,
-    "Reweight" : [1,1,1,1],
+    "Reweight" : [0.125,0.0125,0.00125],
     #"ReadFile" : "0.90_1_coll",
     "Sample" : 1000000,
     "Sweep" : 10,
@@ -48,7 +48,7 @@ TO_DO.append(job.JobConsistLoop(sc_dict))
 # output loop job definition
 ol_dict={
     "__Execute" : ["python", "./run_loop.py"],
-    "__Duplicate" : 1,
+    "__Duplicate" : 0,
     "__IsCluster" : False,
     "__AutoRun" : True,
     "IsLoad" : True,
