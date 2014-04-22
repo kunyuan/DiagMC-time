@@ -38,7 +38,8 @@ def run_loop(infile, outfile):
             logging.error('Collapse_data failed!')
         else:
             try:
-                os.system('echo '+infile+' | '+execf+" >"+outfile)
+                #os.system('echo '+infile+' | '+execf+" >"+outfile)
+                os.system("exec "+execf+"<"+infile+" >>"+outfile)
             except:
                 logging.error('loop error!')
 
