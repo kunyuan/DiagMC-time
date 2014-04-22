@@ -133,7 +133,7 @@ SUBROUTINE print_config
     & 'direction:', i2,2x, 'stat:',i2, 2x,'neigh:', i6,i6,i6)
 
   close(108)
-  !call DRAW
+  call DRAW
 END SUBROUTINE print_config
 
 !=================== VISUALIZATION  ==================================
@@ -835,7 +835,12 @@ SUBROUTINE read_monte_carlo_conf
 
   do ikeyG = 1, NGLn
     i = GLnKey2Value(ikeyG)
-    call add_Hash4G(kLn(i))
+    if(Is_k_valid_for_G(kLn(i))) then
+      call add_Hash4G(kLn(i),i)
+    else
+      call LogFile%QuickLog("read_monte_carlo_conf: k of G Error!",'e')
+      stop
+    endif
     TypeLn(i) = mod(TypeVertex(NeighLn(2,i)), 2)
     if(TypeLn(i)==0)  TypeLn(i) = 2
     tau = TVertex(2, NeighLn(2, i))-TVertex(1,NeighLn(1,i))
@@ -845,7 +850,12 @@ SUBROUTINE read_monte_carlo_conf
 
   do ikeyW = 1, NWLn
     i = WLnKey2Value(ikeyW)
-    call add_Hash4W(abs(kLn(i)))
+    if(Is_k_valid_for_W(kLn(i))) then
+      call add_Hash4W(kLn(i),i)
+    else
+      call LogFile%QuickLog("read_monte_carlo_conf: k of W Error!",'e')
+      stop
+    endif
     iGam = NeighLn(1, i)
     jGam = NeighLn(2, i)
     TypeLn(i) = TypeGam2W(TypeVertex(iGam), TypeVertex(jGam))

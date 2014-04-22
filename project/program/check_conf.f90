@@ -42,7 +42,8 @@ END SUBROUTINE
 SUBROUTINE check_topo
   implicit none
   integer :: i, j, k
-  integer :: nextLn, nLn
+  integer :: nextLn, nLn, curG
+  logical :: flag(MxNGLn)
   
   if(NGLn/=2*(Order+1) .or. NWLn/=Order+1 .or. NVertex/=2*(Order+1)) then
     call LogFile%WriteStamp('e')
@@ -68,12 +69,25 @@ SUBROUTINE check_topo
     endif
   enddo
 
-  if(IsWormPresent .eqv. .false.) then
-    nLn = 1
-    nextLn = NeighVertex(2, NeighLn(2, GLnKey2Value(1)))
-    do while(nextLn/=GLnKey2Value(1))
-      nextLn = NeighVertex(2, NeighLn(2, nextLn))
-      nLn = nLn + 1
+  flag(:)=.false.
+  do i = 1, NGLn
+    NextLn = GLnKey2Value(i)
+    curG=NextLn
+    nLn=1
+    if(flag(NextLn)==.true.) cycle
+    flag(NextLn)=.true.
+    do while(NextLn/=GLnKey2Value(1))
+      NextLn = NeighVertex(2, NeighLn(2, NextLn))
+      nLn=nLn+1
+      if(flag(NextLn)==.true.) then
+        call LogFile%WriteStamp('e')
+        call LogFile%WriteLine("Oops, check_topo found a bug!")
+        call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+", update number"+str(iupdate))
+        call LogFile%WriteLine("The Fermi loop has mulitiple branches!")
+        call LogFile%WriteLine("The gline number in a loop:"+str(NextLn))
+        call print_config
+        stop
+      endif
       if(nLn>NGLn) then
         call LogFile%WriteStamp('e')
         call LogFile%WriteLine("Oops, check_topo found a bug!")
@@ -85,16 +99,16 @@ SUBROUTINE check_topo
       endif
     enddo
 
-    !if(nLn/=NGLn) then
-      !call LogFile%WriteStamp('e')
-      !call LogFile%WriteLine("Oops, check_topo found a bug!")
-      !call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+", update number"+str(iupdate))
-      !call LogFile%WriteLine("The Fermi loop is wrong!")
-      !call LogFile%WriteLine("The gline number in a loop:"+str(nLn))
-      !call print_config
-      !stop
-    !endif
-  endif
+    if(curG/=NGLn) then
+      call LogFile%WriteStamp('e')
+      call LogFile%WriteLine("Oops, check_topo found a bug!")
+      call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+", update number"+str(iupdate))
+      call LogFile%WriteLine("The Fermi loop is wrong!")
+      call LogFile%WriteLine("The gline number in a loop:"+str(nLn))
+      call print_config
+      stop
+    endif
+  enddo
 
   do i = 1, NWLn
     if(LnValue2Key(WLnKey2Value(i))/=i) then
@@ -426,6 +440,7 @@ SUBROUTINE check_irreducibility
   integer :: Gi, Wi
   integer :: Gj, Wj
   integer :: Gk, Wk
+  integer :: Gam1, Gam2
   
   if(CheckG) then
     do i = 1, NGLn
@@ -434,6 +449,7 @@ SUBROUTINE check_irreducibility
         Gj = GLnKey2Value(j)
         if(kLn(Gj)==kLn(Gi)) then
           call LogFile%WriteStamp('e')
+          call LogFile%WriteLine('imc:'+str(imc))
           call LogFile%WriteLine("Oops, check_irreducibility found a bug!")
           call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+",update number"+str(iupdate))
           call LogFile%WriteLine("Gline is not irreducible!")
@@ -450,6 +466,7 @@ SUBROUTINE check_irreducibility
       Wi = WLnKey2Value(i)
       if(kLn(Wi)==0) then
         call LogFile%WriteStamp('e')
+        call LogFile%WriteLine('imc:'+str(imc))
         call LogFile%WriteLine("Oops, check_irreducibility found a bug!")
         call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+",update number"+str(iupdate))
         call LogFile%WriteLine("Wline is not irreducible!")
@@ -462,6 +479,7 @@ SUBROUTINE check_irreducibility
         Wj = WLnKey2Value(j)
         if(abs(kLn(Wj))==abs(kLn(Wi))) then
           call LogFile%WriteStamp('e')
+          call LogFile%WriteLine('imc:'+str(imc))
           call LogFile%WriteLine("Oops, check_irreducibility found a bug!")
           call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+",update number"+str(iupdate))
           call LogFile%WriteLine("Wline is not irreducible!")
@@ -479,15 +497,18 @@ SUBROUTINE check_irreducibility
       Gi = GLnKey2Value(i)
       do j = i+1, NGLn
         Gj = GLnKey2Value(j)
-        if(NeighLn(1,Gi)==NeighLn(2,Gj) .or. NeighLn(2,Gi)==NeighLn(1,Gj)) cycle
+        !if(NeighLn(1,Gi)==NeighLn(2,Gj) .or. NeighLn(2,Gi)==NeighLn(1,Gj)) cycle
         do k = 1, NWLn
           Wk = WLnKey2Value(k)
-          if(NeighLn(1,Wk)==NeighLn(1,Gi) .or. NeighLn(1,Wk)==NeighLn(1,Gj)) cycle
-          if(NeighLn(1,Wk)==NeighLn(2,Gi) .or. NeighLn(1,Wk)==NeighLn(2,Gj)) cycle
-          if(NeighLn(2,Wk)==NeighLn(1,Gi) .or. NeighLn(2,Wk)==NeighLn(1,Gj)) cycle
-          if(NeighLn(2,Wk)==NeighLn(2,Gi) .or. NeighLn(2,Wk)==NeighLn(2,Gj)) cycle
+          Gam1=NeighLn(1,Wk)
+          Gam2=NeighLn(2,Wk)
+          if(NeighVertex(1,Gam1)==Gi .and. NeighVertex(2,Gam1)==Gj) cycle
+          if(NeighVertex(2,Gam1)==Gi .and. NeighVertex(1,Gam1)==Gj) cycle
+          if(NeighVertex(1,Gam2)==Gi .and. NeighVertex(2,Gam2)==Gj) cycle
+          if(NeighVertex(2,Gam2)==Gi .and. NeighVertex(1,Gam2)==Gj) cycle
           if(abs(add_k(kLn(Gi), -kLn(Gj)))==abs(kLn(Wk))) then
             call LogFile%WriteStamp('e')
+            call LogFile%WriteLine('imc:'+str(imc))
             call LogFile%WriteLine("Oops, check_irreducibility found a bug!")
             call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+",update number"+str(iupdate))
             call LogFile%WriteLine("Gamma is not irreducible!")
