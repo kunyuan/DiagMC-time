@@ -1,6 +1,366 @@
 !============== BASIC PROCEDURES IN UPDATE ==========================
 
+!============== translate G,W,Gamma state ===========================
 
+logical FUNCTION is_mea_worm_near_G(stat)
+  implicit none
+  integer :: stat
+  if(stat==0)then
+    is_mea_worm_near_G=.false.
+  elseif(stat==1) then
+    is_mea_worm_near_G=.true.
+  else
+    call LogFile%WriteStamp('e')
+    call LogFile%WriteLine("The number of update: "+str(iupdate)+",imc: "+str(imc))
+    call LogFile%WriteLine("line status error!"+str(stat))
+    call print_config
+    stop
+  endif
+end FUNCTION
+
+logical FUNCTION is_mea_near_W(stat)
+  implicit none
+  integer :: stat
+  if(stat==1 .or. stat==3)then
+    is_mea_near_W=.true.
+  else
+    is_mea_near_W=.false.
+  endif
+end FUNCTION
+
+logical FUNCTION is_worm_near_W(stat)
+  implicit none
+  integer :: stat
+  if(stat==2)then
+    is_worm_near_W=.true.
+  else
+    is_worm_near_W=.false.
+  endif
+end FUNCTION
+
+logical FUNCTION is_mea_near_Gamma(stat)
+  implicit none
+  integer :: stat
+  if(stat==1 .or. stat==3)then
+    is_mea_near_Gamma=.true.
+  else
+    is_mea_near_Gamma=.false.
+  endif
+end FUNCTION
+
+logical FUNCTION is_worm_near_Gamma(stat)
+  implicit none
+  integer :: stat
+  if(stat==2)then
+    is_worm_near_Gamma=.true.
+  else
+    is_worm_near_Gamma=.false.
+  endif
+end FUNCTION
+
+!====================================================================
+!============================== WEIGHTS =============================
+!====================================================================
+
+!-------- the weight of a gline -------------------------
+! tau = tau2-tau1
+COMPLEX*16 FUNCTION weight_gline(stat, tau, typ)
+  implicit none
+  integer :: stat, typ
+  double precision :: tau
+  integer :: t, flag
+
+  t = Floor(tau*MxT/Beta)
+
+  if(is_mea_worm_near_G(stat)) then
+    !  Have measuring vertex around
+    weight_gline = weight_meas_G(t)
+  else
+    weight_gline = weight_G(typ, t)
+  endif
+
+  !---------------------- for test --------------------------------------
+  !t = Floor(tau*MxT/Beta)
+
+  !flag = 0
+  !if(t<0) then
+    !tau = tau +Beta
+    !flag = 1
+  !endif
+
+  !if(stat == 0) then
+
+    !!weight_gline = cdexp(-(0.d0, 1.d0)*pi*tau/(2.d0*Beta))
+    !weight_gline = (1.d0, 0.d0)
+    !!weight_gline = dcmplx(Beta-tau, 0.d0)
+    !if(flag==1) then
+      !weight_gline = -1.d0*weight_gline
+    !endif
+
+  !else if(stat==1) then
+    !weight_gline = weight_meas_G(t)
+  !else
+    !call LogFile%WriteStamp('e')
+    !call LogFile%WriteLine("The number of update: "+str(iupdate))
+    !call LogFile%WriteLine("line status error!"+str(stat))
+    !stop
+  !endif
+  !------------------------ end -----------------------------------------
+
+  return
+END FUNCTION weight_gline
+
+
+
+!-------- the weight of a wline -------------------------
+
+! dx = x2-x1;  dy = y2- y1; tau = tau2-tau1
+COMPLEX*16 FUNCTION weight_wline(stat, isdelta, dr0, tau, typ)
+  implicit none
+  integer :: stat, isdelta, dx, dy, typ
+  integer :: dr0(2)
+  integer :: dr(2)
+  double precision :: tau
+  integer :: t
+
+  t = Floor(tau*MxT/Beta)
+
+  call diff_r(dr0, dr)
+
+  if(is_mea_near_W(stat)) then
+    ! Have measuring vertex around
+    if(isdelta==0) weight_wline = weight_meas_W(dr, t)
+    if(isdelta==1) weight_wline = (0.d0, 0.d0)
+  elseif(is_worm_near_W(stat)) then
+    ! Have Ira or Masha around and no measuring vertex around 
+    ! set the fake weight of W as the W with all spin up ,namely type=1
+    if(isdelta==0) weight_wline = weight_W(1, dr, t)
+    if(isdelta==1) weight_wline = weight_W0(1, dr)
+  else
+    if(isdelta==0) weight_wline = weight_W(typ, dr, t)
+    if(isdelta==1) weight_wline = weight_W0(typ, dr)
+  endif
+
+  !---------------------- for test --------------------------------------
+  !if(stat >= 0 .and. stat<=3) then
+    !if(isdelta==0 .and. dr(1)==0 .and. dr(2)==0) then
+      !weight_wline = weight_meas_W(dr, t)
+    !else 
+      !weight_wline = (0.d0, 0.d0)
+    !endif
+
+    !!if(isdelta==0) weight_wline = weight_meas_W(dr, t)
+    !!if(isdelta==1) weight_wline = weight_meas_W(dr, 0)
+  !else
+    !call LogFile%WriteStamp('e')
+    !call LogFile%WriteLine("The number of update: "+str(iupdate))
+    !call LogFile%WriteLine("line status error!"+str(stat))
+    !stop
+  !endif
+  !------------------------ end -----------------------------------------
+
+  return
+END FUNCTION weight_wline
+
+!-------- the weight of a vertex ------------------------
+ !dx = xg-xw;  dy = yg-yw; dtau1 = tau3-tau2; dtau2 = tau1-tau3
+
+COMPLEX*16 FUNCTION weight_vertex(stat, isdelta, dr0, dtau1, dtau2, typ)
+  implicit none
+  integer :: stat, dr(2), t1, t2, typ, isdelta
+  integer :: dr0(2), flag
+  double precision :: weight
+  double precision :: dtau1, dtau2
+
+  t1 = Floor(dtau1*MxT/Beta)
+  t2 = Floor(dtau2*MxT/Beta)
+
+  call diff_r(dr0, dr)
+
+  if(is_mea_near_Gamma(stat)) then
+    if(isdelta==0) weight_vertex = (0.d0, 0.d0)
+    if(isdelta==1) weight_vertex = weight_meas_Gam0(typ, dr)
+  elseif(is_worm_near_Gamma(stat)) then
+    !You have make sure that those Gamma with Ira or Masha still fall in the range type=1~6 
+    !so that we can use real Gamma function of weight here
+    if(isbold) then
+      !----------------- for bold Gamma ------------------------------
+      if(isdelta==0) weight_vertex = weight_Gam(typ, dr, t1, t2)
+      if(isdelta==1) weight_vertex = weight_Gam0(typ, dr)
+    else 
+      !----------------- for bare Gamma ------------------------------
+      if(isdelta==0) weight_vertex = (0.d0, 0.d0)
+      if(isdelta==1) weight_vertex = weight_Gam0(typ, dr)
+    endif
+  else
+    if(isbold) then
+      !----------------- for bold Gamma ------------------------------
+      if(isdelta==0) weight_vertex = weight_Gam(typ, dr, t1, t2)
+      if(isdelta==1) weight_vertex = weight_Gam0(typ, dr)
+    else
+      !----------------- for bare Gamma ------------------------------
+      if(isdelta==0) weight_vertex = (0.d0, 0.d0)
+      if(isdelta==1) weight_vertex = weight_Gam0(typ, dr)
+    endif
+  endif
+
+  !---------------------- for test --------------------------------------
+  !flag = 0
+  !if(t1<0) then
+    !dtau1 = dtau1 + Beta
+    !flag = flag + 1
+  !endif
+  !if(t2<0) then
+    !dtau2 = dtau2 + Beta
+    !flag = flag + 1
+  !endif
+
+  !if(stat==0 .or. stat==2) then
+    !if(isdelta==1) weight_vertex = weight_meas_Gam(typ, dr)
+    !if(isdelta==0) then
+      !weight_vertex = (0.d0, 0.d0)
+      !if(dr(1)==0 .and. dr(2)==0) then
+        !if(typ==1 .or. typ==2 .or. typ==5 .or. typ==6) then
+          !if(mod(flag, 2)==0) then
+            !weight_vertex = dcmplx(dtau1**2.d0+dtau2**2.d0+1.d0, 0.d0)
+            !!weight_vertex = (1.d0, 0.d0)
+          !else 
+            !weight_vertex = dcmplx(-1.d0*(dtau1**2.d0+dtau2**2.d0+1.d0), 0.d0)
+            !!weight_vertex = (-1.d0, 0.d0)
+          !endif
+        !endif
+      !endif
+    !endif
+
+  !else if(stat==1 .or. stat==3) then
+    !if(isdelta==1) weight_vertex = weight_meas_Gam(typ, dr)
+    !if(isdelta==0) weight_vertex = (0.d0, 0.d0)
+
+  !else
+    !call LogFile%WriteStamp('e')
+    !call LogFile%WriteLine("The number of update: "+str(iupdate))
+    !call LogFile%WriteLine("vertex status error!"+str(stat))
+    !stop
+  !endif
+  !------------------------ end -----------------------------------------
+  return
+END FUNCTION weight_vertex
+
+!!======================== WEIGHT EXTRACTING =========================
+!! most basic interface to the matrix element
+
+!--------- weight for bare propagator ----------------
+Complex*16 FUNCTION weight_G0(typ, t)
+  implicit none
+  integer, intent(in)  :: typ, t  
+  double precision     :: tau
+  complex(kind=8)      :: muc  
+
+  muc = dcmplx(0.d0, Mu(1)*pi/(2.d0*Beta))
+  tau = real(t)*Beta/MxT
+  if(tau>=0) then
+    weight_G0 = cdexp(muc*tau)/(1.d0, 1.d0) 
+  else
+    weight_G0 = -cdexp(muc*(tau+Beta))/(1.d0, 1.d0) 
+  endif
+  return
+END FUNCTION weight_G0
+
+
+!!--------- calculate weight for bare interaction ----
+Complex*16 FUNCTION weight_W0(typ, dr)
+  implicit none
+  integer, intent(in) :: dr(2), typ
+  integer :: dx1, dy1
+  double precision :: ratio
+
+  ratio = Jcp
+
+  dx1 = dr(1);       dy1 = dr(2)
+  if(dx1>=0  .and. dx1<L(1) .and. dy1>=0 .and. dy1<L(2)) then
+    if(dx1>dL(1))     dx1 = L(1)-dx1
+    if(dy1>dL(2))     dy1 = L(2)-dy1
+
+    weight_W0 = (0.d0, 0.d0)
+
+    if((dx1==1.and.dy1==0).or.(dx1==0.and.dy1==1)) then
+      if(typ ==1 .or. typ == 2) then
+        weight_W0 = dcmplx(0.25d0*ratio, 0.d0)
+      else if(typ == 3 .or. typ == 4) then
+        weight_W0 = dcmplx(-0.25d0*ratio, 0.d0)
+      else if(typ == 5 .or. typ == 6) then
+        weight_W0 = dcmplx(0.5d0*ratio, 0.d0)
+      endif
+    endif
+  else
+    call LogFile%QuickLog("Weight_W"+str(dx1)+str(dy1)+"dx, dy bigger than system size!")
+    stop
+  endif
+END FUNCTION weight_W0
+
+
+!!--------- calculate weight for bare Gamma ---------
+COMPLEX*16 FUNCTION weight_Gam0(typ, dr)
+  implicit none
+  integer, intent(in)  :: dr(2), typ
+  double precision :: ratio
+
+  weight_Gam0 = (0.d0, 0.d0)
+
+  if(dr(1)>=0 .and. dr(1)<L(1) .and. dr(2)>=0 .and. dr(2)<L(2)) then
+    if(dr(1)==0.and.dr(2)==0) then
+      if(typ==1 .or. typ==2 .or. typ==5 .or. typ==6) then
+        weight_Gam0 = (1.d0, 0.d0)
+      endif
+    endif
+  else
+    call logFile%QuickLog("Weight_Gam"//str(dr(1))//str(dr(2))//"dx, dy bigger than system size!")
+    stop
+  endif
+END FUNCTION weight_Gam0
+
+!!--------- extract weight for G ---------
+COMPLEX*16 FUNCTION weight_G(typ1, t1)
+  implicit none
+  integer, intent(in)  :: t1, typ1
+
+  if(t1>=0) then
+    weight_G = G(typ1, t1)
+  else
+    weight_G = -G(typ1, t1+MxT)
+  endif
+END FUNCTION weight_G
+
+!!--------- extract weight for W ---------
+COMPLEX*16 FUNCTION weight_W(typ1, dr, t1)
+  implicit none
+  integer, intent(in)  :: dr(2), t1, typ1
+
+  if(t1>=0) then
+    weight_W = W(typ1, dr(1), dr(2), t1)
+  else
+    weight_W = W(typ1, dr(1), dr(2), t1+MxT)
+  endif
+END FUNCTION weight_W
+
+!!--------- extract weight for Gamma ---------
+COMPLEX*16 FUNCTION weight_Gam(typ1, dr, t1, t2)
+  implicit none
+  integer, intent(in)  :: dr(2), t1, t2, typ1
+  double precision :: GaR
+
+  if(t1>=0 .and. t2>=0) then
+    weight_Gam = Gam(typ1, dr(1), dr(2), t1, t2)
+  else if(t1<0 .and. t2>=0) then
+    weight_Gam = -Gam(typ1, dr(1), dr(2), t1+MxT, t2)
+  else if(t1>=0 .and. t2<0) then
+    weight_Gam = -Gam(typ1, dr(1), dr(2), t1, t2+MxT)
+  else
+    weight_Gam = Gam(typ1, dr(1), dr(2), t1+MxT, t2+MxT)
+  endif
+END FUNCTION weight_Gam
+
+!!====================================================================
 !=====================================================================
 !==================FAKE WEIGHT FOR MEASURING AND WORM=================
 !=====================================================================
@@ -38,20 +398,37 @@ complex*16 FUNCTION weight_meas_W(dr, t1)
   return
 END FUNCTION weight_meas_W
 
-complex*16 FUNCTION weight_meas_Gam(ityp, dr, t1, t2)
-  implicit none
-  integer, intent(in)  :: dr(2), ityp, t1, t2
+!complex*16 FUNCTION weight_meas_Gam(ityp, dr, t1, t2)
+  !implicit none
+  !integer, intent(in)  :: dr(2), ityp, t1, t2
 
-  weight_meas_Gam = (0.d0, 0.d0)
-  if(dr(1)==0 .and. dr(2)==0) then
-    weight_meas_Gam = (1.d0, 0.d0)
-  endif
-  return
-END FUNCTION weight_meas_Gam
+  !if(dr(1)==0 .and. dr(2)==0) then
+    !weight_meas_Gam = (1.d0, 0.d0)
+  !else
+    !weight_meas_Gam = (0.d0, 0.d0)
+  !endif
+  !return
+!END FUNCTION weight_meas_Gam
 
 complex*16 FUNCTION weight_meas_Gam0(ityp, dr)
   implicit none
   integer, intent(in)  :: dr(2), ityp
+
+  !----------------------------------------------------------------------------
+  !                       (out)
+  !                 (out) / b
+  !                   d /||
+  !                ====  ||
+  !                   c \||
+  !                  (in) \ a
+  !                       (in)
+  !----- type = 1:  a = up;   b = up;    c = up;   d = up  -------------------
+  !----- type = 2:  a = down; b = down;  c = down; d = down  -----------------
+  !----- type = 3:  a = up;   b = up;    c = down; d = down  -----------------
+  !----- type = 4:  a = down; b = down;  c = up;   d = up  -------------------
+  !----- type = 5:  a = up;   b = down;  c = up;   d = down  -------------------
+  !----- type = 6:  a = down; b = up;    c = down; d = up  -----------------
+  !----------------------------------------------------------------------------
 
   weight_meas_Gam0 = (0.d0, 0.d0)
   if(dr(1)==0 .and. dr(2)==0) then
@@ -419,25 +796,20 @@ LOGICAL FUNCTION Is_reducible_G(GLn)
   integer :: newk
 
   Is_reducible_G = .false.
+  if(CheckG==.false.) return
+
   newk = kLn(GLn)
 
-  if(Is_k_valid(newk) .eqv. .false.) then
+  if(Hash4G(newk)==1) then
     Is_reducible_G = .true.
     return
-  endif
-
-  if(CheckG) then
-    if(Hash4G(newk)==1) then
-      Is_reducible_G = .true.
-      return
-    else if(Hash4G(newk)/=0) then
-      call LogFile%WriteStamp('e')
-      call LogFile%WriteLine("Oops, Is_reducible_G found a bug!")
-      call LogFile%WriteLine("IsWormPresent:"+str(IsWormPresent)+", update number:"+str(iupdate))
-      call LogFile%WriteLine("G Hash table for new k"+str(newk)+" is not 0 or 1!!"+str(Hash4G(newk)))
-      call print_config
-      stop
-    endif
+  else if(Hash4G(newk)/=0) then
+    call LogFile%WriteStamp('e')
+    call LogFile%WriteLine("Oops, Is_reducible_G found a bug!")
+    call LogFile%WriteLine("IsWormPresent:"+str(IsWormPresent)+", update number:"+str(iupdate))
+    call LogFile%WriteLine("G Hash table for new k"+str(newk)+" is not 0 or 1!!"+str(Hash4G(newk)))
+    call print_config
+    stop
   endif
     
   return
@@ -452,6 +824,8 @@ LOGICAL FUNCTION Is_reducible_G_Gam(GLn)
   integer :: i, nnk1, nnk2
 
   Is_reducible_G_Gam = .false.
+  if(CheckGam==.false.) return
+
   newk = kLn(GLn)
 
   Gam1 = NeighLn(1, GLn)
@@ -459,24 +833,26 @@ LOGICAL FUNCTION Is_reducible_G_Gam(GLn)
   W1 = NeighVertex(3, Gam1)
   W2 = NeighVertex(3, Gam2)
 
-  if(CheckGam) then
-    do i = 1, NGLn
-      nG = GLnKey2Value(i)
-      kG = kLn(nG)
-      if(nG==GLn)   cycle             !! rule out the line itself
-      if(nG==NeighVertex(1, Gam1) .or. nG==NeighVertex(2, Gam2)) cycle
-      if(abs(add_k(newk,-kG))==abs(kLn(W1)) .or. &
-        & abs(add_k(newk,-kG))==abs(kLn(W2))) cycle !! rule out the neighbor wlines of newk
-      nnk1 = kLn(NeighVertex(3, NeighLn(1, nG)))
-      nnk2 = kLn(NeighVertex(3, NeighLn(2, nG)))
-      if(abs(add_k(newk, -kG))==abs(nnk1) .or. &
-        & abs(add_k(newk, -kG))==abs(nnk2)) cycle !! rule out the neighbor wlines of neighbor of newk
+  do i = 1, NGLn
+    nG = GLnKey2Value(i)
+    if(nG==GLn)   cycle             !! rule out the line itself
+    if(nG==NeighVertex(1, Gam1) .or. nG==NeighVertex(2, Gam2)) cycle
+    kG = kLn(nG)
+    !if(abs(add_k(newk,-kG))==abs(kLn(W1)) .or. &
+      !& abs(add_k(newk,-kG))==abs(kLn(W2))) then
+      !call LogFile%QuickLog(str(newk)+str(kG)+str(kLn(W1))+str(kLn(W2))+" imc:"+str(imc))
+      !stop
+      !cycle !! rule out the neighbor wlines of newk
+    !endif
+    nnk1 = kLn(NeighVertex(3, NeighLn(1, nG)))
+    nnk2 = kLn(NeighVertex(3, NeighLn(2, nG)))
+    if(abs(add_k(newk, -kG))==abs(nnk1) .or. &
+      & abs(add_k(newk, -kG))==abs(nnk2)) cycle !! rule out the neighbor wlines of neighbor of newk
 
-      if(Hash4W(abs(add_k(newk,-kG)))==1) then
-        Is_reducible_G_Gam = .true.
-      endif
-    enddo
-  endif
+    if(Hash4W(abs(add_k(newk,-kG)))==1) then
+      Is_reducible_G_Gam = .true.
+    endif
+  enddo
     
   return
 END FUNCTION Is_reducible_G_Gam
@@ -490,31 +866,25 @@ LOGICAL FUNCTION Is_reducible_W(WLn)
   integer, intent(in) :: WLn
   integer :: absk 
 
-  absk = abs(kLn(WLn))
   Is_reducible_W = .false.
+  if(CheckW==.false.) return
+  absk = abs(kLn(WLn))
 
-  if(Is_k_valid(absk) .eqv. .false. ) then
+  if(absk==0) then
     Is_reducible_W = .true.
     return
   endif
 
-  if(CheckW) then
-    if(absk==0) then
-      Is_reducible_W = .true.
-      return
-    endif
-
-    if(Hash4W(absk)==1) then
-      Is_reducible_W = .true.
-      return
-    else if(Hash4W(absk)/=0) then
-      call LogFile%WriteStamp('e')
-      call LogFile%WriteLine("Oops, Is_reducible_W found a bug!")
-      call LogFile%WriteLine("IsWormPresent:"+str(IsWormPresent)+", update number:"+str(iupdate))
-      call LogFile%WriteLine("W Hash table for new k"+str(absk)+" is not 0 or 1!!"+str(Hash4W(absk)))
-      call print_config
-      stop
-    endif
+  if(Hash4W(absk)==1) then
+    Is_reducible_W = .true.
+    return
+  else if(Hash4W(absk)/=0) then
+    call LogFile%WriteStamp('e')
+    call LogFile%WriteLine("Oops, Is_reducible_W found a bug!")
+    call LogFile%WriteLine("IsWormPresent:"+str(IsWormPresent)+", update number:"+str(iupdate))
+    call LogFile%WriteLine("W Hash table for new k"+str(absk)+" is not 0 or 1!!"+str(Hash4W(absk)))
+    call print_config
+    stop
   endif
 
   return
@@ -529,8 +899,10 @@ LOGICAL FUNCTION Is_reducible_W_Gam(WLn)
   integer :: absk, i, Gam1, Gam2, G1, G2, G3, G4, kG5, kG6
   integer :: nG, kG, pkGG, nkGG
 
-  absk = abs(kLn(WLn))
   Is_reducible_W_Gam = .false.
+  if(CheckGam) return
+
+  absk = abs(kLn(WLn))
   Gam1 = NeighLn(1, WLn)
   Gam2 = NeighLn(2, WLn)
   G1 = NeighVertex(1, Gam1)
@@ -538,24 +910,22 @@ LOGICAL FUNCTION Is_reducible_W_Gam(WLn)
   G3 = NeighVertex(1, Gam2)
   G4 = NeighVertex(2, Gam2)
 
-  if(CheckGam) then
-    do i = 1, NGLn
-      nG = GLnKey2Value(i)
-      kG5 = kLn(NeighVertex(1, NeighLn(1,nG)))
-      kG6 = kLn(NeighVertex(2, NeighLn(2,nG)))
-      kG = kLn(nG)
-      if(nG==G1 .or. nG==G2 .or. nG==G3 .or. nG==G4) cycle
-      pkGG = add_k(kG, absk)
-      nkGG = add_k(kG, -absk)
-      if(pkGG==kLn(G1) .or. pkGG==kLn(G2) .or. pkGG==kLn(G3) .or. pkGG==kLn(G4)) cycle
-      if(nkGG==kLn(G1) .or. nkGG==kLn(G2) .or. nkGG==kLn(G3) .or. nkGG==kLn(G4)) cycle
-      if(pkGG==kG5 .or. pkGG==kG6 .or. nkGG==kG5 .or. nkGG==kG6) cycle
+  do i = 1, NGLn
+    nG = GLnKey2Value(i)
+    kG5 = kLn(NeighVertex(1, NeighLn(1,nG)))
+    kG6 = kLn(NeighVertex(2, NeighLn(2,nG)))
+    kG = kLn(nG)
+    if(nG==G1 .or. nG==G2 .or. nG==G3 .or. nG==G4) cycle
+    pkGG = add_k(kG, absk)
+    nkGG = add_k(kG, -absk)
+    if(pkGG==kLn(G1) .or. pkGG==kLn(G2) .or. pkGG==kLn(G3) .or. pkGG==kLn(G4)) cycle
+    if(nkGG==kLn(G1) .or. nkGG==kLn(G2) .or. nkGG==kLn(G3) .or. nkGG==kLn(G4)) cycle
+    if(pkGG==kG5 .or. pkGG==kG6 .or. nkGG==kG5 .or. nkGG==kG6) cycle
 
-      if(Hash4G(pkGG)==1 .or. Hash4G(nkGG)==1) then
-        Is_reducible_W_Gam = .true.
-      endif
-    enddo
-  endif
+    if(Hash4G(pkGG)==1 .or. Hash4G(nkGG)==1) then
+      Is_reducible_W_Gam = .true.
+    endif
+  enddo
   return
 END FUNCTION Is_reducible_W_Gam
 

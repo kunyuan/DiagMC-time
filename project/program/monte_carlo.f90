@@ -231,7 +231,7 @@ SUBROUTINE markov(IsToss)
           call change_Gamma_isdelta       
         endif
 
-        call check_config
+        !call check_config
 
       enddo
 
@@ -255,7 +255,6 @@ SUBROUTINE markov(IsToss)
       !call output_test
       call print_status
       call print_config
-      call check_config
 
       call LogFile%QuickLog("Check if there is a new G,W data...")
 
@@ -294,6 +293,7 @@ SUBROUTINE markov(IsToss)
     !================================================================
 
     if(mod(iblck,30)==0) then
+      call check_config
       call LogFile%QuickLog("Writing data and configuration...")
 
       !call statistics
@@ -2229,213 +2229,6 @@ END SUBROUTINE switch_ira_and_masha
 !====================================================================
 !====================================================================
 !====================================================================
-
-
-!====================================================================
-!============================== WEIGHTS =============================
-!====================================================================
-
-!-------- the weight of a gline -------------------------
-! tau = tau2-tau1
-COMPLEX*16 FUNCTION weight_gline(stat, tau, typ)
-  implicit none
-  integer :: stat, typ
-  double precision :: tau
-  integer :: t, flag
-
-  t = Floor(tau*MxT/Beta)
-
-  if(stat == 0) then
-    weight_gline = weight_G(typ, t)
-  else if(stat == 1) then
-    !  Have measuring vertex around
-    weight_gline = weight_meas_G(t)
-  else
-    call LogFile%WriteStamp('e')
-    call LogFile%WriteLine("The number of update: "+str(iupdate))
-    call LogFile%WriteLine("line status error!"+str(stat))
-    call print_config
-    stop
-  endif
-
-  !---------------------- for test --------------------------------------
-  !t = Floor(tau*MxT/Beta)
-
-  !flag = 0
-  !if(t<0) then
-    !tau = tau +Beta
-    !flag = 1
-  !endif
-
-  !if(stat == 0) then
-
-    !!weight_gline = cdexp(-(0.d0, 1.d0)*pi*tau/(2.d0*Beta))
-    !weight_gline = (1.d0, 0.d0)
-    !!weight_gline = dcmplx(Beta-tau, 0.d0)
-    !if(flag==1) then
-      !weight_gline = -1.d0*weight_gline
-    !endif
-
-  !else if(stat==1) then
-    !weight_gline = weight_meas_G(t)
-  !else
-    !call LogFile%WriteStamp('e')
-    !call LogFile%WriteLine("The number of update: "+str(iupdate))
-    !call LogFile%WriteLine("line status error!"+str(stat))
-    !stop
-  !endif
-  !------------------------ end -----------------------------------------
-
-  return
-END FUNCTION weight_gline
-
-
-
-!-------- the weight of a wline -------------------------
-
-! dx = x2-x1;  dy = y2- y1; tau = tau2-tau1
-COMPLEX*16 FUNCTION weight_wline(stat, isdelta, dr0, tau, typ)
-  implicit none
-  integer :: stat, isdelta, dx, dy, typ
-  integer :: dr0(2)
-  integer :: dr(2)
-  double precision :: tau
-  integer :: t
-
-  t = Floor(tau*MxT/Beta)
-
-  call diff_r(dr0, dr)
-
-  if(stat == 0) then
-    if(isdelta==0) weight_wline = weight_W(typ, dr, t)
-    if(isdelta==1) weight_wline = weight_W0(typ, dr)
-  else if(stat == 2) then
-    ! Have Ira or Masha around 
-    if(isdelta==0) weight_wline = weight_W(1, dr, t)
-    if(isdelta==1) weight_wline = weight_W0(1, dr)
-  else if(stat == 1 .or. stat==3) then
-    ! Have measuring vertex around
-    if(isdelta==0) weight_wline = weight_meas_W(dr, t)
-    if(isdelta==1) weight_wline = (0.d0, 0.d0)
-  else
-    call LogFile%WriteStamp('e')
-    call LogFile%WriteLine("The number of update: "+str(iupdate))
-    call LogFile%WriteLine("line status error!"+str(stat))
-    call print_config
-    stop
-  endif
-
-  !---------------------- for test --------------------------------------
-  !if(stat >= 0 .and. stat<=3) then
-    !if(isdelta==0 .and. dr(1)==0 .and. dr(2)==0) then
-      !weight_wline = weight_meas_W(dr, t)
-    !else 
-      !weight_wline = (0.d0, 0.d0)
-    !endif
-
-    !!if(isdelta==0) weight_wline = weight_meas_W(dr, t)
-    !!if(isdelta==1) weight_wline = weight_meas_W(dr, 0)
-  !else
-    !call LogFile%WriteStamp('e')
-    !call LogFile%WriteLine("The number of update: "+str(iupdate))
-    !call LogFile%WriteLine("line status error!"+str(stat))
-    !stop
-  !endif
-  !------------------------ end -----------------------------------------
-
-  return
-END FUNCTION weight_wline
-
-!-------- the weight of a vertex ------------------------
- !dx = xg-xw;  dy = yg-yw; dtau1 = tau3-tau2; dtau2 = tau1-tau3
-
-COMPLEX*16 FUNCTION weight_vertex(stat, isdelta, dr0, dtau1, dtau2, typ)
-  implicit none
-  integer :: stat, dr(2), t1, t2, typ, isdelta
-  integer :: dr0(2), flag
-  double precision :: weight
-  double precision :: dtau1, dtau2
-
-  t1 = Floor(dtau1*MxT/Beta)
-  t2 = Floor(dtau2*MxT/Beta)
-
-  call diff_r(dr0, dr)
-
-  if(stat==0) then
-    if(isbold) then
-      !----------------- for bold Gamma ------------------------------
-      if(isdelta==0) weight_vertex = weight_Gam(typ, dr, t1, t2)
-      if(isdelta==1) weight_vertex = weight_Gam0(typ, dr)
-    else
-      !----------------- for bare Gamma ------------------------------
-      if(isdelta==0) weight_vertex = (0.d0, 0.d0)
-      if(isdelta==1) weight_vertex = weight_Gam0(typ, dr)
-    endif
-
-  else if(stat==2) then
-    if(isbold) then
-      !----------------- for bold Gamma ------------------------------
-      if(isdelta==0) weight_vertex = weight_Gam(typ, dr, t1, t2)
-      if(isdelta==1) weight_vertex = weight_Gam0(typ, dr)
-    else 
-      !----------------- for bare Gamma ------------------------------
-      if(isdelta==0) weight_vertex = (0.d0, 0.d0)
-      if(isdelta==1) weight_vertex = weight_Gam0(typ, dr)
-    endif
-
-  else if(stat==1 .or. stat==3) then
-    if(isdelta==0) weight_vertex = (0.d0, 0.d0)
-    if(isdelta==1) weight_vertex = weight_meas_Gam0(typ, dr)
-  else
-    call LogFile%WriteStamp('e')
-    call LogFile%WriteLine("The number of update: "+str(iupdate))
-    call LogFile%WriteLine("vertex status error!"+str(stat))
-    stop
-  endif
-
-  !---------------------- for test --------------------------------------
-  !flag = 0
-  !if(t1<0) then
-    !dtau1 = dtau1 + Beta
-    !flag = flag + 1
-  !endif
-  !if(t2<0) then
-    !dtau2 = dtau2 + Beta
-    !flag = flag + 1
-  !endif
-
-  !if(stat==0 .or. stat==2) then
-    !if(isdelta==1) weight_vertex = weight_meas_Gam(typ, dr)
-    !if(isdelta==0) then
-      !weight_vertex = (0.d0, 0.d0)
-      !if(dr(1)==0 .and. dr(2)==0) then
-        !if(typ==1 .or. typ==2 .or. typ==5 .or. typ==6) then
-          !if(mod(flag, 2)==0) then
-            !weight_vertex = dcmplx(dtau1**2.d0+dtau2**2.d0+1.d0, 0.d0)
-            !!weight_vertex = (1.d0, 0.d0)
-          !else 
-            !weight_vertex = dcmplx(-1.d0*(dtau1**2.d0+dtau2**2.d0+1.d0), 0.d0)
-            !!weight_vertex = (-1.d0, 0.d0)
-          !endif
-        !endif
-      !endif
-    !endif
-
-  !else if(stat==1 .or. stat==3) then
-    !if(isdelta==1) weight_vertex = weight_meas_Gam(typ, dr)
-    !if(isdelta==0) weight_vertex = (0.d0, 0.d0)
-
-  !else
-    !call LogFile%WriteStamp('e')
-    !call LogFile%WriteLine("The number of update: "+str(iupdate))
-    !call LogFile%WriteLine("vertex status error!"+str(stat))
-    !stop
-  !endif
-  !------------------------ end -----------------------------------------
-  return
-END FUNCTION weight_vertex
-
-
 
 !-------- the weight ratio of new/old config -------------------------
 SUBROUTINE weight_ratio(Pacc, sgn, Anew, Aold)
