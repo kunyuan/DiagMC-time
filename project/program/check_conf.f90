@@ -24,7 +24,7 @@ SUBROUTINE check_isdelta
   if(IsDeltaVertex(MeasureGam)/=1) then
     call LogFile%WriteStamp('e')
     call LogFile%WriteLine("Oops, check_isdelta found a bug!")
-    call LogFile%WriteLine("IsWormPresent:"+str(IsWormPresent)+", update number:"+str(iupdate))
+    call LogFile%WriteLine("IsWormPresent:"+str(IsWormPresent)+", imc:"+str(imc))
     call LogFile%WriteLine("Diagramorder:"+str(Order)+", MeasureGam:"+str(MeasureGam))
     stop
   endif
@@ -32,7 +32,7 @@ SUBROUTINE check_isdelta
   if(IsDeltaLn(NeighVertex(3, MeasureGam))/=0) then
     call LogFile%WriteStamp('e')
     call LogFile%WriteLine("Oops, check_isdelta found a bug!")
-    call LogFile%WriteLine("IsWormPresent:"+str(IsWormPresent)+", update number:"+str(iupdate))
+    call LogFile%WriteLine("IsWormPresent:"+str(IsWormPresent)+", imc:"+str(imc))
     call LogFile%WriteLine("Diagramorder:"+str(Order)+", MeasureGam:"+str(NeighVertex(3,MeasureGam)))
     stop
   endif
@@ -48,7 +48,7 @@ SUBROUTINE check_topo
   if(NGLn/=2*(Order+1) .or. NWLn/=Order+1 .or. NVertex/=2*(Order+1)) then
     call LogFile%WriteStamp('e')
     call LogFile%WriteLine("Oops, check_topo found a bug!")
-    call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+", update number"+str(iupdate))
+    call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+", imc"+str(imc))
     call LogFile%WriteLine("Diagram order"+str(Order))
     call LogFile%WriteLine("number of glines"+str(NGLn)+",number of wlines"+str(NWLn)+ &
       & ",number of gamma"+str(NVertex))
@@ -60,7 +60,7 @@ SUBROUTINE check_topo
     if(LnValue2Key(GLnKey2Value(i))/=i) then
       call LogFile%WriteStamp('e')
       call LogFile%WriteLine("Oops, check_topo found a bug!")
-      call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+", update number"+str(iupdate))
+      call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+", imc"+str(imc))
       call LogFile%WriteLine("gline's location is wrong!")
       call LogFile%WriteLine("real location"+str(i)+",gline's number"+str(GLnKey2Value(i))+",gline's &
         & location"+str(LnValue2Key(GLnKey2Value(i))))
@@ -71,50 +71,42 @@ SUBROUTINE check_topo
 
   flag(:)=.false.
   do i = 1, NGLn
-    NextLn = GLnKey2Value(i)
-    curG=NextLn
+    curG = GLnKey2Value(i)
+    if(flag(curG)==.true.) cycle
+    flag(curG)=.true.
+    NextLn = NeighVertex(2, NeighLn(2, curG))
     nLn=1
-    if(flag(NextLn)==.true.) cycle
-    flag(NextLn)=.true.
-    do while(NextLn/=GLnKey2Value(1))
-      NextLn = NeighVertex(2, NeighLn(2, NextLn))
+    do while(NextLn/=curG)
       nLn=nLn+1
       if(flag(NextLn)==.true.) then
+        !print *,curG, NextLn
         call LogFile%WriteStamp('e')
         call LogFile%WriteLine("Oops, check_topo found a bug!")
-        call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+", update number"+str(iupdate))
+        call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+", imc"+str(imc))
         call LogFile%WriteLine("The Fermi loop has mulitiple branches!")
         call LogFile%WriteLine("The gline number in a loop:"+str(NextLn))
         call print_config
         stop
       endif
+      flag(NextLn)=.true.
       if(nLn>NGLn) then
         call LogFile%WriteStamp('e')
         call LogFile%WriteLine("Oops, check_topo found a bug!")
-        call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+", update number"+str(iupdate))
+        call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+", imc"+str(imc))
         call LogFile%WriteLine("The Fermi loop is wrong!")
         call LogFile%WriteLine("The gline number in a loop:"+str(nLn))
         call print_config
         stop
       endif
+      NextLn = NeighVertex(2, NeighLn(2, NextLn))
     enddo
-
-    if(curG/=NGLn) then
-      call LogFile%WriteStamp('e')
-      call LogFile%WriteLine("Oops, check_topo found a bug!")
-      call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+", update number"+str(iupdate))
-      call LogFile%WriteLine("The Fermi loop is wrong!")
-      call LogFile%WriteLine("The gline number in a loop:"+str(nLn))
-      call print_config
-      stop
-    endif
   enddo
 
   do i = 1, NWLn
     if(LnValue2Key(WLnKey2Value(i))/=i) then
       call LogFile%WriteStamp('e')
       call LogFile%WriteLine("Oops, check_topo found a bug!")
-      call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+", update number"+str(iupdate))
+      call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+", imc"+str(imc))
       call LogFile%WriteLine("wline's location is wrong!")
       call LogFile%WriteLine("real location"+str(i)+",wline's number"+str(WLnKey2Value(i))+",wline's &
         & location"+str(LnValue2Key(WLnKey2Value(i))))
@@ -126,7 +118,7 @@ SUBROUTINE check_topo
       if(NeighLn(1, WLnKey2Value(i))==NeighLn(2, WLnKey2Value(i))) then
         call LogFile%WriteStamp('e')
         call LogFile%WriteLine("Oops, check_topo found a bug!")
-        call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+", update number"+str(iupdate))
+        call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+", imc"+str(imc))
         call LogFile%WriteLine("wline's topology is wrong!")
         call LogFile%WriteLine("wline's number"+str(WLnKey2Value(i))+",wline's left Gam"+str(NeighLn(1, &
           &  WLnKey2Value(i)))+",right Gam"+str(NeighLn(2, WLnKey2Value(i))))
@@ -140,7 +132,7 @@ SUBROUTINE check_topo
     if(VertexValue2Key(VertexKey2Value(i))/=i) then
       call LogFile%WriteStamp('e')
       call LogFile%WriteLine("Oops, check_topo found a bug!")
-      call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+", update number"+str(iupdate))
+      call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+", imc"+str(imc))
       call LogFile%WriteLine("gamma's location is wrong!")
       call LogFile%WriteLine("real location"+str(i)+",gamma's number"+str(VertexKey2Value(i))+",gamma's &
         & location"+str(VertexValue2Key(VertexKey2Value(i))))
@@ -162,7 +154,7 @@ SUBROUTINE check_stat
     if(StatusVertex(Ira)<=1)  then
       call LogFile%WriteStamp('e')
       call LogFile%WriteLine("Oops, check_stat found a bug!")
-      call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+",update number"+str(iupdate))
+      call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+",imc"+str(imc))
       call LogFile%WriteLine("Ira's status is wrong!")
       call LogFile%WriteLine("Ira's number"+str(Ira)+",Ira's status"+str(StatusVertex(Ira)))
       call print_config
@@ -172,7 +164,7 @@ SUBROUTINE check_stat
     if(StatusVertex(Masha)<=1)  then
       call LogFile%WriteStamp('e')
       call LogFile%WriteLine("Oops, check_stat found a bug!")
-      call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+",update number"+str(iupdate))
+      call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+",imc"+str(imc))
       call LogFile%WriteLine("Masha's status is wrong!")
       call LogFile%WriteLine("Masha's number"+str(Masha)+",Masha's status"+str(StatusVertex(Masha)))
       call print_config
@@ -191,7 +183,7 @@ SUBROUTINE check_stat
     if(StatusVertex(i)/=stat) then
       call LogFile%WriteStamp('e')
       call LogFile%WriteLine("Oops, check_stat found a bug!")
-      call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+",update number"+str(iupdate))
+      call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+",imc"+str(imc))
       call LogFile%WriteLine("Gamma's status is wrong!")
       call LogFile%WriteLine("Gamma's number"+str(i)+",real status"+str(stat)+",Gamma's status"+str(StatusVertex(i)))
       call print_config
@@ -206,7 +198,7 @@ SUBROUTINE check_stat
     if(StatusLn(i)/=stat) then
       call LogFile%WriteStamp('e')
       call LogFile%WriteLine("Oops, check_stat found a bug!")
-      call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+",update number"+str(iupdate))
+      call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+",imc"+str(imc))
       call LogFile%WriteLine("line's status is wrong!")
       call LogFile%WriteLine("line's number"+str(i)+",real status"+str(stat)+",line's status"+str(StatusLn(i)))
       call print_config
@@ -225,7 +217,7 @@ SUBROUTINE check_stat
     if(StatusLn(i)/=stat) then
       call LogFile%WriteStamp('e')
       call LogFile%WriteLine("Oops, check_stat found a bug!")
-      call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+",update number"+str(iupdate))
+      call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+",imc"+str(imc))
       call LogFile%WriteLine("line's status is wrong!")
       call LogFile%WriteLine("line's number"+str(i)+",real status"+str(stat)+",line's status"+str(StatusLn(i)))
       call print_config
@@ -245,7 +237,7 @@ SUBROUTINE check_time
         & /=TVertex(3, i)) then
         call LogFile%WriteStamp('e')
         call LogFile%WriteLine("Oops, check_time found a bug!")
-        call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+",update number"+str(iupdate))
+        call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+",imc"+str(imc))
         call LogFile%WriteLine("delta Gamma is wrong!")
         call LogFile%WriteLine("gamma's number"+str(i)+",time"+str(TVertex(1, i))+str(TVertex(2, i))+str(TVertex(3, i)))
         call print_config
@@ -260,7 +252,7 @@ SUBROUTINE check_time
       if(TVertex(3, NeighLn(1, i))/=TVertex(3, NeighLn(2, i))) then
         call LogFile%WriteStamp('e')
         call LogFile%WriteLine("Oops, check_time found a bug!")
-        call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+",update number"+str(iupdate))
+        call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+",imc"+str(imc))
         call LogFile%WriteLine("delta W is wrong!")
         call LogFile%WriteLine("W's number"+str(i)+",time"+str(TVertex(3,NeighLn(1,i)))+str(TVertex(3,NeighLn(2,i))))
         call print_config
@@ -280,7 +272,7 @@ SUBROUTINE check_site
     if(GRVertex(1, i)<0 .or. GRVertex(1, i)>L(1)-1) then
       call LogFile%WriteStamp('e')
       call LogFile%WriteLine("Oops, check_site found a bug!")
-      call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+",update number"+str(iupdate))
+      call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+",imc"+str(imc))
       call LogFile%WriteLine("GX is wrong!")
       call LogFile%WriteLine("gamma's number"+str(i)+",GX"+str(GRVertex(1, i)))
       call print_config
@@ -289,7 +281,7 @@ SUBROUTINE check_site
     if(GRVertex(2, i)<0 .or. GRVertex(2, i)>L(2)-1) then
       call LogFile%WriteStamp('e')
       call LogFile%WriteLine("Oops, check_site found a bug!")
-      call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+",update number"+str(iupdate))
+      call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+",imc"+str(imc))
       call LogFile%WriteLine("GY is wrong!")
       call LogFile%WriteLine("gamma's number"+str(i)+",GY"+str(GRVertex(2, i)))
       call print_config
@@ -298,7 +290,7 @@ SUBROUTINE check_site
     if(WRVertex(1, i)<0 .or. WRVertex(1, i)>L(1)-1) then
       call LogFile%WriteStamp('e')
       call LogFile%WriteLine("Oops, check_site found a bug!")
-      call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+",update number"+str(iupdate))
+      call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+",imc"+str(imc))
       call LogFile%WriteLine("GY is wrong!")
       call LogFile%WriteLine("gamma's number"+str(i)+",WX"+str(WRVertex(1, i)))
       call print_config
@@ -307,7 +299,7 @@ SUBROUTINE check_site
     if(WRVertex(2, i)<0 .or. WRVertex(2, i)>L(2)-1) then
       call LogFile%WriteStamp('e')
       call LogFile%WriteLine("Oops, check_site found a bug!")
-      call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+",update number"+str(iupdate))
+      call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+",imc"+str(imc))
       call LogFile%WriteLine("GY is wrong!")
       call LogFile%WriteLine("gamma's number"+str(i)+",WY"+str(WRVertex(2, i)))
       call print_config
@@ -339,7 +331,7 @@ SUBROUTINE check_k_conserve
     if(k/=0) then
       call LogFile%WriteStamp('e')
       call LogFile%WriteLine("Oops, check_k_conserve found a bug!")
-      call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+",update number"+str(iupdate))
+      call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+",imc"+str(imc))
       call LogFile%WriteLine("k on gamma is not conserved!")
       call LogFile%WriteLine("gamma's number"+str(i)+",k"+str(k))
       call print_config
@@ -394,7 +386,7 @@ SUBROUTINE check_type
     if(flag==1 .or. flag==2) then
       call LogFile%WriteStamp('e')
       call LogFile%WriteLine("Oops, check_type found a bug!")
-      call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+",update number"+str(iupdate))
+      call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+",imc"+str(imc))
       call LogFile%WriteLine("The type of Gamma is wrong!")
       call LogFile%WriteLine("wline's number"+str(i)+",Gamma"+str(Gam1)+str(Gam2))
       call print_config
@@ -402,7 +394,7 @@ SUBROUTINE check_type
     else if(flag==3) then
       call LogFile%WriteStamp('e')
       call LogFile%WriteLine("Oops, check_type found a bug!")
-      call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+",update number"+str(iupdate))
+      call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+",imc"+str(imc))
       call LogFile%WriteLine("The type of wline is wrong!")
       call LogFile%WriteLine("wline's number"+str(i)+",Gamma"+str(Gam1)+str(Gam2))
       call LogFile%WriteLine(str(TypeLn(i))+str(TypeVertex(Gam1))+str(TypeVertex(Gam2)))
@@ -411,7 +403,7 @@ SUBROUTINE check_type
     else if(flag==4) then
       call LogFile%WriteStamp('e')
       call LogFile%WriteLine("Oops, check_type found a bug!")
-      call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+",update number"+str(iupdate))
+      call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+",imc"+str(imc))
       call LogFile%WriteLine("The type of glines are wrong!")
       call LogFile%WriteLine("wline's number"+str(i)+",Gamma"+str(Gam1)+str(Gam2))
       call LogFile%WriteLine(str(sum1)+str(TypeLn(G1))+str(TypeLn(G3))+str(TypeLn(G2))+str(TypeLn(G4)))
@@ -420,7 +412,7 @@ SUBROUTINE check_type
     else if(flag==5) then
       call LogFile%WriteStamp('e')
       call LogFile%WriteLine("Oops, check_type found a bug!")
-      call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+",update number"+str(iupdate))
+      call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+",imc"+str(imc))
       call LogFile%WriteLine("The type of gamma inside lines are wrong!")
       call LogFile%WriteLine("wline's number"+str(i)+",Gamma"+str(Gam1)+str(Gam2))
       call LogFile%WriteLine(str(sum1)+str(SpInVertex(1, &
@@ -451,7 +443,7 @@ SUBROUTINE check_irreducibility
           call LogFile%WriteStamp('e')
           call LogFile%WriteLine('imc:'+str(imc))
           call LogFile%WriteLine("Oops, check_irreducibility found a bug!")
-          call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+",update number"+str(iupdate))
+          call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+",imc"+str(imc))
           call LogFile%WriteLine("Gline is not irreducible!")
           call LogFile%WriteLine("Gline's number"+str(Gi)+",k"+str(kLn(Gi)))
           call print_config
@@ -468,7 +460,7 @@ SUBROUTINE check_irreducibility
         call LogFile%WriteStamp('e')
         call LogFile%WriteLine('imc:'+str(imc))
         call LogFile%WriteLine("Oops, check_irreducibility found a bug!")
-        call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+",update number"+str(iupdate))
+        call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+",imc"+str(imc))
         call LogFile%WriteLine("Wline is not irreducible!")
         call LogFile%WriteLine("Wline's number"+str(Wi)+",k"+str(kLn(Wi)))
         call print_config
@@ -481,7 +473,7 @@ SUBROUTINE check_irreducibility
           call LogFile%WriteStamp('e')
           call LogFile%WriteLine('imc:'+str(imc))
           call LogFile%WriteLine("Oops, check_irreducibility found a bug!")
-          call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+",update number"+str(iupdate))
+          call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+",imc"+str(imc))
           call LogFile%WriteLine("Wline is not irreducible!")
           call LogFile%WriteLine("Wline's number"+str(Wi)+",k"+str(kLn(Wi)))
           call print_config
@@ -510,7 +502,7 @@ SUBROUTINE check_irreducibility
             call LogFile%WriteStamp('e')
             call LogFile%WriteLine('imc:'+str(imc))
             call LogFile%WriteLine("Oops, check_irreducibility found a bug!")
-            call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+",update number"+str(iupdate))
+            call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+",imc"+str(imc))
             call LogFile%WriteLine("Gamma is not irreducible!")
             call LogFile%WriteLine("Gline's number"+str(Gi)+str(Gj)+",Wline"+str(Wk)+ &
                 & ",k"+str(kLn(Gi))+str(kLn(Gj))+str(kLn(Wk)))
@@ -566,7 +558,7 @@ SUBROUTINE check_weight
   if(abs(real(Phase*WeightCurrent-weight))>1.d-6.or.abs(dimag(Phase*WeightCurrent-weight))>1.d-6) then
     call LogFile%WriteStamp('e')
     call LogFile%WriteLine("Oops, check_weight found a bug!")
-    call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+",update number"+str(iupdate))
+    call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+",imc"+str(imc))
     call LogFile%WriteLine("real weight"+str(weight))
     call LogFile%WriteLine("current weight"+str(Phase*WeightCurrent))
     call LogFile%WriteLine(str(Order)+str(Beta))

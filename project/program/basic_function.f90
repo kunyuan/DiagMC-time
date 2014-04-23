@@ -643,9 +643,16 @@ SUBROUTINE update_Hash4G(oldk, newk)
   implicit none
   integer, intent(in) :: oldk, newk
 
-  Hash4G(newk)=Hash4G(oldk)
-  Hash4G(oldk)=0
-
+  if(CheckG .and. Hash4G(newk)/=0) then
+      call LogFile%WriteStamp('e')
+      call LogFile%WriteLine("Oops, update_Hash4G found a bug!")
+      call LogFile%WriteLine("IsWormPresent:"+str(IsWormPresent)+", update number:"+str(iupdate))
+      call LogFile%WriteLine("G Hash table for old k"+str(newk)+" is not 1!!"+str(Hash4G(newk)))
+      call print_config
+  else
+    Hash4G(newk)=Hash4G(oldk)
+    Hash4G(oldk)=0
+  endif
   return
 END SUBROUTINE update_Hash4G
 
@@ -653,8 +660,16 @@ SUBROUTINE add_Hash4G(newk, GLn)
   implicit none
   integer, intent(in) :: newk, GLn
   !MAKE SURE Hash4G(newk)==0 BEFORE CALL THIS SUBROUTINE
+  if(CheckG .and. Hash4G(newk)/=0) then
+      call LogFile%WriteStamp('e')
+      call LogFile%WriteLine("Oops, add_Hash4G found a bug!")
+      call LogFile%WriteLine("IsWormPresent:"+str(IsWormPresent)+", update number:"+str(iupdate))
+      call LogFile%WriteLine("G Hash table for old k"+str(newk)+" is not 1!!"+str(Hash4G(newk)))
+      call print_config
+  else
+    Hash4G(newk)=GLn
+  endif
 
-  Hash4G(newk)=GLn
 END SUBROUTINE add_Hash4G
 
 SUBROUTINE delete_Hash4G(oldk, GLn)
@@ -758,39 +773,35 @@ END FUNCTION Is_reducible_G
 LOGICAL FUNCTION Is_reducible_G_Gam(GLn)
   implicit none
   integer, intent(in) :: GLn
+  integer :: NeighGLn1, NeighGLn2
   integer :: nG, Gam1, Gam2, W1, W2, nW
   integer :: newk, kG 
   integer :: i, nnk1, nnk2
 
+  !Is_reducible_G_Gam=Is_reducible_Gam()
+  !return
   Is_reducible_G_Gam = .false.
   if(CheckGam==.false.) return
 
-  newk = kLn(GLn)
-
   Gam1 = NeighLn(1, GLn)
-  Gam2 = NeighLn(2, GLn)
   W1 = NeighVertex(3, Gam1)
+  NeighGLn1 = NeighVertex(1, Gam1)
+  Gam2 = NeighLn(2, GLn)
   W2 = NeighVertex(3, Gam2)
+  NeighGLn2 = NeighVertex(2, Gam2)
+
+  newk = kLn(GLn)
 
   do i = 1, NGLn
     nG = GLnKey2Value(i)
-    if(nG==GLn)   cycle             !! rule out the line itself
-    if(nG==NeighVertex(1, Gam1) .or. nG==NeighVertex(2, Gam2)) cycle
+    if(nG==GLn) cycle  !don't test GLn itself
     kG = kLn(nG)
-    !if(abs(add_k(newk,-kG))==abs(kLn(W1)) .or. &
-      !& abs(add_k(newk,-kG))==abs(kLn(W2))) then
-      !call LogFile%QuickLog(str(newk)+str(kG)+str(kLn(W1))+str(kLn(W2))+" imc:"+str(imc))
-      !stop
-      !continue
-      !cycle !! rule out the neighbor wlines of newk
-    !endif
-    nnk1 = kLn(NeighVertex(3, NeighLn(1, nG)))
-    nnk2 = kLn(NeighVertex(3, NeighLn(2, nG)))
-    if(abs(add_k(newk, -kG))==abs(nnk1) .or. &
-      & abs(add_k(newk, -kG))==abs(nnk2)) cycle !! rule out the neighbor wlines of neighbor of newk
-
-    if(Hash4W(abs(add_k(newk,-kG)))/=0) then
+    nW=Hash4W(abs(add_k(newk,-kG)))
+    if(nW/=0) then
+      if(nW==W1 .and. nG==NeighGLn1) cycle
+      if(nW==W2 .and. nG==NeighGLn2) cycle
       Is_reducible_G_Gam = .true.
+      return
     endif
   enddo
     
@@ -842,6 +853,9 @@ LOGICAL FUNCTION Is_reducible_W_Gam(WLn)
   integer :: absk, i, Gam1, Gam2, G1, G2, G3, G4, kG5, kG6
   integer :: nG, kG, pkGG, nkGG
 
+  Is_reducible_W_Gam=Is_reducible_Gam()
+  return
+
   Is_reducible_W_Gam = .false.
   if(CheckGam) return
 
@@ -853,25 +867,53 @@ LOGICAL FUNCTION Is_reducible_W_Gam(WLn)
   G3 = NeighVertex(1, Gam2)
   G4 = NeighVertex(2, Gam2)
 
-  do i = 1, NGLn
-    nG = GLnKey2Value(i)
-    kG5 = kLn(NeighVertex(1, NeighLn(1,nG)))
-    kG6 = kLn(NeighVertex(2, NeighLn(2,nG)))
-    kG = kLn(nG)
-    if(nG==G1 .or. nG==G2 .or. nG==G3 .or. nG==G4) cycle
-    pkGG = add_k(kG, absk)
-    nkGG = add_k(kG, -absk)
-    if(pkGG==kLn(G1) .or. pkGG==kLn(G2) .or. pkGG==kLn(G3) .or. pkGG==kLn(G4)) cycle
-    if(nkGG==kLn(G1) .or. nkGG==kLn(G2) .or. nkGG==kLn(G3) .or. nkGG==kLn(G4)) cycle
-    if(pkGG==kG5 .or. pkGG==kG6 .or. nkGG==kG5 .or. nkGG==kG6) cycle
+  !do i = 1, NGLn
+    !nG = GLnKey2Value(i)
+    !kG5 = kLn(NeighVertex(1, NeighLn(1,nG)))
+    !kG6 = kLn(NeighVertex(2, NeighLn(2,nG)))
+    !kG = kLn(nG)
+    !if(nG==G1 .or. nG==G2 .or. nG==G3 .or. nG==G4) cycle
+    !pkGG = add_k(kG, absk)
+    !nkGG = add_k(kG, -absk)
+    !if(pkGG==kLn(G1) .or. pkGG==kLn(G2) .or. pkGG==kLn(G3) .or. pkGG==kLn(G4)) cycle
+    !if(nkGG==kLn(G1) .or. nkGG==kLn(G2) .or. nkGG==kLn(G3) .or. nkGG==kLn(G4)) cycle
+    !if(pkGG==kG5 .or. pkGG==kG6 .or. nkGG==kG5 .or. nkGG==kG6) cycle
 
-    if(Hash4G(pkGG)==1 .or. Hash4G(nkGG)==1) then
-      Is_reducible_W_Gam = .true.
-    endif
-  enddo
-  return
+    !if(Hash4G(pkGG)==1 .or. Hash4G(nkGG)==1) then
+      !Is_reducible_W_Gam = .true.
+    !endif
+  !enddo
+  !return
 END FUNCTION Is_reducible_W_Gam
 
+
+logical FUNCTION Is_reducible_Gam()
+  implicit none
+  integer :: i,j, k, Gi, Gj, Wk, Gam1, Gam2
+  Is_reducible_Gam = .false.
+  if(CheckGam==.false.) return
+
+  do i = 1, NGLn
+    Gi = GLnKey2Value(i)
+    do j = i+1, NGLn
+      Gj = GLnKey2Value(j)
+      !if(NeighLn(1,Gi)==NeighLn(2,Gj) .or. NeighLn(2,Gi)==NeighLn(1,Gj)) cycle
+      do k = 1, NWLn
+        Wk = WLnKey2Value(k)
+        if(abs(add_k(kLn(Gi), -kLn(Gj)))==abs(kLn(Wk))) then
+          Gam1=NeighLn(1,Wk)
+          Gam2=NeighLn(2,Wk)
+          if(NeighVertex(1,Gam1)==Gi .and. NeighVertex(2,Gam1)==Gj) cycle
+          if(NeighVertex(2,Gam1)==Gi .and. NeighVertex(1,Gam1)==Gj) cycle
+          if(NeighVertex(1,Gam2)==Gi .and. NeighVertex(2,Gam2)==Gj) cycle
+          if(NeighVertex(2,Gam2)==Gi .and. NeighVertex(1,Gam2)==Gj) cycle
+          Is_reducible_Gam=.true.
+          return
+        endif
+      enddo
+    enddo
+  enddo
+end FUNCTION
 !!=======================================================================
 !!=======================================================================
 !!=======================================================================
@@ -1009,6 +1051,32 @@ INTEGER FUNCTION gline_stat(stat1, stat2)
   return
 END FUNCTION gline_stat
 
+!------------- update a line  -------------------------------
+!mainly to add the new k to the hash table
+SUBROUTINE update_line(CurLine, k, knd)
+  implicit none
+  integer, intent(in) :: CurLine, k, knd
+
+  kLn(CurLine)=k
+  if(knd==1) then
+    call add_Hash4G(k, CurLine)
+  else
+    call add_Hash4W(k, CurLine)
+  endif
+end SUBROUTINE 
+
+SUBROUTINE undo_update_line(CurLine, k, knd)
+  implicit none
+  integer, intent(in) :: CurLine, k, knd
+  kLn(CurLine)=k
+  if(knd==1) then
+    call delete_Hash4G(k, CurLine)
+  else
+    call delete_Hash4W(k, CurLine)
+  endif
+end SUBROUTINE
+
+
 !------------- insert a line to the link -------------------
 SUBROUTINE insert_line(newline, isdelta, k, knd, typ, stat, weigh)
   implicit none
@@ -1034,10 +1102,12 @@ SUBROUTINE insert_line(newline, isdelta, k, knd, typ, stat, weigh)
     NGLn = NGLn + 1
     GLnKey2Value(NGLn) = newline
     LnValue2Key(newline) = NGLn
+    call add_Hash4G(k,newline)
   else
     NWLn = NWLn + 1
     WLnKey2Value(NWLn) = newline
     LnValue2Key(newline) = NWLn
+    call add_Hash4W(k,newline)
   endif
 
   kLn(newline) = k
@@ -1055,15 +1125,12 @@ SUBROUTINE undo_insert_line(occline, knd)
   integer, intent(in) :: occline, knd
   integer :: tmp
 
+
   if(StatusLn(occline)==-1) then
     call LogFile%QuickLog("update: "+str(iupdate)+" , undo_insert_line error!!!", 'e')
     call print_config
     stop
   endif
-
-  NextLn(occline) = TailLn
-  StatusLn(occline) = -1
-  TailLn = occline
 
   if(knd==1) then
 
@@ -1072,19 +1139,27 @@ SUBROUTINE undo_insert_line(occline, knd)
     GLnKey2Value(LnValue2Key(occline)) = tmp
     LnValue2Key(tmp) = LnValue2Key(occline)
     NGLn = NGLn -1
+    call delete_Hash4G(kLn(occline),occline)
   else
-
     tmp = WLnKey2Value(NWLn)
     WLnKey2Value(NWLn) = 0
     WLnKey2Value(LnValue2Key(occline)) = tmp
     LnValue2Key(tmp) = LnValue2Key(occline)
     NWLn = NWLn -1
+    call delete_Hash4W(kLn(occline),occline)
   endif
+
+  NextLn(occline) = TailLn
+  StatusLn(occline) = -1
+  TailLn = occline
+
 
   if(TailLn == -1) then
     call LogFile%QuickLog("undo_insert_line error! tail=-1!", 'e')
     stop
   endif
+
+
   return
 END SUBROUTINE undo_insert_line
 
@@ -1140,7 +1215,7 @@ SUBROUTINE delete_line(occline, knd)
 
   
   if(knd==1) then
-    !call delete_Hash4G(kLn(occline))
+    call delete_Hash4G(kLn(occline), occline)
   else
     call delete_Hash4W(kLn(occline), occline)
   endif
@@ -1179,9 +1254,9 @@ SUBROUTINE delete_line(occline, knd)
 END SUBROUTINE delete_line
 
 !------------- insert a gamma to the link -------------------
-SUBROUTINE undo_delete_line(newline, knd, stat)
+SUBROUTINE undo_delete_line(newline, knd, stat, k)
   implicit none
-  integer, intent(in) :: newline, knd, stat
+  integer, intent(in) :: newline, knd, stat, k
 
   if(TailLn/=newline)    then
     call LogFile%QuickLog("update: "+str(iupdate)+"  ,undo_delete_line error!!!", 'e')
@@ -1200,12 +1275,12 @@ SUBROUTINE undo_delete_line(newline, knd, stat)
     NGLn = NGLn + 1
     GLnKey2Value(NGLn) = newline
     LnValue2Key(newline) = NGLn
-    !call add_Hash4G(kLn(newline))
+    call add_Hash4G(k, newline)
   else
     NWLn = NWLn + 1
     WLnKey2Value(NWLn) = newline
     LnValue2Key(newline) = NWLn
-    call add_Hash4W(kLn(newline), newline)
+    call add_Hash4W(k, newline)
   endif
   return
 END SUBROUTINE undo_delete_line
@@ -2404,17 +2479,22 @@ SUBROUTINE first_order_diagram
 
   ! the momentum on line 1, 2, and 3
   kLn(1) = 100
-  Hash4G(kLn(1)) = 1
+  call add_Hash4G(kLn(1),1)
   kLn(2) = 32
-  Hash4G(kLn(2)) = 1
+  call add_Hash4G(kLn(2),2)
+
   kLn(3) = add_k(kLn(2), -kLn(1))
-  Hash4W(abs(kLn(3))) = 1
+  call add_Hash4W(kLn(3),3)
+
   kLn(4) = 23
-  Hash4G(kLn(4)) = 1
+  call add_Hash4G(kLn(4),4)
+
+
   kLn(5) = add_k(kLn(3), kLn(4))
-  Hash4G(kLn(5)) = 1
+  call add_Hash4G(kLn(5),5)
+
   kLn(6) = add_k(kLn(1), -kLn(4))
-  Hash4W(abs(kLn(6))) = 1
+  call add_Hash4W(kLn(6),6)
 
 
   ! NeighLn(i, j): the ith neighbor gamma of line j
@@ -2555,18 +2635,19 @@ SUBROUTINE first_order_diagram_with_bubble
 
 
   ! the momentum on line 1, 2, and 3
-  kLn(1) = 100
-  Hash4G(kLn(1)) = 1
-  kLn(2) = 32
-  Hash4G(kLn(2)) = 1
-  kLn(3) = add_k(kLn(1), -kLn(1))
-  Hash4W(abs(kLn(3))) = 1
-  kLn(4) = 23
-  Hash4G(kLn(4)) = 1
-  kLn(5) = add_k(kLn(4), kLn(3))
-  Hash4G(kLn(5)) = 1
-  kLn(6) = add_k(kLn(4), -kLn(2))
-  Hash4W(abs(kLn(6))) = 1
+  !TODO: UPDATE THE HASH TABLE
+  !kLn(1) = 100
+  !Hash4G(kLn(1)) = 1
+  !kLn(2) = 32
+  !Hash4G(kLn(2)) = 1
+  !kLn(3) = add_k(kLn(1), -kLn(1))
+  !Hash4W(abs(kLn(3))) = 1
+  !kLn(4) = 23
+  !Hash4G(kLn(4)) = 1
+  !kLn(5) = add_k(kLn(4), kLn(3))
+  !Hash4G(kLn(5)) = 1
+  !kLn(6) = add_k(kLn(4), -kLn(2))
+  !Hash4W(abs(kLn(6))) = 1
 
 
   ! NeighLn(i, j): the ith neighbor gamma of line j
@@ -2710,24 +2791,25 @@ SUBROUTINE second_order_diagram
 
 
   ! the momentum on line 1, 2, and 3
-  kLn(1) = 10
-  Hash4G(kLn(1)) = 1
-  kLn(2) = 21
-  Hash4G(kLn(2)) = 1
-  kLn(3) = add_k(kLn(1), -kLn(2))
-  Hash4W(abs(kLn(3))) = 1
-  kLn(4) = 33
-  Hash4G(kLn(4)) = 1
-  kLn(5) = add_k(kLn(4), -kLn(3))
-  Hash4G(kLn(5)) = 1
-  kLn(6) = 46
-  Hash4W(abs(kLn(6))) = 1
-  kLn(7) = add_k(kLn(4), -kLn(6))
-  Hash4G(kLn(7)) = 1
-  kLn(8) = add_k(kLn(2), kLn(6))
-  Hash4G(kLn(8)) = 1
-  kLn(9) = add_k(kLn(1), -kLn(8))
-  Hash4W(abs(kLn(9))) = 1
+  !TODO: UPDATE THE HASH TABLE
+  !kLn(1) = 10
+  !Hash4G(kLn(1)) = 1
+  !kLn(2) = 21
+  !Hash4G(kLn(2)) = 1
+  !kLn(3) = add_k(kLn(1), -kLn(2))
+  !Hash4W(abs(kLn(3))) = 1
+  !kLn(4) = 33
+  !Hash4G(kLn(4)) = 1
+  !kLn(5) = add_k(kLn(4), -kLn(3))
+  !Hash4G(kLn(5)) = 1
+  !kLn(6) = 46
+  !Hash4W(abs(kLn(6))) = 1
+  !kLn(7) = add_k(kLn(4), -kLn(6))
+  !Hash4G(kLn(7)) = 1
+  !kLn(8) = add_k(kLn(2), kLn(6))
+  !Hash4G(kLn(8)) = 1
+  !kLn(9) = add_k(kLn(1), -kLn(8))
+  !Hash4W(abs(kLn(9))) = 1
 
 
   ! NeighLn(i, j): the ith neighbor gamma of line j
