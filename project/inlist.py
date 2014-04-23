@@ -12,7 +12,7 @@ com_dict={
     "Ly" :  4,
     "Jcp" :  1.0,
     "Beta" :  0.9,
-    "Order" :  1,
+    "Order" :  2,
     }
 
 
@@ -23,7 +23,7 @@ mc_dict={
     "__IsCluster" : False,
     "__AutoRun" : True,
     "IsLoad" : False,
-    "Reweight" : [1],
+    "Reweight" : [1,1],
     #"ReadFile" : "0.90_1_coll",
     "Sample" : 1000000,
     "Sweep" : 10,
@@ -38,9 +38,11 @@ sc_dict={
     "__Execute" : ["python", "./run_loop.py"],
     "__Duplicate" : 0,
     "__IsCluster" : False,
-    "__AutoRun" : True, 
-    "IsLoad" : True,
-    "ReadFile" : "0.90_1_coll",
+    #"__AutoRun" : True, 
+    #"IsLoad" : True,
+    "__AutoRun" : False, 
+    "IsLoad" : False,
+    "ReadFile" : "0.90_2_coll",
     }
 sc_dict.update(com_dict)
 TO_DO.append(job.JobConsistLoop(sc_dict))
