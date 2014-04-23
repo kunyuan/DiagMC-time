@@ -231,8 +231,7 @@ SUBROUTINE markov(IsToss)
           call change_Gamma_isdelta       
         endif
 
-        call check_irreducibility
-
+        !call check_config
       enddo
 
       if( .not. IsToss) call measure
@@ -1048,14 +1047,16 @@ SUBROUTINE add_interaction
   isdelta = 0
 
   q = generate_k()
+  if(Is_k_valid_for_W(q)==.false.) return
   kM = add_k(kMasha, -(-1)**dirW*q)
+
   kIA = add_k(kLn(GIC), -(-1)**(dir+dirW)*q)
+  if(Is_k_valid_for_G(kIA)==.false.) return
+
   kMB = add_k(kLn(GMD), (-1)**(dir+dirW)*q)
+  if(Is_k_valid_for_G(kMB)==.false.) return
 
   if(kIA==kMB)  return       
-  if(Hash4W(abs(add_k(kIA,-kMB)))==1)  return
-  if(Hash4W(abs(add_k(kIA,-kLn(GMD))))==1)  return
-  if(Hash4W(abs(add_k(kLn(GIC),-kMB)))==1)  return
 
   !-------- the new time, spin, type and status for the new config ----
   tauA = generate_tau()
@@ -1125,27 +1126,11 @@ SUBROUTINE add_interaction
 
   !------------ step4 : configuration check ---------------------
   flag=0
-  if(Is_reducible_G(GIA))      flag=1
-  if(flag==0) then
-    if(Is_reducible_G_Gam(GIA)) flag=1
-  endif
-  if(flag==0) then
-    if(Is_reducible_G(GMB)) flag=1
-  endif
-  if(flag==0) then
-    if(Is_reducible_G_Gam(GMB)) flag=1
-  endif
   if(flag==0) then
     if(Is_reducible_G_Gam(GIC)) flag=1
   endif
   if(flag==0) then
     if(Is_reducible_G_Gam(GMD)) flag=1
-  endif
-  if(flag==0) then
-    if(Is_reducible_W(WAB)) flag=1
-  endif
-  if(flag==0) then
-    if(Is_reducible_W_Gam(WAB)) flag=1
   endif
 
   if(flag==1) then
@@ -1192,9 +1177,6 @@ SUBROUTINE add_interaction
 
     !--------------- update k and omega -------------------------
     kMasha = kM
-    call add_Hash4G(kIA,GIC)
-    call add_Hash4G(kMB,GMD)
-    call add_Hash4W(q, WAB)
 
     !--------------- update the status of elements --------------
     StatusLn(GIC) = statAC
@@ -1260,7 +1242,7 @@ END SUBROUTINE add_interaction
 !-----------------------------------------------------------------
 SUBROUTINE remove_interaction
   implicit none
-  integer :: dir, dirW, flag, kM, kIA, kMB
+  integer :: dir, dirW, flag, kM, kIA, kMB, kAB
   integer :: GAC, GBD, GamC, GamD
   integer :: WAB, GIA, GMB, GamA, GamB
   integer :: statIC, statMD, statIA, statMB, statAB
@@ -1291,7 +1273,8 @@ SUBROUTINE remove_interaction
   GamC = NeighLn(dir, GAC);             GamD = NeighLn(dir, GBD)
 
   dirW = DirecVertex(GamA)
-  kM = add_k(kMasha, (-1)**dirW*kLn(WAB))
+  kAB=kLn(WAB)
+  kM = add_k(kMasha, (-1)**dirW*kAB)
   kIA = kLn(GIA)
   kMB = kLn(GMB)
 
@@ -1323,9 +1306,9 @@ SUBROUTINE remove_interaction
     Order = Order + 1
     call undo_delete_gamma(GamB)
     call undo_delete_gamma(GamA)
-    call undo_delete_line(WAB, 2, statAB)
-    call undo_delete_line(GMB, 1, statMB)
-    call undo_delete_line(GIA, 1, statIA)
+    call undo_delete_line(WAB, 2, statAB, kAB)
+    call undo_delete_line(GMB, 1, statMB, kMB)
+    call undo_delete_line(GIA, 1, statIA, kIA)
 
     NeighLn(3-dir, GAC) = GamA;        NeighLn(3-dir, GBD) = GamB
     NeighVertex(dir, Ira) = GIA;       NeighVertex(dir, Masha)=GMB
@@ -1370,8 +1353,6 @@ SUBROUTINE remove_interaction
 
     !--------------- update k -----------------------------------
     kMasha = kM
-    call delete_Hash4G(kIA, GIA)
-    call delete_Hash4G(kMB, GMB)
 
     !--------------- update the status of elements --------------
     StatusLn(GAC) = statIC
@@ -1390,9 +1371,9 @@ SUBROUTINE remove_interaction
     Order = Order + 1
     call undo_delete_gamma(GamB)
     call undo_delete_gamma(GamA)
-    call undo_delete_line(WAB, 2, statAB)
-    call undo_delete_line(GMB, 1, statMB)
-    call undo_delete_line(GIA, 1, statIA)
+    call undo_delete_line(WAB, 2, statAB, kAB)
+    call undo_delete_line(GMB, 1, statMB, kMB)
+    call undo_delete_line(GIA, 1, statIA, kIA)
 
     NeighLn(3-dir, GAC) = GamA;        NeighLn(3-dir, GBD) = GamB
     NeighVertex(dir, Ira) = GIA;       NeighVertex(dir, Masha)=GMB
