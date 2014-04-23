@@ -1619,7 +1619,7 @@ SUBROUTINE remove_interaction
     if(Is_reducible_G_Gam(GAC))     flag = 1
   endif
   if(flag ==0) then
-    if(Is_reducible_G_Gam(GAC))     flag = 1
+    if(Is_reducible_G_Gam(GBD))     flag = 1
   endif
 
   if(flag==1) then
