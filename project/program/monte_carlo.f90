@@ -192,7 +192,8 @@ SUBROUTINE markov(IsToss)
           call move_worm_along_wline             
         else if(nr<Fupdate(6)) then
           iupdate = 6
-          call move_worm_along_gline              
+          !call move_worm_along_gline              
+          call move_worm_along_gline_test           
         else if(nr<Fupdate(7)) then
           iupdate = 7
           call add_interaction                  
@@ -231,6 +232,7 @@ SUBROUTINE markov(IsToss)
           call change_Gamma_isdelta       
         endif
       enddo
+
 
       if( .not. IsToss) call measure
 
@@ -1002,13 +1004,296 @@ END SUBROUTINE move_worm_along_gline
 !-----      ||     ||                ||     ||  
 !-----      ||     ||                ||     ||
 !-----------------------------------------------------------
-!SUBROUTINE move_worm_along_gline_test
-  !implicit none
-  !integer :: iGam, jGam, iW, jW, GLn1, GLn2, GLn3
-  !integer :: sG1, sG2, sG3, sGam1
+SUBROUTINE move_worm_along_gline_test
+  implicit none
+  integer :: iGam, jGam, iGam2, jGam2, iW, jW, GLn
+  integer :: vertex1, vertex2
+  integer :: sG, typG, typiGam, typjGam, typiW
+  integer, dimension(2) :: spiGam, spjGam
+  integer :: dir, kGold, flag, dr(2)
+  double precision :: Ppro
+  integer :: statiGam, statjGam, statiW, statjW, statG, stat1, stat2
+  double precision :: tau1, tau2, tau
+  double precision :: WWorm, Pacc
+  complex*16 :: WiW, WjW, WiGam, WjGam, WG, Anew, Aold, sgn
 
-  !return
-!END SUBROUTINE
+  if(IsWormPresent .eqv. .false.)  return
+  iGam = Ira
+  dir = Floor(rn()*2.d0) + 1
+  GLn = NeighVertex(dir, iGam)
+  jGam = NeighLn(dir, GLn)
+  if(jGam==Ira .or. jGam==Masha) return
+
+  iW = NeighVertex(3, iGam)
+  jW = NeighVertex(3, jGam)
+
+  sG = get_spin_G(TypeLn(GLn))
+
+  !!deltasG+spinMasha*(-1)**dir==0
+  !!deltasG = -2*sG
+  if(-2*sG+SpinMasha*(-1)**dir/=0)  return
+
+  kGold = kLn(GLn)
+  kLn(GLn) = add_k(kGold, -(-1)**dir*kMasha)
+
+  !-------- irreducibility  check -----------------------
+  flag = 0
+  if(Is_reducible_G(GLn))          flag = 1
+  if(flag==0) then
+    if(Is_reducible_G_Gam(GLn))    flag = 1
+  endif
+
+  if(flag == 1) then
+    kLn(GLn) = kGold
+    return
+  endif
+
+  statiGam = delete_ira_stat(StatusVertex(iGam))
+  statjGam = add_ira_stat(StatusVertex(jGam))
+
+  iGam2 = NeighLn(3-DirecVertex(iGam), iW)
+  statiW = wline_stat(statiGam, StatusVertex(iGam2))
+  if(iGam2==jGam) then
+    statiW = wline_stat(statiGam, statjGam)
+  endif
+
+  jGam2 = NeighLn(3-DirecVertex(jGam), jW)
+  statjW = wline_stat(statjGam, StatusVertex(jGam2))
+  if(jGam2==iGam) then
+    statjW = wline_stat(statiGam, statjGam)
+  endif
+
+  typG = flip_typ_G(TypeLn(GLn))
+
+  call flip_typ_Vertex(dir, TypeVertex(iGam), spiGam, typiGam)
+  call flip_typ_Vertex(3-dir, TypeVertex(jGam), spjGam, typjGam)
+
+  if(is_worm_nearby(statiW)) then
+    typiW = TypeLn(iW)
+  else
+    typiW = get_typW_from_Vertex(DirecVertex(iGam), typiGam, TypeVertex(iGam2))
+  endif
+
+  WWorm = weight_worm(GRVertex(:, jGam)-GRVertex(:, Masha), &
+    & WRVertex(:, jGam)-WRVertex(:, Masha), TVertex(3, jGam)-TVertex(3, Masha))
+
+  tau1 = TVertex(3, iGam)-TVertex(2, iGam)
+  tau2 = TVertex(1, iGam)-TVertex(3, iGam)
+  WiGam = weight_vertex(statiGam, IsDeltaVertex(iGam),GRVertex(:, iGam)-WRVertex(:, iGam),   &
+    & tau1, tau2, typiGam)
+
+  tau1 = TVertex(3, jGam)-TVertex(2, jGam)
+  tau2 = TVertex(1, jGam)-TVertex(3, jGam)
+  WjGam = weight_vertex(statjGam, IsDeltaVertex(jGam),GRVertex(:, jGam)-WRVertex(:, jGam),   &
+    & tau1, tau2, typjGam)
+
+  vertex1 = NeighLn(1, iW)
+  vertex2 = NeighLn(2, iW)
+  tau = TVertex(3, vertex2) - TVertex(3, vertex1)
+  dr  = WRVertex(:, vertex2) - WRVertex(:, vertex1)
+  WiW = weight_wline(statiW, IsDeltaLn(iW), dr, tau, typiW)
+
+  vertex1 = NeighLn(1, jW)
+  vertex2 = NeighLn(2, jW)
+  tau = TVertex(3, vertex2) - TVertex(3, vertex1)
+  dr  = WRVertex(:, vertex2) - WRVertex(:, vertex1)
+  WjW = weight_wline(statjW, IsDeltaLn(jW), dr, tau, TypeLn(jW))
+
+  tau = TVertex(2, NeighLn(2, GLn)) - TVertex(1, NeighLn(1, GLn))
+  WG = weight_gline(StatusLn(GLn), tau, typG)
+
+  Anew = WiGam *WjGam *WiW *WjW *WG
+  Aold = WeightVertex(iGam) *WeightVertex(jGam) *WeightLn(iW) *WeightLn(jW) *WeightLn(GLn)
+
+  if(abs(Anew)==0.d0) then
+    kLn(GLn) = kGold
+    return
+  endif
+
+  if(iW==jW) then
+    Anew = Anew/WjW
+    Aold = Aold/WeightLn(jW)
+  endif
+
+  call weight_ratio(Pacc, sgn, Anew, Aold)
+
+  if(TypeVertex(iGam)==5 .or. TypeVertex(iGam)==6) then
+    Ppro = 0.5d0
+  else if(TypeVertex(iGam)<=4) then
+    Ppro = 2.0d0
+  endif
+
+  if(TypeVertex(jGam)==5 .or. TypeVertex(jGam)==6) then
+    Ppro = Ppro*0.5d0
+  else if(TypeVertex(jGam)<=4) then
+    Ppro = Ppro*2.0d0
+  endif
+
+  Pacc = Pacc *WWorm/WeightWorm/Ppro
+
+  !------- step5 : accept the update --------------------
+  ProbProp(Order, 6) = ProbProp(Order, 6) + 1
+  if(rn()<Pacc) then
+
+    !----- update the diagram info -------------- 
+    Phase = Phase *sgn
+
+    !---- update Ira and Masha ------------------
+    Ira = jGam
+
+    !---- update omega and k --------------------
+    call update_Hash4G(kGold, kLn(GLn))
+    
+    !----- update type configuration ------------
+    TypeLn(GLn) = typG
+    TypeLn(iW)  = typiW
+
+    TypeVertex(iGam) = typiGam
+    TypeVertex(jGam) = typjGam
+
+    SpInVertex(:, iGam) = spiGam(:)
+    SpInVertex(:, jGam) = spjGam(:)
+
+    !---- update the status of elements ---------
+    StatusVertex(iGam) = statiGam
+    StatusVertex(jGam) = statjGam
+    StatusLn(iW) = statiW
+    StatusLn(jW) = statjW
+
+    !---- update the weight of elements ---------
+    WeightWorm = WWorm
+
+    WeightLn(GLn) = WG
+    WeightLn(iW) = WiW
+    WeightLn(jW) = WjW
+    WeightVertex(iGam) = WiGam
+    WeightVertex(jGam) = WjGam
+
+    call update_weight(Anew, Aold)
+
+    ProbAcc(Order, 6) = ProbAcc(Order, 6) + 1
+  else
+    kLn(GLn) = kGold
+    return
+  endif
+
+  return
+END SUBROUTINE move_worm_along_gline_test
+
+INTEGER FUNCTION get_spin_G(typ)
+  implicit none
+  integer, intent(in) :: typ
+  if(typ==1) then
+    get_spin_G = 1
+  else if(typ==2) then
+    get_spin_G = -1
+  endif
+  return
+END FUNCTION get_spin_G
+
+INTEGER FUNCTION flip_typ_G(typ)
+  implicit none
+  integer, intent(in) :: typ
+  if(typ==1) then
+    flip_typ_G = 2
+  elseif(typ==2) then
+    flip_typ_G = 1
+  endif
+  return
+END FUNCTION flip_typ_G
+
+
+SUBROUTINE get_spin_Vertex(typ, sp)
+  implicit none
+  integer, intent(in) :: typ
+  integer, intent(out) :: sp(4)
+
+  !TypeSp2Gam(1,1,1,1) = 1
+  !TypeSp2Gam(2,2,2,2) = 2
+  !TypeSp2Gam(1,1,2,2) = 3
+  !TypeSp2Gam(2,2,1,1) = 4
+  !TypeSp2Gam(1,2,1,2) = 5
+  !TypeSp2Gam(2,1,2,1) = 6
+
+  if(typ==1) then
+    sp(1)=1; sp(2)=1; sp(3)=1; sp(4)=1
+  else if(typ==2) then
+    sp(1)=2; sp(2)=2; sp(3)=2; sp(4)=2
+  else if(typ==3) then
+    sp(1)=1; sp(2)=1; sp(3)=2; sp(4)=2
+  else if(typ==4) then
+    sp(1)=2; sp(2)=2; sp(3)=1; sp(4)=1
+  else if(typ==5) then
+    sp(1)=1; sp(2)=2; sp(3)=1; sp(4)=2
+  else if(typ==6) then
+    sp(1)=2; sp(2)=1; sp(3)=2; sp(4)=1
+  endif
+  return
+END SUBROUTINE get_spin_Vertex
+
+SUBROUTINE flip_typ_Vertex(dir, typ, newspinside, newtyp)
+  implicit none
+  integer, intent(in) :: dir, typ
+  integer, intent(out) :: newspinside(2), newtyp
+  integer :: oldsp(4), newsp(4), oldspinside(2)
+
+  call get_spin_Vertex(typ, oldsp)
+
+  newsp(dir) = flip_typ_G(oldsp(dir))
+  newsp(3-dir) = oldsp(3-dir)
+
+  oldspinside(1) = oldsp(3)
+  oldspinside(2) = oldsp(4)
+
+  if(typ==1 .or. typ==2) then
+    newspinside(dir) = flip_typ_G(oldspinside(dir))
+    newspinside(3-dir) = oldspinside(3-dir)
+
+  else if(typ==3 .or. typ==4) then
+    newspinside(dir) = oldspinside(dir)
+    newspinside(3-dir) = flip_typ_G(oldspinside(3-dir))
+
+  else if(typ==5 .or. typ==6) then
+    if(rn()<0.5d0) then
+      newspinside(dir) = flip_typ_G(oldspinside(dir))
+      newspinside(3-dir) = oldspinside(3-dir)
+    else 
+      newspinside(dir) = oldspinside(dir)
+      newspinside(3-dir) = flip_typ_G(oldspinside(3-dir))
+    endif
+  endif
+
+  newtyp = TypeSp2Gam(newsp(1),newsp(2),newspinside(1), newspinside(2))
+
+  !call LogFile%QuickLog("flip_typ_Vertex")
+  !call LogFile%QuickLog(str(dir)+str(typ))
+  !call LogFile%QuickLog(str(newsp(1))+str(newsp(2)))
+  !call LogFile%QuickLog(str(newspinside(1))+str(newspinside(2)))
+
+  return
+END SUBROUTINE flip_typ_Vertex
+
+LOGICAL FUNCTION is_worm_nearby(statline)
+  implicit none
+  integer :: statline
+  if(statline==2 .or. statline==3) then
+    is_worm_nearby = .true.
+  else
+    is_worm_nearby = .false.
+  endif
+  return
+END FUNCTION is_worm_nearby
+
+INTEGER FUNCTION get_typW_from_Vertex(dir, typGam1, typGam2)
+  implicit none
+  integer, intent(in) :: dir, typGam2, typGam1
+  if(dir==1) then
+    get_typW_from_Vertex = TypeGam2W(typGam1, typGam2)
+  elseif(dir==2) then
+    get_typW_from_Vertex = TypeGam2W(typGam2, typGam1)
+  endif
+  return
+END FUNCTION get_typW_from_Vertex
 
 
 !------------- add interaction : Pupdate(7) -----------------
@@ -1024,7 +1309,7 @@ END SUBROUTINE move_worm_along_gline
 !------    Ira ----<----            Ira ----<---||---<-----  -----
 !------                     ==>                 /\           -----
 !------  Masha ----<----          Masha ----<---||---<-----  -----
-!------               GamD                     GamB     GamD -----
+!------               GamD                     GamB     GamD ----
 !-----------------------------------------------------------------
 !---------------------- dir = 2, dirW = 1 ------------------------
 !------               GamC                     GamA     GamC -----
