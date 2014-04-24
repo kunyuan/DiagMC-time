@@ -17,25 +17,14 @@ SUBROUTINE print_status
     call LogFile%WriteLine("Printing interval:"+str(t_elap,'(f12.3)')+'s')
     call LogFile%WriteLine("Efficiency: "+str(imc/t_elap,'(f12.0)')+"steps per second.")
     call LogFile%WriteLine('Statistics Number ='+str(StatNum))
-    !i = 1
-    !if(Norm(i)>1e-6) then
-      !write(logstr,"(i2, A,f15.6,'+/-',f15.6)") i,QuanName(i),Quan(i)/Norm(i),Error(i)*sqrt(Norm(i))
-      !call LogFile%WriteLine(logstr)
-    !endif
 
-    do i=1,MCOrder+1
+    do i=0,MCOrder
       if(Norm(i)>1e-6) then
-        write(logstr,"(i2, A,f15.6,'+/-',f15.6)") i-1,QuanName(i),Quan(i)/Norm(i),Error(i) 
+        write(logstr,"(i2, A,f15.6,'+/-',f15.6)") i,QuanName(i),Quan(i)/Norm(i),Error(i) 
         call LogFile%WriteLine(logstr)
       endif
     enddo
 
-    do i=MCOrder+2,2*MCOrder+1
-      if(Norm(i)>1e-6) then
-        write(logstr,"(i2, A,f15.6,'+/-',f15.6)") i-MCOrder-1,QuanName(i),Quan(i)/Norm(i),Error(i) 
-        call LogFile%WriteLine(logstr)
-      endif
-    enddo
     call LogFile%WriteLine("------------------------------------------------")
 
     updatename(1)= " 1: create worm along wline"
@@ -516,9 +505,21 @@ SUBROUTINE read_GWGamma
     enddo
   enddo
 
-  if(ios/=0) then
-    call LogFile%QuickLog("Failed to read G,W or Gamma information!",'e')
-    stop -1
+  if(ISub==2) then
+    if(ios/=0) then
+      call LogFile%QuickLog("Failed to read G,W or Gamma information!",'e')
+    else 
+      call update_WeightCurrent
+      mc_version = file_version
+    endif
+  else 
+    if(ios/=0) then
+      call LogFile%QuickLog("Failed to read G,W or Gamma information!",'e')
+      close(100)
+      close(101)
+      close(102)
+      stop -1
+    endif
   endif
 
   close(100)
@@ -1051,16 +1052,25 @@ SUBROUTINE output_Quantities
   close(104)
 END SUBROUTINE output_Quantities
 
-!SUBROUTINE output_test
-  !implicit none
-  !integer :: iorder
+SUBROUTINE output_test
+  implicit none
+  integer :: iorder
   !open(104, status='replace', file=trim(title_mc)//"_Gam_Order_test.dat")
-  !do iorder = 1, MCOrder
-    !write(104, *) iorder, Quan(iorder+2)/Quan(iorder+1), Error(iorder+2)/Quan(iorder+1)
-  !enddo
-  !write(104, *)
-  !close(104)
-!END SUBROUTINE
+  open(104, access='append', file=trim(title_mc)//"_Gam_Order_test.dat")
+  do iorder = 1, MCOrder
+    write(104, *) iorder, Quan(iorder+2)/Quan(2), Error(iorder+2)/Quan(2)
+  enddo
+  write(104, *)
+
+  write(104, *) "Type 1,2 <==> 3,4"
+  do iorder = 0, MCOrder
+    BalenceCheck(iorder,1,3)=(BalenceCheck(iorder,1,1)-BalenceCheck(iorder,1,2)) &
+      & /sqrt(BalenceCheck(iorder,1,1))
+    write(104, '(i3,3f17.5)') iorder, BalenceCheck(iorder,1,:)
+  enddo
+  write(104, *)
+  close(104)
+END SUBROUTINE
 !!================================================================
 !!================================================================
 !!================================================================

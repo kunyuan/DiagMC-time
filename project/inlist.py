@@ -19,7 +19,7 @@ com_dict={
 # monte carlo job defintion
 mc_dict={
     "__Execute" : "./gamma3.exe",
-    "__Duplicate" : 3,
+    "__Duplicate" : 1,
     "__IsCluster" : False,
     "__AutoRun" : True,
     "IsLoad" : False,
@@ -40,7 +40,9 @@ sc_dict={
     "__IsCluster" : False,
     "__AutoRun" : True, 
     "IsLoad" : True,
-    "ReadFile" : "0.90_1_coll",
+    #"__AutoRun" : False, 
+    #"IsLoad" : False,
+    "ReadFile" : "0.90_2_coll",
     }
 sc_dict.update(com_dict)
 TO_DO.append(job.JobConsistLoop(sc_dict))
