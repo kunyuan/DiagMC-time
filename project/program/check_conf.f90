@@ -328,6 +328,9 @@ SUBROUTINE check_k_conserve
       if(i==Ira)   k = add_k(k, kMasha)
       if(i==Masha) k = add_k(k, -kMasha)
     endif
+    if(imc==172436574 .and. i==1) then
+      print *, kMasha, kLn(NeighVertex(1,i)), -kLn(NeighVertex(2,i)), kLn(NeighVertex(3,i))
+    endif
     if(k/=0) then
       call LogFile%WriteStamp('e')
       call LogFile%WriteLine("Oops, check_k_conserve found a bug!")
