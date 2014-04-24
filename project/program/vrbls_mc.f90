@@ -17,7 +17,7 @@ MODULE vrbls_mc
   integer, parameter,dimension(2) :: MxL =(/8,8/)   ! the largest system
   integer, parameter :: MxVol = MxL(1)**D           ! the maximum system volume
   integer, parameter :: MxT   =   64                ! the maximum number of time segments
-  integer, parameter :: MxK   = 1000000             ! the maximum momentum
+  integer, parameter :: MxK   = 1000             ! the maximum momentum
   !integer, parameter :: MxOmegaBasis = 2048        ! the maximum omega used in basis
 
   double precision, parameter :: MxError = 1000.0    ! the maximum error for MC
