@@ -5,128 +5,169 @@ PROGRAM MAIN
   USE logging_module
   USE vrbls_mc
 
+  Beta = 1.d0
+
+  call initialize_polynomials
+
+  !================== define the bins for G,W, Gamma ====================================
+  FromG(1) = 0
+  ToG(1)   = MxT-1
+
+  FromW(1) = 0
+  ToW(1)   = MxT-1
+
+  IsBasis2D(1) = .true.
+  FromGamT1(1) = 0
+  ToGamT1(1) = MxT-2
+  do t1 = 0, MxT-2
+    FromGamT2(t1, 1) = 0
+    ToGamT2(t1, 1)   = MxT-2-t1
+  enddo
+
+  IsBasis2D(2) = .false.
+  FromGamT1(2) = 0
+  ToGamT1(2) = MxT-1
+  do t1 = 0, MxT-1
+    FromGamT2(t1, 2) = MxT-1-t1
+    ToGamT2(t1, 2) = MxT-1-t1
+  enddo
+
+  IsBasis2D(3) = .true.
+  FromGamT1(3) = 1
+  ToGamT1(3) = MxT-1
+  do t1 = 1, MxT-1
+    FromGamT2(t1, 3) = MxT-t1
+    ToGamT2(t1, 3)   = MxT-1
+  enddo
+
+  !================== calculate the basis for G, W, and Gamma ===========================
+  do i = 1, NbinG
+    call calculate_basis(FromG(i), ToG(i), CoefG(:, :, i))
+  enddo
+
+  do i = 1, NbinW
+    call calculate_basis(FromW(i), ToW(i), CoefW(:, :, i))
+  enddo
+
+  !do i = 1, NbinGam
+    !if(IsBasis2D(i)) then
+      !call calculate_basis_Gamma_2D(FromGamT1(i), ToGamT1(i), FromGamT2(:,i), ToGamT2(:,i), &
+        !& CoefGam(:, :, :, i))
+    !else
+      !call calculate_basis_Gamma_1D(FromGamT1(i), ToGamT1(i), FromGamT2(:,i), CoefGam(:, :, :, i))
+    !endif
+  !enddo
 
 CONTAINS
 
+
+SUBROUTINE initialize_polynomials
+  implicit none
+  integer :: i
+
+  Polynomial(:, :) = 0.d0
+
+  !============== set the vectors ==============================================
+  !---------- you can set any polynomial functions as you want -----------------
+  do i = 1, BasisOrder
+    Polynomial(i, i) = 1.d0
+  enddo
+  Polynomial(0, NBasis) = 1.d0
+  !=================end =======================================================
+
+END SUBROUTINE
+
 !!============== GRAM-SCHMIDT BASIS ==================================
 !!-------------- generate the Gram-Schmidt basis --------------
-SUBROUTINE calculate_basis(nbasis, OmegaMin, OmegaMax, EP, EN)
+SUBROUTINE calculate_basis(tmin, tmax, Coef)
   implicit none
-  integer, intent(in):: nbasis, OmegaMin, OmegaMax
-  double precision :: EP(nbasis, nbasis), EN(nbasis, nbasis)
-  double precision :: VP(nbasis, nbasis), VN(nbasis, nbasis)
-  double precision :: norm
+  integer, intent(in):: tmin, tmax
+  double precision, dimension(0:BasisOrder, NBasis) :: Coef
+  double precision :: norm, projtmp
   integer :: i, j, k
 
-  EP(:,:) = 0.d0
-  EN(:,:) = 0.d0
-  VP(:,:) = 0.d0
-  VN(:,:) = 0.d0
+  Coef(:, :) = 0.d0
 
-  do i = 1, nbasis
-    VP(i, i) = 1.d0
-    EP(i, :) = VP(i, :)
+  !========== projecting and normalizing the basis ===========================
+  do i = 1, NBasis
+
+    Coef(:, i) = Polynomial(:, i)
 
     do j = 1, i-1
+      projtmp = projector(tmin, tmax, Coef(:,j), Polynomial(:,i))
       do k = 1, j
-        EP(i, k) = EP(i, k) - EP(j, k) *projector(EP(j,:), VP(i, :), OmegaMin, OmegaMax)
+        Coef(k, i) = Coef(k, i) - Coef(k, j) *projtmp
       enddo
     enddo
 
-    norm = dsqrt(projector(EP(i,:), EP(i,:), OmegaMin, OmegaMax))
-    EP(i, :) = EP(i, :)/norm
+    norm = dsqrt(projector(tmin, tmax, Coef(:, i), Coef(:, i)))
+    Coef(:, i) = Coef(:, i)/norm
   enddo
 
-  do i = 1, nbasis
-    VN(i, i) = 1.d0
-    EN(i, :) = VN(i, :)
-
-    do k = 1, j
-      do j = 1, i-1
-        EN(i, k) = EN(i, k) - EN(j, k) *projector(EN(j,:), VN(i, :), -OmegaMax, -OmegaMin)
-      enddo
-    enddo
-    norm = dsqrt(projector(EN(i,:), EN(i,:), -OmegaMax, -OmegaMin))
-    EN(i, :) = EN(i, :)/norm
-  enddo
+  call test_basis(tmin, tmax, Coef)
 
 END SUBROUTINE calculate_basis
 
 
 
-!---------- weight calculate f(omega) ------------------
-DOUBLE PRECISION FUNCTION weight_basis(Coef, n)
-  implicit none
-  double precision :: Coef(nbasis)
-  integer :: j, n
-  weight_basis = 0.d0
-  do j = 1, nbasis
-    weight_basis = weight_basis + Coef(j)*OriginalBasis(j, n)
-  enddo
-  return 
-END FUNCTION weight_basis
 
-
-!---------- projector: \int_{omega} f1(omega)*f2(omega)  --------
-DOUBLE PRECISION FUNCTION projector(Coef1, Coef2, OmegaMin, OmegaMax)
+DOUBLE PRECISION FUNCTION projector(tmin, tmax, Coef1, Coef2)
   implicit none
-  double precision :: Coef1(nbasis), Coef2(nbasis)
-  integer :: j, k, n, OmegaMin, OmegaMax
+  integer, intent(in) :: tmin, tmax
+  double precision, intent(in) :: Coef1(0:BasisOrder), Coef2(0:BasisOrder)
+  integer :: j, k, t
+  double precision :: tau
 
   projector  = 0.d0
-  do j = 1, nbasis 
-    do k = 1, nbasis
-      do n = OmegaMin, OmegaMax
-        projector = projector + Coef1(j)*OriginalBasis(j, n)*Coef2(k)*OriginalBasis(k, n)
+  do t = tmin, tmax
+    tau = dble(t)*Beta/dble(MxT)
+    do j = 0, BasisOrder 
+      do k = 0, BasisOrder
+        projector = projector + Beta/dble(MxT)*Coef1(j)*Coef2(k)*tau**(dble(j+k))
       enddo
     enddo
   enddo
   return 
 END FUNCTION projector
 
+DOUBLE PRECISION FUNCTION weight_basis(Coef, t)
+  implicit none
+  double precision :: Coef(0:BasisOrder)
+  integer :: j, t
+  double precision :: tau
+  tau = dble(t)*Beta/dble(MxT)
 
+  weight_basis = 0.d0
+  do j = 0, BasisOrder
+    weight_basis = weight_basis + Coef(j)*tau**dble(j)
+  enddo
+  return 
+END FUNCTION weight_basis
 
 
 !--------- test subroutine for the Gram-Schmidt basis ------
-SUBROUTINE test_basis(nbasis, OmegaMin, OmegaMax, CoefP, CoefN)
+SUBROUTINE test_basis(tmin, tmax, Coef)
   implicit none
-  integer, intent(in) :: nbasis, OmegaMin, OmegaMax
-  double precision :: CoefP(nbasis, nbasis), CoefN(nbasis, nbasis)
-  integer :: i, j, k, l, n
+  integer, intent(in) :: tmin, tmax
+  double precision, intent(in) :: Coef(0:BasisOrder, Nbasis)
+  integer :: i, j, k, l, n, t
   double precision :: omega, x, y
 
-  do i = 1, nbasis
-
+  do i = 1, NBasis
     y = 0.d0
-    do  n = OmegaMin, OmegaMax
-      y = y + weight_basis(CoefP(i,:), n)**2.d0
+    do  t = tmin, tmax
+      y = y + Beta/dble(MxT)*weight_basis(Coef(:, i), t)**2.d0
     enddo
     if(dabs(y-1.d0)>1.d-10) then
-      write(logstr, *) i, y, "Positive Basis error!!"
-      call write_log
-    endif
-
-    y = 0.d0
-    do  n = -OmegaMax, -OmegaMin
-      y = y + weight_basis(CoefN(i,:), n)**2.d0
-    enddo
-    if(dabs(y-1.d0)>1.d-10) then
-      write(logstr, *) i, y, "Negative Basis error!!"
-      call write_log
+      call LogFile%QuickLog(str(i)+str(y)+"Basis error!! Not normal!")
     endif
   enddo
 
-  do i = 1, nbasis
-    do j = i+1, nbasis
-      y = projector(CoefP(i, :), CoefP(j, :), OmegaMin, OmegaMax)
+  do i = 1, Nbasis
+    do j = i+1, Nbasis
+      y = projector(tmin, tmax, Coef(:, i), Coef(:, j))
       if(dabs(y)>1.d-10) then
-        write(logstr, *) i, j, y, "Positive Basis error!!"
-        call write_log
-      endif
-      y = projector(CoefN(i, :), CoefN(j, :), -OmegaMax, -OmegaMin)
-      if(dabs(y)>1.d-10) then
-        write(logstr, *) i, j, y, "Negative Basis error!!"
-        call write_log
+        call LogFile%QuickLog(str(i)+str(j)+str(y)+"Basis error!! Not orthogonal!")
       endif
     enddo
   enddo
@@ -134,301 +175,4 @@ SUBROUTINE test_basis(nbasis, OmegaMin, OmegaMax, CoefP, CoefN)
 END SUBROUTINE test_basis
 
 
-
-
-
-!SUBROUTINE calculate_Gamma_basis(nbasisGamma, OmegaMin, OmegaMax, EPN, ENP, &
-  !&  EPPR, ENNR, EPPL, ENNL)
-  !implicit none
-  !integer, intent(in):: nbasisGamma, OmegaMin, OmegaMax
-  !double precision :: ENP(nbasisGamma, nbasisGamma),  EPN(nbasisGamma, nbasisGamma)
-  !double precision :: EPPR(nbasisGamma, nbasisGamma), ENNR(nbasisGamma, nbasisGamma)
-  !double precision :: EPPL(nbasisGamma, nbasisGamma), ENNL(nbasisGamma, nbasisGamma)
-  !double precision :: VNP(nbasisGamma, nbasisGamma),  VPN(nbasisGamma, nbasisGamma)
-  !double precision :: VPPR(nbasisGamma, nbasisGamma), VNNR(nbasisGamma, nbasisGamma)
-  !double precision :: VPPL(nbasisGamma, nbasisGamma), VNNL(nbasisGamma, nbasisGamma)
-  !double precision :: norm
-  !integer :: i, j, k
-  !VPN(:,:) = 0.d0
-  !VNP(:,:) = 0.d0
-  !VPPR(:,:) = 0.d0
-  !VNNR(:,:) = 0.d0
-  !VPPL(:,:) = 0.d0
-  !VNNL(:,:) = 0.d0
-
-  !EPN(:,:) = 0.d0
-  !ENP(:,:) = 0.d0
-  !EPPR(:,:) = 0.d0
-  !ENNR(:,:) = 0.d0
-  !EPPL(:,:) = 0.d0
-  !ENNL(:,:) = 0.d0
-
-  !do i = 1, nbasisGamma
-    !VPN(i, i) = 1.d0
-    !EPN(i, :) = VPN(i, :)
-
-    !do j = 1, i-1
-      !do k = 1, j
-        !EPN(i, k) = EPN(i, k) - EPN(j, k) *projector_Gamma(EPN(j,:), VPN(i, :), OmegaMin, OmegaMax, &
-          !& -OmegaMax, -OmegaMin)
-      !enddo
-    !enddo
-
-    !norm = dsqrt(projector_Gamma(EPN(i, :), EPN(i,:), OmegaMin, OmegaMax, &
-      !& -OmegaMax, -OmegaMin))
-    !EPN(i, :) = EPN(i, :)/norm 
-  !enddo
-
-  !do i = 1, nbasisGamma
-    !VNP(i, i) = 1.d0
-    !ENP(i, :) = VNP(i, :)
-
-    !do j = 1, i-1
-      !do k = 1, j
-        !ENP(i, k) = ENP(i, k) - ENP(j, k) *projector_Gamma(ENP(j,:), VNP(i, :), -OmegaMax, -OmegaMin, &
-          !& OmegaMin, OmegaMax)
-      !enddo
-    !enddo
-
-    !norm = dsqrt(projector_Gamma(ENP(i, :), ENP(i,:), -OmegaMax, -OmegaMin, &
-      !& OmegaMin, OmegaMax))
-    !ENP(i, :) =  ENP(i, :)/norm
-  !enddo
-
-  !do i = 1, nbasisGamma
-    !VPPR(i, i) = 1.d0
-    !EPPR(i, :) = VPPR(i, :)
-
-    !do j = 1, i-1
-      !do k = 1, j
-        !EPPR(i, k) = EPPR(i, k) - EPPR(j, k) *projector_Gamma(EPPR(j,:), VPPR(i, :), OmegaMin, OmegaMax, &
-          !& OmegaMin, 0)
-      !enddo
-    !enddo
-
-    !norm = dsqrt(projector_Gamma(EPPR(i, :), EPPR(i,:), OmegaMin, OmegaMax, &
-      !& OmegaMin, 0))
-    !EPPR(i, :) = EPPR(i, :)/norm 
-  !enddo
-
-  !do i = 1, nbasisGamma
-    !VPPL(i, i) = 1.d0
-    !EPPL(i, :) = VPPL(i, :)
-
-    !do j = 1, i-1
-      !do k = 1, j
-        !EPPL(i, k) = EPPL(i, k) - EPPL(j, k) *projector_Gamma(EPPL(j,:), VPPL(i, :), OmegaMin, OmegaMax, &
-          !& 0, OmegaMax)
-      !enddo
-    !enddo
-
-    !norm = dsqrt(projector_Gamma(EPPL(i, :), EPPL(i,:), OmegaMin, OmegaMax, &
-      !& 0, OmegaMax))
-    !EPPL(i, :) = EPPL(i, :)/norm 
-  !enddo
-
-  !do i = 1, nbasisGamma
-    !VNNR(i, i) = 1.d0
-    !ENNR(i, :) = VNNR(i, :)
-
-    !do j = 1, i-1
-      !do k = 1, j
-        !ENNR(i, k) = ENNR(i, k) - ENNR(j, k) *projector_Gamma(ENNR(j,:), VNNR(i, :), -OmegaMax, -OmegaMin, &
-          !& -OmegaMax, 0)
-      !enddo
-    !enddo
-
-    !norm = dsqrt(projector_Gamma(ENNR(i, :), ENNR(i,:), -OmegaMax, -OmegaMin, &
-      !& -OmegaMax, 0))
-    !ENNR(i, :) = ENNR(i, :)/norm
-  !enddo
-
-  !do i = 1, nbasisGamma
-    !VNNL(i, i) = 1.d0
-    !ENNL(i, :) = VNNL(i, :)
-
-    !do j = 1, i-1
-      !do k = 1, j
-        !ENNL(i, k) = ENNL(i, k) - ENNL(j, k) *projector_Gamma(ENNL(j,:), VNNL(i, :), -OmegaMax, -OmegaMin, &
-          !& 0, -OmegaMin)
-      !enddo
-    !enddo
-
-    !norm = dsqrt(projector_Gamma(ENNL(i, :), ENNL(i,:), -OmegaMax, -OmegaMin, &
-      !& 0, -OmegaMin))
-    !ENNL(i, :) = ENNL(i, :)/norm
-  !enddo
-  !return
-!END SUBROUTINE calculate_Gamma_basis
-
-
-
-
-!!---------- weight calculate f(omega) ------------------
-!DOUBLE PRECISION FUNCTION weight_basis_Gamma(Coef, n1, n2)
-  !implicit none
-  !double precision :: Coef(nbasisGamma)
-  !integer :: j, n1, n2
-  !weight_basis_Gamma = 0.d0
-  !do j = 1, nbasisGamma
-    !weight_basis_Gamma = weight_basis_Gamma+Coef(j)*OriginalBasisGamma(j, n1, n2)
-  !enddo
-  !return 
-!END FUNCTION weight_basis_Gamma
-
-
-!!---------- projector: \int_{omega1, omega2} f1(omega1,omega2)*f2(omega1,omega2)  --------
-!DOUBLE PRECISION FUNCTION projector_Gamma(Coef1, Coef2, OmegaMin1, OmegaMax1, OmegaMin2, OmegaMax2)
-  !implicit none
-  !double precision :: Coef1(nbasisGamma), Coef2(nbasisGamma)
-  !integer :: j, k, n1, n2, OmegaMin1, OmegaMax1, OmegaMin2, OmegaMax2
-
-  !projector_Gamma  = 0.d0
-
-  !do j = 1, nbasisGamma
-    !do k = 1, nbasisGamma
-      !do n1 = OmegaMin1, OmegaMax1
-        !if(OmegaMin2==0) then
-          !if(n1<OmegaMax1) then
-            !do n2 = n1+1, OmegaMax1
-              !projector_Gamma = projector_Gamma + Coef1(j)*OriginalBasisGamma(j, n1, n2)*Coef2(k)* &
-                !& OriginalBasisGamma(k, n1, n2)*ReweightBasis(n1, n2)
-            !enddo
-          !endif
-        !else if(OmegaMax2==0) then
-          !if(n1>OmegaMin1) then
-            !do n2 = OmegaMin2, n1-1
-              !projector_Gamma = projector_Gamma + Coef1(j)*OriginalBasisGamma(j, n1, n2)*Coef2(k)* &
-                !& OriginalBasisGamma(k, n1, n2)*ReweightBasis(n1, n2)
-            !enddo
-          !endif
-        !else
-          !do n2 = OmegaMin2, OmegaMax2
-            !projector_Gamma = projector_Gamma + Coef1(j)*OriginalBasisGamma(j, n1, n2)*Coef2(k)* &
-              !& OriginalBasisGamma(k, n1, n2)*ReweightBasis(n1, n2)
-          !enddo
-        !endif
-      !enddo
-    !enddo
-  !enddo
-  !return 
-!END FUNCTION projector_Gamma
-
-
-!!--------- test subroutine for the Gram-Schmidt basis ------
-!SUBROUTINE test_basis_Gamma(nbasisGamma, OmegaMin, OmegaMax, EPN, ENP, &
-    !& EPPR, ENNR, EPPL, ENNL)
-  !implicit none
-  !integer, intent(in) :: nbasisGamma, OmegaMin, OmegaMax
-  !double precision :: ENP(nbasisGamma, nbasisGamma), EPN(nbasisGamma,nbasisGamma)
-  !double precision :: EPPR(nbasisGamma, nbasisGamma),ENNR(nbasisGamma,nbasisGamma)
-  !double precision :: EPPL(nbasisGamma, nbasisGamma),ENNL(nbasisGamma,nbasisGamma)
-  !integer :: i, j, k, l, n1, n2
-  !double precision :: omega, x, y
-
-  !do i = 1, nbasisGamma
-    !y = 0.d0
-    !do  n1 = OmegaMin+1, OmegaMax
-      !do n2 = OmegaMin, n1-1
-        !y = y + weight_basis_Gamma(EPPR(i,:), n1, n2)**2.d0*ReweightBasis(n1, n2)
-      !enddo
-    !enddo
-    !if(dabs(y-1.d0)>1.d-8) then
-      !write(logstr, *) i, y-1.d0, "++R Gamma Basis error!!"
-      !call write_log
-    !endif
-
-    !y = 0.d0
-    !do  n1 = OmegaMin, OmegaMax-1
-      !do n2 = n1+1, OmegaMax
-        !y = y + weight_basis_Gamma(EPPL(i,:), n1, n2)**2.d0*ReweightBasis(n1, n2)
-      !enddo
-    !enddo
-    !if(dabs(y-1.d0)>1.d-8) then
-      !write(logstr, *) i, y-1.d0, "++L Gamma Basis error!!"
-      !call write_log
-    !endif
-
-    !y = 0.d0
-    !do  n1 = OmegaMin, OmegaMax
-      !do n2 = -OmegaMax, -OmegaMin
-        !y = y + weight_basis_Gamma(EPN(i,:), n1, n2)**2.d0*ReweightBasis(n1, n2)
-      !enddo
-    !enddo
-    !if(dabs(y-1.d0)>1.d-8) then
-      !write(logstr, *) i, y-1.d0, "+- Gamma Basis error!!"
-      !call write_log
-    !endif
-
-    !y = 0.d0
-    !do  n1 = -OmegaMax, -OmegaMin
-      !do n2 = OmegaMin, OmegaMax
-        !y = y + weight_basis_Gamma(ENP(i,:), n1, n2)**2.d0*ReweightBasis(n1, n2)
-      !enddo
-    !enddo
-    !if(dabs(y-1.d0)>1.d-8) then
-      !write(logstr, *) i, y-1.d0, "-+ Gamma Basis error!!"
-      !call write_log
-    !endif
-
-    !y = 0.d0
-    !do  n1 = -OmegaMax+1, -OmegaMin
-      !do n2 = -OmegaMax, n1-1
-        !y = y + weight_basis_Gamma(ENNR(i,:), n1, n2)**2.d0*ReweightBasis(n1, n2)
-      !enddo
-    !enddo
-    !if(dabs(y-1.d0)>1.d-8) then
-      !write(logstr, *) i, y-1.d0, "--R Gamma Basis error!!"
-      !call write_log
-    !endif
-
-    !y = 0.d0
-    !do  n1 = -OmegaMax, -OmegaMin-1
-      !do n2 = n1+1, -OmegaMin
-        !y = y + weight_basis_Gamma(ENNL(i,:), n1, n2)**2.d0*ReweightBasis(n1, n2)
-      !enddo
-    !enddo
-    !if(dabs(y-1.d0)>1.d-8) then
-      !write(logstr, *) i, y-1.d0, "--L Gamma Basis error!!"
-      !call write_log
-    !endif
-  !enddo
-
-
-  !do i = 1, nbasisGamma
-    !do j = i+1, nbasisGamma
-      !y = projector_Gamma(EPN(i, :), EPN(j, :), OmegaMin, OmegaMax,-OmegaMax,-OmegaMin)
-      !if(dabs(y)>1.d-8) then
-        !write(logstr, *) i, j, y, "+- Gamma Basis error!!"
-        !call write_log
-      !endif
-      !y = projector_Gamma(ENP(i, :), ENP(j, :),-OmegaMax,-OmegaMin, OmegaMin, OmegaMax)
-      !if(dabs(y)>1.d-8) then
-        !write(logstr, *) i, j, y, "-+ Gamma Basis error!!"
-        !call write_log
-      !endif
-      !y = projector_Gamma(EPPR(i, :), EPPR(j, :), OmegaMin, OmegaMax, OmegaMin, 0)
-      !if(dabs(y)>1.d-7) then
-        !write(logstr, *) i, j, y, "++R Gamma Basis error!!"
-        !call write_log
-      !endif
-      !y = projector_Gamma(EPPL(i, :), EPPL(j, :), OmegaMin, OmegaMax, 0, OmegaMax)
-      !if(dabs(y)>1.d-7) then
-        !write(logstr, *) i, j, y, "++L Gamma Basis error!!"
-        !call write_log
-      !endif
-      !y = projector_Gamma(ENNR(i, :), ENNR(j, :),-OmegaMax,-OmegaMin,-OmegaMax, 0)
-      !if(dabs(y)>1.d-7) then
-        !write(logstr, *) i, j, y, "--R Gamma Basis error!!"
-        !call write_log
-      !endif
-      !y = projector_Gamma(ENNL(i, :), ENNL(j, :),-OmegaMax,-OmegaMin, 0, -OmegaMin)
-      !if(dabs(y)>1.d-7) then
-        !write(logstr, *) i, j, y, "--L Gamma Basis error!!"
-        !call write_log
-      !endif
-    !enddo
-  !enddo
-
-!END SUBROUTINE test_basis_Gamma
 END PROGRAM MAIN
