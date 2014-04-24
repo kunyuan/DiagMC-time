@@ -18,7 +18,6 @@ MODULE vrbls_mc
   integer, parameter :: MxVol = MxL(1)**D           ! the maximum system volume
   integer, parameter :: MxT   =   64                ! the maximum number of time segments
   integer, parameter :: MxK   = 1000000             ! the maximum momentum
-  !integer, parameter :: MxOmegaBasis = 2048        ! the maximum omega used in basis
 
   double precision, parameter :: MxError = 1000.0    ! the maximum error for MC
   integer, parameter          :: MxNblck = 1000000   ! the maximum memory blocks in MC simulations
@@ -235,6 +234,35 @@ MODULE vrbls_mc
   double precision :: Z_normal
   double precision :: Z_worm
 	DOUBLE PRECISION :: amax, tmax, amin, tmin
+
+
+  !================ Grand-Schmit Basis ===================================
+  integer, parameter :: BasisOrder=4
+  integer, parameter :: Nbasis=BasisOrder+1
+  double precision, dimension(0:BasisOrder, 1:Nbasis) :: Polynomial
+
+  integer, parameter :: NbinG=1
+  integer, dimension(1:NbinG) :: FromG, ToG
+  integer, parameter :: NbinW=1
+  integer, dimension(1:NbinW) :: FromW, ToW
+
+  double precision, dimension(0:BasisOrder, 1:Nbasis, 1:NbinG) :: CoefG
+  double precision, dimension(0:BasisOrder, 1:Nbasis, 1:NbinW) :: CoefW
+
+
+
+  integer, parameter :: BasisOrderGam=4
+  integer, parameter :: NbasisGam=16
+
+  integer, parameter :: NbinGam=3
+  integer, dimension(1:NbinGam) :: FromGamT1, ToGamT1
+  integer, dimension(0:MxT-1, 1:NbinGam) :: FromGamT2, ToGamT2
+  logical, dimension(1:NbinGam) :: IsBasis2D
+
+  double precision, dimension(0:BasisOrderGam,0:BasisOrderGam,1:NbasisGam,1:NbinGam) :: CoefGam
+  !=======================================================================
+
+
   !================= Random-number generator =============================
   integer                      :: Seed              ! random-number seed
   integer, parameter           :: mult=32781
