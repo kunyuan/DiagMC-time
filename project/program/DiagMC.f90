@@ -168,9 +168,9 @@ end subroutine
 
 subroutine just_output
   implicit none
-  call LogFile%QuickLog("Just output something!")
-  call LogFile%QuickLog("Reading G,W, and Gamma...")
-  call read_GWGamma
+  !call LogFile%QuickLog("Just output something!")
+  !call LogFile%QuickLog("Reading G,W, and Gamma...")
+  !call read_GWGamma
 
   call LogFile%QuickLog("Reading MC data...")
   call read_monte_carlo_data
@@ -279,12 +279,13 @@ END FUNCTION self_consistent_GW
 
 SUBROUTINE monte_carlo
   implicit none
-  integer :: mc_version
+  integer :: i, mc_version
   double precision :: WR, GamR
 
   call LogFile%QuickLog("Initializing monte carlo...")
   call read_GWGamma
-  call calculate_Gam1
+
+  !call calculate_Gam1
 
   call calculate_GamNormWeight
 
@@ -292,7 +293,9 @@ SUBROUTINE monte_carlo
 
   call LogFile%QuickLog("Initializing monte carlo done!")
 
-  QuanName(1) = "(1st-Gamma(0,0))"
+  do i= 0, MCOrder
+    QuanName(i) = "(Order "+str(i)+"Gamma)"
+  enddo
 
   if(IsLoad==.false.) then
 

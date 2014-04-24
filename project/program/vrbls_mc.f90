@@ -225,11 +225,11 @@ MODULE vrbls_mc
   integer          :: MaxStat
   integer          :: StatNum
   integer, parameter :: NObs = 20              ! Total # observables
-  double precision   :: Quan(NObs)             ! 1st--#quan.  2nd--#block
-  double precision   :: Norm(NObs)
-  double precision   :: Error(NObs)
+  double precision   :: Quan(0:NObs-1)             ! 1st--#quan.  2nd--#block
+  double precision   :: Norm(0:NObs-1)
+  double precision   :: Error(0:NObs-1)
   double precision   :: ratioerr
-  character(len=30),dimension(NObs) :: QuanName
+  character(len=30),dimension(0:NObs-1) :: QuanName
 
   double precision, allocatable :: ObsRecord(:,:)                 ! 1st--#quan.  2nd--#block
   double precision :: Z_normal

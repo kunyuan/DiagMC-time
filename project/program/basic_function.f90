@@ -72,14 +72,20 @@ COMPLEX*16 FUNCTION weight_gline(stat, tau, typ)
 
   t = Floor(tau*MxT/Beta)
 
-  if(is_mea_worm_near_G(stat)) then
+  if(stat == 0) then
+    weight_gline = weight_G(typ, t)
+  else if(stat == 1) then
     !  Have measuring vertex around
     weight_gline = weight_meas_G(t)
   else
-    weight_gline = weight_G(typ, t)
+    call LogFile%WriteStamp('e')
+    call LogFile%WriteLine("The number of update: "+str(iupdate))
+    call LogFile%WriteLine("line status error!"+str(stat))
+    call print_config
+    stop
   endif
 
-  !---------------------- for test --------------------------------------
+  !---------------------- test1: fake function ------------------------------
   !t = Floor(tau*MxT/Beta)
 
   !flag = 0
@@ -101,7 +107,17 @@ COMPLEX*16 FUNCTION weight_gline(stat, tau, typ)
     !weight_gline = weight_meas_G(t)
   !else
     !call LogFile%WriteStamp('e')
-    !call LogFile%WriteLine("The number of update: "+str(imc))
+    !call LogFile%WriteLine("The number of update: "+str(iupdate))
+    !call LogFile%WriteLine("line status error!"+str(stat))
+    !stop
+  !endif
+
+  !---------------------- test2: uniform function -----------------------
+  !if(stat==0 .or. stat==1) then
+    !weight_gline = weight_meas_G(t)
+  !else
+    !call LogFile%WriteStamp('e')
+    !call LogFile%WriteLine("The number of update: "+str(iupdate))
     !call LogFile%WriteLine("line status error!"+str(stat))
     !stop
   !endif
@@ -124,24 +140,28 @@ COMPLEX*16 FUNCTION weight_wline(stat, isdelta, dr0, tau, typ)
   integer :: t
 
   t = Floor(tau*MxT/Beta)
-
   call diff_r(dr0, dr)
 
-  if(is_mea_near_W(stat)) then
+  if(stat == 0) then
+    if(isdelta==0) weight_wline = weight_W(typ, dr, t)
+    if(isdelta==1) weight_wline = weight_W0(typ, dr)
+  else if(stat == 2) then
+    ! Have Ira or Masha around 
+    if(isdelta==0) weight_wline = weight_W(1, dr, t)
+    if(isdelta==1) weight_wline = weight_W0(1, dr)
+  else if(stat == 1 .or. stat==3) then
     ! Have measuring vertex around
     if(isdelta==0) weight_wline = weight_meas_W(dr, t)
     if(isdelta==1) weight_wline = (0.d0, 0.d0)
-  elseif(is_worm_near_W(stat)) then
-    ! Have Ira or Masha around and no measuring vertex around 
-    ! set the fake weight of W as the W with all spin up ,namely type=1
-    if(isdelta==0) weight_wline = weight_W(1, dr, t)
-    if(isdelta==1) weight_wline = weight_W0(1, dr)
   else
-    if(isdelta==0) weight_wline = weight_W(typ, dr, t)
-    if(isdelta==1) weight_wline = weight_W0(typ, dr)
+    call LogFile%WriteStamp('e')
+    call LogFile%WriteLine("The number of update: "+str(iupdate))
+    call LogFile%WriteLine("line status error!"+str(stat))
+    call print_config
+    stop
   endif
 
-  !---------------------- for test --------------------------------------
+  !---------------------- test1: fake function ----------------------------
   !if(stat >= 0 .and. stat<=3) then
     !if(isdelta==0 .and. dr(1)==0 .and. dr(2)==0) then
       !weight_wline = weight_meas_W(dr, t)
@@ -153,7 +173,22 @@ COMPLEX*16 FUNCTION weight_wline(stat, isdelta, dr0, tau, typ)
     !!if(isdelta==1) weight_wline = weight_meas_W(dr, 0)
   !else
     !call LogFile%WriteStamp('e')
-    !call LogFile%WriteLine("The number of update: "+str(imc))
+    !call LogFile%WriteLine("The number of update: "+str(iupdate))
+    !call LogFile%WriteLine("line status error!"+str(stat))
+    !stop
+  !endif
+
+  !---------------------- test2: uniform function ----------------------------
+  !if(stat >= 0 .and. stat<=3) then
+    !if(isdelta==0 .and. dr(1)==0 .and. dr(2)==0) then
+      !weight_wline = weight_meas_W(dr, t)
+    !else 
+      !weight_wline = (0.d0, 0.d0)
+    !endif
+
+  !else
+    !call LogFile%WriteStamp('e')
+    !call LogFile%WriteLine("The number of update: "+str(iupdate))
     !call LogFile%WriteLine("line status error!"+str(stat))
     !stop
   !endif
@@ -177,22 +212,7 @@ COMPLEX*16 FUNCTION weight_vertex(stat, isdelta, dr0, dtau1, dtau2, typ)
 
   call diff_r(dr0, dr)
 
-  if(is_mea_near_Gamma(stat)) then
-    if(isdelta==0) weight_vertex = (0.d0, 0.d0)
-    if(isdelta==1) weight_vertex = weight_meas_Gam0(typ, dr)
-  elseif(is_worm_near_Gamma(stat)) then
-    !You have make sure that those Gamma with Ira or Masha still fall in the range type=1~6 
-    !so that we can use real Gamma function of weight here
-    if(isbold) then
-      !----------------- for bold Gamma ------------------------------
-      if(isdelta==0) weight_vertex = weight_Gam(typ, dr, t1, t2)
-      if(isdelta==1) weight_vertex = weight_Gam0(typ, dr)
-    else 
-      !----------------- for bare Gamma ------------------------------
-      if(isdelta==0) weight_vertex = (0.d0, 0.d0)
-      if(isdelta==1) weight_vertex = weight_Gam0(typ, dr)
-    endif
-  else
+  if(stat==0) then
     if(isbold) then
       !----------------- for bold Gamma ------------------------------
       if(isdelta==0) weight_vertex = weight_Gam(typ, dr, t1, t2)
@@ -202,9 +222,29 @@ COMPLEX*16 FUNCTION weight_vertex(stat, isdelta, dr0, dtau1, dtau2, typ)
       if(isdelta==0) weight_vertex = (0.d0, 0.d0)
       if(isdelta==1) weight_vertex = weight_Gam0(typ, dr)
     endif
+
+  else if(stat==2) then
+    if(isbold) then
+      !----------------- for bold Gamma ------------------------------
+      if(isdelta==0) weight_vertex = weight_Gam(typ, dr, t1, t2)
+      if(isdelta==1) weight_vertex = weight_Gam0(typ, dr)
+    else 
+      !----------------- for bare Gamma ------------------------------
+      if(isdelta==0) weight_vertex = (0.d0, 0.d0)
+      if(isdelta==1) weight_vertex = weight_Gam0(typ, dr)
+    endif
+
+  else if(stat==1 .or. stat==3) then
+    if(isdelta==0) weight_vertex = (0.d0, 0.d0)
+    if(isdelta==1) weight_vertex = weight_meas_Gam0(typ, dr)
+  else
+    call LogFile%WriteStamp('e')
+    call LogFile%WriteLine("The number of update: "+str(iupdate))
+    call LogFile%WriteLine("vertex status error!"+str(stat))
+    stop
   endif
 
-  !---------------------- for test --------------------------------------
+  !---------------------- test1: fake function -----------------------------------
   !flag = 0
   !if(t1<0) then
     !dtau1 = dtau1 + Beta
@@ -216,12 +256,12 @@ COMPLEX*16 FUNCTION weight_vertex(stat, isdelta, dr0, dtau1, dtau2, typ)
   !endif
 
   !if(stat==0 .or. stat==2) then
-    !if(isdelta==1) weight_vertex = weight_meas_Gam(typ, dr)
+    !if(isdelta==1) weight_vertex = weight_meas_Gam0(typ, dr)
     !if(isdelta==0) then
       !weight_vertex = (0.d0, 0.d0)
       !if(dr(1)==0 .and. dr(2)==0) then
         !if(typ==1 .or. typ==2 .or. typ==5 .or. typ==6) then
-          !if(mod(flag, 2)==0) then
+          !if(mod(flag, 2)==0) the
             !weight_vertex = dcmplx(dtau1**2.d0+dtau2**2.d0+1.d0, 0.d0)
             !!weight_vertex = (1.d0, 0.d0)
           !else 
@@ -233,18 +273,31 @@ COMPLEX*16 FUNCTION weight_vertex(stat, isdelta, dr0, dtau1, dtau2, typ)
     !endif
 
   !else if(stat==1 .or. stat==3) then
-    !if(isdelta==1) weight_vertex = weight_meas_Gam(typ, dr)
+    !if(isdelta==1) weight_vertex = weight_meas_Gam0(typ, dr)
     !if(isdelta==0) weight_vertex = (0.d0, 0.d0)
 
   !else
     !call LogFile%WriteStamp('e')
-    !call LogFile%WriteLine("The number of update: "+str(imc))
+    !call LogFile%WriteLine("The number of update: "+str(iupdate))
+    !call LogFile%WriteLine("vertex status error!"+str(stat))
+    !stop
+  !endif
+
+  !---------------------- test2: uniform function ---------------------
+  !if(stat>=0 .and. stat<=3) then
+    !if(isdelta==1) weight_vertex = weight_meas_Gam0(typ, dr)
+    !if(isdelta==0) weight_vertex = weight_meas_Gam0(1,   dr)
+
+  !else
+    !call LogFile%WriteStamp('e')
+    !call LogFile%WriteLine("The number of update: "+str(iupdate))
     !call LogFile%WriteLine("vertex status error!"+str(stat))
     !stop
   !endif
   !------------------------ end -----------------------------------------
   return
 END FUNCTION weight_vertex
+
 
 !!======================== WEIGHT EXTRACTING =========================
 !! most basic interface to the matrix element
@@ -402,10 +455,9 @@ END FUNCTION weight_meas_W
   !implicit none
   !integer, intent(in)  :: dr(2), ityp, t1, t2
 
+  !weight_meas_Gam = (0.d0, 0.d0)
   !if(dr(1)==0 .and. dr(2)==0) then
     !weight_meas_Gam = (1.d0, 0.d0)
-  !else
-    !weight_meas_Gam = (0.d0, 0.d0)
   !endif
   !return
 !END FUNCTION weight_meas_Gam
@@ -1295,434 +1347,6 @@ END SUBROUTINE undo_delete_gamma
 !!=======================================================================
 
 
-
-
-
-!!============== GRAM-SCHMIDT BASIS ==================================
-
-!!-------------- generate the Gram-Schmidt basis --------------
-!SUBROUTINE calculate_basis(nbasis, OmegaMin, OmegaMax, EP, EN)
-  !implicit none
-  !integer, intent(in):: nbasis, OmegaMin, OmegaMax
-  !double precision :: EP(nbasis, nbasis), EN(nbasis, nbasis)
-  !double precision :: VP(nbasis, nbasis), VN(nbasis, nbasis)
-  !double precision :: norm
-  !integer :: i, j, k
-
-  !EP(:,:) = 0.d0
-  !EN(:,:) = 0.d0
-  !VP(:,:) = 0.d0
-  !VN(:,:) = 0.d0
-
-  !do i = 1, nbasis
-    !VP(i, i) = 1.d0
-    !EP(i, :) = VP(i, :)
-
-    !do j = 1, i-1
-      !do k = 1, j
-        !EP(i, k) = EP(i, k) - EP(j, k) *projector(EP(j,:), VP(i, :), OmegaMin, OmegaMax)
-      !enddo
-    !enddo
-
-    !norm = dsqrt(projector(EP(i,:), EP(i,:), OmegaMin, OmegaMax))
-    !EP(i, :) = EP(i, :)/norm
-  !enddo
-
-  !do i = 1, nbasis
-    !VN(i, i) = 1.d0
-    !EN(i, :) = VN(i, :)
-
-    !do k = 1, j
-      !do j = 1, i-1
-        !EN(i, k) = EN(i, k) - EN(j, k) *projector(EN(j,:), VN(i, :), -OmegaMax, -OmegaMin)
-      !enddo
-    !enddo
-    !norm = dsqrt(projector(EN(i,:), EN(i,:), -OmegaMax, -OmegaMin))
-    !EN(i, :) = EN(i, :)/norm
-  !enddo
-
-!END SUBROUTINE calculate_basis
-
-
-
-!SUBROUTINE calculate_Gamma_basis(nbasisGamma, OmegaMin, OmegaMax, EPN, ENP, &
-  !&  EPPR, ENNR, EPPL, ENNL)
-  !implicit none
-  !integer, intent(in):: nbasisGamma, OmegaMin, OmegaMax
-  !double precision :: ENP(nbasisGamma, nbasisGamma),  EPN(nbasisGamma, nbasisGamma)
-  !double precision :: EPPR(nbasisGamma, nbasisGamma), ENNR(nbasisGamma, nbasisGamma)
-  !double precision :: EPPL(nbasisGamma, nbasisGamma), ENNL(nbasisGamma, nbasisGamma)
-  !double precision :: VNP(nbasisGamma, nbasisGamma),  VPN(nbasisGamma, nbasisGamma)
-  !double precision :: VPPR(nbasisGamma, nbasisGamma), VNNR(nbasisGamma, nbasisGamma)
-  !double precision :: VPPL(nbasisGamma, nbasisGamma), VNNL(nbasisGamma, nbasisGamma)
-  !double precision :: norm
-  !integer :: i, j, k
-  !VPN(:,:) = 0.d0
-  !VNP(:,:) = 0.d0
-  !VPPR(:,:) = 0.d0
-  !VNNR(:,:) = 0.d0
-  !VPPL(:,:) = 0.d0
-  !VNNL(:,:) = 0.d0
-
-  !EPN(:,:) = 0.d0
-  !ENP(:,:) = 0.d0
-  !EPPR(:,:) = 0.d0
-  !ENNR(:,:) = 0.d0
-  !EPPL(:,:) = 0.d0
-  !ENNL(:,:) = 0.d0
-
-  !do i = 1, nbasisGamma
-    !VPN(i, i) = 1.d0
-    !EPN(i, :) = VPN(i, :)
-
-    !do j = 1, i-1
-      !do k = 1, j
-        !EPN(i, k) = EPN(i, k) - EPN(j, k) *projector_Gamma(EPN(j,:), VPN(i, :), OmegaMin, OmegaMax, &
-          !& -OmegaMax, -OmegaMin)
-      !enddo
-    !enddo
-
-    !norm = dsqrt(projector_Gamma(EPN(i, :), EPN(i,:), OmegaMin, OmegaMax, &
-      !& -OmegaMax, -OmegaMin))
-    !EPN(i, :) = EPN(i, :)/norm 
-  !enddo
-
-  !do i = 1, nbasisGamma
-    !VNP(i, i) = 1.d0
-    !ENP(i, :) = VNP(i, :)
-
-    !do j = 1, i-1
-      !do k = 1, j
-        !ENP(i, k) = ENP(i, k) - ENP(j, k) *projector_Gamma(ENP(j,:), VNP(i, :), -OmegaMax, -OmegaMin, &
-          !& OmegaMin, OmegaMax)
-      !enddo
-    !enddo
-
-    !norm = dsqrt(projector_Gamma(ENP(i, :), ENP(i,:), -OmegaMax, -OmegaMin, &
-      !& OmegaMin, OmegaMax))
-    !ENP(i, :) =  ENP(i, :)/norm
-  !enddo
-
-  !do i = 1, nbasisGamma
-    !VPPR(i, i) = 1.d0
-    !EPPR(i, :) = VPPR(i, :)
-
-    !do j = 1, i-1
-      !do k = 1, j
-        !EPPR(i, k) = EPPR(i, k) - EPPR(j, k) *projector_Gamma(EPPR(j,:), VPPR(i, :), OmegaMin, OmegaMax, &
-          !& OmegaMin, 0)
-      !enddo
-    !enddo
-
-    !norm = dsqrt(projector_Gamma(EPPR(i, :), EPPR(i,:), OmegaMin, OmegaMax, &
-      !& OmegaMin, 0))
-    !EPPR(i, :) = EPPR(i, :)/norm 
-  !enddo
-
-  !do i = 1, nbasisGamma
-    !VPPL(i, i) = 1.d0
-    !EPPL(i, :) = VPPL(i, :)
-
-    !do j = 1, i-1
-      !do k = 1, j
-        !EPPL(i, k) = EPPL(i, k) - EPPL(j, k) *projector_Gamma(EPPL(j,:), VPPL(i, :), OmegaMin, OmegaMax, &
-          !& 0, OmegaMax)
-      !enddo
-    !enddo
-
-    !norm = dsqrt(projector_Gamma(EPPL(i, :), EPPL(i,:), OmegaMin, OmegaMax, &
-      !& 0, OmegaMax))
-    !EPPL(i, :) = EPPL(i, :)/norm 
-  !enddo
-
-  !do i = 1, nbasisGamma
-    !VNNR(i, i) = 1.d0
-    !ENNR(i, :) = VNNR(i, :)
-
-    !do j = 1, i-1
-      !do k = 1, j
-        !ENNR(i, k) = ENNR(i, k) - ENNR(j, k) *projector_Gamma(ENNR(j,:), VNNR(i, :), -OmegaMax, -OmegaMin, &
-          !& -OmegaMax, 0)
-      !enddo
-    !enddo
-
-    !norm = dsqrt(projector_Gamma(ENNR(i, :), ENNR(i,:), -OmegaMax, -OmegaMin, &
-      !& -OmegaMax, 0))
-    !ENNR(i, :) = ENNR(i, :)/norm
-  !enddo
-
-  !do i = 1, nbasisGamma
-    !VNNL(i, i) = 1.d0
-    !ENNL(i, :) = VNNL(i, :)
-
-    !do j = 1, i-1
-      !do k = 1, j
-        !ENNL(i, k) = ENNL(i, k) - ENNL(j, k) *projector_Gamma(ENNL(j,:), VNNL(i, :), -OmegaMax, -OmegaMin, &
-          !& 0, -OmegaMin)
-      !enddo
-    !enddo
-
-    !norm = dsqrt(projector_Gamma(ENNL(i, :), ENNL(i,:), -OmegaMax, -OmegaMin, &
-      !& 0, -OmegaMin))
-    !ENNL(i, :) = ENNL(i, :)/norm
-  !enddo
-  !return
-!END SUBROUTINE calculate_Gamma_basis
-
-
-
-
-!!---------- weight calculate f(omega) ------------------
-!DOUBLE PRECISION FUNCTION weight_basis(Coef, n)
-  !implicit none
-  !double precision :: Coef(nbasis)
-  !integer :: j, n
-  !weight_basis = 0.d0
-  !do j = 1, nbasis
-    !weight_basis = weight_basis + Coef(j)*OriginalBasis(j, n)
-  !enddo
-  !return 
-!END FUNCTION weight_basis
-
-
-!!---------- projector: \int_{omega} f1(omega)*f2(omega)  --------
-!DOUBLE PRECISION FUNCTION projector(Coef1, Coef2, OmegaMin, OmegaMax)
-  !implicit none
-  !double precision :: Coef1(nbasis), Coef2(nbasis)
-  !integer :: j, k, n, OmegaMin, OmegaMax
-
-  !projector  = 0.d0
-  !do j = 1, nbasis 
-    !do k = 1, nbasis
-      !do n = OmegaMin, OmegaMax
-        !projector = projector + Coef1(j)*OriginalBasis(j, n)*Coef2(k)*OriginalBasis(k, n)
-      !enddo
-    !enddo
-  !enddo
-  !return 
-!END FUNCTION projector
-
-
-
-!!---------- weight calculate f(omega) ------------------
-!DOUBLE PRECISION FUNCTION weight_basis_Gamma(Coef, n1, n2)
-  !implicit none
-  !double precision :: Coef(nbasisGamma)
-  !integer :: j, n1, n2
-  !weight_basis_Gamma = 0.d0
-  !do j = 1, nbasisGamma
-    !weight_basis_Gamma = weight_basis_Gamma+Coef(j)*OriginalBasisGamma(j, n1, n2)
-  !enddo
-  !return 
-!END FUNCTION weight_basis_Gamma
-
-
-!!---------- projector: \int_{omega1, omega2} f1(omega1,omega2)*f2(omega1,omega2)  --------
-!DOUBLE PRECISION FUNCTION projector_Gamma(Coef1, Coef2, OmegaMin1, OmegaMax1, OmegaMin2, OmegaMax2)
-  !implicit none
-  !double precision :: Coef1(nbasisGamma), Coef2(nbasisGamma)
-  !integer :: j, k, n1, n2, OmegaMin1, OmegaMax1, OmegaMin2, OmegaMax2
-
-  !projector_Gamma  = 0.d0
-
-  !do j = 1, nbasisGamma
-    !do k = 1, nbasisGamma
-      !do n1 = OmegaMin1, OmegaMax1
-        !if(OmegaMin2==0) then
-          !if(n1<OmegaMax1) then
-            !do n2 = n1+1, OmegaMax1
-              !projector_Gamma = projector_Gamma + Coef1(j)*OriginalBasisGamma(j, n1, n2)*Coef2(k)* &
-                !& OriginalBasisGamma(k, n1, n2)*ReweightBasis(n1, n2)
-            !enddo
-          !endif
-        !else if(OmegaMax2==0) then
-          !if(n1>OmegaMin1) then
-            !do n2 = OmegaMin2, n1-1
-              !projector_Gamma = projector_Gamma + Coef1(j)*OriginalBasisGamma(j, n1, n2)*Coef2(k)* &
-                !& OriginalBasisGamma(k, n1, n2)*ReweightBasis(n1, n2)
-            !enddo
-          !endif
-        !else
-          !do n2 = OmegaMin2, OmegaMax2
-            !projector_Gamma = projector_Gamma + Coef1(j)*OriginalBasisGamma(j, n1, n2)*Coef2(k)* &
-              !& OriginalBasisGamma(k, n1, n2)*ReweightBasis(n1, n2)
-          !enddo
-        !endif
-      !enddo
-    !enddo
-  !enddo
-  !return 
-!END FUNCTION projector_Gamma
-
-
-
-
-!!--------- test subroutine for the Gram-Schmidt basis ------
-!SUBROUTINE test_basis(nbasis, OmegaMin, OmegaMax, CoefP, CoefN)
-  !implicit none
-  !integer, intent(in) :: nbasis, OmegaMin, OmegaMax
-  !double precision :: CoefP(nbasis, nbasis), CoefN(nbasis, nbasis)
-  !integer :: i, j, k, l, n
-  !double precision :: omega, x, y
-
-  !do i = 1, nbasis
-
-    !y = 0.d0
-    !do  n = OmegaMin, OmegaMax
-      !y = y + weight_basis(CoefP(i,:), n)**2.d0
-    !enddo
-    !if(dabs(y-1.d0)>1.d-10) then
-      !write(logstr, *) i, y, "Positive Basis error!!"
-      !call write_log
-    !endif
-
-    !y = 0.d0
-    !do  n = -OmegaMax, -OmegaMin
-      !y = y + weight_basis(CoefN(i,:), n)**2.d0
-    !enddo
-    !if(dabs(y-1.d0)>1.d-10) then
-      !write(logstr, *) i, y, "Negative Basis error!!"
-      !call write_log
-    !endif
-  !enddo
-
-  !do i = 1, nbasis
-    !do j = i+1, nbasis
-      !y = projector(CoefP(i, :), CoefP(j, :), OmegaMin, OmegaMax)
-      !if(dabs(y)>1.d-10) then
-        !write(logstr, *) i, j, y, "Positive Basis error!!"
-        !call write_log
-      !endif
-      !y = projector(CoefN(i, :), CoefN(j, :), -OmegaMax, -OmegaMin)
-      !if(dabs(y)>1.d-10) then
-        !write(logstr, *) i, j, y, "Negative Basis error!!"
-        !call write_log
-      !endif
-    !enddo
-  !enddo
-
-!END SUBROUTINE test_basis
-
-
-
-
-!!--------- test subroutine for the Gram-Schmidt basis ------
-!SUBROUTINE test_basis_Gamma(nbasisGamma, OmegaMin, OmegaMax, EPN, ENP, &
-    !& EPPR, ENNR, EPPL, ENNL)
-  !implicit none
-  !integer, intent(in) :: nbasisGamma, OmegaMin, OmegaMax
-  !double precision :: ENP(nbasisGamma, nbasisGamma), EPN(nbasisGamma,nbasisGamma)
-  !double precision :: EPPR(nbasisGamma, nbasisGamma),ENNR(nbasisGamma,nbasisGamma)
-  !double precision :: EPPL(nbasisGamma, nbasisGamma),ENNL(nbasisGamma,nbasisGamma)
-  !integer :: i, j, k, l, n1, n2
-  !double precision :: omega, x, y
-
-  !do i = 1, nbasisGamma
-    !y = 0.d0
-    !do  n1 = OmegaMin+1, OmegaMax
-      !do n2 = OmegaMin, n1-1
-        !y = y + weight_basis_Gamma(EPPR(i,:), n1, n2)**2.d0*ReweightBasis(n1, n2)
-      !enddo
-    !enddo
-    !if(dabs(y-1.d0)>1.d-8) then
-      !write(logstr, *) i, y-1.d0, "++R Gamma Basis error!!"
-      !call write_log
-    !endif
-
-    !y = 0.d0
-    !do  n1 = OmegaMin, OmegaMax-1
-      !do n2 = n1+1, OmegaMax
-        !y = y + weight_basis_Gamma(EPPL(i,:), n1, n2)**2.d0*ReweightBasis(n1, n2)
-      !enddo
-    !enddo
-    !if(dabs(y-1.d0)>1.d-8) then
-      !write(logstr, *) i, y-1.d0, "++L Gamma Basis error!!"
-      !call write_log
-    !endif
-
-    !y = 0.d0
-    !do  n1 = OmegaMin, OmegaMax
-      !do n2 = -OmegaMax, -OmegaMin
-        !y = y + weight_basis_Gamma(EPN(i,:), n1, n2)**2.d0*ReweightBasis(n1, n2)
-      !enddo
-    !enddo
-    !if(dabs(y-1.d0)>1.d-8) then
-      !write(logstr, *) i, y-1.d0, "+- Gamma Basis error!!"
-      !call write_log
-    !endif
-
-    !y = 0.d0
-    !do  n1 = -OmegaMax, -OmegaMin
-      !do n2 = OmegaMin, OmegaMax
-        !y = y + weight_basis_Gamma(ENP(i,:), n1, n2)**2.d0*ReweightBasis(n1, n2)
-      !enddo
-    !enddo
-    !if(dabs(y-1.d0)>1.d-8) then
-      !write(logstr, *) i, y-1.d0, "-+ Gamma Basis error!!"
-      !call write_log
-    !endif
-
-    !y = 0.d0
-    !do  n1 = -OmegaMax+1, -OmegaMin
-      !do n2 = -OmegaMax, n1-1
-        !y = y + weight_basis_Gamma(ENNR(i,:), n1, n2)**2.d0*ReweightBasis(n1, n2)
-      !enddo
-    !enddo
-    !if(dabs(y-1.d0)>1.d-8) then
-      !write(logstr, *) i, y-1.d0, "--R Gamma Basis error!!"
-      !call write_log
-    !endif
-
-    !y = 0.d0
-    !do  n1 = -OmegaMax, -OmegaMin-1
-      !do n2 = n1+1, -OmegaMin
-        !y = y + weight_basis_Gamma(ENNL(i,:), n1, n2)**2.d0*ReweightBasis(n1, n2)
-      !enddo
-    !enddo
-    !if(dabs(y-1.d0)>1.d-8) then
-      !write(logstr, *) i, y-1.d0, "--L Gamma Basis error!!"
-      !call write_log
-    !endif
-  !enddo
-
-
-  !do i = 1, nbasisGamma
-    !do j = i+1, nbasisGamma
-      !y = projector_Gamma(EPN(i, :), EPN(j, :), OmegaMin, OmegaMax,-OmegaMax,-OmegaMin)
-      !if(dabs(y)>1.d-8) then
-        !write(logstr, *) i, j, y, "+- Gamma Basis error!!"
-        !call write_log
-      !endif
-      !y = projector_Gamma(ENP(i, :), ENP(j, :),-OmegaMax,-OmegaMin, OmegaMin, OmegaMax)
-      !if(dabs(y)>1.d-8) then
-        !write(logstr, *) i, j, y, "-+ Gamma Basis error!!"
-        !call write_log
-      !endif
-      !y = projector_Gamma(EPPR(i, :), EPPR(j, :), OmegaMin, OmegaMax, OmegaMin, 0)
-      !if(dabs(y)>1.d-7) then
-        !write(logstr, *) i, j, y, "++R Gamma Basis error!!"
-        !call write_log
-      !endif
-      !y = projector_Gamma(EPPL(i, :), EPPL(j, :), OmegaMin, OmegaMax, 0, OmegaMax)
-      !if(dabs(y)>1.d-7) then
-        !write(logstr, *) i, j, y, "++L Gamma Basis error!!"
-        !call write_log
-      !endif
-      !y = projector_Gamma(ENNR(i, :), ENNR(j, :),-OmegaMax,-OmegaMin,-OmegaMax, 0)
-      !if(dabs(y)>1.d-7) then
-        !write(logstr, *) i, j, y, "--R Gamma Basis error!!"
-        !call write_log
-      !endif
-      !y = projector_Gamma(ENNL(i, :), ENNL(j, :),-OmegaMax,-OmegaMin, 0, -OmegaMin)
-      !if(dabs(y)>1.d-7) then
-        !write(logstr, *) i, j, y, "--L Gamma Basis error!!"
-        !call write_log
-      !endif
-    !enddo
-  !enddo
-
-!END SUBROUTINE test_basis_Gamma
-!====================================================================
 
 !======================= Complex Operations =============================
 COMPLEX*16 FUNCTION d_times_cd(nd, ncd)

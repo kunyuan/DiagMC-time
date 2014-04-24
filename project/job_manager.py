@@ -127,7 +127,6 @@ def submit_job(job_atom):
                 shellstr = "exec "+job_atom.execute+" < "+infile+" >> "+outfile
             else:
                 shellstr = "exec echo "+infile+" | "+job_atom.execute+" >> "+outfile
-                print shellstr
             proc = subprocess.Popen(shellstr, shell=True)
             if job_atom.keep_cpu_busy:
                 PROCLIST.append((proc, job_atom))
