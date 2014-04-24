@@ -273,8 +273,8 @@ SUBROUTINE markov(IsToss)
       call LogFile%WriteStamp()
       call LogFile%WriteLine("Reweighting order of diagrams...")
 
-      x=sum(GamWormOrder(:))
-      CoefOfWeight(:)=x/(GamWormOrder(:)+50.d0)
+      x=sum(GamWormOrder(:)/Error(0:MCOrder))
+      CoefOfWeight(:)=x/(GamWormOrder(:)/Error(0:MCOrder)+50.d0)
 
       call LogFile%WriteLine("Reweight Ratios:")
 
@@ -2925,12 +2925,15 @@ SUBROUTINE measure
     ImGamSqMC(Order, ityp, dx, dy, dt1, dt2 ) = ImGamSqMC(Order, ityp, dx, dy, dt1, dt2) &
       & + (dimag(Phase)/factorM)**2.d0
 
+    Quan(Order) = Quan(Order) + real(Phase)/factorM
+    Norm(Order) = Norm(Order) + 1.d0
+
     !===============  test variables =================================
-    !Norm(1) = Z_normal
+    !Norm(MCOrder+1) = Z_normal
 
     !if(Order==1 .and. ityp==1 .and. dx==0 .and. dy==0) then
       !if(dt1==0 .and. dt2==0) then
-        !Quan(1) = Quan(1) + real(Phase)/factorM
+        !Quan(MCOrder+1) = Quan(MCOrder+1) + real(Phase)/factorM
       !endif
     !endif
     !================================================================
@@ -2946,8 +2949,8 @@ SUBROUTINE measure
       !sumd = sumd+ IsDeltaVertex(i)
     !enddo
     !if(sumt==NWLn .and. sumd==NVertex) then
-      !Quan(Order+2) = Quan(Order+2) + 1.d0/abs(factorM)
-      !Norm(Order+2) = Norm(Order+2) + 1.d0
+      !Quan(MCOrder+Order+2) = Quan(MCOrder+Order+2) + 1.d0/abs(factorM)
+      !Norm(MCOrder+Order+2) = Norm(MCOrder+Order+2) + 1.d0
     !endif
     !=============================================================
 
@@ -2977,12 +2980,14 @@ SUBROUTINE statistics
       deallocate(temp)
     endif
 
-    do i=1,NObs
+    do i=0,NObs-1
       if(Norm(i)>1e-6) then
         x=Quan(i)/Norm(i)
         ObsRecord(StatNum,i)=x 
         call ERSTAT(ObsRecord(:,i),StatNum,amax,tmax,amin,tmin) 
         Error(i)=(amax-amin)/2.d0;
+      else
+        Error(i)=100.d0
       endif
     enddo
 end SUBROUTINE

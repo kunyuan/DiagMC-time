@@ -17,25 +17,14 @@ SUBROUTINE print_status
     call LogFile%WriteLine("Printing interval:"+str(t_elap,'(f12.3)')+'s')
     call LogFile%WriteLine("Efficiency: "+str(imc/t_elap,'(f12.0)')+"steps per second.")
     call LogFile%WriteLine('Statistics Number ='+str(StatNum))
-    !i = 1
-    !if(Norm(i)>1e-6) then
-      !write(logstr,"(i2, A,f15.6,'+/-',f15.6)") i,QuanName(i),Quan(i)/Norm(i),Error(i)*sqrt(Norm(i))
-      !call LogFile%WriteLine(logstr)
-    !endif
 
-    do i=1,MCOrder+1
+    do i=0,MCOrder
       if(Norm(i)>1e-6) then
-        write(logstr,"(i2, A,f15.6,'+/-',f15.6)") i-1,QuanName(i),Quan(i)/Norm(i),Error(i) 
+        write(logstr,"(i2, A,f15.6,'+/-',f15.6)") i,QuanName(i),Quan(i)/Norm(i),Error(i) 
         call LogFile%WriteLine(logstr)
       endif
     enddo
 
-    do i=MCOrder+2,2*MCOrder+1
-      if(Norm(i)>1e-6) then
-        write(logstr,"(i2, A,f15.6,'+/-',f15.6)") i-MCOrder-1,QuanName(i),Quan(i)/Norm(i),Error(i) 
-        call LogFile%WriteLine(logstr)
-      endif
-    enddo
     call LogFile%WriteLine("------------------------------------------------")
 
     updatename(1)= " 1: create worm along wline"

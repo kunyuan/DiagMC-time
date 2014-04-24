@@ -279,7 +279,7 @@ END FUNCTION self_consistent_GW
 
 SUBROUTINE monte_carlo
   implicit none
-  integer :: mc_version
+  integer :: i, mc_version
   double precision :: WR, GamR
 
   call LogFile%QuickLog("Initializing monte carlo...")
@@ -293,7 +293,9 @@ SUBROUTINE monte_carlo
 
   call LogFile%QuickLog("Initializing monte carlo done!")
 
-  QuanName(1) = "(1st-Gamma(0,0))"
+  do i= 0, MCOrder
+    QuanName(i) = "(Order "+str(i)+"Gamma)"
+  enddo
 
   if(IsLoad==.false.) then
 
