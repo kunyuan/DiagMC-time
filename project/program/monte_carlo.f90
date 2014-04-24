@@ -1071,7 +1071,7 @@ SUBROUTINE move_worm_along_gline_test
   if(-2*sG+SpinMasha*(-1)**dir/=0)  return
 
   kGold = kLn(GLn)
-  kLn(GLn) = add_k(kGold, -(-1)**dir*kMasha)
+  ktemp = add_k(kGold, -(-1)**dir*kMasha)
   ! make sure that on Ira, we don't have |kG1-kG2|==|kW|
   ! orignailly, we have abs(add_k(kGold, -kjGLn))==abs(jW)
   ! once Ira moves in, we want to exclude config with: abs(add_k(ktemp, -kjGLn))==abs(jW)
