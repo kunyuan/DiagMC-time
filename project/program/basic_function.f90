@@ -730,7 +730,6 @@ END SUBROUTINE delete_Hash4W
 !!================= IRREDUCIBILITY CHECK ================================
 !!=======================================================================
 
-
 !--------- check the irreducibility for G -----------------------
 LOGICAL FUNCTION Is_k_valid_for_G(k)
   implicit none
@@ -865,9 +864,7 @@ logical FUNCTION Is_reducible_Gam()
           if(NeighVertex(1,Gam2)==Gi .and. NeighVertex(2,Gam2)==Gj) cycle
           if(NeighVertex(2,Gam2)==Gi .and. NeighVertex(1,Gam2)==Gj) cycle
           Is_reducible_Gam=.true.
-          if(imc==172436573) print *,imc, Gi,kLn(Gi), Gj,kLn(Gj), Wk,kLn(Wk)
-          if(imc==172436574) print *,imc, Gi,kLn(Gi), Gj,kLn(Gj), Wk,kLn(Wk)
-          if(imc==172436575) print *,imc, Gi,kLn(Gi), Gj,kLn(Gj), Wk,kLn(Wk)
+          !if(imc==935670) print *,imc, Gi,kLn(Gi), Gj,kLn(Gj), Wk,kLn(Wk)
           return
         endif
       enddo

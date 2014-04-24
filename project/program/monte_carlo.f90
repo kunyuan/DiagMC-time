@@ -233,11 +233,27 @@ SUBROUTINE markov(IsToss)
           call change_Gamma_isdelta       
         endif
 
-        if(imc>=172436500 .and. imc<=172436575) then
-          call check_k_conserve
-          call check_config
-          call print_config
-        endif
+        !if(imc>=1041587 .and. imc<=172436575) then
+        !call check_config
+        !endif
+        !if(IsWormPresent) then
+          !if(abs(add_k(kLn(NeighVertex(1,Ira)), -kLn(NeighVertex(2,Ira))))==abs(kLn(NeighVertex(3,Ira)))) then
+            !print *,"Ira",Ira, imc, iupdate, kMasha
+            !print *,NeighVertex(1,Ira),kLn(NeighVertex(1,Ira))
+            !print *,NeighVertex(2,Ira),kLn(NeighVertex(2,Ira))
+            !print *,NeighVertex(3,Ira),kLn(NeighVertex(3,Ira))
+            !call print_config
+            !stop
+          !endif
+          !if(abs(add_k(kLn(NeighVertex(1,Masha)), -kLn(NeighVertex(2,Masha))))==abs(kLn(NeighVertex(3,Masha)))) then
+            !print *,"Masha",Ira, imc, iupdate, kMasha
+            !print *,NeighVertex(1,Masha),kLn(NeighVertex(1,Masha))
+            !print *,NeighVertex(2,Masha),kLn(NeighVertex(2,Masha))
+            !print *,NeighVertex(3,Masha),kLn(NeighVertex(3,Masha))
+            !call print_config
+            !stop
+          !endif
+        !endif
 
       enddo
 
@@ -358,6 +374,12 @@ SUBROUTINE create_worm_along_wline
   k = generate_k()
   kiWold = kLn(iWLn)
   ktemp=add_k(kiWold, k)
+  ! make sure that on Ira, we don't have |kG1-kG2|==|kW|
+  ! orignailly, we have abs(add_k(kiGin, -kiGout))==abs(kiWold)
+  ! once Ira moves in, we want to exclude config with: abs(add_k(kiGin, -kiGout))==abs(ktemp)
+  ! so the only requirement is abs(kiWold)/=abs(ktemp)
+  ! The Masha side has EXACTLY the same requirement!!!
+  if(abs(kiWold)==abs(ktemp)) return
   if(Is_k_valid_for_W(ktemp)==.false.) return
   call update_line(iWLn, ktemp, 2)
    
@@ -645,7 +667,7 @@ END SUBROUTINE delete_worm_along_wline
 SUBROUTINE move_worm_along_wline
   implicit none
   integer :: dir, kW, kWold, ktemp
-  integer :: iGam, jGam, WLn, GLn1, GLn2
+  integer :: iGam, jGam, WLn, GLn1, GLn2, GLn3, GLn4
   integer :: typiGam, typW
   integer :: statiGam, statjGam, statW
   double precision :: tau1, tau2, tau
@@ -664,12 +686,19 @@ SUBROUTINE move_worm_along_wline
   jGam = NeighLn(3-dir, WLn)
   if(jGam == Masha .or. jGam==Ira)  return
 
-  GLn1 = NeighVertex(1, iGam);     GLn2 = NeighVertex(2, iGam)
 
   !------- step3 : configuration check ------------------
   !-------- irreducibility check ------------------------
   kWold = kLn(WLn)
   ktemp = add_k(kWold, (-1)**dir *kMasha)
+
+  ! make sure that on Ira, we don't have |kG1-kG2|==|kW|
+  ! suppose GLn3 = NeighVertex(1, jGam);     GLn4 = NeighVertex(2, jGam)
+  ! orignailly, we have abs(add_k(kGLn3, -kGLn4))==abs(kWold)
+  ! once Ira moves in, we want to exclude config with: abs(add_k(kGLn3, -kGLn4))==abs(ktemp)
+  ! so the only requirement is abs(kWold)/=abs(ktemp)
+  if(abs(kWold)==abs(ktemp)) return
+
   if(Is_k_valid_for_W(ktemp)==.false.) return
   call update_line(WLn, ktemp, 2)
 
@@ -688,6 +717,7 @@ SUBROUTINE move_worm_along_wline
   statW = wline_stat(statiGam, statjGam)
 
   typW = TypeLn(WLn)
+  GLn1 = NeighVertex(1, iGam);     GLn2 = NeighVertex(2, iGam)
   typiGam = TypeSp2Gam(TypeLn(GLn1), TypeLn(GLn2), SpInVertex(1, iGam), SpInVertex(2, iGam))
 
   !------- step4 : weight calculation -------------------
@@ -769,7 +799,7 @@ SUBROUTINE move_worm_along_gline
   implicit none
   integer :: dir, kGold, ktemp, dr(2)
   double precision :: Ppro
-  integer :: iGam, jGam, iW, jW, GLn
+  integer :: iGam, jGam, iW, jW, GLn, kjGLn
   integer :: vertex1, vertex2
   integer :: typG, typiGam, typjGam, typiW
   integer, dimension(2) :: spiGam, spjGam
@@ -799,6 +829,14 @@ SUBROUTINE move_worm_along_gline
   
   kGold = kLn(GLn)
   ktemp = add_k(kGold, (-1)**(dir+1) *kMasha)
+
+  ! make sure that on Ira, we don't have |kG1-kG2|==|kW|
+  ! orignailly, we have abs(add_k(kGold, -kjGLn))==abs(jW)
+  ! once Ira moves in, we want to exclude config with: abs(add_k(ktemp, -kjGLn))==abs(jW)
+  ! so the only requirement is abs(add_k(ktemp, -kjGLn))==abs(add_k(kGold, -kjGLn))
+
+  kjGLn = kLn(NeighVertex(dir, jGam))
+  if(abs(add_k(ktemp, -kjGLn))==abs(add_k(kGold, -kjGLn))) return
   if(Is_k_valid_for_G(ktemp)==.false.) return
   call update_line(GLn, ktemp, 1)
 
@@ -1020,7 +1058,7 @@ END SUBROUTINE move_worm_along_gline
 SUBROUTINE add_interaction
   implicit none
   integer :: isdelta, dir, dirW, kIA, kMB, kM, q
-  integer :: GIC, GMD, GamC, GamD
+  integer :: GIC, GMD, GamC, GamD, kNeighG
   integer :: WAB, GIA, GMB, GamA, GamB
   integer :: typGamA, typGamB, typAB
   integer :: statA, statB, statIA, statAC, statMB, statBD
@@ -1048,9 +1086,18 @@ SUBROUTINE add_interaction
   kM = add_k(kMasha, -(-1)**dirW*q)
 
   kIA = add_k(kLn(GIC), -(-1)**(dir+dirW)*q)
+
+  kNeighG=kLn(NeighVertex(3-dir, Ira))
+  if(abs(add_k(KIA,-kNeighG))==abs(kLn(NeighVertex(3,Ira))))return
+
   if(Is_k_valid_for_G(kIA)==.false.) return
 
+
   kMB = add_k(kLn(GMD), (-1)**(dir+dirW)*q)
+
+  kNeighG=kLn(NeighVertex(3-dir, Masha))
+  if(abs(add_k(KMB,-kNeighG))==abs(kLn(NeighVertex(3,Masha))))return
+
   if(Is_k_valid_for_G(kMB)==.false.) return
 
   if(kIA==kMB)  return       
@@ -1241,7 +1288,7 @@ END SUBROUTINE add_interaction
 !-----------------------------------------------------------------
 SUBROUTINE remove_interaction
   implicit none
-  integer :: dir, dirW, kM, kIA, kMB, kAB
+  integer :: dir, dirW, kM, kIA, kMB, kAB, kAC, kBD, kNeighG
   integer :: GAC, GBD, GamC, GamD
   integer :: WAB, GIA, GMB, GamA, GamB
   integer :: statIC, statMD, statIA, statMB, statAB
@@ -1277,6 +1324,14 @@ SUBROUTINE remove_interaction
   kM = add_k(kMasha, (-1)**dirW*kAB)
   kIA = kLn(GIA)
   kMB = kLn(GMB)
+  kAC = kLn(GAC)
+  kBD = kLn(GBD)
+
+  kNeighG=kLn(NeighVertex(3-dir, Ira))
+  if(abs(add_k(kAC,-kNeighG))==abs(kLn(NeighVertex(3,Ira))))return
+  kNeighG=kLn(NeighVertex(3-dir, Masha))
+  if(abs(add_k(KBD,-kNeighG))==abs(kLn(NeighVertex(3,Masha))))return
+
 
   statIA = StatusLn(GIA)
   statMB = StatusLn(GMB)
@@ -1397,7 +1452,7 @@ END SUBROUTINE remove_interaction
 SUBROUTINE reconnect
   implicit none
   integer :: GamA,GamB,dir
-  integer :: GIA,GMB
+  integer :: GIA,GMB, kNeighG
   integer :: statIA,statMB
   complex*16 :: Anew, Aold, sgn
   complex*16 :: WGIA,WGMB
@@ -1412,6 +1467,10 @@ SUBROUTINE reconnect
   GIA=NeighVertex(dir,Ira)
   GMB=NeighVertex(dir,Masha)
   if(TypeLn(GIA)/=TypeLn(GMB))return
+  kNeighG=kLn(NeighVertex(3-dir, Ira))
+  if(abs(add_k(kLn(GMB),-kNeighG))==abs(kLn(NeighVertex(3,Ira))))return
+  kNeighG=kLn(NeighVertex(3-dir, Masha))
+  if(abs(add_k(kLn(GIA),-kNeighG))==abs(kLn(NeighVertex(3,Masha))))return
 
   GamA=NeighLn(dir,GIA)
   GamB=NeighLn(dir,GMB)
@@ -1422,7 +1481,7 @@ SUBROUTINE reconnect
   NeighLn(3-dir,GMB)=Ira
   NeighVertex(dir, Ira) = GMB
 
-  !Don't have change delta_k of Ira and Masha yet here
+  !Don't have changed delta_k of Ira and Masha yet here
 
   !------------ step4 : configuration check ---------------------
   ! do the step4 here so we can save some time
