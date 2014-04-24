@@ -279,11 +279,6 @@ SUBROUTINE DRAW
       x2=scx*TVertex(3, Vertex2)
       y2=scy*site_num(GRVertex(1, Vertex2),GRVertex(2, Vertex2))
 
-      !if(TypeLn(iWLn)<=4) then
-        !write(11,*) '0 0 0 setrgbcolor'
-      !else
-        !write(11,*) '1 0 1 setrgbcolor'
-      !endif
       ra=dsqrt((x2-x1)**2+(y2-y1)**2)/2.d0
       if(dabs(ra)<1e-6) then
         write(11,792) x1, y1+scy/5. , scy/5. 
@@ -307,7 +302,6 @@ SUBROUTINE DRAW
       a2=a2*radian 
 
       write(11,791)  ca1, ca2, ra, a1, a2
-      !write(11,791) x1,y1,x2,y2 
     enddo
   
     do i=1,NGLn;
@@ -397,7 +391,7 @@ SUBROUTINE DRAW
          & GRVertex(1, Vertex1),GRVertex(2, Vertex1)
       ini=ini-seg
     enddo
-    !write G info
+
     write(11,*) '0 0 0 setrgbcolor'
     write(11,"(f6.1,x,f6.1,x,' M (G info) C')") 530.0,ini
     ini=ini-seg

@@ -11,7 +11,7 @@ logical FUNCTION is_mea_worm_near_G(stat)
     is_mea_worm_near_G=.true.
   else
     call LogFile%WriteStamp('e')
-    call LogFile%WriteLine("The number of update: "+str(iupdate)+",imc: "+str(imc))
+    call LogFile%WriteLine("The number of update: "+str(imc)+",imc: "+str(imc))
     call LogFile%WriteLine("line status error!"+str(stat))
     call print_config
     stop
@@ -101,7 +101,7 @@ COMPLEX*16 FUNCTION weight_gline(stat, tau, typ)
     !weight_gline = weight_meas_G(t)
   !else
     !call LogFile%WriteStamp('e')
-    !call LogFile%WriteLine("The number of update: "+str(iupdate))
+    !call LogFile%WriteLine("The number of update: "+str(imc))
     !call LogFile%WriteLine("line status error!"+str(stat))
     !stop
   !endif
@@ -153,7 +153,7 @@ COMPLEX*16 FUNCTION weight_wline(stat, isdelta, dr0, tau, typ)
     !!if(isdelta==1) weight_wline = weight_meas_W(dr, 0)
   !else
     !call LogFile%WriteStamp('e')
-    !call LogFile%WriteLine("The number of update: "+str(iupdate))
+    !call LogFile%WriteLine("The number of update: "+str(imc))
     !call LogFile%WriteLine("line status error!"+str(stat))
     !stop
   !endif
@@ -238,7 +238,7 @@ COMPLEX*16 FUNCTION weight_vertex(stat, isdelta, dr0, dtau1, dtau2, typ)
 
   !else
     !call LogFile%WriteStamp('e')
-    !call LogFile%WriteLine("The number of update: "+str(iupdate))
+    !call LogFile%WriteLine("The number of update: "+str(imc))
     !call LogFile%WriteLine("vertex status error!"+str(stat))
     !stop
   !endif
@@ -636,17 +636,19 @@ END FUNCTION generate_vertex
 !!=======================================================================
 
 !-------- update G Hash table -----------------------------------
-SUBROUTINE update_Hash4G(oldk, newk)
+SUBROUTINE update_Hash4G(newk, GLn)
   !the newk and oldk is alway about the same G,
   !PLEASE MAKE SURE THAT!!!
   !ALSO MAKE SURE Hash4G(newk)==0 BEFORE CALL THIS SUBROUTINE
   implicit none
-  integer, intent(in) :: oldk, newk
+  integer, intent(in) :: newk, GLn
+  integer :: oldk
+  oldk=kLn(GLn)
 
-  if(CheckG .and. Hash4G(newk)/=0) then
+  if(CheckG .and. (Hash4G(newk)/=0 .or. Hash4G(oldk)/=GLn)) then
       call LogFile%WriteStamp('e')
       call LogFile%WriteLine("Oops, update_Hash4G found a bug!")
-      call LogFile%WriteLine("IsWormPresent:"+str(IsWormPresent)+", update number:"+str(iupdate))
+      call LogFile%WriteLine("IsWormPresent:"+str(IsWormPresent)+", update number:"+str(imc))
       call LogFile%WriteLine("G Hash table for old k"+str(newk)+" is not 1!!"+str(Hash4G(newk)))
       call print_config
   else
@@ -663,7 +665,7 @@ SUBROUTINE add_Hash4G(newk, GLn)
   if(CheckG .and. Hash4G(newk)/=0) then
       call LogFile%WriteStamp('e')
       call LogFile%WriteLine("Oops, add_Hash4G found a bug!")
-      call LogFile%WriteLine("IsWormPresent:"+str(IsWormPresent)+", update number:"+str(iupdate))
+      call LogFile%WriteLine("IsWormPresent:"+str(IsWormPresent)+", update number:"+str(imc))
       call LogFile%WriteLine("G Hash table for old k"+str(newk)+" is not 1!!"+str(Hash4G(newk)))
       call print_config
   else
@@ -681,7 +683,7 @@ SUBROUTINE delete_Hash4G(oldk, GLn)
     if(CheckG) then
       call LogFile%WriteStamp('e')
       call LogFile%WriteLine("Oops, delete_Hash4G found a bug!")
-      call LogFile%WriteLine("IsWormPresent:"+str(IsWormPresent)+", update number:"+str(iupdate))
+      call LogFile%WriteLine("IsWormPresent:"+str(IsWormPresent)+", update number:"+str(imc))
       call LogFile%WriteLine("G Hash table for old k"+str(oldk)+" is not 1!!"+str(Hash4G(oldk)))
       call print_config
       stop
@@ -692,12 +694,12 @@ END SUBROUTINE delete_Hash4G
 
 
 !-------- update W Hash table -----------------------------------
-SUBROUTINE update_Hash4W(oldk, newk)
+SUBROUTINE update_Hash4W(newk, WLn)
   implicit none
-  integer, intent(in) :: oldk, newk
+  integer, intent(in) :: newk, WLn
   integer :: aoldk, anewk
   !COME ON, MAKE SURE Hash4W(aoldk)==0 BEFORE YOU CALL IT
-  aoldk = abs(oldk)
+  aoldk = abs(kLn(WLn))
   anewk = abs(newk)
   Hash4W(anewk)=Hash4W(aoldk)
   Hash4W(aoldk)=0
@@ -719,18 +721,7 @@ SUBROUTINE delete_Hash4W(oldk, WLn)
 
   aoldk = abs(oldk)
 
-  if(Hash4W(aoldk)==WLn) then
-    Hash4W(aoldk)=0
-  else
-    if(CheckG) then
-      call LogFile%WriteStamp('e')
-      call LogFile%WriteLine("Oops, delete_Hash4G found a bug!")
-      call LogFile%WriteLine("IsWormPresent:"+str(IsWormPresent)+", update number:"+str(iupdate))
-      call LogFile%WriteLine("W Hash table for old k"+str(aoldk)+" is not 1!!"+str(Hash4W(aoldk)))
-      call print_config
-      stop
-    endif
-  endif
+  Hash4W(aoldk)=0
   return
 END SUBROUTINE delete_Hash4W
 
@@ -750,25 +741,6 @@ LOGICAL FUNCTION Is_k_valid_for_G(k)
     Is_k_valid_for_G=.true.
   endif
 END FUNCTION
-
-LOGICAL FUNCTION Is_reducible_G(GLn)
-  implicit none
-  integer, intent(in) :: GLn
-  integer :: newk
-
-  Is_reducible_G = .false.
-  if(CheckG==.false.) return
-
-  newk = kLn(GLn)
-
-  if(Hash4G(newk)/=0) then
-    Is_reducible_G = .true.
-    return
-  endif
-    
-  return
-END FUNCTION Is_reducible_G
-
 
 LOGICAL FUNCTION Is_reducible_G_Gam(GLn)
   implicit none
@@ -804,7 +776,6 @@ LOGICAL FUNCTION Is_reducible_G_Gam(GLn)
       return
     endif
   enddo
-    
   return
 END FUNCTION Is_reducible_G_Gam
 
@@ -822,42 +793,16 @@ LOGICAL FUNCTION Is_k_valid_for_W(k)
   endif
 END FUNCTION
 
-LOGICAL FUNCTION Is_reducible_W(WLn)
-  implicit none
-  integer, intent(in) :: WLn
-  integer :: absk 
-
-  Is_reducible_W = .false.
-  if(CheckW==.false.) return
-  absk = abs(kLn(WLn))
-
-  if(absk==0) then
-    Is_reducible_W = .true.
-    return
-  endif
-
-  if(Hash4W(absk)/=0) then
-    Is_reducible_W = .true.
-    return
-  endif
-
-  return
-END FUNCTION Is_reducible_W
-
-
-
 !--------- check the irreducibility for W -----------------------
 LOGICAL FUNCTION Is_reducible_W_Gam(WLn)
   implicit none
   integer, intent(in) :: WLn
-  integer :: absk, i, Gam1, Gam2, G1, G2, G3, G4, kG5, kG6
-  integer :: nG, kG, pkGG, nkGG
-
-  Is_reducible_W_Gam=Is_reducible_Gam()
-  return
+  integer :: absk, i, Gam1, Gam2, G1, G2, G3, G4
+  integer :: nG, kG, pkGG, nkGG, pk, nk
+  logical :: test
 
   Is_reducible_W_Gam = .false.
-  if(CheckGam) return
+  if(CheckGam==.false.) return
 
   absk = abs(kLn(WLn))
   Gam1 = NeighLn(1, WLn)
@@ -867,25 +812,37 @@ LOGICAL FUNCTION Is_reducible_W_Gam(WLn)
   G3 = NeighVertex(1, Gam2)
   G4 = NeighVertex(2, Gam2)
 
-  !do i = 1, NGLn
-    !nG = GLnKey2Value(i)
-    !kG5 = kLn(NeighVertex(1, NeighLn(1,nG)))
-    !kG6 = kLn(NeighVertex(2, NeighLn(2,nG)))
-    !kG = kLn(nG)
-    !if(nG==G1 .or. nG==G2 .or. nG==G3 .or. nG==G4) cycle
-    !pkGG = add_k(kG, absk)
-    !nkGG = add_k(kG, -absk)
-    !if(pkGG==kLn(G1) .or. pkGG==kLn(G2) .or. pkGG==kLn(G3) .or. pkGG==kLn(G4)) cycle
-    !if(nkGG==kLn(G1) .or. nkGG==kLn(G2) .or. nkGG==kLn(G3) .or. nkGG==kLn(G4)) cycle
-    !if(pkGG==kG5 .or. pkGG==kG6 .or. nkGG==kG5 .or. nkGG==kG6) cycle
+  do i = 1, NGLn
+    nG = GLnKey2Value(i)
+    kG = kLn(nG)
+    pkGG=Hash4G(add_k(kG, absk))
+    if(pkGG/=0) then
+      if((nG/=G1 .or. pkGG/=G2) .and. (nG/=G3 .or. pkGG/=G4) .and. (nG/=G2 .or. pkGG/=G1) .and. (nG/=G4 .or. pkGG/=G3)) then
+        Is_reducible_W_Gam=.true.
+        return
+      endif
+    endif
 
-    !if(Hash4G(pkGG)==1 .or. Hash4G(nkGG)==1) then
-      !Is_reducible_W_Gam = .true.
-    !endif
-  !enddo
-  !return
+    nkGG=Hash4G(add_k(kG, -absk))
+    if(nkGG/=0) then
+      if((nG/=G1 .or. nkGG/=G2) .and. (nG/=G3 .or. nkGG/=G4) .and. (nG/=G2 .or. nkGG/=G1) .and. (nG/=G4 .or. nkGG/=G3)) then
+        Is_reducible_W_Gam=.true.
+        return
+      endif
+    endif
+  enddo
 END FUNCTION Is_reducible_W_Gam
 
+SUBROUTINE test_reduciblility(is_reducible, mcname)
+  implicit none
+  logical :: is_reducible
+  character(len=*) :: mcname
+  if(is_reducible/=Is_reducible_Gam()) then
+    call LogFile%QuickLog(mcname+", Reducibility check is wrong!"+" imc: "+str(imc), "e")
+    call print_config
+    stop
+  endif
+end SUBROUTINE
 
 logical FUNCTION Is_reducible_Gam()
   implicit none
@@ -908,6 +865,9 @@ logical FUNCTION Is_reducible_Gam()
           if(NeighVertex(1,Gam2)==Gi .and. NeighVertex(2,Gam2)==Gj) cycle
           if(NeighVertex(2,Gam2)==Gi .and. NeighVertex(1,Gam2)==Gj) cycle
           Is_reducible_Gam=.true.
+          if(imc==172436573) print *,imc, Gi,kLn(Gi), Gj,kLn(Gj), Wk,kLn(Wk)
+          if(imc==172436574) print *,imc, Gi,kLn(Gi), Gj,kLn(Gj), Wk,kLn(Wk)
+          if(imc==172436575) print *,imc, Gi,kLn(Gi), Gj,kLn(Gj), Wk,kLn(Wk)
           return
         endif
       enddo
@@ -917,10 +877,6 @@ end FUNCTION
 !!=======================================================================
 !!=======================================================================
 !!=======================================================================
-
-
-
-
 
 
 !!=======================================================================
@@ -942,7 +898,7 @@ INTEGER FUNCTION add_ira_stat(stat)
     add_ira_stat = stat
   endif
   if(add_ira_stat>=4) then
-    call LogFile%QuickLog(str(iupdate)+" add_ira_stat(stat>3): "+str(add_ira_stat),'e')
+    call LogFile%QuickLog(str(imc)+" add_ira_stat(stat>3): "+str(add_ira_stat),'e')
     call print_config
     stop
   endif
@@ -961,7 +917,7 @@ INTEGER FUNCTION delete_ira_stat(stat)
   if(delete_ira_stat == -2) delete_ira_stat = 0
   if(delete_ira_stat == -1) delete_ira_stat = 1
   if(delete_ira_stat<0) then
-    call LogFile%QuickLog(str(iupdate)+" del_ira_stat(stat<0): "+str(delete_ira_stat),'e')
+    call LogFile%QuickLog(str(imc)+" del_ira_stat(stat<0): "+str(delete_ira_stat),'e')
     call print_config
     stop
   endif
@@ -981,7 +937,7 @@ INTEGER FUNCTION add_mea_stat(stat)
   if(add_mea_stat == 2)   add_mea_stat = 1
 
   if(add_mea_stat>=4) then
-    call LogFile%QuickLog(str(iupdate)+" add_mea(stat>3): "+str(add_mea_stat),'e')
+    call LogFile%QuickLog(str(imc)+" add_mea(stat>3): "+str(add_mea_stat),'e')
     call print_config
     stop
   endif
@@ -998,7 +954,7 @@ INTEGER FUNCTION delete_mea_stat(stat)
   endif
   delete_mea_stat = stat - 1
   if(delete_mea_stat<0) then
-    call LogFile%QuickLog(str(iupdate)+"del_mea_stat(stat<0): "+str(delete_mea_stat),'e')
+    call LogFile%QuickLog(str(imc)+"del_mea_stat(stat<0): "+str(delete_mea_stat),'e')
     call print_config
     stop
   endif
@@ -1057,23 +1013,23 @@ SUBROUTINE update_line(CurLine, k, knd)
   implicit none
   integer, intent(in) :: CurLine, k, knd
 
-  kLn(CurLine)=k
   if(knd==1) then
-    call add_Hash4G(k, CurLine)
+    call update_Hash4G(k, CurLine)
   else
-    call add_Hash4W(k, CurLine)
+    call update_Hash4W(k, CurLine)
   endif
+  kLn(CurLine)=k
 end SUBROUTINE 
 
 SUBROUTINE undo_update_line(CurLine, k, knd)
   implicit none
   integer, intent(in) :: CurLine, k, knd
-  kLn(CurLine)=k
   if(knd==1) then
-    call delete_Hash4G(k, CurLine)
+    call update_Hash4G(k, CurLine)
   else
-    call delete_Hash4W(k, CurLine)
+    call update_Hash4W(k, CurLine)
   endif
+  kLn(CurLine)=k
 end SUBROUTINE
 
 
@@ -1087,7 +1043,7 @@ SUBROUTINE insert_line(newline, isdelta, k, knd, typ, stat, weigh)
   newline = TailLn
   TailLn  = NextLn(TailLn)
   if(StatusLn(TailLn)>=0) then
-    call LogFile%QuickLog("update: "+str(iupdate)+", insert_line error!!!", 'e')
+    call LogFile%QuickLog("update: "+str(imc)+", insert_line error!!!", 'e')
     call print_config
     stop
   endif
@@ -1127,7 +1083,7 @@ SUBROUTINE undo_insert_line(occline, knd)
 
 
   if(StatusLn(occline)==-1) then
-    call LogFile%QuickLog("update: "+str(iupdate)+" , undo_insert_line error!!!", 'e')
+    call LogFile%QuickLog("update: "+str(imc)+" , undo_insert_line error!!!", 'e')
     call print_config
     stop
   endif
@@ -1175,7 +1131,7 @@ SUBROUTINE insert_gamma(newgamma, isdelta, gx, gy, wx, wy, t1, t2, t3, dir, typ,
   newgamma = TailVertex
   TailVertex = NextVertex(TailVertex)
   if(StatusVertex(TailVertex)>=0) then
-    call LogFile%QuickLog("update: "+str(iupdate)+" , insert_gamma error!!!", 'e')
+    call LogFile%QuickLog("update: "+str(imc)+" , insert_gamma error!!!", 'e')
     call print_config
     stop
   endif
@@ -1221,7 +1177,7 @@ SUBROUTINE delete_line(occline, knd)
   endif
 
   if(StatusLn(occline)==-1) then
-    call LogFile%QuickLog("update: "+str(iupdate)+" , delete_gamma error!!!", 'e')
+    call LogFile%QuickLog("update: "+str(imc)+" , delete_gamma error!!!", 'e')
     call print_config
     stop
   endif
@@ -1259,7 +1215,7 @@ SUBROUTINE undo_delete_line(newline, knd, stat, k)
   integer, intent(in) :: newline, knd, stat, k
 
   if(TailLn/=newline)    then
-    call LogFile%QuickLog("update: "+str(iupdate)+"  ,undo_delete_line error!!!", 'e')
+    call LogFile%QuickLog("update: "+str(imc)+"  ,undo_delete_line error!!!", 'e')
     call print_config
     stop
   endif
@@ -1293,7 +1249,7 @@ SUBROUTINE delete_gamma(occgamma)
   integer :: tmp
 
   if(StatusVertex(occgamma)==-1) then
-    call LogFile%QuickLog("update: "+str(iupdate)+" , delete_gamma error!!!", 'e')
+    call LogFile%QuickLog("update: "+str(imc)+" , delete_gamma error!!!", 'e')
     call print_config
     stop
   endif
@@ -1320,7 +1276,7 @@ SUBROUTINE undo_delete_gamma(newgamma)
   integer, intent(in) :: newgamma
 
   if(TailVertex/=newgamma)    then
-    call LogFile%QuickLog("update: "+str(iupdate)+" , undo_delete_gamma error!!!", 'e')
+    call LogFile%QuickLog("update: "+str(imc)+" , undo_delete_gamma error!!!", 'e')
     stop
   endif
   StatusVertex(newgamma) = 0

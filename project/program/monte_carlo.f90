@@ -164,10 +164,12 @@ SUBROUTINE markov(IsToss)
   endif
 
   call LogFile%QuickLog("Starting Markov...")
-  call check_weight
+  !call check_weight
+  call check_config
 
   do while(.true.)
     iblck = iblck +1
+    call LogFile%QuickLog("Block:"+str(iblck),"i")
     do isamp = 1, MaxSamp
       do istep=1, Nstep
         imc = imc + 1.0
@@ -231,7 +233,12 @@ SUBROUTINE markov(IsToss)
           call change_Gamma_isdelta       
         endif
 
-        !call check_config
+        if(imc>=172436500 .and. imc<=172436575) then
+          call check_k_conserve
+          call check_config
+          call print_config
+        endif
+
       enddo
 
       if( .not. IsToss) call measure
@@ -247,7 +254,7 @@ SUBROUTINE markov(IsToss)
 
 
     !========================== REWEIGHTING =========================
-    if(mod(iblck, 10)==0) then
+    if(mod(iblck, 1)==0) then
 
       call statistics
       call output_GamMC
@@ -325,14 +332,15 @@ SUBROUTINE create_worm_along_wline
   integer :: iWLn, iGam, jGam, iGin, jGin, iGout, jGout
   integer :: statiGam, statjGam, statW
   integer :: statiGin, statiGout, statjGin, statjGout
-  integer :: k, kiW
-  integer :: kiWold, flag
+  integer :: k, kiW, ktemp
+  integer :: kiWold
   integer :: spin
   integer :: tempGam
   double precision :: tau, tau1, tau2, Pacc
   double precision :: WWorm
   complex*16 :: WiGin, WiGout, WjGin, WjGout
   complex*16 :: WIra, WMasha, WWNew, Anew, Aold, sgn
+  logical :: flag
 
   !------------ step1 : check if worm is present ------------------
   if(IsWormPresent .eqv. .true.)   return
@@ -349,19 +357,18 @@ SUBROUTINE create_worm_along_wline
 
   k = generate_k()
   kiWold = kLn(iWLn)
-  kLn(iWLn) = add_k(kiWold, k)
+  ktemp=add_k(kiWold, k)
+  if(Is_k_valid_for_W(ktemp)==.false.) return
+  call update_line(iWLn, ktemp, 2)
+   
 
   !------------ step3 : configuration check -------------------
-  flag=0
-  if(flag==0) then
-    if(Is_reducible_W(iWLn))                 flag=1
-  endif
-  if(flag==0) then
-    if(Is_reducible_W_Gam(iWLn))           flag=1
-  endif
+  flag=Is_reducible_W_Gam(iWLn)
 
-  if(flag==1) then
-    kLn(iWLn) = kiWold
+  call test_reduciblility(flag, "create_worm")
+
+  if(flag) then
+    call undo_update_line(iWLn, kiWold, 2)
     return
   endif
 
@@ -404,7 +411,7 @@ SUBROUTINE create_worm_along_wline
   & *WeightLn(iGout) *WeightLn(jGin) *WeightLn(jGout)
 
   if(abs(Anew)==0.d0) then
-    kLn(iWLn) = kiWold
+    call undo_update_line(iWLn, kiWold, 2)
     return
   endif
 
@@ -441,11 +448,8 @@ SUBROUTINE create_worm_along_wline
     !---------- update Ira and Masha -------------------
     Ira = iGam
     Masha = jGam
-    kMasha = k
     SpinMasha = spin
-
-    !----------- update k and omega of elements --------
-    call update_Hash4W(kiWold, kLn(iWLn))
+    kMasha = k
 
     !----------- update status of elements -------------
     StatusVertex(Ira)  = statiGam
@@ -467,7 +471,7 @@ SUBROUTINE create_worm_along_wline
 
     ProbAcc(Order, 1) = ProbAcc(Order, 1) + 1
   else
-    kLn(iWLn) = kiWold
+    call undo_update_line(iWLn, kiWold, 2)
   endif
   return
 END SUBROUTINE create_worm_along_wline
@@ -486,10 +490,11 @@ SUBROUTINE delete_worm_along_wline
   integer :: typIra, typMasha, typW
   integer :: statIra, statMasha, statW
   integer :: statiGin, statiGout, statjGin, statjGout
-  integer :: k, kiW, kiWold, flag
+  integer :: k, kiW, kiWold,ktemp
   double precision :: Pacc, tau, tau1, tau2
   complex*16 :: WiGin, WiGout, WjGin, WjGout
   complex*16 :: Wi, Wj, WWNew, Anew, Aold, sgn
+  logical :: flag
 
   !------------ step1 : check if worm is present ------------------
   if(IsWormPresent .eqv. .false.)  return
@@ -505,19 +510,17 @@ SUBROUTINE delete_worm_along_wline
 
   k = kMasha
   kiWold = kLn(iWLn)
-  kLn(iWLn) = add_k(kiWold, (-1)**dir*k)
+  ktemp = add_k(kiWold, (-1)**dir*k)
+  if(Is_k_valid_for_W(ktemp)==.false.) return
+  call update_line(iWLn, ktemp, 2)
 
   !------------ step3 : configuration check ---------------------
-  flag=0
-  if(flag==0) then
-    if(Is_reducible_W(iWLn))   flag=1
-  endif
-  if(flag==0) then
-    if(Is_reducible_W_Gam(iWLn))  flag=1
-  endif
+  flag=Is_reducible_W_Gam(iWLn)
 
-  if(flag==1) then
-    kLn(iWLn) = kiWold
+  call test_reduciblility(flag, "delete_worm")
+
+  if(flag) then
+    call undo_update_line(iWLn, kiWold, 2)
     return
   endif
 
@@ -567,7 +570,7 @@ SUBROUTINE delete_worm_along_wline
   & *WeightLn(iGout) *WeightLn(jGin) *WeightLn(jGout)
 
   if(abs(Anew)==0.d0) then
-    kLn(iWLn) = kiWold
+    call undo_update_line(iWLn, kiWold, 2)
     return
   endif
 
@@ -603,9 +606,6 @@ SUBROUTINE delete_worm_along_wline
     Phase = Phase*sgn
     IsWormPresent = .false.
 
-    !----------- update k and omega of elements --------
-    call update_Hash4W(kiWold, kLn(iWLn))
-
     !----------- update type ---------------------------
     TypeVertex(Ira) = typIra
     TypeVertex(Masha) = typMasha
@@ -630,7 +630,7 @@ SUBROUTINE delete_worm_along_wline
 
     ProbAcc(Order, 2) = ProbAcc(Order, 2) + 1
   else
-    kLn(iWLn) = kiWold
+    call undo_update_line(iWLn, kiWold, 2)
   endif
   return
 END SUBROUTINE delete_worm_along_wline
@@ -644,7 +644,7 @@ END SUBROUTINE delete_worm_along_wline
 !-----------------------------------------------------------
 SUBROUTINE move_worm_along_wline
   implicit none
-  integer :: dir, kW, kWold, flag
+  integer :: dir, kW, kWold, ktemp
   integer :: iGam, jGam, WLn, GLn1, GLn2
   integer :: typiGam, typW
   integer :: statiGam, statjGam, statW
@@ -652,6 +652,7 @@ SUBROUTINE move_worm_along_wline
   double precision :: WWorm, Pacc
   complex*16 :: WiGam, WjGam, WW
   complex*16 :: Anew, Aold, sgn
+  logical :: flag
 
   !------- step1 : check if worm is present -------------
   if(IsWormPresent .eqv. .false.)  return
@@ -668,16 +669,16 @@ SUBROUTINE move_worm_along_wline
   !------- step3 : configuration check ------------------
   !-------- irreducibility check ------------------------
   kWold = kLn(WLn)
-  kLn(WLn) = add_k(kWold, (-1)**dir *kMasha)
+  ktemp = add_k(kWold, (-1)**dir *kMasha)
+  if(Is_k_valid_for_W(ktemp)==.false.) return
+  call update_line(WLn, ktemp, 2)
 
-  flag = 0
-  if(Is_reducible_W(WLn))   flag=1
-  if(flag==0) then
-    if(Is_reducible_W_Gam(WLn))  flag=1
-  endif
+  flag=Is_reducible_W_Gam(WLn)
 
-  if(flag==1) then
-    kLn(WLn) = kWold
+  call test_reduciblility(flag, "move worm on W")
+
+  if(flag) then
+    call undo_update_line(WLn, kWold, 2)
     return
   endif
 
@@ -724,9 +725,6 @@ SUBROUTINE move_worm_along_wline
     !------ update Ira ------------------------
     Ira = jGam
 
-    !------ update k --------------------------
-    call update_Hash4W(kWold, kLn(WLn)) 
-
     !------ update type of elements -----------
     TypeVertex(iGam) = typiGam
     TypeLn(WLn) = typW
@@ -747,7 +745,7 @@ SUBROUTINE move_worm_along_wline
 
     ProbAcc(Order, 5) = ProbAcc(Order, 5) + 1
   else
-    kLn(WLn) = kWold
+    call undo_update_line(WLn, kWold, 2)
   endif
   return
 END SUBROUTINE move_worm_along_wline
@@ -769,7 +767,7 @@ END SUBROUTINE move_worm_along_wline
 !-----------------------------------------------------------
 SUBROUTINE move_worm_along_gline
   implicit none
-  integer :: dir, kGold, flag, dr(2)
+  integer :: dir, kGold, ktemp, dr(2)
   double precision :: Ppro
   integer :: iGam, jGam, iW, jW, GLn
   integer :: vertex1, vertex2
@@ -779,6 +777,7 @@ SUBROUTINE move_worm_along_gline
   double precision :: tau1, tau2, tau
   double precision :: WWorm, Pacc
   complex*16 :: WiW, WjW, WiGam, WjGam, WG, Anew, Aold, sgn
+  logical :: flag
 
   !------- step1 : check if worm is present -------------
   if(IsWormPresent .eqv. .false.)   return
@@ -799,18 +798,18 @@ SUBROUTINE move_worm_along_gline
   endif
   
   kGold = kLn(GLn)
-  kLn(GLn) = add_k(kGold, (-1)**(dir+1) *kMasha)
+  ktemp = add_k(kGold, (-1)**(dir+1) *kMasha)
+  if(Is_k_valid_for_G(ktemp)==.false.) return
+  call update_line(GLn, ktemp, 1)
 
   !------- step3 : configuration check ------------------
   !-------- irreducibility  check -----------------------
-  flag = 0
-  if(Is_reducible_G(GLn))          flag = 1
-  if(flag==0) then
-    if(Is_reducible_G_Gam(GLn))    flag = 1
-  endif
+  flag=Is_reducible_G_Gam(GLn)
 
-  if(flag == 1) then
-    kLn(GLn) = kGold
+  call test_reduciblility(flag, "move worm on G")
+
+  if(flag) then
+    call undo_update_line(GLn, kGold, 1)
     return
   endif
 
@@ -926,7 +925,7 @@ SUBROUTINE move_worm_along_gline
   Aold = WeightVertex(iGam) *WeightVertex(jGam) *WeightLn(iW) *WeightLn(jW) *WeightLn(GLn)
 
   if(abs(Anew)==0.d0) then
-    kLn(GLn) = kGold
+    call undo_update_line(GLn, kGold, 1)
     return
   endif
 
@@ -949,9 +948,6 @@ SUBROUTINE move_worm_along_gline
     !---- update Ira and Masha ------------------
     Ira = jGam
 
-    !---- update omega and k --------------------
-    call update_Hash4G(kGold, kLn(GLn))
-    
     !----- update type configuration ------------
     TypeLn(GLn) = typG
     TypeLn(iW)  = typiW
@@ -981,7 +977,7 @@ SUBROUTINE move_worm_along_gline
 
     ProbAcc(Order, 6) = ProbAcc(Order, 6) + 1
   else
-    kLn(GLn) = kGold
+    call undo_update_line(GLn, kGold, 1)
     return
   endif
 END SUBROUTINE move_worm_along_gline
@@ -1023,7 +1019,7 @@ END SUBROUTINE move_worm_along_gline
 !-----------------------------------------------------------------
 SUBROUTINE add_interaction
   implicit none
-  integer :: isdelta, dir, dirW, flag, kIA, kMB, kM, q
+  integer :: isdelta, dir, dirW, kIA, kMB, kM, q
   integer :: GIC, GMD, GamC, GamD
   integer :: WAB, GIA, GMB, GamA, GamB
   integer :: typGamA, typGamB, typAB
@@ -1032,6 +1028,7 @@ SUBROUTINE add_interaction
   double precision :: tau, tau1, tau2, Pacc
   complex*16 :: WA, WB, WGIA, WGAC, WGMB, WGBD, WWAB, WMeasureGam
   complex*16 :: Anew, Aold, sgn
+  logical :: flag
   
   !---------- step1 : check if worm is present ------------------
   if(IsWormPresent .eqv. .false.)    return
@@ -1125,15 +1122,17 @@ SUBROUTINE add_interaction
   NeighLn(dirW, WAB)= GamA;          NeighLn(3-dirW,WAB)= GamB
 
   !------------ step4 : configuration check ---------------------
-  flag=0
-  if(flag==0) then
-    if(Is_reducible_G_Gam(GIC)) flag=1
-  endif
-  if(flag==0) then
-    if(Is_reducible_G_Gam(GMD)) flag=1
-  endif
+  !TODO you may return after each Is_reducible_ function
+  !flag=Is_reducible_G_Gam(GIC)
+  !flag=flag .or. Is_reducible_G_Gam(GMD)
+  flag=.false.
+  flag=flag .or. Is_reducible_G_Gam(GIA)
+  flag=flag .or. Is_reducible_G_Gam(GMB)
+  flag=flag .or. Is_reducible_W_Gam(WAB)
 
-  if(flag==1) then
+  call test_reduciblility(flag, "add interaction")
+
+  if(flag) then
     Order = Order - 1
     call delete_gamma(GamA)
     call delete_gamma(GamB)
@@ -1242,13 +1241,14 @@ END SUBROUTINE add_interaction
 !-----------------------------------------------------------------
 SUBROUTINE remove_interaction
   implicit none
-  integer :: dir, dirW, flag, kM, kIA, kMB, kAB
+  integer :: dir, dirW, kM, kIA, kMB, kAB
   integer :: GAC, GBD, GamC, GamD
   integer :: WAB, GIA, GMB, GamA, GamB
   integer :: statIC, statMD, statIA, statMB, statAB
   double precision :: tau, tau1, tau2, Pacc
   complex*16 :: WGIC, WGMD, WMeasureGam
   complex*16 :: Anew, Aold, sgn
+  logical :: flag
   
   !---------- step1 : check if worm is present ------------------
   if(IsWormPresent .eqv. .false.)    return
@@ -1294,15 +1294,10 @@ SUBROUTINE remove_interaction
   NeighVertex(dir, Ira) = GAC;          NeighVertex(dir, Masha)=GBD
 
   !------------ step3 : configuration check ---------------------
-  flag = 0
-  if(flag ==0) then
-    if(Is_reducible_G_Gam(GAC))     flag = 1
-  endif
-  if(flag ==0) then
-    if(Is_reducible_G_Gam(GAC))     flag = 1
-  endif
-
-  if(flag==1) then
+  !flag=Is_reducible_G_Gam(GAC) .or. Is_reducible_G_Gam(GBD)
+  flag=.false.
+  call test_reduciblility(flag, "delete interaction")
+  if(flag) then
     Order = Order + 1
     call undo_delete_gamma(GamB)
     call undo_delete_gamma(GamA)
@@ -1407,6 +1402,7 @@ SUBROUTINE reconnect
   complex*16 :: Anew, Aold, sgn
   complex*16 :: WGIA,WGMB
   double precision :: tau, Pacc
+  logical :: flag
   !---------- step1 : check if worm is present ------------------
   if(IsWormPresent .eqv. .false.)    return
   if(GRVertex(1,Ira)/=GRVertex(1,Masha) .or. &
@@ -1430,7 +1426,9 @@ SUBROUTINE reconnect
 
   !------------ step4 : configuration check ---------------------
   ! do the step4 here so we can save some time
-  if(Is_reducible_G_Gam(GIA) .or. Is_reducible_G_Gam(GMB)) then
+  flag=Is_reducible_G_Gam(GIA) .or. Is_reducible_G_Gam(GMB)
+  call test_reduciblility(flag, "reconnect")
+  if(flag) then
     NeighLn(3-dir, GIA)=Ira
     NeighVertex(dir, Ira)=GIA
     NeighLn(3-dir, GMB)=Masha
