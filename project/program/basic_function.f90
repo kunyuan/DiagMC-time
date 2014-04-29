@@ -884,6 +884,66 @@ LOGICAL FUNCTION Is_reducible_W_Gam(WLn)
   enddo
 END FUNCTION Is_reducible_W_Gam
 
+!------------- check the irreducibility for add interaction operation --------------------
+
+LOGICAL FUNCTION Is_reducible_add_interaction(kW, kIA, kMB, kIC, kMD)
+  implicit none
+  integer,intent(in) :: kW, kIA, kMB, kIC, kMD
+  integer :: kG
+  integer :: ktemp
+
+  Is_reducible_add_interaction = .false.
+  if(CheckGam==.false.) return
+
+  do i = 1, NGLn
+    kG = kLn(GLnKey2Value(i))
+    !check the W which is the new interaction line added
+    ktemp = add_k(kG, kW)
+    !ktemp is G here
+    if((kG/=kIA .or. ktemp/=kIC) .and. (kG/=kIC .or. ktemp/=kIA) &
+      & .and. (kG/=kMB .or. ktemp/=kMD) .and. (kG/=kMD .or. ktemp/=kMB)) then
+      if(Hash4G(ktemp)/=0) then
+          Is_reducible_add_interaction=.true.
+          return
+      endif
+    endif
+
+    ktemp = add_k(kG, -kW)
+    !ktemp is G here
+    if((kG/=kIA .or. ktemp/=kIC) .and. (kG/=kIC .or. ktemp/=kIA) &
+      & .and. (kG/=kMB .or. ktemp/=kMD) .and. (kG/=kMD .or. ktemp/=kMB)) then
+      if(Hash4G(ktemp)/=0) then
+          Is_reducible_add_interaction=.true.
+          return
+      endif
+    endif
+
+    if(kG/=kIA) then
+    !check GIA
+      !ktemp is W here
+      ktemp = abs(add_k(kG, -kIA))
+      if(Hash4W(ktemp)/=0) then
+        if(ktemp/=abs(kW)) then
+          Is_reducible_add_interaction=.true.
+          return
+        endif
+      endif
+    endif
+
+    if(kG/=kMB) then
+    !check GMB
+      !ktemp is W here
+      ktemp = abs(add_k(kG, -kMB))
+      if(Hash4W(ktemp)/=0) then
+        if(ktemp/=abs(kW)) then
+          Is_reducible_add_interaction=.true.
+          return
+        endif
+      endif
+    endif
+  enddo
+END FUNCTION Is_reducible_add_interaction
+
 SUBROUTINE test_reduciblility(is_reducible, mcname)
   implicit none
   logical :: is_reducible

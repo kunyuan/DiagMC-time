@@ -1368,7 +1368,7 @@ END FUNCTION get_typW_from_Vertex
 !-----------------------------------------------------------------
 SUBROUTINE add_interaction
   implicit none
-  integer :: isdelta, dir, dirW, kIA, kMB, kM, q
+  integer :: isdelta, dir, dirW, kIA, kMB, kM, q, kIC, kMD
   integer :: GIC, GMD, GamC, GamD, kNeighG
   integer :: WAB, GIA, GMB, GamA, GamB
   integer :: typGamA, typGamB, typAB
@@ -1396,7 +1396,8 @@ SUBROUTINE add_interaction
   if(Is_k_valid_for_W(q)==.false.) return
   kM = add_k(kMasha, -(-1)**dirW*q)
 
-  kIA = add_k(kLn(GIC), -(-1)**(dir+dirW)*q)
+  kIC = kLn(GIC)
+  kIA = add_k(kIC, -(-1)**(dir+dirW)*q)
 
   kNeighG=kLn(NeighVertex(3-dir, Ira))
   if(abs(add_k(KIA,-kNeighG))==abs(kLn(NeighVertex(3,Ira))))return
@@ -1404,7 +1405,8 @@ SUBROUTINE add_interaction
   if(Is_k_valid_for_G(kIA)==.false.) return
 
 
-  kMB = add_k(kLn(GMD), (-1)**(dir+dirW)*q)
+  kMD = kLn(GMD)
+  kMB = add_k(kMD, (-1)**(dir+dirW)*q)
 
   kNeighG=kLn(NeighVertex(3-dir, Masha))
   if(abs(add_k(KMB,-kNeighG))==abs(kLn(NeighVertex(3,Masha))))return
@@ -1480,14 +1482,7 @@ SUBROUTINE add_interaction
   NeighLn(dirW, WAB)= GamA;          NeighLn(3-dirW,WAB)= GamB
 
   !------------ step4 : configuration check ---------------------
-  !TODO you may return after each Is_reducible_ function
-  !flag=Is_reducible_G_Gam(GIC)
-  !flag=flag .or. Is_reducible_G_Gam(GMD)
-  flag=.false.
-  flag=flag .or. Is_reducible_G_Gam(GIA)
-  flag=flag .or. Is_reducible_G_Gam(GMB)
-  flag=flag .or. Is_reducible_W_Gam(WAB)
-
+  flag=Is_reducible_add_interaction(q, kIA, kMB, kIC, kMD)
   call test_reduciblility(flag, "add interaction")
 
   if(flag) then
