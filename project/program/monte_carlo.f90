@@ -1655,24 +1655,6 @@ SUBROUTINE remove_interaction
   NeighLn(3-dir, GAC) = Ira;            NeighLn(3-dir, GBD) = Masha
   NeighVertex(dir, Ira) = GAC;          NeighVertex(dir, Masha)=GBD
 
-  !------------ step3 : configuration check ---------------------
-  !flag=Is_reducible_G_Gam(GAC) .or. Is_reducible_G_Gam(GBD)
-  flag=.false.
-  call test_reduciblility(flag, "delete interaction")
-  if(flag) then
-    print *,imc,"Reducibility fail"
-    Order = Order + 1
-    call undo_delete_gamma(GamB)
-    call undo_delete_gamma(GamA)
-    call undo_delete_line(WAB, 2, statAB, kAB)
-    call undo_delete_line(GMB, 1, statMB, kMB)
-    call undo_delete_line(GIA, 1, statIA, kIA)
-
-    NeighLn(3-dir, GAC) = GamA;        NeighLn(3-dir, GBD) = GamB
-    NeighVertex(dir, Ira) = GIA;       NeighVertex(dir, Masha)=GMB
-    return
-  endif
-
   !-------- the new status for the new config ----
   statIC = gline_stat(StatusVertex(Ira), StatusVertex(GamC))
   statMD = gline_stat(StatusVertex(Masha),StatusVertex(GamD))
