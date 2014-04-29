@@ -256,7 +256,7 @@ SUBROUTINE markov(IsToss)
 
     enddo 
 
-    if(IsToss .and. iblck==1)return
+    if(IsToss .and. iblck==1) return
 
     !========================== REWEIGHTING =========================
     if(mod(iblck, 10)==0) then
@@ -290,6 +290,9 @@ SUBROUTINE markov(IsToss)
       CoefOfWeight(:)=TimeRatio(:)*CoefOfWeight(:)*x/(GamWormOrder(:)+50.d0)
       CoefOfWeight(1:MCOrder) = CoefOfWeight(1:MCOrder)/CoefOfWeight(0)
       CoefOfWeight(0) = 1.d0
+      !x=sum(GamWormOrder(:)/Error(0:MCOrder))
+      !CoefOfWeight(:)=x/(GamWormOrder(:)/Error(0:MCOrder)+50.d0)
+
 
       call LogFile%WriteLine("Reweight Ratios:")
 
