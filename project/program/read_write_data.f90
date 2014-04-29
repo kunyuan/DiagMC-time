@@ -65,6 +65,8 @@ SUBROUTINE print_status
       write(logstr, '(A,3f17.5)') "Gamma Type 1,2 <==> 3,4:",BalenceCheck(iorder,1,:)
       call LogFile%WriteLine(logstr)
     enddo
+    call LogFile%WriteLine("------------------------------------------------")
+    call LogFile%WriteLine("Reducibility ratio "+str(TestData(2)/TestData(1))+" : "+str(TestData(3)/TestData(1)))
 
 END SUBROUTINE print_status
 

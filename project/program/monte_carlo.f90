@@ -272,9 +272,10 @@ SUBROUTINE markov(IsToss)
 
 
     !========================== REWEIGHTING =========================
-    if(mod(iblck, 1)==0) then
+    if(mod(iblck, 10)==0) then
 
       call statistics
+      print *, Quan(0:MCOrder)
       call output_GamMC
       !call output_test
       call print_status
@@ -1659,6 +1660,7 @@ SUBROUTINE remove_interaction
   flag=.false.
   call test_reduciblility(flag, "delete interaction")
   if(flag) then
+    print *,imc,"Reducibility fail"
     Order = Order + 1
     call undo_delete_gamma(GamB)
     call undo_delete_gamma(GamA)
@@ -1791,15 +1793,6 @@ SUBROUTINE reconnect
 
   !------------ step4 : configuration check ---------------------
   ! do the step4 here so we can save some time
-  flag=Is_reducible_G_Gam(GIA) .or. Is_reducible_G_Gam(GMB)
-  call test_reduciblility(flag, "reconnect")
-  if(flag) then
-    NeighLn(3-dir, GIA)=Ira
-    NeighVertex(dir, Ira)=GIA
-    NeighLn(3-dir, GMB)=Masha
-    NeighVertex(dir, Masha)=GMB
-    return
-  endif
 
   !-------- the new spin, type and status for the new config ----
   statIA = gline_stat(StatusVertex(GamA), StatusVertex(Masha))
@@ -2725,6 +2718,7 @@ SUBROUTINE measure
 
     Quan(Order) = Quan(Order) + real(Phase)/factorM
     Norm(Order) = Norm(Order) + 1.d0
+    !print *, Order, Quan(Order), Norm(Order)
 
     !===============  test variables =================================
     !Norm(MCOrder+1) = Z_normal
