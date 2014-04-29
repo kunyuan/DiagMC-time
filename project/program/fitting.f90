@@ -141,21 +141,23 @@ SUBROUTINE initialize_bins
     FromGamT2(t1, 1) = 0
     ToGamT2(t1, 1)   = MxT-2-t1
   enddo
+  
 
-  IsBasis2D(2) = .false.
-  FromGamT1(2) = 0
-  ToGamT1(2) = MxT-1
-  do t1 = 0, MxT-1
-    FromGamT2(t1, 2) = MxT-1-t1
-    ToGamT2(t1, 2) = MxT-1-t1
+  muc = dcmplx(0.d0, pi/(2.d0*Beta))
+  do t = 0, MxT-1
+    tau = real(t)*Beta/MxT
+    FG(t) = cdexp(muc*tau)/(1.d0, 1.d0) 
   enddo
 
-  IsBasis2D(3) = .true.
-  FromGamT1(3) = 1
-  ToGamT1(3) = MxT-1
-  do t1 = 1, MxT-1
-    FromGamT2(t1, 3) = MxT-t1
-    ToGamT2(t1, 3)   = MxT-1
+  !======================== calculate the fitting coeffcients for G ==========================
+  call LogFile%QuickLog("test for G fitting ...")
+  do j = 1, NBasis
+    do i = 1, NbinG
+      GBasis(i, j) = (0.d0, 0.d0)
+      do t = FromG(i), ToG(i)
+        GBasis(i, j) = GBasis(i, j) + (Beta/dble(MxT))*FG(t)*weight_basis(CoefG(:, j, i), t)
+      enddo
+    enddo
   enddo
 
   !!=============== test the get_bin_Gam ======================
@@ -417,7 +419,6 @@ SUBROUTINE test_basis_Gam(t1min, t1max, t2min, t2max, Coef)
 
 END SUBROUTINE test_basis_Gam
 
-<<<<<<< HEAD
 DOUBLE PRECISION FUNCTION projector(tmin, tmax, Coef1, Coef2)
   implicit none
   integer, intent(in) :: tmin, tmax
