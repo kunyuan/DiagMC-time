@@ -14,8 +14,6 @@ PROGRAM MAIN
   complex*16 :: GamBasis(1:NbinGam, 1:NBasisGam)
   complex*16 :: Gamfit
 
-
-
   Beta = 1.d0
 
   call initialize_polynomials
@@ -167,9 +165,7 @@ PROGRAM MAIN
   enddo
   call LogFile%QuickLog("test for Gamma fitting done~")
 
-
 CONTAINS
-
 
 SUBROUTINE initialize_polynomials
   implicit none
