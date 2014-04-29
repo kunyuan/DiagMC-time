@@ -237,7 +237,7 @@ MODULE vrbls_mc
 
 
   !================ Grand-Schmit Basis ===================================
-  integer, parameter :: BasisOrder=4
+  integer, parameter :: BasisOrder=6
   integer, parameter :: Nbasis=BasisOrder+1
 
   integer, parameter :: NbinG=1
