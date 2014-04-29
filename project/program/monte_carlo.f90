@@ -298,8 +298,8 @@ SUBROUTINE markov(IsToss)
       call LogFile%WriteStamp()
       call LogFile%WriteLine("Reweighting order of diagrams...")
 
-      x=sum(GamWormOrder(:)/Error(0:MCOrder))
-      CoefOfWeight(:)=x/(GamWormOrder(:)/Error(0:MCOrder)+50.d0)
+      x=sum(GamWormOrder(:))
+      CoefOfWeight(:)=x/(GamWormOrder(:)+50.d0)
 
       call LogFile%WriteLine("Reweight Ratios:")
 
