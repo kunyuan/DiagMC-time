@@ -944,11 +944,14 @@ LOGICAL FUNCTION Is_reducible_add_interaction(kW, kIA, kMB, kIC, kMD)
   enddo
 END FUNCTION Is_reducible_add_interaction
 
+
 SUBROUTINE test_reduciblility(is_reducible, mcname)
   implicit none
   logical :: is_reducible
+  logical :: flag1
   character(len=*) :: mcname
-  if(is_reducible/=Is_reducible_Gam()) then
+  flag1=Is_reducible_Gam()
+  if(is_reducible/=flag1) then
     call LogFile%QuickLog(mcname+", Reducibility check is wrong!"+" imc: "+str(imc), "e")
     call print_config
     stop
@@ -965,7 +968,6 @@ logical FUNCTION Is_reducible_Gam()
     Gi = GLnKey2Value(i)
     do j = i+1, NGLn
       Gj = GLnKey2Value(j)
-      !if(NeighLn(1,Gi)==NeighLn(2,Gj) .or. NeighLn(2,Gi)==NeighLn(1,Gj)) cycle
       do k = 1, NWLn
         Wk = WLnKey2Value(k)
         if(abs(add_k(kLn(Gi), -kLn(Gj)))==abs(kLn(Wk))) then
@@ -976,7 +978,6 @@ logical FUNCTION Is_reducible_Gam()
           if(NeighVertex(1,Gam2)==Gi .and. NeighVertex(2,Gam2)==Gj) cycle
           if(NeighVertex(2,Gam2)==Gi .and. NeighVertex(1,Gam2)==Gj) cycle
           Is_reducible_Gam=.true.
-          !if(imc==935670) print *,imc, Gi,kLn(Gi), Gj,kLn(Gj), Wk,kLn(Wk)
           return
         endif
       enddo
