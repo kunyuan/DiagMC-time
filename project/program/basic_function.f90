@@ -781,6 +781,12 @@ END SUBROUTINE delete_Hash4W
 !!=======================================================================
 !!================= IRREDUCIBILITY CHECK ================================
 !!=======================================================================
+!reducibility check strategy
+!for both worm and normal space, pick up two G lines and one W line, the following rule give the definition
+!of reducibility:
+!     |k_G1-kG2|==|k_W|
+!unless: G1, G2 and W are connect to the same Gamma and this Gamma is not Ira or Masha
+!You may refer check_conf.f90: check_irreducibility subroutine to find the implementation of the rule
 
 !--------- check the irreducibility for G -----------------------
 LOGICAL FUNCTION Is_k_valid_for_G(k)
@@ -792,44 +798,20 @@ LOGICAL FUNCTION Is_k_valid_for_G(k)
     Is_k_valid_for_G=.true.
   endif
 END FUNCTION
+!--------- check the irreducibility for W -----------------------
 
-LOGICAL FUNCTION Is_reducible_G_Gam(GLn)
+LOGICAL FUNCTION Is_k_valid_for_W(k)
   implicit none
-  integer, intent(in) :: GLn
-  integer :: NeighGLn1, NeighGLn2
-  integer :: nG, Gam1, Gam2, W1, W2, nW
-  integer :: newk, kG 
-  integer :: i, nnk1, nnk2
-
-  !Is_reducible_G_Gam=Is_reducible_Gam()
-  !return
-  Is_reducible_G_Gam = .false.
-  if(CheckGam==.false.) return
-
-  Gam1 = NeighLn(1, GLn)
-  W1 = NeighVertex(3, Gam1)
-  NeighGLn1 = NeighVertex(1, Gam1)
-  Gam2 = NeighLn(2, GLn)
-  W2 = NeighVertex(3, Gam2)
-  NeighGLn2 = NeighVertex(2, Gam2)
-
-  newk = kLn(GLn)
-
-  do i = 1, NGLn
-    nG = GLnKey2Value(i)
-    if(nG==GLn) cycle  !don't test GLn itself
-    kG = kLn(nG)
-    nW=Hash4W(abs(add_k(newk,-kG)))
-    if(nW/=0) then
-      if(nW==W1 .and. nG==NeighGLn1) cycle
-      if(nW==W2 .and. nG==NeighGLn2) cycle
-      Is_reducible_G_Gam = .true.
-      return
-    endif
-  enddo
-  return
-END FUNCTION Is_reducible_G_Gam
-
+  integer,intent(in) :: k
+  integer :: ak
+  ak=abs(k)
+  if(CheckW .and. (ak==0 .or. Hash4W(ak)/=0)) then
+    Is_k_valid_for_W=.false.
+  else
+    Is_k_valid_for_W=.true.
+  endif
+END FUNCTION
+!-------------- check the ireeducibility of Gamma --------------
 LOGICAL FUNCTION Is_reducible_G_Gam_one_side(kG, kNeighG)
   implicit none
   integer, intent(in) :: kG, kNeighG
@@ -850,60 +832,6 @@ LOGICAL FUNCTION Is_reducible_G_Gam_one_side(kG, kNeighG)
 
   return
 END FUNCTION Is_reducible_G_Gam_one_side
-
-!--------- check the irreducibility for W -----------------------
-
-LOGICAL FUNCTION Is_k_valid_for_W(k)
-  implicit none
-  integer,intent(in) :: k
-  integer :: ak
-  ak=abs(k)
-  if(CheckW .and. (ak==0 .or. Hash4W(ak)/=0)) then
-    Is_k_valid_for_W=.false.
-  else
-    Is_k_valid_for_W=.true.
-  endif
-END FUNCTION
-
-!--------- check the irreducibility for W -----------------------
-LOGICAL FUNCTION Is_reducible_W_Gam(WLn)
-  implicit none
-  integer, intent(in) :: WLn
-  integer :: absk, i, Gam1, Gam2, G1, G2, G3, G4
-  integer :: nG, kG, pkGG, nkGG, pk, nk
-  logical :: test
-
-  Is_reducible_W_Gam = .false.
-  if(CheckGam==.false.) return
-
-  absk = abs(kLn(WLn))
-  Gam1 = NeighLn(1, WLn)
-  Gam2 = NeighLn(2, WLn)
-  G1 = NeighVertex(1, Gam1)
-  G2 = NeighVertex(2, Gam1)
-  G3 = NeighVertex(1, Gam2)
-  G4 = NeighVertex(2, Gam2)
-
-  do i = 1, NGLn
-    nG = GLnKey2Value(i)
-    kG = kLn(nG)
-    pkGG=Hash4G(add_k(kG, absk))
-    if(pkGG/=0) then
-      if((nG/=G1 .or. pkGG/=G2) .and. (nG/=G3 .or. pkGG/=G4) .and. (nG/=G2 .or. pkGG/=G1) .and. (nG/=G4 .or. pkGG/=G3)) then
-        Is_reducible_W_Gam=.true.
-        return
-      endif
-    endif
-
-    nkGG=Hash4G(add_k(kG, -absk))
-    if(nkGG/=0) then
-      if((nG/=G1 .or. nkGG/=G2) .and. (nG/=G3 .or. nkGG/=G4) .and. (nG/=G2 .or. nkGG/=G1) .and. (nG/=G4 .or. nkGG/=G3)) then
-        Is_reducible_W_Gam=.true.
-        return
-      endif
-    endif
-  enddo
-END FUNCTION Is_reducible_W_Gam
 
 LOGICAL FUNCTION Is_reducible_W_Gam_one_side(kW, kG1, kG2)
   implicit none
@@ -933,9 +861,43 @@ LOGICAL FUNCTION Is_reducible_W_Gam_one_side(kW, kG1, kG2)
   enddo
 END FUNCTION Is_reducible_W_Gam_one_side
 
+
+LOGICAL FUNCTION Is_reducible_W_Gam_both_side(kW, kIA, kIC, kMB, kMD)
+  implicit none
+  integer,intent(in) :: kW, kIA, kMB, kIC, kMD
+  integer :: kG
+  integer :: ktemp
+
+  Is_reducible_W_Gam_both_side = .false.
+  if(CheckGam==.false.) return
+
+  do i = 1, NGLn
+    kG = kLn(GLnKey2Value(i))
+    ktemp = add_k(kG, kW)
+    !ktemp is G here
+    if((kG/=kIA .or. ktemp/=kIC) .and. (kG/=kIC .or. ktemp/=kIA) &
+      & .and. (kG/=kMB .or. ktemp/=kMD) .and. (kG/=kMD .or. ktemp/=kMB)) then
+      if(Hash4G(ktemp)/=0) then
+          Is_reducible_W_Gam_both_side=.true.
+          return
+      endif
+    endif
+
+    ktemp = add_k(kG, -kW)
+    !ktemp is G here
+    if((kG/=kIA .or. ktemp/=kIC) .and. (kG/=kIC .or. ktemp/=kIA) &
+      & .and. (kG/=kMB .or. ktemp/=kMD) .and. (kG/=kMD .or. ktemp/=kMB)) then
+      if(Hash4G(ktemp)/=0) then
+          Is_reducible_W_Gam_both_side=.true.
+          return
+      endif
+    endif
+  enddo 
+end FUNCTION
+
 !------------- check the irreducibility for add interaction operation --------------------
 
-LOGICAL FUNCTION Is_reducible_add_interaction(kW, kIA, kMB, kIC, kMD)
+LOGICAL FUNCTION Is_reducible_add_interaction(kW, kIA, kIC, kMB, kMD)
   implicit none
   integer,intent(in) :: kW, kIA, kMB, kIC, kMD
   integer :: kG
@@ -967,27 +929,19 @@ LOGICAL FUNCTION Is_reducible_add_interaction(kW, kIA, kMB, kIC, kMD)
       endif
     endif
 
-    if(kG/=kIA) then
+    if(kG/=kIA .and. kG/=kIC) then
     !check GIA
-      !ktemp is W here
-      ktemp = abs(add_k(kG, -kIA))
-      if(Hash4W(ktemp)/=0) then
-        if(ktemp/=abs(kW)) then
-          Is_reducible_add_interaction=.true.
-          return
-        endif
+      if(Hash4W(abs(add_k(kG, -kIA)))/=0) then
+        Is_reducible_add_interaction=.true.
+        return
       endif
     endif
 
-    if(kG/=kMB) then
+    if(kG/=kMB .and. kG/=kMD) then
     !check GMB
-      !ktemp is W here
-      ktemp = abs(add_k(kG, -kMB))
-      if(Hash4W(ktemp)/=0) then
-        if(ktemp/=abs(kW)) then
-          Is_reducible_add_interaction=.true.
-          return
-        endif
+      if(Hash4W(abs(add_k(kG, -kMB)))/=0) then
+        Is_reducible_add_interaction=.true.
+        return
       endif
     endif
   enddo
