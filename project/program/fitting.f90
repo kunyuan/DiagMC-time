@@ -235,6 +235,32 @@ DOUBLE PRECISION FUNCTION get_polynomial_Gam(iorder1, iorder2, tau1, tau2)
   return
 END FUNCTION get_polynomial_Gam
 
+
+SUBROUTINE calculate_basis_GWGam
+  implicit none
+  integer :: i
+
+  do i = 1, NbinG
+    call calculate_basis(FromG(i), ToG(i), CoefG(:, :, i))
+  enddo
+
+  do i = 1, NbinW
+    call calculate_basis(FromW(i), ToW(i), CoefW(:, :, i))
+  enddo
+
+  do i = 1, NbinGam
+    if(IsBasis2D(i)) then
+      call calculate_basis_Gamma_2D(FromGamT1(i), ToGamT1(i), FromGamT2(:,i), ToGamT2(:,i), &
+        & CoefGam(0:BasisOrderGam, 0:BasisOrderGam, 1:NBasisGam, i))
+    else
+      call calculate_basis(FromGamT1(i), ToGamT1(i), CoefGam(0:BasisOrder, &
+        & 0, 1:NBasis, i))
+    endif
+  enddo
+  return
+END SUBROUTINE calculate_basis_GWGam
+
+
 !!============== GRAM-SCHMIDT BASIS ==================================
 
 !============== basis for G and W ====================================

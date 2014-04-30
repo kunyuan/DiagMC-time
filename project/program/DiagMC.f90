@@ -134,6 +134,7 @@ PROGRAM MAIN
   !=========== initialization of basis =======================
   call initialize_polynomials
   call initialize_bins
+  call calculate_basis_GWGam
 
   call initialize_self_consistent
   call def_symmetry
