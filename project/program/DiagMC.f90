@@ -121,6 +121,8 @@ PROGRAM MAIN
   allocate(ReGamSqMC(0:MCOrder,1:NTypeGam/2, 0:L(1)-1, 0:L(2)-1, 0:MxT-1, 0:MxT-1))
   allocate(ImGamSqMC(0:MCOrder,1:NTypeGam/2, 0:L(1)-1, 0:L(2)-1, 0:MxT-1, 0:MxT-1))
 
+  allocate(GamMCBasis(0:MCOrder,1:NTypeGam/2, 0:L(1)-1, 0:L(2)-1, 1:NbinGam, 1:NBasisGam))
+
   MaxStat=1024
   allocate(ObsRecord(1:MaxStat,0:NObs-1))
 
@@ -128,6 +130,11 @@ PROGRAM MAIN
 
   call set_time_elapse
   call set_RNG
+
+  !=========== initialization of basis =======================
+  call initialize_polynomials
+  call initialize_bins
+
   call initialize_self_consistent
   call def_symmetry
 
@@ -156,6 +163,7 @@ INCLUDE "monte_carlo.f90"
 INCLUDE "check_conf.f90"
 INCLUDE "analytic_integration.f90"
 INCLUDE "read_write_data.f90"
+INCLUDE "fitting.f90"
 
 
 subroutine numerical_integeration
