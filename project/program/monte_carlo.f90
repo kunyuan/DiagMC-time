@@ -689,6 +689,7 @@ SUBROUTINE move_worm_along_wline
   WLn = NeighVertex(3, Ira)
   jGam = NeighLn(3-dir, WLn)
   if(jGam == Masha .or. jGam==Ira)  return
+  GLn1 = NeighVertex(1, iGam);     GLn2 = NeighVertex(2, iGam)
 
 
   !------- step3 : configuration check ------------------
@@ -706,7 +707,7 @@ SUBROUTINE move_worm_along_wline
   if(Is_k_valid_for_W(ktemp)==.false.) return
   call update_line(WLn, ktemp, 2)
 
-  flag=Is_reducible_W_Gam(WLn)
+  flag=Is_reducible_W_Gam_one_side(ktemp, kLn(GLn1), kLn(GLn2))
 
   call test_reduciblility(flag, "move worm on W")
 
@@ -721,7 +722,6 @@ SUBROUTINE move_worm_along_wline
   statW = wline_stat(statiGam, statjGam)
 
   typW = TypeLn(WLn)
-  GLn1 = NeighVertex(1, iGam);     GLn2 = NeighVertex(2, iGam)
   typiGam = TypeSp2Gam(TypeLn(GLn1), TypeLn(GLn2), SpInVertex(1, iGam), SpInVertex(2, iGam))
 
   !------- step4 : weight calculation -------------------
@@ -1043,7 +1043,7 @@ END SUBROUTINE move_worm_along_gline
 !-----------------------------------------------------------
 SUBROUTINE move_worm_along_gline_test
   implicit none
-  integer :: iGam, jGam, iGam2, jGam2, iW, jW, GLn, kjGLn
+  integer :: iGam, jGam, iGam2, jGam2, iW, jW, GLn,kiGLn, kjGLn
   integer :: vertex1, vertex2
   integer :: sG, typG, typiGam, typjGam, typiW
   integer, dimension(2) :: spiGam, spjGam
@@ -1078,6 +1078,7 @@ SUBROUTINE move_worm_along_gline_test
   ! once Ira moves in, we want to exclude config with: abs(add_k(ktemp, -kjGLn))==abs(jW)
   ! so the only requirement is abs(add_k(ktemp, -kjGLn))==abs(add_k(kGold, -kjGLn))
 
+  kiGLn = kLn(NeighVertex(3-dir, iGam))
   kjGLn = kLn(NeighVertex(dir, jGam))
   if(abs(add_k(ktemp, -kjGLn))==abs(add_k(kGold, -kjGLn))) return
   if(Is_k_valid_for_G(ktemp)==.false.) return
@@ -1085,6 +1086,11 @@ SUBROUTINE move_worm_along_gline_test
 
   !-------- irreducibility  check -----------------------
   flag=Is_reducible_G_Gam(GLn)
+  if(flag/=Is_reducible_G_Gam_one_side(ktemp, kiGLn)) then
+    print *,imc, "move worm wrong",ktemp,kiGLn,kLn(iW)
+    call print_config
+    stop
+  endif
 
   call test_reduciblility(flag, "move worm on G")
 
