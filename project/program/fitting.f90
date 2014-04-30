@@ -18,28 +18,9 @@
 
   !call initialize_polynomials
   !call initialize_bins
+  !call calculate_basis_GWGam 
 
-
-  !!================== calculate the basis for G, W, and Gamma ===========================
-  !do i = 1, NbinG
-    !call calculate_basis(FromG(i), ToG(i), CoefG(:, :, i))
-  !enddo
-
-  !do i = 1, NbinW
-    !call calculate_basis(FromW(i), ToW(i), CoefW(:, :, i))
-  !enddo
-
-  !do i = 1, NbinGam
-    !if(IsBasis2D(i)) then
-      !call calculate_basis_Gamma_2D(FromGamT1(i), ToGamT1(i), FromGamT2(:,i), ToGamT2(:,i), &
-        !& CoefGam(0:BasisOrderGam, 0:BasisOrderGam, 1:NBasisGam, i))
-    !else
-      !call calculate_basis(FromGamT1(i), ToGamT1(i), CoefGam(0:BasisOrder, &
-        !& 0, 1:NBasis, i))
-    !endif
-  !enddo
-  
-
+  !!=========fack G ==============================
   !muc = dcmplx(0.d0, pi/(2.d0*Beta))
   !do t = 0, MxT-1
     !tau = real(t)*Beta/MxT
@@ -73,7 +54,7 @@
 
 
 
-  !!==================== initialize the Gamma function ==============================
+  !!=========fack Gamma ==============================
   !do t1 = 0, MxT-1
     !do t2 = 0, MxT-1
       !tau1 = real(t1)*Beta/MxT
@@ -141,6 +122,7 @@
 
 
 
+!============== divide the space into N bins for G,W, Gamma =============================
 SUBROUTINE initialize_bins
   implicit none
   integer :: t1, t2
@@ -175,6 +157,24 @@ SUBROUTINE initialize_bins
     FromGamT2(t1, 3) = MxT-t1
     ToGamT2(t1, 3)   = MxT-1
   enddo
+
+  !!=============== test the get_bin_Gam ======================
+  !do t1 = 0, MxT-1
+    !t2 = MxT-1-t1-2
+    !if(t2>=0) then
+      !if(get_bin_Gam(t1, t2)/=1) print *, "bin 1 error!"
+    !endif
+
+    !t2 = MxT-1-t1
+    !if(get_bin_Gam(t1, t2)/=2) then
+      !print *, "bin 2 error!"
+    !endif
+
+    !t2 = MxT-1-t1+2
+    !if(t2<MxT) then
+      !if(get_bin_Gam(t1, t2)/=3) print *, "bin 3 error!"
+    !endif
+  !enddo
   return
 END SUBROUTINE initialize_bins
 
@@ -182,28 +182,39 @@ END SUBROUTINE initialize_bins
 INTEGER FUNCTION get_bin_Gam(it1, it2)
   implicit none
   integer :: it1, it2
-  get_bin_Gam = 1
+  if(it1+it2<MxT-1)  get_bin_Gam = 1
+  if(it1+it2==MxT-1) get_bin_Gam = 2
+  if(it1+it2>MxT-1)  get_bin_Gam = 3
   return
 END FUNCTION get_bin_Gam
 
+INTEGER FUNCTION get_bin_W(it1)
+  implicit none
+  integer :: it1
+  get_bin_W = 1
+  return
+END FUNCTION get_bin_W
+
+INTEGER FUNCTION get_bin_G(it1)
+  implicit none
+  integer :: it1
+  get_bin_G = 1
+  return
+END FUNCTION get_bin_G
+
+!============== set the polynomial vectors ==============================================
+!---------- you can set any polynomial functions as you want -----------------
 SUBROUTINE initialize_polynomials
   implicit none
   integer :: i, it1, it2, ibasis
 
   Polynomial(:, :) = 0.d0
-
-  !============== set the vectors ==============================================
-  !---------- you can set any polynomial functions as you want -----------------
   do i = 1, BasisOrder
     Polynomial(i, i) = 1.d0
   enddo
   Polynomial(0, NBasis) = 1.d0
-  !=================end =======================================================
 
   PolynomialGam(:, :, :) = 0.d0
-
-  !============== set the vectors ==============================================
-  !---------- you can set any polynomial functions as you want -----------------
   ibasis = 0
   do it1 = 0, BasisOrderGam
     do it2 = 0, BasisOrderGam
@@ -214,7 +225,6 @@ SUBROUTINE initialize_polynomials
   enddo
 
   PolynomialGam(0, 0, NBasisGam) = 1.d0
-  !=================end =======================================================
 
 END SUBROUTINE initialize_polynomials
 

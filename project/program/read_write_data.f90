@@ -969,6 +969,8 @@ SUBROUTINE output_Quantities
   integer :: dx, dy, it
   complex*16 :: gam1
   double precision :: normal
+  integer :: ibin, ibasis
+  double precision :: tau1, tau2
 
   open(104, status='replace', file=trim(title_loop)//"_quantities.dat")
 
@@ -991,6 +993,35 @@ SUBROUTINE output_Quantities
       do it1 = 0, MxT-1
         write(104, *)  real(GamMC(iorder, 1, 0, 0, it1, it2))*normal &
           & , dimag(GamMC(iorder, 1, 0, 0, it1, it2))*normal
+      enddo
+    enddo
+    write(104, *)
+  enddo
+
+  do iorder = 1, MCOrder
+    write(104, *) "##################################GammaBasis",trim(adjustl(str(iorder)))
+    write(104, *) "#tau1:", MxT, ",tau2:", MxT
+    write(104, *) "#Beta", Beta, "L", L(1), L(2), "Order", MCOrder
+    do it2 = 0, MxT-1
+      do it1 = 0, MxT-1
+        ibin = get_bin_Gam(it1, it2)
+        tau1 = dble(it1)*Beta/dble(MxT)
+        tau2 = dble(it2)*Beta/dble(MxT)
+        if(IsBasis2D(ibin)) then
+          gam1 = (0.d0, 0.d0)
+          do  ibasis = 1, NBasisGam
+            gam1 = gam1 + GamMCBasis(iorder, 1, 0, 0, ibin, ibasis)* weight_basis_Gam( &
+              & CoefGam(:,:,ibasis,ibin), tau1, tau2)
+          enddo
+        else
+          gam1 = (0.d0, 0.d0)
+          do  ibasis = 1, NBasis
+            gam1 = gam1 + GamMCBasis(iorder, 1, 0, 0, ibin, ibasis)* weight_basis( &
+              & CoefGam(:,0,ibasis,ibin), tau1)
+          enddo
+        endif
+
+        write(104, *) real(gam1)*normal, dimag(gam1)*normal
       enddo
     enddo
     write(104, *)
