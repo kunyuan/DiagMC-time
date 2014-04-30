@@ -830,6 +830,27 @@ LOGICAL FUNCTION Is_reducible_G_Gam(GLn)
   return
 END FUNCTION Is_reducible_G_Gam
 
+LOGICAL FUNCTION Is_reducible_G_Gam_one_side(kG, kNeighG)
+  implicit none
+  integer, intent(in) :: kG, kNeighG
+  integer :: i, knG
+
+  Is_reducible_G_Gam_one_side = .false.
+  if(CheckGam==.false.) return
+
+  do i = 1, NGLn
+    knG = kLn(GLnKey2Value(i))
+    if(knG/=kG .and. knG/=kNeighG) then
+      if(Hash4W(abs(add_k(knG, -kG)))/=0) then
+          Is_reducible_G_Gam_one_side = .true.
+          return
+      endif
+    endif
+  enddo
+
+  return
+END FUNCTION Is_reducible_G_Gam_one_side
+
 !--------- check the irreducibility for W -----------------------
 
 LOGICAL FUNCTION Is_k_valid_for_W(k)
@@ -883,6 +904,34 @@ LOGICAL FUNCTION Is_reducible_W_Gam(WLn)
     endif
   enddo
 END FUNCTION Is_reducible_W_Gam
+
+LOGICAL FUNCTION Is_reducible_W_Gam_one_side(kW, kG1, kG2)
+  implicit none
+  integer, intent(in) :: kW, kG1, kG2
+  integer :: i, ktemp, kG
+
+  Is_reducible_W_Gam_one_side = .false.
+  if(CheckGam==.false.) return
+
+  do i = 1, NGLn
+    kG = kLn(GLnKey2Value(i))
+    ktemp = add_k(kG, kW)
+    if((kG/=kG1 .or. ktemp/=kG2) .and. (kG/=kG2 .or. ktemp/=kG1)) then
+      if(Hash4G(ktemp)/=0) then
+        Is_reducible_W_Gam_one_side=.true.
+        return
+      endif
+    endif
+
+    ktemp = add_k(kG, -kW)
+    if((kG/=kG1 .or. ktemp/=kG2) .and. (kG/=kG2 .or. ktemp/=kG1)) then
+      if(Hash4G(ktemp)/=0) then
+        Is_reducible_W_Gam_one_side=.true.
+        return
+      endif
+    endif
+  enddo
+END FUNCTION Is_reducible_W_Gam_one_side
 
 !------------- check the irreducibility for add interaction operation --------------------
 
@@ -973,10 +1022,8 @@ logical FUNCTION Is_reducible_Gam()
         if(abs(add_k(kLn(Gi), -kLn(Gj)))==abs(kLn(Wk))) then
           Gam1=NeighLn(1,Wk)
           Gam2=NeighLn(2,Wk)
-          if(NeighVertex(1,Gam1)==Gi .and. NeighVertex(2,Gam1)==Gj) cycle
-          if(NeighVertex(2,Gam1)==Gi .and. NeighVertex(1,Gam1)==Gj) cycle
-          if(NeighVertex(1,Gam2)==Gi .and. NeighVertex(2,Gam2)==Gj) cycle
-          if(NeighVertex(2,Gam2)==Gi .and. NeighVertex(1,Gam2)==Gj) cycle
+          if(is_connected(Gam1, Gi, Gj)) cycle
+          if(is_connected(Gam2, Gi, Gj)) cycle
           Is_reducible_Gam=.true.
           return
         endif
@@ -984,6 +1031,24 @@ logical FUNCTION Is_reducible_Gam()
     enddo
   enddo
 end FUNCTION
+
+logical FUNCTION is_connected(Gam, G1, G2)
+  implicit none
+  integer :: Gam, G1, G2
+  if((NeighVertex(1,Gam)==G1 .and. NeighVertex(2,Gam)==G2) .or. &
+   & (NeighVertex(2,Gam)==G1 .and. NeighVertex(1,Gam)==G2)) then
+    if(IsWormPresent .and. (Gam==Ira .or. Gam==Masha)) then
+      is_connected=.false.
+      !is_connected=.true.
+    else
+      is_connected=.true.
+    endif
+  else
+    is_connected=.false.
+  endif
+  return
+end FUNCTION
+
 !!=======================================================================
 !!=======================================================================
 !!=======================================================================
