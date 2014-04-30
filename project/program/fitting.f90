@@ -54,7 +54,6 @@
 
 
 
-  !!=========fack Gamma ==============================
   !do t1 = 0, MxT-1
     !do t2 = 0, MxT-1
       !tau1 = real(t1)*Beta/MxT
@@ -122,7 +121,6 @@
 
 
 
-!============== divide the space into N bins for G,W, Gamma =============================
 SUBROUTINE initialize_bins
   implicit none
   integer :: t1, t2
