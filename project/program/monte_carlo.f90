@@ -234,9 +234,8 @@ SUBROUTINE markov(IsToss)
           call change_Gamma_isdelta       
         endif
 
-        !if(imc>=1041587 .and. imc<=172436575) then
         !call check_config
-        !endif
+        !call check_irreducibility
         !if(IsWormPresent) then
           !if(abs(add_k(kLn(NeighVertex(1,Ira)), -kLn(NeighVertex(2,Ira))))==abs(kLn(NeighVertex(3,Ira)))) then
             !print *,"Ira",Ira, imc, iupdate, kMasha
@@ -259,17 +258,12 @@ SUBROUTINE markov(IsToss)
       enddo
 
 
+      call check_irreducibility
       if( .not. IsToss) call measure
 
     enddo 
 
     if(IsToss .and. iblck==1)return
-
-    !if(imc>100000000.d0 .and. imc<=110000000.d0) then
-      !call print_config
-      !call check_config
-    !endif
-
 
     !========================== REWEIGHTING =========================
     if(mod(iblck, 10)==0) then
@@ -390,8 +384,6 @@ SUBROUTINE create_worm_along_wline
 
   !------------ step3 : configuration check -------------------
   flag=Is_reducible_W_Gam(iWLn)
-
-  call test_reduciblility(flag, "create_worm")
 
   if(flag) then
     call undo_update_line(iWLn, kiWold, 2)
@@ -542,8 +534,6 @@ SUBROUTINE delete_worm_along_wline
 
   !------------ step3 : configuration check ---------------------
   flag=Is_reducible_W_Gam(iWLn)
-
-  call test_reduciblility(flag, "delete_worm")
 
   if(flag) then
     call undo_update_line(iWLn, kiWold, 2)
@@ -709,8 +699,6 @@ SUBROUTINE move_worm_along_wline
 
   flag=Is_reducible_W_Gam_one_side(ktemp, kLn(GLn1), kLn(GLn2))
 
-  call test_reduciblility(flag, "move worm on W")
-
   if(flag) then
     call undo_update_line(WLn, kWold, 2)
     return
@@ -847,8 +835,6 @@ SUBROUTINE move_worm_along_gline
   !------- step3 : configuration check ------------------
   !-------- irreducibility  check -----------------------
   flag=Is_reducible_G_Gam(GLn)
-
-  call test_reduciblility(flag, "move worm on G")
 
   if(flag) then
     call undo_update_line(GLn, kGold, 1)
@@ -1091,8 +1077,6 @@ SUBROUTINE move_worm_along_gline_test
     call print_config
     stop
   endif
-
-  call test_reduciblility(flag, "move worm on G")
 
   if(flag) then
     call undo_update_line(GLn, kGold, 1)
@@ -1490,7 +1474,6 @@ SUBROUTINE add_interaction
 
   !------------ step4 : configuration check ---------------------
   flag=Is_reducible_add_interaction(q, kIA, kMB, kIC, kMD)
-  call test_reduciblility(flag, "add interaction")
 
   if(flag) then
     Order = Order - 1
