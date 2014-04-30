@@ -2532,6 +2532,7 @@ SUBROUTINE measure
   implicit none
   integer :: i, iln,iGam,jGam, iW
   integer :: flag, it
+  integer :: ibasis, ibin
   integer :: spg, spw
   integer :: ityp, nloop
   integer :: MeaGin, MeaGout, MeaW, rg(2), rw(2), dir, typ
@@ -2540,6 +2541,7 @@ SUBROUTINE measure
   integer :: ikey, sumt, sumd
   double precision  :: factorM
   double precision :: tau1, tau2, tau3
+  double precision :: dtau1, dtau2
 
   GamWormOrder(Order) = GamWormOrder(Order) + 1.d0
   !===========  Measure in worm space  ==========================
@@ -2616,17 +2618,22 @@ SUBROUTINE measure
     tau3 = TVertex(3, NeighLn(3-dir, MeaW))
 
     factorM = 1.d0
-    dt1 = Floor((tau3-tau2)*MxT/Beta)
+    dtau1 = tau3-tau2
+    dt1 = Floor(dtau1*MxT/Beta)
     if(dt1<0) then
+      dtau1 = dtau1 + Beta
       dt1 = dt1 + MxT
       factorM = factorM * (-1.d0)
     endif
 
-    dt2 = Floor((tau1-tau3)*MxT/Beta)
+    dtau2 = tau1-tau3
+    dt2 = Floor(dtau2*MxT/Beta)
     if(dt2<0) then
+      dtau2 = dtau2 + Beta
       dt2 = dt2 + MxT
       factorM = factorM * (-1.d0)
     endif
+
 
     factorM = factorM *CoefOfSymmetry(dx, dy)* CoefOfWeight(Order) *abs(WeightVertex(MeasureGam))
     !================= accumulation ===================================
@@ -2634,12 +2641,30 @@ SUBROUTINE measure
       GamNorm = GamNorm + Phase/CoefOfWeight(0)
     endif
 
+    !============== save Gamma in the matrix =============================================
     GamMC(Order, ityp, dx, dy, dt1, dt2) = GamMC(Order, ityp, dx, dy, dt1, dt2) &
       & + Phase/factorM
     ReGamSqMC(Order, ityp, dx, dy, dt1, dt2 ) = ReGamSqMC(Order, ityp, dx, dy, dt1, dt2) &
       & + (real(Phase)/factorM)**2.d0
     ImGamSqMC(Order, ityp, dx, dy, dt1, dt2 ) = ImGamSqMC(Order, ityp, dx, dy, dt1, dt2) &
       & + (dimag(Phase)/factorM)**2.d0
+
+    !============ save Gamma in the fitting coeffecients =====================================
+
+    ibin = get_bin_Gam(dt1, dt2)
+
+    if(IsBasis2D(ibin)) then
+      do ibasis = 1, NBasisGam
+        GamMCBasis(Order, ityp, dx, dy, ibin, ibasis) = GamMCBasis(Order, ityp, dx, dy, ibin, &
+          & ibasis) + Phase/factorM * weight_basis_Gam(CoefGam(:,:,ibasis,ibin), dtau1, dtau2)
+      enddo
+    else 
+      do ibasis = 1, NBasis
+        GamMCBasis(Order, ityp, dx, dy, ibin, ibasis) = GamMCBasis(Order, ityp, dx, dy, ibin, &
+          & ibasis) + Phase/factorM * weight_basis(CoefGam(:,0,ibasis,ibin), dtau1)
+      enddo
+    endif
+
 
     Quan(Order) = Quan(Order) + real(Phase)/factorM
     Norm(Order) = Norm(Order) + 1.d0

@@ -1,22 +1,149 @@
-INCLUDE "mylib/mylib.f90"
-INCLUDE "vrbls_mc.f90"
-PROGRAM MAIN
-  USE string_basic
-  USE logging_module
-  USE vrbls_mc
+!include "mylib/mylib.f90"
+!INCLUDE "vrbls_mc.f90"
+!PROGRAM MAIN
+  !USE string_basic
+  !USE logging_module
+  !USE vrbls_mc
+  !implicit none
+  !integer :: i, j, t1, t2, t
+  !double precision :: tau, tau1, tau2
+  !complex*16 :: muc, FG(0:MxT-1)
+  !complex*16 :: GBasis(1:NbinG, 1:NBasis)
+  !complex*16 :: Gfit
+  !complex*16 :: FGamma(0:MxT-1, 0:MxT-1)
+  !complex*16 :: GamBasis(1:NbinGam, 1:NBasisGam)
+  !complex*16 :: Gamfit
+
+  !Beta = 1.d0
+
+  !call initialize_polynomials
+  !call initialize_bins
+
+
+  !!================== calculate the basis for G, W, and Gamma ===========================
+  !do i = 1, NbinG
+    !call calculate_basis(FromG(i), ToG(i), CoefG(:, :, i))
+  !enddo
+
+  !do i = 1, NbinW
+    !call calculate_basis(FromW(i), ToW(i), CoefW(:, :, i))
+  !enddo
+
+  !do i = 1, NbinGam
+    !if(IsBasis2D(i)) then
+      !call calculate_basis_Gamma_2D(FromGamT1(i), ToGamT1(i), FromGamT2(:,i), ToGamT2(:,i), &
+        !& CoefGam(0:BasisOrderGam, 0:BasisOrderGam, 1:NBasisGam, i))
+    !else
+      !call calculate_basis(FromGamT1(i), ToGamT1(i), CoefGam(0:BasisOrder, &
+        !& 0, 1:NBasis, i))
+    !endif
+  !enddo
+  
+
+  !muc = dcmplx(0.d0, pi/(2.d0*Beta))
+  !do t = 0, MxT-1
+    !tau = real(t)*Beta/MxT
+    !FG(t) = cdexp(muc*tau)/(1.d0, 1.d0) 
+  !enddo
+
+  !!======================== calculate the fitting coeffcients for G ==========================
+  !call LogFile%QuickLog("test for G fitting ...")
+  !do j = 1, NBasis
+    !do i = 1, NbinG
+      !GBasis(i, j) = (0.d0, 0.d0)
+      !do t = FromG(i), ToG(i)
+        !GBasis(i, j) = GBasis(i, j) + (Beta/dble(MxT))*FG(t)*weight_basis(CoefG(:, j, i), t)
+      !enddo
+    !enddo
+  !enddo
+
+  !!========================= test the fitting function for G ================================
+  !do i = 1, NbinG
+    !do t = FromG(i), ToG(i)
+      !Gfit = (0.d0, 0.d0)
+      !do j = 1, NBasis
+        !Gfit = Gfit + weight_basis(CoefG(:, j, i), t)*GBasis(i, j)
+      !enddo
+      !if(abs(Gfit-FG(t))>1.d-6)  then
+        !call LogFile%QuickLog(str(t)+str(Gfit-FG(t))+"G fitting error!")
+      !endif
+    !enddo
+  !enddo
+  !call LogFile%QuickLog("test for G fitting done~")
+
+
+
+  !!==================== initialize the Gamma function ==============================
+  !do t1 = 0, MxT-1
+    !do t2 = 0, MxT-1
+      !tau1 = real(t1)*Beta/MxT
+      !tau2 = real(t2)*Beta/MxT
+      !FGamma(t1, t2) = dcmplx((tau1+tau2)**2.d0, 0.d0)
+    !enddo
+  !enddo
+
+  !!======================== calculate the fitting coeffcients for Gamma ==========================
+  !do i = 1, NbinGam
+    !if(IsBasis2D(i)) then
+      !do j = 1, NBasisGam
+        !GamBasis(i, j) = (0.d0, 0.d0)
+        !do t1 = FromGamT1(i), ToGamT1(i)
+          !do t2 = FromGamT2(t1, i), ToGamT2(t1, i)
+            !GamBasis(i, j) = GamBasis(i, j) + (Beta/dble(MxT))**2.d0*FGamma(t1,t2)* &
+              !& weight_basis_Gam(CoefGam(0:BasisOrderGam, 0:BasisOrderGam, j, i), t1, t2)
+          !enddo
+        !enddo
+      !enddo
+    !else
+      !do j = 1, NBasis
+        !GamBasis(i, j) = (0.d0, 0.d0)
+        !do t1 = FromGamT1(i), ToGamT1(i)
+          !GamBasis(i, j) = GamBasis(i, j) + (Beta/dble(MxT))*FGamma(t1, FromGamT2(t1, i))* &
+            !& weight_basis(CoefGam(0:BasisOrder, 0, j, i), t1)
+        !enddo
+      !enddo
+    !endif
+  !enddo
+
+  !!========================= test the fitting function for Gamma ================================
+  !call LogFile%QuickLog("test for Gamma fitting ...")
+  !do i = 1, NbinGam
+    !if(IsBasis2D(i)) then
+      !do t1 = FromGamT1(i), ToGamT1(i)
+        !do t2 = FromGamT2(t1, i), ToGamT2(t1, i)
+          !Gamfit = (0.d0, 0.d0)
+          !do j = 1, NBasisGam
+            !Gamfit = Gamfit + GamBasis(i, j) * weight_basis_Gam(CoefGam(0:BasisOrderGam, &
+              !& 0:BasisOrderGam, j, i), t1, t2)
+          !enddo
+          !if(abs(Gamfit-FGamma(t1,t2))>1.d-9)  then
+            !call LogFile%QuickLog(str(t1)+str(t2)+str(Gamfit-FGamma(t1,t2))+"Gamma fitting error!")
+          !endif
+        !enddo
+      !enddo
+    !else 
+      !do t1 = FromGamT1(i), ToGamT1(i)
+        !Gamfit = (0.d0, 0.d0)
+        !do j = 1, NBasis
+          !Gamfit = Gamfit + GamBasis(i, j) * weight_basis(CoefGam(0:BasisOrder, 0, j, i), t1)
+        !enddo
+        !t2 = FromGamT2(t1, i)
+        !if(abs(Gamfit-FGamma(t1,t2))>1.d-9)  then
+          !call LogFile%QuickLog(str(t1)+str(t2)+str(Gamfit-FGamma(t1,t2))+"Gamma fitting error!")
+        !endif
+      !enddo
+    !endif
+  !enddo
+  !call LogFile%QuickLog("test for Gamma fitting done~")
+
+!CONTAINS
+
+
+
+
+SUBROUTINE initialize_bins
   implicit none
-  integer :: i, j, t1, t2, t
-  double precision :: tau, tau1, tau2
-  complex*16 :: muc, FG(0:MxT-1)
-  complex*16 :: GBasis(1:NbinG, 1:NBasis)
-  complex*16 :: Gfit
-  complex*16 :: FGamma(0:MxT-1, 0:MxT-1)
-  complex*16 :: GamBasis(1:NbinGam, 1:NBasisGam)
-  complex*16 :: Gamfit
-
-  Beta = 1.d0
-
-  call initialize_polynomials
+  integer :: t1, t2
 
   !================== define the bins for G,W, Gamma ====================================
   FromG(1) = 0
@@ -48,124 +175,16 @@ PROGRAM MAIN
     FromGamT2(t1, 3) = MxT-t1
     ToGamT2(t1, 3)   = MxT-1
   enddo
-
-  !================== calculate the basis for G, W, and Gamma ===========================
-  do i = 1, NbinG
-    call calculate_basis(FromG(i), ToG(i), CoefG(:, :, i))
-  enddo
-
-  do i = 1, NbinW
-    call calculate_basis(FromW(i), ToW(i), CoefW(:, :, i))
-  enddo
-
-  do i = 1, NbinGam
-    if(IsBasis2D(i)) then
-      call calculate_basis_Gamma_2D(FromGamT1(i), ToGamT1(i), FromGamT2(:,i), ToGamT2(:,i), &
-        & CoefGam(0:BasisOrderGam, 0:BasisOrderGam, 1:NBasisGam, i))
-    else
-      call calculate_basis(FromGamT1(i), ToGamT1(i), CoefGam(0:BasisOrder, &
-        & 0, 1:NBasis, i))
-    endif
-  enddo
-  
-
-  muc = dcmplx(0.d0, pi/(2.d0*Beta))
-  do t = 0, MxT-1
-    tau = real(t)*Beta/MxT
-    FG(t) = cdexp(muc*tau)/(1.d0, 1.d0) 
-  enddo
-
-  !======================== calculate the fitting coeffcients for G ==========================
-  call LogFile%QuickLog("test for G fitting ...")
-  do j = 1, NBasis
-    do i = 1, NbinG
-      GBasis(i, j) = (0.d0, 0.d0)
-      do t = FromG(i), ToG(i)
-        GBasis(i, j) = GBasis(i, j) + (Beta/dble(MxT))*FG(t)*weight_basis(CoefG(:, j, i), t)
-      enddo
-    enddo
-  enddo
-
-  !========================= test the fitting function for G ================================
-  do i = 1, NbinG
-    do t = FromG(i), ToG(i)
-      Gfit = (0.d0, 0.d0)
-      do j = 1, NBasis
-        Gfit = Gfit + weight_basis(CoefG(:, j, i), t)*GBasis(i, j)
-      enddo
-      if(abs(Gfit-FG(t))>1.d-6)  then
-        call LogFile%QuickLog(str(t)+str(Gfit-FG(t))+"G fitting error!")
-      endif
-    enddo
-  enddo
-  call LogFile%QuickLog("test for G fitting done~")
+  return
+END SUBROUTINE initialize_bins
 
 
-
-  !==================== initialize the Gamma function ==============================
-  do t1 = 0, MxT-1
-    do t2 = 0, MxT-1
-      tau1 = real(t1)*Beta/MxT
-      tau2 = real(t2)*Beta/MxT
-      FGamma(t1, t2) = dcmplx((tau1+tau2)**2.d0, 0.d0)
-    enddo
-  enddo
-
-  !======================== calculate the fitting coeffcients for Gamma ==========================
-  do i = 1, NbinGam
-    if(IsBasis2D(i)) then
-      do j = 1, NBasisGam
-        GamBasis(i, j) = (0.d0, 0.d0)
-        do t1 = FromGamT1(i), ToGamT1(i)
-          do t2 = FromGamT2(t1, i), ToGamT2(t1, i)
-            GamBasis(i, j) = GamBasis(i, j) + (Beta/dble(MxT))**2.d0*FGamma(t1,t2)* &
-              & weight_basis_Gam(CoefGam(0:BasisOrderGam, 0:BasisOrderGam, j, i), t1, t2)
-          enddo
-        enddo
-      enddo
-    else
-      do j = 1, NBasis
-        GamBasis(i, j) = (0.d0, 0.d0)
-        do t1 = FromGamT1(i), ToGamT1(i)
-          GamBasis(i, j) = GamBasis(i, j) + (Beta/dble(MxT))*FGamma(t1, FromGamT2(t1, i))* &
-            & weight_basis(CoefGam(0:BasisOrder, 0, j, i), t1)
-        enddo
-      enddo
-    endif
-  enddo
-
-  !========================= test the fitting function for Gamma ================================
-  call LogFile%QuickLog("test for Gamma fitting ...")
-  do i = 1, NbinGam
-    if(IsBasis2D(i)) then
-      do t1 = FromGamT1(i), ToGamT1(i)
-        do t2 = FromGamT2(t1, i), ToGamT2(t1, i)
-          Gamfit = (0.d0, 0.d0)
-          do j = 1, NBasisGam
-            Gamfit = Gamfit + GamBasis(i, j) * weight_basis_Gam(CoefGam(0:BasisOrderGam, &
-              & 0:BasisOrderGam, j, i), t1, t2)
-          enddo
-          if(abs(Gamfit-FGamma(t1,t2))>1.d-9)  then
-            call LogFile%QuickLog(str(t1)+str(t2)+str(Gamfit-FGamma(t1,t2))+"Gamma fitting error!")
-          endif
-        enddo
-      enddo
-    else 
-      do t1 = FromGamT1(i), ToGamT1(i)
-        Gamfit = (0.d0, 0.d0)
-        do j = 1, NBasis
-          Gamfit = Gamfit + GamBasis(i, j) * weight_basis(CoefGam(0:BasisOrder, 0, j, i), t1)
-        enddo
-        t2 = FromGamT2(t1, i)
-        if(abs(Gamfit-FGamma(t1,t2))>1.d-9)  then
-          call LogFile%QuickLog(str(t1)+str(t2)+str(Gamfit-FGamma(t1,t2))+"Gamma fitting error!")
-        endif
-      enddo
-    endif
-  enddo
-  call LogFile%QuickLog("test for Gamma fitting done~")
-
-CONTAINS
+INTEGER FUNCTION get_bin_Gam(it1, it2)
+  implicit none
+  integer :: it1, it2
+  get_bin_Gam = 1
+  return
+END FUNCTION get_bin_Gam
 
 SUBROUTINE initialize_polynomials
   implicit none
@@ -200,6 +219,21 @@ SUBROUTINE initialize_polynomials
 END SUBROUTINE initialize_polynomials
 
 
+DOUBLE PRECISION FUNCTION get_polynomial(iorder, tau)
+  implicit none
+  integer, intent(in) :: iorder
+  double precision, intent(in) :: tau
+  get_polynomial = (tau)**iorder
+  return
+END FUNCTION get_polynomial
+
+DOUBLE PRECISION FUNCTION get_polynomial_Gam(iorder1, iorder2, tau1, tau2)
+  implicit none
+  integer, intent(in) :: iorder1, iorder2
+  double precision, intent(in) :: tau1, tau2
+  get_polynomial_Gam = (tau1)**iorder1 *(tau2)**iorder2
+  return
+END FUNCTION get_polynomial_Gam
 
 !!============== GRAM-SCHMIDT BASIS ==================================
 
@@ -254,12 +288,11 @@ DOUBLE PRECISION FUNCTION projector(tmin, tmax, Coef1, Coef2)
   return 
 END FUNCTION projector
 
-DOUBLE PRECISION FUNCTION weight_basis(Coef, t)
+DOUBLE PRECISION FUNCTION weight_basis(Coef, tau)
   implicit none
   double precision :: Coef(0:BasisOrder)
-  integer :: j, t
+  integer :: j
   double precision :: tau
-  tau = dble(t)*Beta/dble(MxT)
 
   weight_basis = 0.d0
   do j = 0, BasisOrder
@@ -275,12 +308,14 @@ SUBROUTINE test_basis(tmin, tmax, Coef)
   integer, intent(in) :: tmin, tmax
   double precision, intent(in) :: Coef(0:BasisOrder, Nbasis)
   integer :: i, j, k, l, n, t
-  double precision :: omega, x, y
+  double precision :: x, y
+  double precision :: tau, tau1, tau2
 
   do i = 1, NBasis
     y = 0.d0
     do  t = tmin, tmax
-      y = y + Beta/dble(MxT)*weight_basis(Coef(:, i), t)**2.d0
+      tau = dble(t)*Beta/dble(MxT)
+      y = y + Beta/dble(MxT)*weight_basis(Coef(:, i), tau)**2.d0
     enddo
     if(dabs(y-1.d0)>1.d-8) then
       call LogFile%QuickLog(str(i)+str(y)+"Basis error!! Not normal!")
@@ -364,14 +399,11 @@ DOUBLE PRECISION FUNCTION projector_Gam(t1min, t1max, t2min, t2max, Coef1, Coef2
   return 
 END FUNCTION projector_Gam
 
-DOUBLE PRECISION FUNCTION weight_basis_Gam(Coef, t1, t2)
+DOUBLE PRECISION FUNCTION weight_basis_Gam(Coef, tau1, tau2)
   implicit none
   double precision :: Coef(0:BasisOrderGam, 0:BasisOrderGam)
   integer :: j1, t1, j2, t2
   double precision :: tau1, tau2
-  tau1 = dble(t1)*Beta/dble(MxT)
-  tau2 = dble(t2)*Beta/dble(MxT)
-
   weight_basis_Gam = 0.d0
   do j1 = 0, BasisOrderGam
     do j2 = 0, BasisOrderGam
@@ -389,13 +421,17 @@ SUBROUTINE test_basis_Gam(t1min, t1max, t2min, t2max, Coef)
   integer, intent(in) :: t2min(0:MxT-1), t2max(0:MxT-1)
   double precision, intent(in) :: Coef(0:BasisOrderGam, 0:BasisOrderGam, NbasisGam)
   integer :: i, j, k, l, n, t1, t2
+  double precision :: tau, tau1, tau2
   double precision :: omega, x, y
 
   do i = 1, NBasisGam
     y = 0.d0
     do  t1 = t1min, t1max
+      tau1 = dble(t1)*Beta/dble(MxT)
       do  t2 = t2min(t1), t2max(t1)
-        y = y + (Beta/dble(MxT))**2.d0*weight_basis_Gam(Coef(:, :, i), t1, t2)**2.d0
+        tau2 = dble(t2)*Beta/dble(MxT)
+
+        y = y + (Beta/dble(MxT))**2.d0*weight_basis_Gam(Coef(:, :, i), tau1, tau2)**2.d0
       enddo
     enddo
     if(dabs(y-1.d0)>1.d-8) then
@@ -414,5 +450,4 @@ SUBROUTINE test_basis_Gam(t1min, t1max, t2min, t2max, Coef)
 
 END SUBROUTINE test_basis_Gam
 
->>>>>>> add the fitting functions for Gamma
-END PROGRAM MAIN
+!END PROGRAM MAIN
