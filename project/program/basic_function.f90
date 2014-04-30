@@ -993,62 +993,6 @@ LOGICAL FUNCTION Is_reducible_add_interaction(kW, kIA, kMB, kIC, kMD)
   enddo
 END FUNCTION Is_reducible_add_interaction
 
-
-SUBROUTINE test_reduciblility(is_reducible, mcname)
-  implicit none
-  logical :: is_reducible
-  logical :: flag1
-  character(len=*) :: mcname
-  flag1=Is_reducible_Gam()
-  if(is_reducible/=flag1) then
-    call LogFile%QuickLog(mcname+", Reducibility check is wrong!"+" imc: "+str(imc), "e")
-    call print_config
-    stop
-  endif
-end SUBROUTINE
-
-logical FUNCTION Is_reducible_Gam()
-  implicit none
-  integer :: i,j, k, Gi, Gj, Wk, Gam1, Gam2
-  Is_reducible_Gam = .false.
-  if(CheckGam==.false.) return
-
-  do i = 1, NGLn
-    Gi = GLnKey2Value(i)
-    do j = i+1, NGLn
-      Gj = GLnKey2Value(j)
-      do k = 1, NWLn
-        Wk = WLnKey2Value(k)
-        if(abs(add_k(kLn(Gi), -kLn(Gj)))==abs(kLn(Wk))) then
-          Gam1=NeighLn(1,Wk)
-          Gam2=NeighLn(2,Wk)
-          if(is_connected(Gam1, Gi, Gj)) cycle
-          if(is_connected(Gam2, Gi, Gj)) cycle
-          Is_reducible_Gam=.true.
-          return
-        endif
-      enddo
-    enddo
-  enddo
-end FUNCTION
-
-logical FUNCTION is_connected(Gam, G1, G2)
-  implicit none
-  integer :: Gam, G1, G2
-  if((NeighVertex(1,Gam)==G1 .and. NeighVertex(2,Gam)==G2) .or. &
-   & (NeighVertex(2,Gam)==G1 .and. NeighVertex(1,Gam)==G2)) then
-    if(IsWormPresent .and. (Gam==Ira .or. Gam==Masha)) then
-      is_connected=.false.
-      !is_connected=.true.
-    else
-      is_connected=.true.
-    endif
-  else
-    is_connected=.false.
-  endif
-  return
-end FUNCTION
-
 !!=======================================================================
 !!=======================================================================
 !!=======================================================================
