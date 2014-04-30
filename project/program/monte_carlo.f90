@@ -236,29 +236,11 @@ SUBROUTINE markov(IsToss)
 
         !call check_config
         !call check_irreducibility
-        !if(IsWormPresent) then
-          !if(abs(add_k(kLn(NeighVertex(1,Ira)), -kLn(NeighVertex(2,Ira))))==abs(kLn(NeighVertex(3,Ira)))) then
-            !print *,"Ira",Ira, imc, iupdate, kMasha
-            !print *,NeighVertex(1,Ira),kLn(NeighVertex(1,Ira))
-            !print *,NeighVertex(2,Ira),kLn(NeighVertex(2,Ira))
-            !print *,NeighVertex(3,Ira),kLn(NeighVertex(3,Ira))
-            !call print_config
-            !stop
-          !endif
-          !if(abs(add_k(kLn(NeighVertex(1,Masha)), -kLn(NeighVertex(2,Masha))))==abs(kLn(NeighVertex(3,Masha)))) then
-            !print *,"Masha",Ira, imc, iupdate, kMasha
-            !print *,NeighVertex(1,Masha),kLn(NeighVertex(1,Masha))
-            !print *,NeighVertex(2,Masha),kLn(NeighVertex(2,Masha))
-            !print *,NeighVertex(3,Masha),kLn(NeighVertex(3,Masha))
-            !call print_config
-            !stop
-          !endif
-        !endif
 
       enddo
 
 
-      call check_irreducibility
+      !call check_irreducibility
       if( .not. IsToss) call measure
 
     enddo 
@@ -269,9 +251,10 @@ SUBROUTINE markov(IsToss)
     if(mod(iblck, 10)==0) then
 
       call statistics
-      print *, Quan(0:MCOrder)
       call output_GamMC
+
       !call output_test
+
       call print_status
 
       call print_config
@@ -313,7 +296,9 @@ SUBROUTINE markov(IsToss)
     !================================================================
 
     if(mod(iblck,30)==0) then
+
       call check_config
+
       call LogFile%QuickLog("Writing data and configuration...")
 
       !call statistics
@@ -372,18 +357,12 @@ SUBROUTINE create_worm_along_wline
   k = generate_k()
   kiWold = kLn(iWLn)
   ktemp=add_k(kiWold, k)
-  ! make sure that on Ira, we don't have |kG1-kG2|==|kW|
-  ! orignailly, we have abs(add_k(kiGin, -kiGout))==abs(kiWold)
-  ! once Ira moves in, we want to exclude config with: abs(add_k(kiGin, -kiGout))==abs(ktemp)
-  ! so the only requirement is abs(kiWold)/=abs(ktemp)
-  ! The Masha side has EXACTLY the same requirement!!!
-  if(abs(kiWold)==abs(ktemp)) return
   if(Is_k_valid_for_W(ktemp)==.false.) return
   call update_line(iWLn, ktemp, 2)
    
 
   !------------ step3 : configuration check -------------------
-  flag=Is_reducible_W_Gam(iWLn)
+  flag=Is_reducible_W_Gam_both_side(ktemp, kLn(iGin), kLn(iGout), kLn(jGin), kLn(jGout))
 
   if(flag) then
     call undo_update_line(iWLn, kiWold, 2)
@@ -533,7 +512,7 @@ SUBROUTINE delete_worm_along_wline
   call update_line(iWLn, ktemp, 2)
 
   !------------ step3 : configuration check ---------------------
-  flag=Is_reducible_W_Gam(iWLn)
+  flag=Is_reducible_W_Gam_both_side(ktemp, kLn(iGin), kLn(iGout), kLn(jGin), kLn(jGout))
 
   if(flag) then
     call undo_update_line(iWLn, kiWold, 2)
@@ -686,14 +665,6 @@ SUBROUTINE move_worm_along_wline
   !-------- irreducibility check ------------------------
   kWold = kLn(WLn)
   ktemp = add_k(kWold, (-1)**dir *kMasha)
-
-  ! make sure that on Ira, we don't have |kG1-kG2|==|kW|
-  ! suppose GLn3 = NeighVertex(1, jGam);     GLn4 = NeighVertex(2, jGam)
-  ! orignailly, we have abs(add_k(kGLn3, -kGLn4))==abs(kWold)
-  ! once Ira moves in, we want to exclude config with: abs(add_k(kGLn3, -kGLn4))==abs(ktemp)
-  ! so the only requirement is abs(kWold)/=abs(ktemp)
-  if(abs(kWold)==abs(ktemp)) return
-
   if(Is_k_valid_for_W(ktemp)==.false.) return
   call update_line(WLn, ktemp, 2)
 
@@ -791,7 +762,7 @@ SUBROUTINE move_worm_along_gline
   implicit none
   integer :: dir, kGold, ktemp, dr(2)
   double precision :: Ppro
-  integer :: iGam, jGam, iW, jW, GLn, kjGLn
+  integer :: iGam, jGam, iW, jW, GLn, kiGLn
   integer :: vertex1, vertex2
   integer :: typG, typiGam, typjGam, typiW
   integer, dimension(2) :: spiGam, spjGam
@@ -822,19 +793,13 @@ SUBROUTINE move_worm_along_gline
   kGold = kLn(GLn)
   ktemp = add_k(kGold, (-1)**(dir+1) *kMasha)
 
-  ! make sure that on Ira, we don't have |kG1-kG2|==|kW|
-  ! orignailly, we have abs(add_k(kGold, -kjGLn))==abs(jW)
-  ! once Ira moves in, we want to exclude config with: abs(add_k(ktemp, -kjGLn))==abs(jW)
-  ! so the only requirement is abs(add_k(ktemp, -kjGLn))==abs(add_k(kGold, -kjGLn))
-
-  kjGLn = kLn(NeighVertex(dir, jGam))
-  if(abs(add_k(ktemp, -kjGLn))==abs(add_k(kGold, -kjGLn))) return
   if(Is_k_valid_for_G(ktemp)==.false.) return
   call update_line(GLn, ktemp, 1)
 
   !------- step3 : configuration check ------------------
   !-------- irreducibility  check -----------------------
-  flag=Is_reducible_G_Gam(GLn)
+  kiGLn = kLn(NeighVertex(3-dir, iGam))
+  flag=Is_reducible_G_Gam_one_side(ktemp, kiGLn)
 
   if(flag) then
     call undo_update_line(GLn, kGold, 1)
@@ -1059,24 +1024,12 @@ SUBROUTINE move_worm_along_gline_test
 
   kGold = kLn(GLn)
   ktemp = add_k(kGold, -(-1)**dir*kMasha)
-  ! make sure that on Ira, we don't have |kG1-kG2|==|kW|
-  ! orignailly, we have abs(add_k(kGold, -kjGLn))==abs(jW)
-  ! once Ira moves in, we want to exclude config with: abs(add_k(ktemp, -kjGLn))==abs(jW)
-  ! so the only requirement is abs(add_k(ktemp, -kjGLn))==abs(add_k(kGold, -kjGLn))
-
-  kiGLn = kLn(NeighVertex(3-dir, iGam))
-  kjGLn = kLn(NeighVertex(dir, jGam))
-  if(abs(add_k(ktemp, -kjGLn))==abs(add_k(kGold, -kjGLn))) return
   if(Is_k_valid_for_G(ktemp)==.false.) return
   call update_line(GLn, ktemp, 1)
 
   !-------- irreducibility  check -----------------------
-  flag=Is_reducible_G_Gam(GLn)
-  if(flag/=Is_reducible_G_Gam_one_side(ktemp, kiGLn)) then
-    print *,imc, "move worm wrong",ktemp,kiGLn,kLn(iW)
-    call print_config
-    stop
-  endif
+  kiGLn = kLn(NeighVertex(3-dir, iGam))
+  flag=Is_reducible_G_Gam_one_side(ktemp, kiGLn)
 
   if(flag) then
     call undo_update_line(GLn, kGold, 1)
@@ -1392,6 +1345,10 @@ SUBROUTINE add_interaction
 
   kNeighG=kLn(NeighVertex(3-dir, Ira))
   if(abs(add_k(KIA,-kNeighG))==abs(kLn(NeighVertex(3,Ira))))return
+  !This line is used to reject the configuration with |k_GAC-kNeighG|==|k of W attached to Ira|
+  !Such configuration will always become reducibile once new interaction line is added
+  !Please refer to the comments in the reducibility check codes block in basic_function.f90
+  !for further information on the definition of reducibility
 
   if(Is_k_valid_for_G(kIA)==.false.) return
 
@@ -1473,7 +1430,7 @@ SUBROUTINE add_interaction
   NeighLn(dirW, WAB)= GamA;          NeighLn(3-dirW,WAB)= GamB
 
   !------------ step4 : configuration check ---------------------
-  flag=Is_reducible_add_interaction(q, kIA, kMB, kIC, kMD)
+  flag=Is_reducible_add_interaction(q, kIA, kIC, kMB, kMD)
 
   if(flag) then
     Order = Order - 1
@@ -1622,12 +1579,6 @@ SUBROUTINE remove_interaction
   kMB = kLn(GMB)
   kAC = kLn(GAC)
   kBD = kLn(GBD)
-
-  kNeighG=kLn(NeighVertex(3-dir, Ira))
-  if(abs(add_k(kAC,-kNeighG))==abs(kLn(NeighVertex(3,Ira))))return
-  kNeighG=kLn(NeighVertex(3-dir, Masha))
-  if(abs(add_k(KBD,-kNeighG))==abs(kLn(NeighVertex(3,Masha))))return
-
 
   statIA = StatusLn(GIA)
   statMB = StatusLn(GMB)

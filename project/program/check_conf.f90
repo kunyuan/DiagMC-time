@@ -492,20 +492,17 @@ SUBROUTINE check_irreducibility
       Gi = GLnKey2Value(i)
       do j = i+1, NGLn
         Gj = GLnKey2Value(j)
-        !if(NeighLn(1,Gi)==NeighLn(2,Gj) .or. NeighLn(2,Gi)==NeighLn(1,Gj)) cycle
         do k = 1, NWLn
           Wk = WLnKey2Value(k)
-          Gam1=NeighLn(1,Wk)
-          Gam2=NeighLn(2,Wk)
-          if(NeighVertex(1,Gam1)==Gi .and. NeighVertex(2,Gam1)==Gj) cycle
-          if(NeighVertex(2,Gam1)==Gi .and. NeighVertex(1,Gam1)==Gj) cycle
-          if(NeighVertex(1,Gam2)==Gi .and. NeighVertex(2,Gam2)==Gj) cycle
-          if(NeighVertex(2,Gam2)==Gi .and. NeighVertex(1,Gam2)==Gj) cycle
           if(abs(add_k(kLn(Gi), -kLn(Gj)))==abs(kLn(Wk))) then
+            Gam1=NeighLn(1,Wk)
+            Gam2=NeighLn(2,Wk)
+            if(is_connected(Gam1, Gi, Gj)) cycle
+            if(is_connected(Gam2, Gi, Gj)) cycle
             call LogFile%WriteStamp('e')
             call LogFile%WriteLine('imc:'+str(imc))
             call LogFile%WriteLine("Oops, check_irreducibility found a bug!")
-            call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+",imc"+str(imc))
+            call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+",iupdate"+str(iupdate))
             call LogFile%WriteLine("Gamma is not irreducible!")
             call LogFile%WriteLine("Gline's number"+str(Gi)+str(Gj)+",Wline"+str(Wk)+ &
                 & ",k"+str(kLn(Gi))+str(kLn(Gj))+str(kLn(Wk)))
@@ -519,6 +516,23 @@ SUBROUTINE check_irreducibility
 
   return
 END SUBROUTINE check_irreducibility
+
+logical FUNCTION is_connected(Gam, G1, G2)
+  implicit none
+  integer :: Gam, G1, G2
+  if((NeighVertex(1,Gam)==G1 .and. NeighVertex(2,Gam)==G2) .or. &
+   & (NeighVertex(2,Gam)==G1 .and. NeighVertex(1,Gam)==G2)) then
+    if(IsWormPresent .and. (Gam==Ira .or. Gam==Masha)) then
+      is_connected=.false.
+      !is_connected=.true.
+    else
+      is_connected=.true.
+    endif
+  else
+    is_connected=.true.
+  endif
+  return
+end FUNCTION
 
 
 
