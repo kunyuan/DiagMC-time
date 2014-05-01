@@ -7,7 +7,6 @@ N = 64
 
 tau = np.arange(0, Beta, Beta/N)
 
-
 #Gamma=["Gamma1","Gamma2","Gamma3","Gamma4"]
 Gamma=["Gamma1","Gamma2","Gamma3"]
 #Gamma=["Gamma1","Gamma2"]

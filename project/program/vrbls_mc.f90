@@ -86,12 +86,12 @@ MODULE vrbls_mc
   !                   c \||
   !                  (in) \ a
   !                       (in)
-  !----- type = 1:  a = up;   d = up;   b = up;    c = up  -------------------
-  !----- type = 2:  a = down; d = down; b = down;  c = down  -----------------
-  !----- type = 3:  a = up;   d = down; b = up;    c = down  -----------------
-  !----- type = 4:  a = down; d = up;   b = down;  c = up  -------------------
-  !----- type = 5:  a = up;   d = down; b = down;  c = up  -------------------
-  !----- type = 6:  a = down; d = up;   b = up;    c = down  -----------------
+  !----- type = 1:  a = up;   b = up;    c = up;   d = up  -------------------
+  !----- type = 2:  a = down; b = down;  c = down; d = down  -----------------
+  !----- type = 3:  a = up;   b = up;    c = down; d = down  -----------------
+  !----- type = 4:  a = down; b = down;  c = up;   d = up  -------------------
+  !----- type = 5:  a = up;   b = down;  c = up;   d = down  -------------------
+  !----- type = 6:  a = down; b = up;    c = down; d = up  -----------------
   !----------------------------------------------------------------------------
   integer, parameter :: NTypeChi = 4                  ! types of Chi 
   !----------------------------------------------------------------------------
