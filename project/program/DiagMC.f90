@@ -122,7 +122,7 @@ PROGRAM MAIN
   allocate(ImGamSqMC(0:MCOrder,1:NTypeGam/2, 0:L(1)-1, 0:L(2)-1, 0:MxT-1, 0:MxT-1))
 
   MaxStat=1024
-  allocate(ObsRecord(1:MaxStat,1:NObs))
+  allocate(ObsRecord(1:MaxStat,0:NObs-1))
 
   call LogFile%QuickLog("Initializing time and RNG...")
 
