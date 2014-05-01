@@ -529,7 +529,7 @@ logical FUNCTION is_connected(Gam, G1, G2)
       is_connected=.true.
     endif
   else
-    is_connected=.true.
+    is_connected=.false.
   endif
   return
 end FUNCTION

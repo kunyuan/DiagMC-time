@@ -362,7 +362,7 @@ SUBROUTINE create_worm_along_wline
    
 
   !------------ step3 : configuration check -------------------
-  flag=Is_reducible_W_Gam_both_side(ktemp, kLn(iGin), kLn(iGout), kLn(jGin), kLn(jGout))
+  flag=Is_reducible_W_Gam(ktemp)
 
   if(flag) then
     call undo_update_line(iWLn, kiWold, 2)
@@ -1357,7 +1357,7 @@ SUBROUTINE add_interaction
   kMB = add_k(kMD, (-1)**(dir+dirW)*q)
 
   kNeighG=kLn(NeighVertex(3-dir, Masha))
-  if(abs(add_k(KMB,-kNeighG))==abs(kLn(NeighVertex(3,Masha))))return
+  !if(abs(add_k(KMB,-kNeighG))==abs(kLn(NeighVertex(3,Masha))))return
 
   if(Is_k_valid_for_G(kMB)==.false.) return
 
