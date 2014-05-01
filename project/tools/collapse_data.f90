@@ -108,6 +108,7 @@ PROGRAM MAIN
         Z_normal = Z_normal+Ztmp
         GamNorm = GamNorm + iGamNorm
         GamNormWeight = iGamNormWeight
+
         GamMC=GamMC+GamTmp
         ReGamSqMC=ReGamSqMC+ReGamSqTmp
         ImGamSqMC=ImGamSqMC+ImGamSqTmp
