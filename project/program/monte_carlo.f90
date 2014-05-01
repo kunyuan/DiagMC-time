@@ -2636,6 +2636,12 @@ SUBROUTINE measure
 
 
     factorM = factorM *CoefOfSymmetry(dx, dy)* CoefOfWeight(Order) *abs(WeightVertex(MeasureGam))
+
+    if(abs(factorM)<1.d-18) then
+      call LogFile%QuickLog("factorM is zero! Fatal Error!"+str(factorM))
+      stop
+    endif
+
     !================= accumulation ===================================
     if(Order==0 .and. IsDeltaVertex(NeighLn(3-dir, MeaW))==1) then
       GamNorm = GamNorm + Phase/CoefOfWeight(0)
