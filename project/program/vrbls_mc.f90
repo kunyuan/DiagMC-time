@@ -257,6 +257,7 @@ MODULE vrbls_mc
   integer, parameter :: BasisOrderGam=3
   integer, parameter :: NbasisGam=(BasisOrderGam+1)**2
 
+  integer, parameter :: NbinGam=3
   integer, dimension(1:NbinGam) :: FromGamT1, ToGamT1
   integer, dimension(0:MxT-1, 1:NbinGam) :: FromGamT2, ToGamT2
   logical, dimension(1:NbinGam) :: IsBasis2D
