@@ -833,6 +833,30 @@ LOGICAL FUNCTION Is_reducible_G_Gam_one_side(kG, kNeighG)
   return
 END FUNCTION Is_reducible_G_Gam_one_side
 
+LOGICAL FUNCTION Is_reducible_W_Gam(kW)
+  implicit none
+  integer, intent(in) :: kW
+  integer :: i, ktemp, kG
+
+  Is_reducible_W_Gam = .false.
+  if(CheckGam==.false.) return
+
+  do i = 1, NGLn
+    kG = kLn(GLnKey2Value(i))
+    ktemp = add_k(kG, kW)
+    if(Hash4G(ktemp)/=0) then
+      Is_reducible_W_Gam=.true.
+      return
+    endif
+
+    ktemp = add_k(kG, -kW)
+    if(Hash4G(ktemp)/=0) then
+      Is_reducible_W_Gam=.true.
+      return
+    endif
+  enddo
+END FUNCTION Is_reducible_W_Gam
+
 LOGICAL FUNCTION Is_reducible_W_Gam_one_side(kW, kG1, kG2)
   implicit none
   integer, intent(in) :: kW, kG1, kG2
