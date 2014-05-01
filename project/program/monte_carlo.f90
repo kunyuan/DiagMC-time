@@ -234,13 +234,11 @@ SUBROUTINE markov(IsToss)
           call change_Gamma_isdelta       
         endif
 
-        !call check_config
-        !call check_irreducibility
-
+        if(HEAVY_DEBUG) then
+          !call check_config
+        endif
       enddo
 
-
-      !call check_irreducibility
       if( .not. IsToss) call measure
 
     enddo 
@@ -252,8 +250,6 @@ SUBROUTINE markov(IsToss)
 
       call statistics
       call output_GamMC
-
-      !call output_test
 
       call print_status
 
@@ -297,7 +293,9 @@ SUBROUTINE markov(IsToss)
 
     if(mod(iblck,30)==0) then
 
-      call check_config
+      if(DEBUG) then
+        call check_config
+      endif
 
       call LogFile%QuickLog("Writing data and configuration...")
 

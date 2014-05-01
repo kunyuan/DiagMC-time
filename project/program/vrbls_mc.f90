@@ -3,6 +3,16 @@ MODULE vrbls_mc
   USE logging_module
   IMPLICIT NONE
 
+  !======================== code mode control ============================
+  logical, parameter  ::  DEBUG=.true.          
+  !light weight debug switch, suggest to turn it on even if you are running large-scale simulation
+  logical, parameter  ::  HEAVY_DEBUG=.false.
+  !heavy deug mode will turn on checking for all low level subroutines, it will significantly slow down the code
+  !Please use it if you are debugging
+  logical, parameter  ::  IS_BOLD=.true.
+  logical, parameter  ::  CHECK_G=.true.
+  logical, parameter  ::  CHECK_W=.true.
+  logical, parameter  ::  CHECK_GAM=IS_BOLD
   !======================== Parameters ====================================
   double precision, parameter :: Pi    = 3.14159265358979323846d0
   double precision, parameter :: Pi2   = 6.2831853071795865d0
@@ -44,7 +54,6 @@ MODULE vrbls_mc
 
   type(logging) :: LogFile
   type(logging) :: LogTerm
-  logical :: isbold
 
   !======================== Input parameter ==============================
   integer          ::  L(2), Vol                ! System size
@@ -54,7 +63,6 @@ MODULE vrbls_mc
   double precision ::  Mu(2)                      ! Chem. potential for spin down & up
   double precision ::  Beta                       ! inverse temperature
   integer          ::  MCOrder                    ! the max order for Gamma in MC
-  logical          ::  CheckG, CheckW, CheckGam ! if turn on the irreducibility check
   !=======================================================================
 
 
