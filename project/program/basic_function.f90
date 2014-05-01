@@ -110,6 +110,7 @@ COMPLEX*16 FUNCTION weight_gline(stat, tau, typ)
     !call LogFile%WriteLine("The number of update: "+str(iupdate))
     !call LogFile%WriteLine("line status error!"+str(stat))
     !stop
+
   !endif
 
   !---------------------- test2: uniform function -----------------------
@@ -172,10 +173,10 @@ COMPLEX*16 FUNCTION weight_wline(stat, isdelta, dr0, tau, typ)
     !!if(isdelta==0) weight_wline = weight_meas_W(dr, t)
     !!if(isdelta==1) weight_wline = weight_meas_W(dr, 0)
   !else
-    !call LogFile%WriteStamp('e')
-    !call LogFile%WriteLine("The number of update: "+str(iupdate))
-    !call LogFile%WriteLine("line status error!"+str(stat))
-    !stop
+      !call LogFile%WriteStamp('e')
+      !call LogFile%WriteLine("The number of update: "+str(iupdate))
+      !call LogFile%WriteLine("line status error!"+str(stat))
+      !stop
   !endif
 
   !---------------------- test2: uniform function ----------------------------
@@ -187,10 +188,10 @@ COMPLEX*16 FUNCTION weight_wline(stat, isdelta, dr0, tau, typ)
     !endif
 
   !else
-    !call LogFile%WriteStamp('e')
-    !call LogFile%WriteLine("The number of update: "+str(iupdate))
-    !call LogFile%WriteLine("line status error!"+str(stat))
-    !stop
+      !call LogFile%WriteStamp('e')
+      !call LogFile%WriteLine("The number of update: "+str(iupdate))
+      !call LogFile%WriteLine("line status error!"+str(stat))
+      !stop
   !endif
   !------------------------ end -----------------------------------------
 
@@ -213,7 +214,7 @@ COMPLEX*16 FUNCTION weight_vertex(stat, isdelta, dr0, dtau1, dtau2, typ)
   call diff_r(dr0, dr)
 
   if(stat==0) then
-    if(isbold) then
+    if(IS_BOLD) then
       !----------------- for bold Gamma ------------------------------
       if(isdelta==0) weight_vertex = weight_Gam(typ, dr, t1, t2)
       if(isdelta==1) weight_vertex = weight_Gam0(typ, dr)
@@ -224,7 +225,7 @@ COMPLEX*16 FUNCTION weight_vertex(stat, isdelta, dr0, dtau1, dtau2, typ)
     endif
 
   else if(stat==2) then
-    if(isbold) then
+    if(IS_BOLD) then
       !----------------- for bold Gamma ------------------------------
       if(isdelta==0) weight_vertex = weight_Gam(typ, dr, t1, t2)
       if(isdelta==1) weight_vertex = weight_Gam0(typ, dr)
@@ -697,33 +698,34 @@ SUBROUTINE update_Hash4G(newk, GLn)
   integer :: oldk
   oldk=kLn(GLn)
 
-  if(CheckG .and. (Hash4G(newk)/=0 .or. Hash4G(oldk)/=GLn)) then
+  if(HEAVY_DEBUG .and. CHECK_G) then
+    if(Hash4G(newk)/=0 .or. Hash4G(oldk)/=GLn) then
       call LogFile%WriteStamp('e')
       call LogFile%WriteLine("Oops, update_Hash4G found a bug!")
       call LogFile%WriteLine("IsWormPresent:"+str(IsWormPresent)+", update number:"+str(imc))
       call LogFile%WriteLine("G Hash table for old k"+str(newk)+" is not 1!!"+str(Hash4G(newk)))
       call print_config
-  else
-    Hash4G(newk)=Hash4G(oldk)
-    Hash4G(oldk)=0
+      stop
+    endif
   endif
-  return
+
+  Hash4G(newk)=Hash4G(oldk)
+  Hash4G(oldk)=0
 END SUBROUTINE update_Hash4G
 
 SUBROUTINE add_Hash4G(newk, GLn)
   implicit none
   integer, intent(in) :: newk, GLn
   !MAKE SURE Hash4G(newk)==0 BEFORE CALL THIS SUBROUTINE
-  if(CheckG .and. Hash4G(newk)/=0) then
-      call LogFile%WriteStamp('e')
-      call LogFile%WriteLine("Oops, add_Hash4G found a bug!")
-      call LogFile%WriteLine("IsWormPresent:"+str(IsWormPresent)+", update number:"+str(imc))
-      call LogFile%WriteLine("G Hash table for old k"+str(newk)+" is not 1!!"+str(Hash4G(newk)))
-      call print_config
-  else
-    Hash4G(newk)=GLn
+  if(HEAVY_DEBUG .and. CHECK_G .and. Hash4G(newk)/=0) then
+    call LogFile%WriteStamp('e')
+    call LogFile%WriteLine("Oops, add_Hash4G found a bug!")
+    call LogFile%WriteLine("IsWormPresent:"+str(IsWormPresent)+", update number:"+str(imc))
+    call LogFile%WriteLine("G Hash table for old k"+str(newk)+" is not 1!!"+str(Hash4G(newk)))
+    call print_config
+    stop
   endif
-
+  Hash4G(newk)=GLn
 END SUBROUTINE add_Hash4G
 
 SUBROUTINE delete_Hash4G(oldk, GLn)
@@ -732,7 +734,7 @@ SUBROUTINE delete_Hash4G(oldk, GLn)
   if(Hash4G(oldk)==GLn) then
     Hash4G(oldk)=0
   else
-    if(CheckG) then
+    if(HEAVY_DEBUG .and. CHECK_G) then
       call LogFile%WriteStamp('e')
       call LogFile%WriteLine("Oops, delete_Hash4G found a bug!")
       call LogFile%WriteLine("IsWormPresent:"+str(IsWormPresent)+", update number:"+str(imc))
@@ -792,7 +794,7 @@ END SUBROUTINE delete_Hash4W
 LOGICAL FUNCTION Is_k_valid_for_G(k)
   implicit none
   integer,intent(in) :: k
-  if(CheckG .and. Hash4G(k)/=0) then
+  if(CHECK_G .and. Hash4G(k)/=0) then
     Is_k_valid_for_G=.false.
   else
     Is_k_valid_for_G=.true.
@@ -805,7 +807,7 @@ LOGICAL FUNCTION Is_k_valid_for_W(k)
   integer,intent(in) :: k
   integer :: ak
   ak=abs(k)
-  if(CheckW .and. (ak==0 .or. Hash4W(ak)/=0)) then
+  if(CHECK_W .and. (ak==0 .or. Hash4W(ak)/=0)) then
     Is_k_valid_for_W=.false.
   else
     Is_k_valid_for_W=.true.
@@ -818,7 +820,7 @@ LOGICAL FUNCTION Is_reducible_G_Gam_one_side(kG, kNeighG)
   integer :: i, knG
 
   Is_reducible_G_Gam_one_side = .false.
-  if(CheckGam==.false.) return
+  if(.not. CHECK_GAM) return
 
   do i = 1, NGLn
     knG = kLn(GLnKey2Value(i))
@@ -839,7 +841,7 @@ LOGICAL FUNCTION Is_reducible_W_Gam(kW)
   integer :: i, ktemp, kG
 
   Is_reducible_W_Gam = .false.
-  if(CheckGam==.false.) return
+  if(.not. CHECK_GAM) return
 
   do i = 1, NGLn
     kG = kLn(GLnKey2Value(i))
@@ -863,7 +865,7 @@ LOGICAL FUNCTION Is_reducible_W_Gam_one_side(kW, kG1, kG2)
   integer :: i, ktemp, kG
 
   Is_reducible_W_Gam_one_side = .false.
-  if(CheckGam==.false.) return
+  if(.not. CHECK_GAM) return
 
   do i = 1, NGLn
     kG = kLn(GLnKey2Value(i))
@@ -893,7 +895,7 @@ LOGICAL FUNCTION Is_reducible_W_Gam_both_side(kW, kIA, kIC, kMB, kMD)
   integer :: ktemp
 
   Is_reducible_W_Gam_both_side = .false.
-  if(CheckGam==.false.) return
+  if(.not. CHECK_GAM) return
 
   do i = 1, NGLn
     kG = kLn(GLnKey2Value(i))
@@ -928,7 +930,7 @@ LOGICAL FUNCTION Is_reducible_add_interaction(kW, kIA, kIC, kMB, kMD)
   integer :: ktemp
 
   Is_reducible_add_interaction = .false.
-  if(CheckGam==.false.) return
+  if(.not. CHECK_GAM) return
 
   do i = 1, NGLn
     kG = kLn(GLnKey2Value(i))
