@@ -5,6 +5,7 @@
 SUBROUTINE check_config
   implicit none
 
+  call LogFile%QuickLog("Checking the configuration...")
   call check_topo
   call check_stat
   call check_irreducibility
@@ -14,6 +15,7 @@ SUBROUTINE check_config
   call check_time
   call check_site
   call check_weight
+  call LogFile%QuickLog("Checking configuration is done!")
   return
 END SUBROUTINE check_config
 
@@ -308,9 +310,6 @@ SUBROUTINE check_site
   enddo
 END SUBROUTINE check_site
   
-
-
-
 SUBROUTINE check_k_conserve
   implicit none
   integer :: ikey
@@ -437,7 +436,7 @@ SUBROUTINE check_irreducibility
   integer :: Gk, Wk
   integer :: Gam1, Gam2
   
-  if(CheckG) then
+  if(CHECK_G) then
     do i = 1, NGLn
       Gi = GLnKey2Value(i)
       do j = i+1, NGLn
@@ -456,7 +455,7 @@ SUBROUTINE check_irreducibility
     enddo
   endif
 
-  if(CheckW) then
+  if(CHECK_W) then
     do i = 1, NWLn
       Wi = WLnKey2Value(i)
       if(kLn(Wi)==0) then
@@ -487,7 +486,7 @@ SUBROUTINE check_irreducibility
   endif
 
 
-  if(CheckGam) then
+  if(CHECK_GAM) then
     do i = 1, NGLn
       Gi = GLnKey2Value(i)
       do j = i+1, NGLn
@@ -597,11 +596,6 @@ SUBROUTINE check_weight
     call print_config
     stop
   endif
-
-  !if(real(Phase*WeightCurrent-weight)>1.d-8.or.dimag(Phase*WeightCurrent-weight)>1.d-8) then
-    !call print_config
-    !stop
-  !endif
   return
 END SUBROUTINE check_weight
 
