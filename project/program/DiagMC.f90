@@ -154,6 +154,7 @@ INCLUDE "monte_carlo.f90"
 INCLUDE "check_conf.f90"
 INCLUDE "analytic_integration.f90"
 INCLUDE "read_write_data.f90"
+INCLUDE "fitting.f90"
 
 subroutine numerical_integeration
   implicit none
@@ -264,6 +265,8 @@ LOGICAL FUNCTION self_consistent_GW(err)
   enddo
   call calculate_Sigma
   call calculate_Polar
+  call calculate_Denom
+  call calculate_Chi
 
   !!-------------------------------------------------------
   call plus_minus_W0(-1)

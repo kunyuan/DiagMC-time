@@ -146,6 +146,7 @@ MODULE vrbls_mc
 
   double precision :: GamOrder(0:MxOrder)              ! the configuration number of different orders
   double precision :: GamWormOrder(0:MxOrder)          ! the configuration number in whole section
+  double precision :: TimeRatio(0:MxOrder)
 
   double precision :: WeightCurrent            ! the current weight of the configuration
   double precision :: CoefOfWorm
