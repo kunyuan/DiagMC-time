@@ -115,6 +115,8 @@ PROGRAM MAIN
   allocate(ReGamSqMC(0:MCOrder,1:NTypeGam/2, 0:L(1)-1, 0:L(2)-1, 0:MxT-1, 0:MxT-1))
   allocate(ImGamSqMC(0:MCOrder,1:NTypeGam/2, 0:L(1)-1, 0:L(2)-1, 0:MxT-1, 0:MxT-1))
 
+  allocate(GamMCBasis(0:MCOrder,1:NTypeGam/2, 0:L(1)-1, 0:L(2)-1, 1:NbinGam, 1:NBasisGam))
+
   MaxStat=1024
   allocate(ObsRecord(1:MaxStat,0:NObs-1))
 
@@ -122,6 +124,12 @@ PROGRAM MAIN
 
   call set_time_elapse
   call set_RNG
+
+  !=========== initialization of basis =======================
+  call initialize_polynomials
+  call initialize_bins
+  call calculate_basis_GWGam
+
   call initialize_self_consistent
   call def_symmetry
 
@@ -143,299 +151,302 @@ PROGRAM MAIN
     call test_subroutine
   endif
 
-  CONTAINS
+CONTAINS
 
-  INCLUDE "basic_function.f90"
-  INCLUDE "self_consistent.f90"
-  INCLUDE "monte_carlo.f90"
-  INCLUDE "check_conf.f90"
-  INCLUDE "analytic_integration.f90"
-  INCLUDE "read_write_data.f90"
+INCLUDE "basic_function.f90"
+INCLUDE "self_consistent.f90"
+INCLUDE "monte_carlo.f90"
+INCLUDE "check_conf.f90"
+INCLUDE "analytic_integration.f90"
+INCLUDE "read_write_data.f90"
+INCLUDE "fitting.f90"
 
-  subroutine numerical_integeration
-    implicit none
-    !call LogFile%QuickLog("Reading G,W, and Gamma...")
-    !call read_GWGamma
+subroutine numerical_integeration
+  implicit none
+  !call LogFile%QuickLog("Reading G,W, and Gamma...")
+  !call read_GWGamma
 
-    call calculate_Gam1
-  end subroutine
+  call calculate_Gam1
+end subroutine
 
-  subroutine just_output
-    implicit none
-    !call LogFile%QuickLog("Just output something!")
-    !call LogFile%QuickLog("Reading G,W, and Gamma...")
-    !call read_GWGamma
+subroutine just_output
+  implicit none
+  !call LogFile%QuickLog("Just output something!")
+  !call LogFile%QuickLog("Reading G,W, and Gamma...")
+  !call read_GWGamma
+
+  call LogFile%QuickLog("Reading MC data...")
+  call read_monte_carlo_data
+
+  call Gam_mc2matrix_mc
+
+  call LogFile%QuickLog("Reading Done!...")
+  call output_Quantities
+end subroutine just_output
+
+SUBROUTINE self_consistent
+  implicit none
+  integer :: iloop
+  logical :: flag
+
+  !------- read the G, W, and Gamma  -------------------
+  if(IsLoad==.false.) then
+
+    flag = self_consistent_GW(1.d-8)
+
+    call calculate_Chi
+    call transfer_Chi_r(-1)
+    call transfer_Chi_t(-1)
+    call transfer_Sigma_t(-1)
+    call output_Quantities
+
+    call write_GWGamma
+    !!!======================================================================
+  else if(IsLoad) then
+
+    call LogFile%QuickLog("Reading G,W, and Gamma...")
+    call read_GWGamma
+
 
     call LogFile%QuickLog("Reading MC data...")
     call read_monte_carlo_data
 
+    call LogFile%QuickLog("Reading Done!...")
+
+    !!-------- update the Gamma matrix with MC data -------
     call Gam_mc2matrix_mc
 
-    call LogFile%QuickLog("Reading Done!...")
+    flag = self_consistent_GW(1.d-8)
+
+    call calculate_Chi
+    call transfer_Chi_r(-1)
+    call transfer_Chi_t(-1)
+    call transfer_Sigma_t(-1)
+
     call output_Quantities
-  end subroutine just_output
 
-  SUBROUTINE self_consistent
-    implicit none
-    integer :: iloop
-    logical :: flag
+    call update_flag
+    call write_GWGamma
+  endif
+  return
+END SUBROUTINE self_consistent
 
-    !------- read the G, W, and Gamma  -------------------
-    if(IsLoad==.false.) then
+LOGICAL FUNCTION self_consistent_GW(err)
+  implicit none
+  double precision, intent(in) :: err
+  integer :: iloop
+  integer :: px, py
+  complex*16 :: WOld, WNow
 
-      flag = self_consistent_GW(1.d-8)
+  call transfer_r(1)
+  call transfer_t(1)
 
-      call calculate_Chi
-      call transfer_Chi_r(-1)
-      call transfer_Chi_t(-1)
-      call transfer_Sigma_t(-1)
-      call output_Quantities
+  call plus_minus_W0(1)
+  call plus_minus_Gam0(1)
 
-      call write_GWGamma
-      !!!======================================================================
-    else if(IsLoad) then
+  !!------ calculate G, W in momentum domain --------------
+  WOld = (10.d0, 0.d0)
+  WNow = weight_W(1, (/0, 0/), 0)
+  self_consistent_GW = .true.
 
-      call LogFile%QuickLog("Reading G,W, and Gamma...")
-      call read_GWGamma
+  iloop = 0
 
+  call calculate_Polar
+  call calculate_W
 
-      call LogFile%QuickLog("Reading MC data...")
-      call read_monte_carlo_data
+  do while(abs(real(WNow)-real(WOld))>err) 
+    WOld = WNow
+    iloop = iloop + 1
 
-      call LogFile%QuickLog("Reading Done!...")
-
-      !!-------- update the Gamma matrix with MC data -------
-      call Gam_mc2matrix_mc
-
-      flag = self_consistent_GW(1.d-8)
-
-      call calculate_Chi
-      call transfer_Chi_r(-1)
-      call transfer_Chi_t(-1)
-      call transfer_Sigma_t(-1)
-
-      call output_Quantities
-
-      call update_flag
-      call write_GWGamma
-    endif
-    return
-  END SUBROUTINE self_consistent
-
-  LOGICAL FUNCTION self_consistent_GW(err)
-    implicit none
-    double precision, intent(in) :: err
-    integer :: iloop
-    integer :: px, py
-    complex*16 :: WOld, WNow
-
-    call transfer_r(1)
-    call transfer_t(1)
-
-    call plus_minus_W0(1)
-    call plus_minus_Gam0(1)
-
-    !!------ calculate G, W in momentum domain --------------
-    WOld = (10.d0, 0.d0)
-    WNow = weight_W(1, (/0, 0/), 0)
-    self_consistent_GW = .true.
-
-    iloop = 0
-
-    call calculate_Polar
-    call calculate_W
-
-    do while(abs(real(WNow)-real(WOld))>err) 
-      WOld = WNow
-      iloop = iloop + 1
-
-      call calculate_Sigma
-      call calculate_Polar
-
-      call calculate_G
-      call calculate_W
-
-      WNow = weight_W(1, (/0, 0/), 0)
-
-      call LogFile%QuickLog("G-W loop:"//str(iloop)//str(real(WOld))//str(real(WNOw)))
-    enddo
     call calculate_Sigma
     call calculate_Polar
 
-    !!-------------------------------------------------------
-    call plus_minus_W0(-1)
-    call plus_minus_Gam0(-1)
+    call calculate_G
+    call calculate_W
 
-    call transfer_r(-1)
-    call transfer_t(-1)
-    return
-  END FUNCTION self_consistent_GW
+    WNow = weight_W(1, (/0, 0/), 0)
 
-  SUBROUTINE monte_carlo
-    implicit none
-    integer :: i, mc_version
-    double precision :: WR, GamR
+    call LogFile%QuickLog("G-W loop:"//str(iloop)//str(real(WOld))//str(real(WNOw)))
+  enddo
+  call calculate_Sigma
+  call calculate_Polar
+  call calculate_Denom
+  call calculate_Chi
 
-    call LogFile%QuickLog("Initializing monte carlo...")
-    call read_GWGamma
+  !!-------------------------------------------------------
+  call plus_minus_W0(-1)
+  call plus_minus_Gam0(-1)
 
-    !call calculate_Gam1
+  call transfer_r(-1)
+  call transfer_t(-1)
+  return
+END FUNCTION self_consistent_GW
 
-    call calculate_GamNormWeight
+SUBROUTINE monte_carlo
+  implicit none
+  integer :: i, mc_version
+  double precision :: WR, GamR
 
-    call initialize_markov
+  call LogFile%QuickLog("Initializing monte carlo...")
+  call read_GWGamma
 
-    call LogFile%QuickLog("Initializing monte carlo done!")
+  !call calculate_Gam1
 
-    do i= 0, MCOrder
-      QuanName(i) = "(Order "+str(i)+"Gamma)"
-    enddo
+  call calculate_GamNormWeight
 
-    if(IsLoad==.false.) then
+  call initialize_markov
 
-      call LogFile%QuickLog("Start Thermalization ...")
+  call LogFile%QuickLog("Initializing monte carlo done!")
 
-      ProbProp(:,:) = 0.d0
-      ProbAcc(:,:) = 0.d0
-      BalenceCheck(:,:,:)=0.d0
+  do i= 0, MCOrder
+    QuanName(i) = "(Order "+str(i)+"Gamma)"
+  enddo
 
-      !-------- throw away some configurations to thermalize -----------
-      call markov(.true.)
+  if(IsLoad==.false.) then
 
-      call LogFile%QuickLog("Thermalization done!")
+    call LogFile%QuickLog("Start Thermalization ...")
 
-      call time_elapse
-      t_simu = t_elap
-      call LogFile%QuickLog('Thermalization time: '//trim(str(t_simu,'(f12.2)'))//'s')
-      
+    ProbProp(:,:) = 0.d0
+    ProbAcc(:,:) = 0.d0
+    BalenceCheck(:,:,:)=0.d0
 
-      !!================ MC SIMULATION FOR GAMMA =============================
-      imc = 0.d0
-      Z_normal=0.0
-      Z_worm=0.0
-      StatNum=0
+    !-------- throw away some configurations to thermalize -----------
+    call markov(.true.)
 
-      ProbProp(:,:) = 0.d0
-      ProbAcc(:,:) = 0.d0
-
-      GamOrder(:) = 0.d0
-      GamWormOrder(:) = 0.d0
-
-      GamMC(:,:,:,:,:,:) = (0.d0, 0.d0)
-      ReGamSqMC(:,:,:,:,:,:) = 0.d0
-      ImGamSqMC(:,:,:,:,:,:) = 0.d0
-      GamNorm = (0.d0, 0.d0)
-      TestData(:)=0.d0
-
-      call read_flag
-      mc_version = file_version
-
-    else if(IsLoad) then
-
-      !------- read the configuration and MC data from previous simulation --
-      call LogFile%QuickLog("Reading the previous MC data...")
-
-      call read_monte_carlo_conf
-      call read_monte_carlo_data
-      call print_config
-      call check_config
-
-      call LogFile%QuickLog("Read the previous MC data Done!...")
-    endif
-
-    call LogFile%QuickLog("Running MC Simulations...")
-
-    call markov(.false.)
+    call LogFile%QuickLog("Thermalization done!")
 
     call time_elapse
     t_simu = t_elap
-    call LogFile%QuickLog('Simulation time: '//trim(str(t_simu,'(f12.2)'))//'s')
+    call LogFile%QuickLog('Thermalization time: '//trim(str(t_simu,'(f12.2)'))//'s')
+    
 
+    !!================ MC SIMULATION FOR GAMMA =============================
+    imc = 0.d0
+    Z_normal=0.0
+    Z_worm=0.0
+    StatNum=0
+
+    ProbProp(:,:) = 0.d0
+    ProbAcc(:,:) = 0.d0
+
+    GamOrder(:) = 0.d0
+    GamWormOrder(:) = 0.d0
+
+    GamMC(:,:,:,:,:,:) = (0.d0, 0.d0)
+    ReGamSqMC(:,:,:,:,:,:) = 0.d0
+    ImGamSqMC(:,:,:,:,:,:) = 0.d0
+    GamNorm = (0.d0, 0.d0)
+    TestData(:)=0.d0
+
+    call read_flag
+    mc_version = file_version
+
+  else if(IsLoad) then
+
+    !------- read the configuration and MC data from previous simulation --
+    call LogFile%QuickLog("Reading the previous MC data...")
+
+    call read_monte_carlo_conf
+    call read_monte_carlo_data
+    call print_config
+    call check_config
+
+    call LogFile%QuickLog("Read the previous MC data Done!...")
+  endif
+
+  call LogFile%QuickLog("Running MC Simulations...")
+
+  call markov(.false.)
+
+  call time_elapse
+  t_simu = t_elap
+  call LogFile%QuickLog('Simulation time: '//trim(str(t_simu,'(f12.2)'))//'s')
+
+  return
+END SUBROUTINE monte_carlo
+
+SUBROUTINE read_flag
+  implicit none
+  integer :: ios
+
+  open(11, status="old", iostat=ios, file="loop.inp")
+  read(11, *) file_version
+  close(11)
+
+  if(ios/=0) then
+    call LogFile%QuickLog(str(ios)+"Fail to read the loop number, continue to MC!")
     return
-  END SUBROUTINE monte_carlo
+  endif
 
-  SUBROUTINE read_flag
+  return
+END SUBROUTINE read_flag
+
+
+SUBROUTINE update_flag
+  implicit none
+  integer :: ios 
+
+  open(11, status="old", iostat=ios, file="loop.inp")
+  read(11, *) file_version
+  close(11)
+
+  if(ios/=0) then
+    call LogFile%QuickLog(str(ios)+"Fail to read the loop number in loop.inp!")
+    return
+  endif
+
+  open(12, status="replace", iostat=ios, file="loop.inp")
+  write(12, *) file_version+1
+  close(12)
+
+  if(ios/=0) then
+    call LogFile%QuickLog(str(ios)+"Fail to write the loop number to loop.inp!")
+    return
+  endif
+  return
+END SUBROUTINE update_flag
+
+SUBROUTINE test_subroutine
     implicit none
-    integer :: ios
+    !integer :: isamp
+    !!======== test x,y distribution =========================
+    !integer :: i,nr(2),cr(2),dr(2),N,x,y
+    !double precision :: hist(2,0:MxL(1)-1),weight
+    !call initialize_markov
+    !print *,"Testing..."
+    !hist(:,:)=0.d0
+    !N=100000
+    !weight=0.0
+    !cr(:)=0
+    !do i=1,N
+      !call generate_xy(cr,nr,dr,weight,.true.)
+      !hist(1,nr(1))=hist(1,nr(1))+1
+      !hist(2,nr(2))=hist(2,nr(2))+1
+    !enddo
+    !open(11,file="testx.dat")
+    !write(11,*) "X:",L(1),logL(1)
+    !do x=0,L(1)
+      !write(11,*) x, hist(1,x)/N, SpatialWeight(1,x)
+    !enddo
+    !close(11)
+    !open(11,file="testy.dat")
+    !write(11,*) "Y:",L(2),logL(2)
+    !do y=0,L(2)
+      !write(11,*) y, hist(2,y)/N, SpatialWeight(2,y)
+    !enddo
+    !close(11)
 
-    open(11, status="old", iostat=ios, file="loop.inp")
-    read(11, *) file_version
-    close(11)
+    !========  test drawing subroutine =====================
+    !call initialize_markov
+    !call print_config
 
-    if(ios/=0) then
-      call LogFile%QuickLog(str(ios)+"Fail to read the loop number, continue to MC!")
-      return
-    endif
+    !======== analytic_integration =========================
+    !call read_GWGamma
+    !call calculate_Gam1
+    !call output_Gam1
 
     return
-  END SUBROUTINE read_flag
-
-
-  SUBROUTINE update_flag
-    implicit none
-    integer :: ios 
-
-    open(11, status="old", iostat=ios, file="loop.inp")
-    read(11, *) file_version
-    close(11)
-
-    if(ios/=0) then
-      call LogFile%QuickLog(str(ios)+"Fail to read the loop number in loop.inp!")
-      return
-    endif
-
-    open(12, status="replace", iostat=ios, file="loop.inp")
-    write(12, *) file_version+1
-    close(12)
-
-    if(ios/=0) then
-      call LogFile%QuickLog(str(ios)+"Fail to write the loop number to loop.inp!")
-      return
-    endif
-    return
-  END SUBROUTINE update_flag
-
-  SUBROUTINE test_subroutine
-      implicit none
-      !integer :: isamp
-      !!======== test x,y distribution =========================
-      !integer :: i,nr(2),cr(2),dr(2),N,x,y
-      !double precision :: hist(2,0:MxL(1)-1),weight
-      !call initialize_markov
-      !print *,"Testing..."
-      !hist(:,:)=0.d0
-      !N=100000
-      !weight=0.0
-      !cr(:)=0
-      !do i=1,N
-        !call generate_xy(cr,nr,dr,weight,.true.)
-        !hist(1,nr(1))=hist(1,nr(1))+1
-        !hist(2,nr(2))=hist(2,nr(2))+1
-      !enddo
-      !open(11,file="testx.dat")
-      !write(11,*) "X:",L(1),logL(1)
-      !do x=0,L(1)
-        !write(11,*) x, hist(1,x)/N, SpatialWeight(1,x)
-      !enddo
-      !close(11)
-      !open(11,file="testy.dat")
-      !write(11,*) "Y:",L(2),logL(2)
-      !do y=0,L(2)
-        !write(11,*) y, hist(2,y)/N, SpatialWeight(2,y)
-      !enddo
-      !close(11)
-
-      !========  test drawing subroutine =====================
-      !call initialize_markov
-      !call print_config
-
-      !======== analytic_integration =========================
-      !call read_GWGamma
-      !call calculate_Gam1
-      !call output_Gam1
-
-      return
-  END SUBROUTINE
+END SUBROUTINE
 
 END PROGRAM MAIN
 
