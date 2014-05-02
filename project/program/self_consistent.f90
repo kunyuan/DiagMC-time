@@ -169,11 +169,16 @@ SUBROUTINE calculate_W
 
   !-------- calculate W = W0/(1-W0*G^2*Gamma) ----------------------------
   W(:,:,:,:) = (0.d0, 0.d0)
-  W(1,:,:,:) = W0PF(:,:,:)/((1.d0, 0.d0)-W0PF(:,:,:)*Polar(:,:,:))
 
   do  omega = 0, MxT-1
     do py = 0, L(2)-1
       do px = 0, L(1)-1
+        Denom(px,py,omega) = (1.d0, 0.d0) -W0PF(px,py,omega)*Polar(px,py,omega)
+        W(1,px,py,omega) = W0PF(px,py,omega)/Denom(px,py,omega)
+        if(W(1,px,py,omega)/=W(1,px,py,omega)) then
+          call LogFile%QuickLog("calculate_W NaN appears!")
+          stop
+        endif
         W(3,px,py,omega) = d_times_cd(-1.d0,W(1,px,py,omega))
         W(5,px,py,omega) = d_times_cd( 2.d0,W(1,px,py,omega))
       enddo
@@ -191,16 +196,33 @@ END SUBROUTINE calculate_W
 SUBROUTINE calculate_G
   implicit none
   complex(kind=8) :: G0
+  integer :: omega
 
   G(:,:) = (0.d0, 0.d0)
 
   !--------- G = G0/(1-G0*Sigma)----------------------
-  G(1, :) =  G0F(:)/((1.d0,0.d0)-G0F(:)*Sigma(:))
-  G(2, :) =  G(1, :)
+  do omega = 0, MxT-1
+
+    G(1, omega) =  G0F(omega)/((1.d0,0.d0)-G0F(omega)*Sigma(omega))
+
+    if(G(1,omega)/=G(1,omega)) then
+      call LogFile%QuickLog("calculate_G NaN appears!")
+      stop
+    endif
+
+    G(2, omega) =  G(1, omega)
+  enddo
 
   !!-------------- update the matrix and tail ------------
 END SUBROUTINE calculate_G
 
+
+!!------------- calculate the denominator of the susceptibility ---------
+SUBROUTINE calculate_Denom
+  implicit none
+  Denom(:,:,:) = (1.d0, 0.d0) -W0PF(:,:,:)*Polar(:,:,:)
+  return
+END SUBROUTINE calculate_Denom
 
 
 
@@ -212,20 +234,16 @@ SUBROUTINE calculate_Chi
 
   !!-------- calculate Chi = Pi/(1 - W0 * Pi) ------------------
   !!--------- already sum over the spins -----------------------
-  Chi(:,:,:) = 0.d0
   ratio = -1.d0*(real(MxT)/Beta)**2.d0*0.75d0
 
-  Denom(:,:,:) = (1.d0, 0.d0) -W0PF(:,:,:)*Polar(:,:,:)
-  Chi(:,:,:) = Polar(:,:,:)/Denom(:,:,:)
-
-  do omega = 0, MxT-1
+  do  omega = 0, MxT-1
     do py = 0, L(2)-1
       do px = 0, L(1)-1
-        Chi(px, py, omega) = d_times_cd(ratio, Chi(px, py, omega))
+        Chi(px,py,omega) = Polar(px,py,omega)/Denom(px,py,omega)
+        Chi(px,py,omega) = d_times_cd(ratio, Chi(px,py,omega))
       enddo
     enddo
   enddo
-
   return
 END SUBROUTINE calculate_Chi
 
