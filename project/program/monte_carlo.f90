@@ -4,6 +4,19 @@
 SUBROUTINE initialize_markov
     implicit none
     integer :: i
+    double precision :: ratioleft
+
+
+    call LogFile%QuickLog("Initializing the configuration...")
+
+    !------- assign the config ratio for each order ------
+    TimeRatio(0) = 0.25d0
+    ratioleft = 1.d0 - TimeRatio(0)
+    do i = MCOrder, 1, -1
+      TimeRatio(i) = 0.5d0*(ratioleft)
+      ratioleft = ratioleft - TimeRatio(i)
+    enddo
+    TimeRatio(1) = TimeRatio(1) + ratioleft
 
     !--------------- initialize variables ---------------
     GLnKey2Value(:) = 0
@@ -28,8 +41,6 @@ SUBROUTINE initialize_markov
       NextVertex(i) = i+1
       if(i==MxNVertex)  NextVertex(i) = -1
     enddo
-
-    call LogFile%QuickLog("Initializing the configuration...")
 
     call def_prob
     call def_spatial_weight
@@ -169,7 +180,7 @@ SUBROUTINE markov(IsToss)
 
   do while(.true.)
     iblck = iblck +1
-    call LogFile%QuickLog("Block:"+str(iblck),"i")
+    !call LogFile%QuickLog("Block:"+str(iblck),"i")
     do isamp = 1, MaxSamp
       do istep=1, Nstep
         imc = imc + 1.0
@@ -234,22 +245,26 @@ SUBROUTINE markov(IsToss)
           call change_Gamma_isdelta       
         endif
 
-        if(HEAVY_DEBUG) then
-          !call check_config
-        endif
+        !call check_config
+        !call check_irreducibility
+
       enddo
 
+
+      !call check_irreducibility
       if( .not. IsToss) call measure
 
     enddo 
 
-    if(IsToss .and. iblck==1) return
+    if(IsToss .and. iblck==1)return
 
     !========================== REWEIGHTING =========================
     if(mod(iblck, 10)==0) then
 
       call statistics
       call output_GamMC
+
+      call output_test
 
       call print_status
 
@@ -271,11 +286,10 @@ SUBROUTINE markov(IsToss)
       call LogFile%WriteStamp()
       call LogFile%WriteLine("Reweighting order of diagrams...")
 
-      !x=sum(GamWormOrder(:)/Error(0:MCOrder))
-      !CoefOfWeight(:)=x/(GamWormOrder(:)/Error(0:MCOrder)+50.d0)
-
-      x=sum(GamWormOrder(:))
-      CoefOfWeight(:)=x/(GamWormOrder(:)+50.d0)
+      x = SUM(GamWormOrder(:))
+      CoefOfWeight(:)=TimeRatio(:)*CoefOfWeight(:)*x/(GamWormOrder(:)+50.d0)
+      CoefOfWeight(1:MCOrder) = CoefOfWeight(1:MCOrder)/CoefOfWeight(0)
+      CoefOfWeight(0) = 1.d0
 
       call LogFile%WriteLine("Reweight Ratios:")
 
@@ -296,9 +310,7 @@ SUBROUTINE markov(IsToss)
 
     if(mod(iblck,30)==0) then
 
-      if(DEBUG) then
-        call check_config
-      endif
+      call check_config
 
       call LogFile%QuickLog("Writing data and configuration...")
 
@@ -363,7 +375,7 @@ SUBROUTINE create_worm_along_wline
    
 
   !------------ step3 : configuration check -------------------
-  flag=Is_reducible_W_Gam(ktemp)
+  flag=Is_reducible_W_Gam_both_side(ktemp, kLn(iGin), kLn(iGout), kLn(jGin), kLn(jGout))
 
   if(flag) then
     call undo_update_line(iWLn, kiWold, 2)
@@ -1358,7 +1370,7 @@ SUBROUTINE add_interaction
   kMB = add_k(kMD, (-1)**(dir+dirW)*q)
 
   kNeighG=kLn(NeighVertex(3-dir, Masha))
-  !if(abs(add_k(KMB,-kNeighG))==abs(kLn(NeighVertex(3,Masha))))return
+  if(abs(add_k(KMB,-kNeighG))==abs(kLn(NeighVertex(3,Masha))))return
 
   if(Is_k_valid_for_G(kMB)==.false.) return
 
@@ -2530,7 +2542,6 @@ SUBROUTINE measure
   implicit none
   integer :: i, iln,iGam,jGam, iW
   integer :: flag, it
-  integer :: ibasis, ibin
   integer :: spg, spw
   integer :: ityp, nloop
   integer :: MeaGin, MeaGout, MeaW, rg(2), rw(2), dir, typ
@@ -2539,7 +2550,6 @@ SUBROUTINE measure
   integer :: ikey, sumt, sumd
   double precision  :: factorM
   double precision :: tau1, tau2, tau3
-  double precision :: dtau1, dtau2
 
   GamWormOrder(Order) = GamWormOrder(Order) + 1.d0
   !===========  Measure in worm space  ==========================
@@ -2616,59 +2626,31 @@ SUBROUTINE measure
     tau3 = TVertex(3, NeighLn(3-dir, MeaW))
 
     factorM = 1.d0
-    dtau1 = tau3-tau2
-    dt1 = Floor(dtau1*MxT/Beta)
+    dt1 = Floor((tau3-tau2)*MxT/Beta)
     if(dt1<0) then
-      dtau1 = dtau1 + Beta
       dt1 = dt1 + MxT
       factorM = factorM * (-1.d0)
     endif
 
-    dtau2 = tau1-tau3
-    dt2 = Floor(dtau2*MxT/Beta)
+    dt2 = Floor((tau1-tau3)*MxT/Beta)
     if(dt2<0) then
-      dtau2 = dtau2 + Beta
       dt2 = dt2 + MxT
       factorM = factorM * (-1.d0)
     endif
 
-
     factorM = factorM *CoefOfSymmetry(dx, dy)* CoefOfWeight(Order) *abs(WeightVertex(MeasureGam))
-
-    if(abs(factorM)<1.d-18) then
-      call LogFile%QuickLog("factorM is zero! Fatal Error!"+str(factorM))
-      stop
-    endif
 
     !================= accumulation ===================================
     if(Order==0 .and. IsDeltaVertex(NeighLn(3-dir, MeaW))==1) then
       GamNorm = GamNorm + Phase/CoefOfWeight(0)
     endif
 
-    !============== save Gamma in the matrix =============================================
     GamMC(Order, ityp, dx, dy, dt1, dt2) = GamMC(Order, ityp, dx, dy, dt1, dt2) &
       & + Phase/factorM
     ReGamSqMC(Order, ityp, dx, dy, dt1, dt2 ) = ReGamSqMC(Order, ityp, dx, dy, dt1, dt2) &
       & + (real(Phase)/factorM)**2.d0
     ImGamSqMC(Order, ityp, dx, dy, dt1, dt2 ) = ImGamSqMC(Order, ityp, dx, dy, dt1, dt2) &
       & + (dimag(Phase)/factorM)**2.d0
-
-    !============ save Gamma in the fitting coeffecients =====================================
-
-    ibin = get_bin_Gam(dt1, dt2)
-
-    if(IsBasis2D(ibin)) then
-      do ibasis = 1, NBasisGam
-        GamMCBasis(Order, ityp, dx, dy, ibin, ibasis) = GamMCBasis(Order, ityp, dx, dy, ibin, &
-          & ibasis) + Phase/factorM * weight_basis_Gam(CoefGam(:,:,ibasis,ibin), dtau1, dtau2)
-      enddo
-    else 
-      do ibasis = 1, NBasis
-        GamMCBasis(Order, ityp, dx, dy, ibin, ibasis) = GamMCBasis(Order, ityp, dx, dy, ibin, &
-          & ibasis) + Phase/factorM * weight_basis(CoefGam(:,0,ibasis,ibin), dtau1)
-      enddo
-    endif
-
 
     Quan(Order) = Quan(Order) + real(Phase)/factorM
     Norm(Order) = Norm(Order) + 1.d0
@@ -2683,21 +2665,23 @@ SUBROUTINE measure
       !endif
     !endif
     !================================================================
-    !sumt = 0
-    !do ikey = 1, NWLn
-      !i = WLnKey2Value(ikey)
-      !sumt = sumt+ TypeLn(i)
-    !enddo
 
-    !sumd = 0
-    !do ikey = 1, NVertex
-      !i = VertexKey2Value(ikey)
-      !sumd = sumd+ IsDeltaVertex(i)
-    !enddo
-    !if(sumt==NWLn .and. sumd==NVertex) then
-      !Quan(MCOrder+Order+2) = Quan(MCOrder+Order+2) + 1.d0/abs(factorM)
-      !Norm(MCOrder+Order+2) = Norm(MCOrder+Order+2) + 1.d0
-    !endif
+    sumt = 0
+    do ikey = 1, NWLn
+      i = WLnKey2Value(ikey)
+      sumt = sumt+ TypeLn(i)
+    enddo
+
+    sumd = 0
+    do ikey = 1, NVertex
+      i = VertexKey2Value(ikey)
+      sumd = sumd+ IsDeltaVertex(i)
+    enddo
+
+    if(sumt==NWLn .and. sumd==NVertex) then
+      Quan(MCOrder+Order+2) = Quan(MCOrder+Order+2) + 1.d0/CoefOfWeight(Order)
+      Norm(MCOrder+Order+2) = Norm(MCOrder+Order+2) + 1.d0
+    endif
     !=============================================================
 
   endif

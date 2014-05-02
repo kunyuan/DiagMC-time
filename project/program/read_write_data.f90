@@ -581,6 +581,7 @@ SUBROUTINE write_monte_carlo_data
   implicit none
   integer :: iorder, itopo, ix, iy, ityp, it1, it2
   double precision :: rgam2, rerr
+  integer :: ibin, ibasis
   complex*16 :: gam
 
   gam = GamMC(1, 1, 0, 0, 0, 0)/Z_normal
@@ -610,6 +611,20 @@ SUBROUTINE write_monte_carlo_data
       enddo
     enddo
   enddo
+
+  do ibasis = 1, NBasisGam
+    do ibin = 1, NbinGam
+      do iy = 0, L(2)-1
+        do ix = 0, L(1)-1
+          do ityp = 1, NtypeGam/2
+            do iorder = 0, MCOrder
+              write(104) GamMCBasis(iorder, ityp, ix, iy, ibin, ibasis)
+            enddo
+          enddo
+        enddo
+      enddo
+    enddo
+  enddo
   !=========  write on the screen ========================================
 
   
@@ -620,6 +635,7 @@ END SUBROUTINE write_monte_carlo_data
 SUBROUTINE read_monte_carlo_data
   implicit none
   integer :: iorder, ix, iy, ityp, it1, it2, itopo,ios
+  integer :: ibin, ibasis
   logical :: alive
 
   inquire(file=trim(title)//"_monte_carlo_data.bin.dat",exist=alive)
@@ -642,6 +658,20 @@ SUBROUTINE read_monte_carlo_data
               read(105,iostat=ios)  GamMC(iorder, ityp, ix, iy, it1, it2)
               read(105,iostat=ios)  ReGamSqMC(iorder, ityp, ix, iy, it1, it2)
               read(105,iostat=ios)  ImGamSqMC(iorder, ityp, ix, iy, it1, it2)
+            enddo
+          enddo
+        enddo
+      enddo
+    enddo
+  enddo
+
+  do ibasis = 1, NBasisGam
+    do ibin = 1, NbinGam
+      do iy = 0, L(2)-1
+        do ix = 0, L(1)-1
+          do ityp = 1, NtypeGam/2
+            do iorder = 0, MCOrder
+              read(105) GamMCBasis(iorder, ityp, ix, iy, ibin, ibasis)
             enddo
           enddo
         enddo
