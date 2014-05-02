@@ -9,6 +9,7 @@ PROGRAM MAIN
     integer :: i, itot, iorder
     integer :: ifile,ios
     integer, parameter :: Mxjobs = 200
+    integer :: ibin, ibasis
     double precision :: imctmp, Ztmp
     complex*16 :: iGam
     complex*16 :: iGamNorm, iGamNormWeight
@@ -17,6 +18,7 @@ PROGRAM MAIN
     character(len=100),dimension(Mxjobs) :: title_file
     logical :: flag,alive
     complex*16, allocatable :: GamTmp(:,:,:,:,:,:)
+    complex*16, allocatable :: GamBasisTmp(:,:,:,:,:,:)
     double precision, allocatable :: ReGamSqTmp(:,:,:,:,:,:)
     double precision, allocatable :: ImGamSqTmp(:,:,:,:,:,:)
     integer :: EffectiveSamp
@@ -61,11 +63,14 @@ PROGRAM MAIN
     title_mc = str(Beta,'(f4.2)')+'_'+str(MCOrder,'(i1)')+'_coll'
 
     allocate(GamMC(0:MCOrder,1:NTypeGam/2, 0:L(1)-1, 0:L(2)-1, 0:MxT-1, 0:MxT-1))
+    allocate(GamMCBasis(0:MCOrder,1:NTypeGam/2, 0:L(1)-1, 0:L(2)-1, 1:NBinGam, 1:NBasisGam))
     allocate(ReGamSqMC(0:MCOrder,1:NTypeGam/2, 0:L(1)-1, 0:L(2)-1, 0:MxT-1, 0:MxT-1))
     allocate(ImGamSqMC(0:MCOrder,1:NTypeGam/2, 0:L(1)-1, 0:L(2)-1, 0:MxT-1, 0:MxT-1))
+
     allocate(GamTmp(0:MCOrder,1:NTypeGam/2, 0:L(1)-1, 0:L(2)-1, 0:MxT-1, 0:MxT-1))
     allocate(ReGamSqTmp(0:MCOrder,1:NTypeGam/2, 0:L(1)-1, 0:L(2)-1, 0:MxT-1, 0:MxT-1))
     allocate(ImGamSqTmp(0:MCOrder,1:NTypeGam/2, 0:L(1)-1, 0:L(2)-1, 0:MxT-1, 0:MxT-1))
+    allocate(GamBasisTmp(0:MCOrder,1:NTypeGam/2, 0:L(1)-1, 0:L(2)-1, 1:NBinGam, 1:NBasisGam))
 
     GamNorm = 0.d0
     imc = 0.d0
@@ -73,6 +78,7 @@ PROGRAM MAIN
     Z_normal = 0.d0
 
     GamMC(:,:,:,:,:,:) = 0.d0
+    GamMCBasis(:,:,:,:,:,:) = 0.d0
     ReGamSqMC(:,:,:,:,:,:) = 0.d0
     ImGamSqMC(:,:,:,:,:,:) = 0.d0
 
@@ -100,6 +106,20 @@ PROGRAM MAIN
             enddo
           enddo
         enddo
+
+        do ibasis = 1, NBasisGam
+          do ibin = 1, NBinGam
+            do iy = 0, L(2)-1
+              do ix = 0, L(1)-1
+                do ityp = 1, NtypeGam/2
+                  do iorder = 0, MCOrder
+                    read(101,iostat=ios)  GamBasisTmp(iorder, ityp, ix, iy, ibin, ibasis)
+                  enddo
+                enddo
+              enddo
+            enddo
+          enddo
+        enddo
         close(101)
       endif
       if(ios==0) then
@@ -112,6 +132,7 @@ PROGRAM MAIN
         GamMC=GamMC+GamTmp
         ReGamSqMC=ReGamSqMC+ReGamSqTmp
         ImGamSqMC=ImGamSqMC+ImGamSqTmp
+        GamMCBasis = GamMCBasis+GamBasisTmp
       endif
     enddo
 
@@ -149,6 +170,19 @@ PROGRAM MAIN
                 write(104)  GamMC(iorder,  ityp, ix, iy, it1, it2)
                 write(104)  ReGamSqMC(iorder,  ityp, ix, iy, it1, it2)
                 write(104)  ImGamSqMC(iorder,  ityp, ix, iy, it1, it2)
+              enddo
+            enddo
+          enddo
+        enddo
+      enddo
+    enddo
+    do ibasis = 1, NBasisGam
+      do ibin = 1, NBinGam
+        do iy = 0, L(2)-1
+          do ix = 0, L(1)-1
+            do ityp = 1, NtypeGam/2
+              do iorder = 0, MCOrder
+                write(104)  GamMCBasis(iorder,  ityp, ix, iy, ibin, ibasis)
               enddo
             enddo
           enddo
