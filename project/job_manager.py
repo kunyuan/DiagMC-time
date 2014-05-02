@@ -10,7 +10,6 @@ import inlist
 
 PROCLIST = []
 PROCLIST_BACK = []
-PURE_BACK = True
 logging.basicConfig(filename="./project.log",
         level=logging.INFO,
         format="\n[job.daemon][%(asctime)s][%(levelname)s]:\n%(message)s",
@@ -18,6 +17,7 @@ logging.basicConfig(filename="./project.log",
 
 INFILEPATH = os.path.abspath("./infile")
 OUTFILEPATH = os.path.abspath("./outfile")
+PURE_BACK = False
 
 class JobAtom():
     '''atom class of all jobs'''
@@ -30,7 +30,6 @@ class JobAtom():
         else:
             print "Jobs.execute should be a list or str!"
 
-        self.direct_input = bundle.direct_input
         self.is_cluster = bundle.is_cluster
         self.auto_run = bundle.auto_run
         self.keep_cpu_busy = bundle.keep_cpu_busy
@@ -57,14 +56,16 @@ def construct_job_queue(to_do):
     #running the jobs doesn't use much cpu first
         for _ in range(0, bundle.duplicate):
             pid += 1
-            PURE_BACK = True
+            if not bundle.is_cluster:
+                PURE_BACK = True
             job_queue.append(JobAtom(pid, bundle))
 
     for bundle in [elem for elem in to_do if elem.keep_cpu_busy == True]:
     #running the jobs use much cpu next
         for _ in range(0, bundle.duplicate):
             pid += 1
-            PURE_BACK = False
+            if not bundle.is_cluster:
+                PURE_BACK = False
             job_queue.append(JobAtom(pid, bundle))
     logging.info("Constructed the job queue!")
     return job_queue
@@ -110,10 +111,7 @@ def submit_job(job_atom):
         fjob.write("#PBS -o "+homedir+"/Output\n")
         fjob.write("#PBS -e "+homedir+"/Error\n")
         fjob.write("cd "+homedir+"\n")
-        if job_atom.direct_input:
-            fjob.write(job_atom.execute+"<"+infile)
-        else:
-            fjob.write("echo "+infile+" | "+job_atom.execute)
+        fjob.write(job_atom.execute+" "+infile)
         fjob.close()
         if job_atom.auto_run:
             os.system("qsub "+jobfile)
@@ -123,10 +121,7 @@ def submit_job(job_atom):
             print "You have to run "+job_atom.get_job_name()+" by yourself!"
     else:
         if job_atom.auto_run:
-            if job_atom.direct_input:
-                shellstr = "exec "+job_atom.execute+" < "+infile+" >> "+outfile
-            else:
-                shellstr = "exec echo "+infile+" | "+job_atom.execute+" >> "+outfile
+            shellstr = "exec "+job_atom.execute+" "+infile+" >> "+outfile
             proc = subprocess.Popen(shellstr, shell=True)
             if job_atom.keep_cpu_busy:
                 PROCLIST.append((proc, job_atom))

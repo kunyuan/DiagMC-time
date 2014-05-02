@@ -28,9 +28,6 @@ class Job:
                     execu[i] = os.path.abspath(execu[i])
         #self.execute is the execute file str
         self.execute = execu
-        #self.direct_input=False, then job_manage will pass the input file name to the execute file
-        #self.direct_input=True, then job_manage will pass the content of input file to the execute file
-        self.direct_input = False
         self.is_cluster = para.pop("__IsCluster")
         self.auto_run = para.pop("__AutoRun")
         self.keep_cpu_busy = True
@@ -81,7 +78,6 @@ class JobMonteCarlo(Job):
         self.keep_cpu_busy = True
         self.para["Type: MC"] = 2
         self.name = "MC"
-        self.direct_input = True
 
     def __check_parameters__(self, para):
         if Job.__check_parameters__(self, para) is False:
@@ -113,7 +109,6 @@ class JobConsistLoop(Job):
         self.keep_cpu_busy = False
         self.para["Type: SCL"] = 1
         self.name = "SCL"
-        self.direct_input = False
 
     def to_string(self, pid=0):
         input_str = Job.to_string(self, pid)
@@ -128,7 +123,6 @@ class JobOutputLoop(Job):
         self.keep_cpu_busy = False
         self.para["Type: OL"] = 4
         self.name = "OL"
-        self.direct_input = False
 
     def to_string(self, pid=0):
         input_str = Job.to_string(self, pid)
@@ -143,7 +137,6 @@ class JobIntegration(Job):
         self.keep_cpu_busy = True
         self.para["Type: NI"] = 3
         self.name = "NI"
-        self.direct_input = True
 
     def to_string(self, pid=0):
         input_str = Job.to_string(self, pid)
