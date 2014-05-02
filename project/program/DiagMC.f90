@@ -7,35 +7,40 @@ PROGRAM MAIN
   implicit none
   integer :: it, i, ISub,ID
   logical :: IsLoad
-  character(len=100) :: infile
+  character(len=128) :: infile
 
-  read(*,*) ID
-  read(*,*) L(1)
-  read(*,*) L(2)
-  read(*,*) Jcp
-  read(*,*) Beta
-  read(*,*) MCOrder
-  read(*,*) IsLoad
-  read(*,*) ISub
-  if(ISub==2) then
-    read(*,*) Ntoss
-    read(*,*) Nsamp
-    read(*,*) Nstep
-    read(*,*) Seed
-    !read(100,*) title
-    read(*,*) CoefOfWorm
-    CoefOfWeight(0) = 1.d0
-    read(*,*) CoefOfWeight(1:MCOrder)
-  elseif(ISub==1 .or. ISub==4) then
-    read(*,*) title
+  call get_command_argument(1,infile)
+  if(len_trim(infile)==0) then
+    call LogFile%QuickLog("No input file is specified!",'e')
+    stop
   endif
-
-  write(*,*) title
+  open(unit=11, file=trim(infile), action='read')
+    read(11,*) ID
+    read(11,*) L(1)
+    read(11,*) L(2)
+    read(11,*) Jcp
+    read(11,*) Beta
+    read(11,*) MCOrder
+    read(11,*) IsLoad
+    read(11,*) ISub
+    if(ISub==2) then
+      read(11,*) Ntoss
+      read(11,*) Nsamp
+      read(11,*) Nstep
+      read(11,*) Seed
+      read(11,*) CoefOfWorm
+      CoefOfWeight(0) = 1.d0
+      read(11,*) CoefOfWeight(1:MCOrder)
+    elseif(ISub==1 .or. ISub==4) then
+      read(11,*) title
+    endif
+  close(11)
 
   logL(:)=dlog(L(:)*1.d0)
   SpatialWeight(:,:)=0.d0
 
 
+  write(*,*) Beta, MCOrder
   write(title_loop, '(f5.2)') beta
   write(title1, '(i2)')  MCOrder
   write(title2,'(i4)') ID
