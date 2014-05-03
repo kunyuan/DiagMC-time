@@ -261,17 +261,14 @@ SUBROUTINE markov(IsToss)
     !========================== REWEIGHTING =========================
     if(mod(iblck, 10)==0) then
 
+
+      call check_config
       call statistics
       call output_GamMC
-
       call output_test
-
       call print_status
-
       call print_config
-
       call LogFile%QuickLog("Check if there is a new G,W data...")
-
       call read_flag
 
       if(mc_version/=file_version) then
@@ -279,7 +276,10 @@ SUBROUTINE markov(IsToss)
         call LogFile%QuickLog("Updating G, W, and Gamma...")
 
         call read_GWGamma
+        call output_Quantities
         call update_WeightCurrent
+        call check_config
+        call print_config
         mc_version = file_version
       endif
 
@@ -314,7 +314,7 @@ SUBROUTINE markov(IsToss)
 
       call LogFile%QuickLog("Writing data and configuration...")
 
-      !call statistics
+      call statistics
       call write_monte_carlo_conf
       call write_monte_carlo_data
 
@@ -2656,16 +2656,17 @@ SUBROUTINE measure
     Norm(Order) = Norm(Order) + 1.d0
     !print *, Order, Quan(Order), Norm(Order)
 
-    !===============  test variables =================================
-    !Norm(MCOrder+1) = Z_normal
 
-    !if(Order==1 .and. ityp==1 .and. dx==0 .and. dy==0) then
-      !if(dt1==0 .and. dt2==0) then
-        !Quan(MCOrder+1) = Quan(MCOrder+1) + real(Phase)/factorM
-      !endif
-    !endif
+    !==============  Error renormalization =========================
+    if(Order==1 .and. ityp==1 .and. dx==0 .and. dy==0) then
+      if(dt1==0 .and. dt2==0) then
+        Norm(MCOrder+1) = Norm(MCOrder+1)+1.d0
+        Quan(MCOrder+1) = Quan(MCOrder+1) + real(Phase)/factorM
+      endif
+    endif
     !================================================================
 
+    !===============  test variables =================================
     sumt = 0
     do ikey = 1, NWLn
       i = WLnKey2Value(ikey)

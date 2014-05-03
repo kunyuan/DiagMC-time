@@ -11,9 +11,12 @@ com_dict={
     "Lx" :  4,
     "Ly" :  4,
     "Jcp" :  1.0,
-    "Beta" :  0.9,
-    "Order" :  3,
+    "Beta" :  0.90,
+    "Order" :  2,
     }
+
+readfile="{0:4.2f}_{1}_coll".format(com_dict["Beta"],com_dict["Order"])
+print readfile
 
 # monte carlo job defintion
 mc_dict={
@@ -22,8 +25,8 @@ mc_dict={
     "__IsCluster" : False,
     "__AutoRun" : True,
     "IsLoad" : False,
-    "Reweight" : [1,1,1],
-    #"ReadFile" : "0.90_1_coll",
+    "Reweight" : [0.5,0.25],
+    #"ReadFile" : "0.90_3_coll",
     "Sample" : 1000000,
     "Sweep" : 10,
     "Toss" : 1000,
@@ -41,7 +44,7 @@ sc_dict={
     "IsLoad" : True,
     #"__AutoRun" : False, 
     #"IsLoad" : False,
-    "ReadFile" : "0.90_3_coll",
+    "ReadFile" : readfile,
     }
 sc_dict.update(com_dict)
 TO_DO.append(job.JobConsistLoop(sc_dict))
@@ -53,7 +56,7 @@ ol_dict={
     "__IsCluster" : False,
     "__AutoRun" : True,
     "IsLoad" : True,
-    "ReadFile" : "0.90_1_coll",
+    "ReadFile" : readfile,
     }
 ol_dict.update(com_dict)
 TO_DO.append(job.JobOutputLoop(ol_dict))
@@ -71,5 +74,6 @@ TO_DO.append(job.JobIntegration(ni_dict))
 
 if __name__ == "__main__":
     for e in TO_DO:
-        print e.ToString(1)+"\n"
+        print e
+        print e.to_string(1)+"\n"
 
