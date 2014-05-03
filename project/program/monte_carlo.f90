@@ -2664,18 +2664,17 @@ SUBROUTINE measure
       & + (dimag(Phase)/factorM)**2.d0
 
     !============ save Gamma in the fitting coeffecients =====================================
-
     ibin = get_bin_Gam(dt1, dt2)
 
     if(IsBasis2D(ibin)) then
       do ibasis = 1, NBasisGam
         GamMCBasis(Order, ityp, dx, dy, ibin, ibasis) = GamMCBasis(Order, ityp, dx, dy, ibin, &
-          & ibasis) + Phase/factorM * weight_basis_Gam(CoefGam(:,:,ibasis,ibin), dtau1, dtau2)
+          & ibasis) + (Phase/factorM)*weight_basis_Gam(CoefGam(:,:,ibasis,ibin), dtau1, dtau2)
       enddo
     else 
       do ibasis = 1, NBasis
         GamMCBasis(Order, ityp, dx, dy, ibin, ibasis) = GamMCBasis(Order, ityp, dx, dy, ibin, &
-          & ibasis) + Phase/factorM * weight_basis(CoefGam(:,0,ibasis,ibin), dtau1)
+          & ibasis) + (Phase/factorM)*weight_basis(CoefGam(:,0,ibasis,ibin), dtau1)
       enddo
     endif
 
