@@ -587,7 +587,8 @@ SUBROUTINE write_monte_carlo_data
   gam1 = GamMC(1, 1, 0, 0, 0, 0)/Z_normal
   rgam2 = ReGamSqMC(1, 1, 0, 0, 0, 0)/Z_normal
   rerr = sqrt(abs(rgam2)-(real(gam1))**2.d0)/sqrt(Z_normal-1)
-  ratioerr = Error(MCOrder+1)/rerr
+  !ratioerr = Error(MCOrder+1)/rerr
+  ratioerr = 1.d0
 
   !=========== write into files =========================================
   open(104, status="replace", &
@@ -925,7 +926,8 @@ SUBROUTINE output_GamMC
   gam = GamMC(1, 1, 0, 0, 0, 0)/Z_normal
   rgam2 = ReGamSqMC(1, 1, 0, 0, 0, 0)/Z_normal
   rerr = sqrt(abs(rgam2)-(real(gam))**2.d0)/sqrt(Z_normal-1)
-  ratioerr = Error(MCOrder+1)/rerr
+  !ratioerr = Error(MCOrder+1)/rerr
+  ratioerr = 1.d0
 
 
   write(35, *) "============================================"

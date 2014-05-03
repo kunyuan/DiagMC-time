@@ -318,7 +318,7 @@ SUBROUTINE Gam_mc2matrix_mc
     do it1 = 0, MxT-1
       do iorder = 1, MCOrder
 
-        cgam = GamMC(iorder, 1, 0, 0,it1,it2) /Z_normal
+        cgam = GamMC(iorder, 1, 0, 0, it1, it2) /Z_normal
 
         rgam2 = ReGamSqMC(iorder, 1, 0, 0, it1, it2)/Z_normal
         rerr = sqrt(abs(rgam2)-(real(cgam))**2.d0)/sqrt(Z_normal-1)
