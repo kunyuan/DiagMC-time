@@ -1036,8 +1036,10 @@ SUBROUTINE output_Quantities
     do it2 = 0, MxT-1
       do it1 = 0, MxT-1
         ibin = get_bin_Gam(it1, it2)
+
         tau1 = dble(it1)*Beta/dble(MxT)
         tau2 = dble(it2)*Beta/dble(MxT)
+
         if(IsBasis2D(ibin)) then
           gam1 = (0.d0, 0.d0)
           do  ibasis = 1, NBasisGam

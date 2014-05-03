@@ -335,6 +335,9 @@ SUBROUTINE monte_carlo
     GamMC(:,:,:,:,:,:) = (0.d0, 0.d0)
     ReGamSqMC(:,:,:,:,:,:) = 0.d0
     ImGamSqMC(:,:,:,:,:,:) = 0.d0
+
+    GamMCBasis(:,:,:,:,:,:) = (0.d0, 0.d0)
+
     GamNorm = (0.d0, 0.d0)
     TestData(:)=0.d0
 

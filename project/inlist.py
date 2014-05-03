@@ -52,9 +52,10 @@ TO_DO.append(job.JobConsistLoop(sc_dict))
 # output loop job definition
 ol_dict={
     "__Execute" : ["python", "./run_loop.py"],
-    "__Duplicate" : 0,
+    "__Duplicate" : 1,
     "__IsCluster" : False,
-    "__AutoRun" : True,
+    #"__AutoRun" : True,
+    "__AutoRun" : False,
     "IsLoad" : True,
     "ReadFile" : readfile,
     }

@@ -304,6 +304,7 @@ SUBROUTINE Gam_mc2matrix_mc
   implicit none
   integer :: iorder, dx, dy, ityp, iloop, it1, it2, typ
   complex*16 :: cgam, normal
+  logical :: flag(MxOrder)
   double precision :: rgam2, igam2, rerr, ierr, rpercenterr, ipercenterr
 
   call initialize_Gam
@@ -312,46 +313,55 @@ SUBROUTINE Gam_mc2matrix_mc
 
   call LogFile%QuickLog("(ErrorRatio):"+str(ratioerr))
 
+  flag(:) = .true.
   do it2 = 0, MxT-1
     do it1 = 0, MxT-1
-      do dy = 0, L(2)-1
-        do dx = 0, L(1)-1
-          do ityp = 1, NTypeGam/2
-            do iorder = 1, MCOrder
+      do iorder = 1, MCOrder
 
-              cgam = GamMC(iorder,ityp,dx,dy,it1,it2) /Z_normal
+        cgam = GamMC(iorder, 1, 0, 0,it1,it2) /Z_normal
 
-              rgam2 = ReGamSqMC(iorder, ityp, dx, dy, it1, it2)/Z_normal
-              rerr = sqrt(abs(rgam2)-(real(cgam))**2.d0)/sqrt(Z_normal-1)
-              rerr = rerr* ratioerr
+        rgam2 = ReGamSqMC(iorder, 1, 0, 0, it1, it2)/Z_normal
+        rerr = sqrt(abs(rgam2)-(real(cgam))**2.d0)/sqrt(Z_normal-1)
+        rerr = rerr* ratioerr
 
-              if(abs(real(cgam))<1.d-30) then
-                rpercenterr = 0.d0
-              else
-                rpercenterr = rerr/abs(real(cgam))
-              endif
-              if(rpercenterr>MxError)  cycle
+        if(abs(real(cgam))<1.d-30) then
+          rpercenterr = 0.d0
+        else
+          rpercenterr = rerr/abs(real(cgam))
+        endif
+        if(rpercenterr>MxError)  flag(iorder)=.false.
 
-              igam2 = ImGamSqMC(iorder,ityp , dx, dy, it1, it2)/Z_normal
-              ierr = sqrt(abs(igam2)-(dimag(cgam))**2.d0)/sqrt(Z_normal-1)
-              ierr = ierr* ratioerr
+        igam2 = ImGamSqMC(iorder, 1, 0, 0, it1, it2)/Z_normal
+        ierr = sqrt(abs(igam2)-(dimag(cgam))**2.d0)/sqrt(Z_normal-1)
+        ierr = ierr* ratioerr
 
-              if(abs(dimag(cgam))<1.d-30) then
-                ipercenterr = 0.d0
-              else
-                ipercenterr = ierr/abs(dimag(cgam))
-              endif
-              if(ipercenterr>MxError)  cycle
-
-              typ = 2*(ityp-1)+1
-              Gam(typ,dx,dy,it1,it2) = Gam(typ,dx,dy,it1,it2)+ cgam*normal
-            enddo
-          enddo
-        enddo
+        if(abs(dimag(cgam))<1.d-30) then
+          ipercenterr = 0.d0
+        else
+          ipercenterr = ierr/abs(dimag(cgam))
+        endif
+        if(ipercenterr>MxError) flag(iorder)=.false.
       enddo
     enddo
   enddo
 
+  do iorder = 1, MCOrder
+    if(flag(iorder)) then
+      do it2 = 0, MxT-1
+        do it1 = 0, MxT-1
+          do dx = 0, L(1)-1
+            do dy = 0, L(2)-1
+              do ityp = 1, NTypeGam/2
+                cgam = GamMC(iorder,ityp,dx,dy,it1,it2)/Z_normal
+                typ = 2*(ityp-1)+1
+                Gam(typ,dx,dy,it1,it2) = Gam(typ,dx,dy,it1,it2)+ cgam*normal
+              enddo
+            enddo
+          enddo
+        enddo
+      enddo
+    endif
+  enddo
   Gam(2,:,:,:,:) = Gam(1,:,:,:,:)
   Gam(4,:,:,:,:) = Gam(3,:,:,:,:)
   Gam(6,:,:,:,:) = Gam(5,:,:,:,:)
