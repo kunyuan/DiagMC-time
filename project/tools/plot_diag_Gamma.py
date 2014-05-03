@@ -13,7 +13,7 @@ Gamma=["Gamma1","Gamma2","Gamma3","Gamma4"]
 #Gamma=["Gamma1"]
 
 #quan = read_data.read_array("./../data/bold_0.90_4_quantities.dat", Gamma)
-quan = read_data.read_array("./bold_noloop_0.90_4_quantities.dat", Gamma)
+quan = read_data.read_array("./bold_noloop_0.90_4_quantities.dat", Gamma) 
 
 #Gamma=["Gamma1"]
 #Quans=[]

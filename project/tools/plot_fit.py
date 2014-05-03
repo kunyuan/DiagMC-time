@@ -8,9 +8,10 @@ N = 64
 tau = np.arange(0, Beta, Beta/N)
 
 #Gamma=["Gamma1","Gamma2","Gamma3","Gamma4"]
-Gamma=["Gamma1","Gamma2","Gamma3"]
-GammaBasis=["GammaBasis1","GammaBasis2","GammaBasis3"]
-total=["Gamma1","Gamma2","Gamma3","GammaBasis1","GammaBasis2","GammaBasis3"]
+#Gamma=["Gamma1","Gamma2","Gamma3"]
+Gamma=["Gamma1"]
+GammaBasis=["GammaBasis1"]
+total=["Gamma1","GammaBasis1"]
 
 
 #Gamma=["Gamma1","Gamma2"]
