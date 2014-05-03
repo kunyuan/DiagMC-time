@@ -6,7 +6,7 @@ import subprocess
 import time
 import logging
 
-INTERVAL = 300
+INTERVAL = 100
 EXEC = "./gamma3.exe"
 
 def run_loop(infile):

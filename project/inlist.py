@@ -42,17 +42,28 @@ sc_dict={
     "__IsCluster" : False,
     "__AutoRun" : True, 
     "IsLoad" : True,
-    #"__AutoRun" : False, 
-    #"IsLoad" : False,
     "ReadFile" : readfile,
     }
 sc_dict.update(com_dict)
 TO_DO.append(job.JobConsistLoop(sc_dict))
 
+# self consist loop job to initialize the simulation
+sc_ini_dict={
+    "__Execute" : ["python", "./run_loop.py"],
+    "__Duplicate" : 0,
+    "__IsCluster" : False,
+    "__AutoRun" : False, 
+    "IsLoad" : False,
+    "ReadFile" : readfile,
+    }
+sc_ini_dict.update(com_dict)
+
+TO_DO.append(job.JobConsistLoop(sc_ini_dict))
+
 # output loop job definition
 ol_dict={
     "__Execute" : ["python", "./run_loop.py"],
-    "__Duplicate" : 1,
+    "__Duplicate" : 0,
     "__IsCluster" : False,
     #"__AutoRun" : True,
     "__AutoRun" : False,
