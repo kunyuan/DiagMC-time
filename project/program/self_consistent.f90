@@ -305,7 +305,8 @@ SUBROUTINE Gam_mc2matrix_mc
   integer :: iorder, dx, dy, ityp, iloop, it1, it2, typ
   complex*16 :: cgam, normal
   logical :: flag(MxOrder)
-  double precision :: rgam2, igam2, rerr, ierr, rpercenterr, ipercenterr
+  double precision :: totrerr, totierr
+  double precision :: rgam, igam, rgam2, igam2, rerr, ierr, rpercenterr, ipercenterr
 
   call initialize_Gam
 
@@ -314,38 +315,54 @@ SUBROUTINE Gam_mc2matrix_mc
   call LogFile%QuickLog("(ErrorRatio):"+str(ratioerr))
 
   flag(:) = .true.
-  do it2 = 0, MxT-1
-    do it1 = 0, MxT-1
-      do iorder = 1, MCOrder
 
-        cgam = GamMC(iorder, 1, 0, 0, it1, it2) /Z_normal
+  call LogFile%WriteStamp('i')
 
+  looporder: do iorder = 1, MCOrder
+    totrerr = 0.d0
+    totierr = 0.d0
+    do it2 = 0, MxT-1
+      do it1 = 0, MxT-1
+        rgam = real(GamMC(iorder, 1, 0, 0, it1, it2))/Z_normal
         rgam2 = ReGamSqMC(iorder, 1, 0, 0, it1, it2)/Z_normal
-        rerr = sqrt(abs(rgam2)-(real(cgam))**2.d0)/sqrt(Z_normal-1)
+
+        rerr = sqrt(abs(rgam2)-rgam**2.d0)/sqrt(Z_normal-1)
         rerr = rerr* ratioerr
+        totrerr = totrerr + abs(rerr)
 
-        if(abs(real(cgam))<1.d-30) then
-          rpercenterr = 0.d0
-        else
-          rpercenterr = rerr/abs(real(cgam))
-        endif
-        if(rpercenterr>MxError)  flag(iorder)=.false.
-
+        igam = dimag(GamMC(iorder, 1, 0, 0, it1, it2))/Z_normal
         igam2 = ImGamSqMC(iorder, 1, 0, 0, it1, it2)/Z_normal
-        ierr = sqrt(abs(igam2)-(dimag(cgam))**2.d0)/sqrt(Z_normal-1)
-        ierr = ierr* ratioerr
 
-        if(abs(dimag(cgam))<1.d-30) then
-          ipercenterr = 0.d0
-        else
-          ipercenterr = ierr/abs(dimag(cgam))
-        endif
-        if(ipercenterr>MxError) flag(iorder)=.false.
+        ierr = sqrt(abs(igam2)-igam**2.d0)/sqrt(Z_normal-1)
+        ierr = ierr* ratioerr
+        totierr = totierr + abs(ierr)
       enddo
     enddo
-  enddo
 
-  do iorder = 1, MCOrder
+    rgam = SUM(abs(real(GamMC(iorder, 1,0,0,:,:))))/Z_normal
+    if(rgam<1.d-30) then
+      rpercenterr = 0.d0
+    else
+      rpercenterr = totrerr/rgam
+    endif
+
+    if(rpercenterr>MxError) then
+      flag(iorder)=.false.
+    endif
+
+    igam = SUM(abs(dimag(GamMC(iorder, 1,0,0,:,:))))/Z_normal
+    if(igam<1.d-30) then
+      ipercenterr = 0.d0
+    else
+      ipercenterr = totierr/igam
+    endif
+
+    if(ipercenterr>MxError) then
+      flag(iorder)=.false.
+    endif
+
+    call LogFile%WriteLine("Order "+str(iorder)+" relative error: "+str(rpercenterr,'(f6.3)')+","+str(ipercenterr,'(f6.3)')+", accept: "+str(flag(iorder)))
+
     if(flag(iorder)) then
       do it2 = 0, MxT-1
         do it1 = 0, MxT-1
@@ -361,7 +378,8 @@ SUBROUTINE Gam_mc2matrix_mc
         enddo
       enddo
     endif
-  enddo
+
+  enddo looporder
   Gam(2,:,:,:,:) = Gam(1,:,:,:,:)
   Gam(4,:,:,:,:) = Gam(3,:,:,:,:)
   Gam(6,:,:,:,:) = Gam(5,:,:,:,:)
