@@ -45,6 +45,7 @@ def construct_job_queue(to_do):
     '''construct JobAtom queue from Job class '''
     logging.info("Constructing the job queue...")
     job_queue = []
+    global PURE_BACK
     pid = 0
     if os.path.exists(INFILEPATH):
         filelist = [int(elem.split('_')[-1]) for elem in os.listdir(INFILEPATH)]
@@ -67,6 +68,7 @@ def construct_job_queue(to_do):
             if not bundle.is_cluster:
                 PURE_BACK = False
             job_queue.append(JobAtom(pid, bundle))
+
     logging.info("Constructed the job queue!")
     return job_queue
 

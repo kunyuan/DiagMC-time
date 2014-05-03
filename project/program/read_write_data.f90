@@ -582,12 +582,12 @@ SUBROUTINE write_monte_carlo_data
   integer :: iorder, itopo, ix, iy, ityp, it1, it2
   double precision :: rgam2, rerr
   integer :: ibin, ibasis
-  complex*16 :: gam
+  complex*16 :: gam1
 
-  gam = GamMC(1, 1, 0, 0, 0, 0)/Z_normal
+  gam1 = GamMC(1, 1, 0, 0, 0, 0)/Z_normal
   rgam2 = ReGamSqMC(1, 1, 0, 0, 0, 0)/Z_normal
-  rerr = sqrt(abs(rgam2)-(real(gam))**2.d0)/sqrt(Z_normal-1)
-  ratioerr = Error(1)/rerr
+  rerr = sqrt(abs(rgam2)-(real(gam1))**2.d0)/sqrt(Z_normal-1)
+  ratioerr = Error(MCOrder+1)/rerr
 
   !=========== write into files =========================================
   open(104, status="replace", &
@@ -925,7 +925,7 @@ SUBROUTINE output_GamMC
   gam = GamMC(1, 1, 0, 0, 0, 0)/Z_normal
   rgam2 = ReGamSqMC(1, 1, 0, 0, 0, 0)/Z_normal
   rerr = sqrt(abs(rgam2)-(real(gam))**2.d0)/sqrt(Z_normal-1)
-  ratioerr = Error(1)/rerr
+  ratioerr = Error(MCOrder+1)/rerr
 
 
   write(35, *) "============================================"
@@ -1015,6 +1015,7 @@ SUBROUTINE output_Quantities
   write(104, *)
 
   normal = GamNormWeight/GamNorm
+
   do iorder = 1, MCOrder
     write(104, *) "##################################Gamma",trim(adjustl(str(iorder)))
     write(104, *) "#tau1:", MxT, ",tau2:", MxT
@@ -1067,10 +1068,14 @@ SUBROUTINE output_Quantities
   write(104, *)
 
   write(104, *) "##################################W"
-  write(104, *) "#tau:", MxT
+  write(104, *) "#x:", L(1), ",y:", L(2), ",tau:", MxT
   write(104, *) "#Beta", Beta, "L", L(1), L(2), "Order", MCOrder
   do it1 = 0, MxT-1
-    write(104, *)  real(W(1, 0, 0, it1)), dimag(W(1, 0, 0, it1))
+    do dy = 0, L(2)-1
+      do dx = 0, L(1)-1
+        write(104, *)  real(W(1, dx, dy, it1)), dimag(W(1, dx, dy, it1))
+      enddo
+    enddo
   enddo
   write(104, *)
 

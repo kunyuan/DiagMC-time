@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 import numpy as np
 import matplotlib.pyplot as plt
 import read_data
@@ -7,13 +8,14 @@ N = 64
 
 tau = np.arange(0, Beta, Beta/N)
 
-Gamma=["Gamma1","Gamma2","Gamma3","Gamma4"]
+#Gamma=["Gamma1","Gamma2","Gamma3","Gamma4"]
 #Gamma=["Gamma1","Gamma2","Gamma3"]
-#Gamma=["Gamma1","Gamma2"]
+Gamma=["Gamma1","Gamma2"]
 #Gamma=["Gamma1"]
 
 #quan = read_data.read_array("./../data/bold_0.90_4_quantities.dat", Gamma)
-quan = read_data.read_array("./bold_noloop_0.90_4_quantities.dat", Gamma)
+quan = read_data.read_array("../0.90_quantities.dat", Gamma)
+#quan2 = read_data.read_array("./0.90_quantities.dat", Gamma)
 
 #Gamma=["Gamma1"]
 #Quans=[]
@@ -33,6 +35,7 @@ ax = plt.subplot(111)
 
 for key in Gamma:
     ax.plot(tau, quan[key][0].diagonal().real, label=key)
+    #ax.plot(tau, quan2[key][0].diagonal().real, label=key)
 
 #ax.plot(tau, Quans[0][0].diagonal().real, label="Order"+str(1))
 #for i in range(1,2):

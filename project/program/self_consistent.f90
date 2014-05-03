@@ -310,6 +310,8 @@ SUBROUTINE Gam_mc2matrix_mc
 
   normal = GamNormWeight*Z_normal/GamNorm
 
+  call LogFile%QuickLog("(ErrorRatio):"+str(ratioerr))
+
   do it2 = 0, MxT-1
     do it1 = 0, MxT-1
       do dy = 0, L(2)-1
@@ -330,7 +332,7 @@ SUBROUTINE Gam_mc2matrix_mc
               endif
               if(rpercenterr>MxError)  cycle
 
-              igam2 = ImGamSqMC(iorder,1, 0, 0, it1, it2)/Z_normal
+              igam2 = ImGamSqMC(iorder,ityp , dx, dy, it1, it2)/Z_normal
               ierr = sqrt(abs(igam2)-(dimag(cgam))**2.d0)/sqrt(Z_normal-1)
               ierr = ierr* ratioerr
 
