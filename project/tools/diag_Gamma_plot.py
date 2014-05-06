@@ -10,15 +10,17 @@ tau = np.arange(0, Beta, Beta/N)
 
 #Gamma=["Gamma1","Gamma2","Gamma3","Gamma4"]
 #Gamma=["Gamma1","Gamma2","Gamma3"]
-Gamma=["Gamma1","Gamma2"]
+#Gamma=["Gamma1","Gamma2"]
 #Gamma=["Gamma1"]
+Gamma=["Gam0PF0","Gam0PF1","Gam0PF2"]
 
 #quan = read_data.read_array("./../../data/conservation/bare_0.90_4_quantities.dat", Gamma)
-quan = read_data.read_array("../bold_0.90_2_quantities.dat", Gamma)
+#quan = read_data.read_array("../bold_0.90_2_quantities.dat", Gamma)
 #quan = read_data.read_array("../bold_0.90_4_quantities.dat", Gamma)
 #quan = read_data.read_array("./bold_0.90_4_quan.dat", Gamma)
 #quan = read_data.read_array("../0.90_quantities.dat", Gamma)
-#quan2 = read_data.read_array("./0.90_quantities.dat", Gamma)
+#quan = read_data.read_array("./0.90_quantities.dat", Gamma)
+quan = read_data.read_array("../program/test/test_fourier.dat", Gamma)
 
 
 fig = plt.figure()

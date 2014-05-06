@@ -68,9 +68,9 @@ SUBROUTINE initialize_W0PF
   W0PF(:,:,:) = (0.d0, 0.d0)
   ratio = 0.25d0*Jcp*real(MxT)/Beta
 
-  W0PF(1,    0, 0) = dcmplx(ratio, 0.d0)
+  W0PF(1,      0, 0) = dcmplx(ratio, 0.d0)
   W0PF(L(1)-1, 0, 0) = dcmplx(ratio, 0.d0)
-  W0PF(0,    1, 0) = dcmplx(ratio, 0.d0)
+  W0PF(0,      1, 0) = dcmplx(ratio, 0.d0)
   W0PF(0, L(2)-1, 0) = dcmplx(ratio, 0.d0)
 
   call transfer_W0_r(1)
@@ -118,8 +118,9 @@ SUBROUTINE calculate_Polar
             Gam1 = -1.d0*weight_Gam(5, p, omegaGin, omegaGout+MxT)
           endif
           
-          Polar(px, py, omega) = Polar(px, py, omega)+d_times_cd(ratio, cdexp((0.d0, -1.d0) &
-            & *2.d0*omegaGout*Pi/MxT)*Gin*Gout*Gam1)
+          !Polar(px, py, omega) = Polar(px, py, omega)+d_times_cd(ratio, cdexp((0.d0, -1.d0) &
+            !& *2.d0*omegaGout*Pi/MxT)*Gin*Gout*Gam1)
+          Polar(px, py, omega) = Polar(px, py, omega)+d_times_cd(ratio, Gin*Gout*Gam1)
         enddo
       enddo
     enddo
