@@ -21,14 +21,14 @@ print readfile
 # monte carlo job defintion
 mc_dict={
     "__Execute" : "./gamma3.exe",
-    "__Duplicate" : 3,
+    "__Duplicate" : 4,
     "__IsCluster" : False,
     "__AutoRun" : True,
     "IsLoad" : False,
     "Reweight" : [0.5,0.25],
     #"ReadFile" : "0.90_3_coll",
     "Sample" : 1000000,
-    "Sweep" : 10,
+    "Sweep" : 5,
     "Toss" : 1000,
     "Worm/Norm" : 0.5 
     }
@@ -65,8 +65,8 @@ ol_dict={
     "__Execute" : ["python", "./run_loop.py"],
     "__Duplicate" : 0,
     "__IsCluster" : False,
-    #"__AutoRun" : True,
-    "__AutoRun" : False,
+    "__AutoRun" : True,
+    #"__AutoRun" : False,
     "IsLoad" : True,
     "ReadFile" : readfile,
     }

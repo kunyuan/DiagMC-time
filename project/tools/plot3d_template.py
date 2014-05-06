@@ -35,7 +35,7 @@ else:
     ax = fig.gca(projection='3d')
 
     surf = ax.plot_surface(
-        X, Y, GamMC.imag, rstride=1, cstride=1, cmap=cm.coolwarm,
+        X, Y, GamMC.real, rstride=1, cstride=1, cmap=cm.coolwarm,
         linewidth=0, antialiased=False)
     # ax.set_zlim(-1.01, 1.01)
 

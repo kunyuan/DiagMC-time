@@ -6,7 +6,7 @@ import subprocess
 import time
 import logging
 
-INTERVAL = 100
+INTERVAL = 300
 EXEC = "./gamma3.exe"
 
 def run_loop(infile):
@@ -19,6 +19,7 @@ def run_loop(infile):
     logging.info("Loop daemon started!")
     #logging.info(title+" is the target!")
     print "loop daemon started..."
+    #time.sleep(INTERVAL)
     i = 0
     while True:
         i += 1

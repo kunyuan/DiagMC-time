@@ -4,8 +4,14 @@ import os
 import sys
 import StringIO
 
+class data_list(list):
+    def data(self):
+        return list.__getitem__(self, 0)
 
-def __index(file, comment='#', separator='^[[:blank:]]*###*'):
+    def xylabel(self):
+        return list.__getitem__(self, 1)
+
+def __index__(file, comment='#', separator='^[[:blank:]]*###*'):
     index_list = []
     name_list = []
     if os.path.exists(file):
@@ -18,24 +24,20 @@ def __index(file, comment='#', separator='^[[:blank:]]*###*'):
             if name=='':
                 name='Block: '+str(i)+''
             name_list.append(name)
-        print "Block Number: {}".format(len(index_list))
-        print "Name List: {}".format(name_list)
+        print "Block Number: {0}".format(len(index_list))
+        print "Name List: {0}".format(name_list)
         length=os.path.getsize(file)
         for i in range(0, len(index_list)-1):
             index_list[i]=(index_list[i], index_list[i+1])
         index_list[-1]=(index_list[-1], length)
-        # print index_list
 
     else:
-        print "Data file '{}' does not exist!".format(file)
+        print "Data file '{0}' does not exist!".format(file)
         sys.exit()
-
-    #index_list.append(os.path.getsize(file))
-    #the last item is the end of the file
 
     return index_list, name_list, length
 
-def __parse_scope(index_list, name_list, length,scope=':'):
+def __parse_scope__(index_list, name_list, length,scope=':'):
     scope_bound_str=scope.split(':')
     if len(scope_bound_str)>2:
         print "Only 2 parameters are allowed in range: {}".format(scope)
@@ -60,7 +62,7 @@ def __parse_scope(index_list, name_list, length,scope=':'):
 
     return scope_bound,scope_name_list
 
-def __parse_dim(dimstr):
+def __parse_dim__(dimstr):
     dim=[]
     dim_name=[]
     strbuff=dimstr.strip(' \t\n\r')[1:].split(',')
@@ -89,12 +91,12 @@ def __parse_dim(dimstr):
 
     return dim, dim_name
 
-def __read_one_block(f,bound,comment='#'):
+def __read_one_block__(f,bound,comment='#'):
     f.seek(bound[0])
     buff=StringIO.StringIO(f.read(bound[1]-bound[0]))
     buff.readline()
     buffstr=buff.readline()
-    dim, dim_name=__parse_dim(buffstr)
+    dim, dim_name=__parse_dim__(buffstr)
     a=np.loadtxt(buff,comments=comment)
     if a.shape[1]>2:
         print "At most two numbers in each row!"
@@ -106,12 +108,17 @@ def __read_one_block(f,bound,comment='#'):
 def read_array(file, name=[], scope=':',
                comment='#', separator='^[[:blank:]]*###*'):
     '''
-    Return: a dict of data blocks as {block_name:[block,dim_info],...}
+    Return: a dict of data blocks as {block_name: blocklist([block,dim_info]),...}
     ------------------------
         -block_name: a string contains the name of the block
+
         -block: an array contains data
         !!!!Attention: It always returns the last block in the file which is named after block_name
         -dim_info: a list conatins the name of each dimension, e.g. ['X','Y']
+
+        -blocklist: a class inherits from list, including two additional methods:
+         * data(): return "block"
+         * xylabel(): return "dim_info"
 
     Parameters:
     -----------
@@ -145,36 +152,41 @@ def read_array(file, name=[], scope=':',
     is same as:
 
     data_block=read_data.read_array("PATH/TO/FILE", ["Gamma","Sigma"])
-    dim_info, block_name=data_block["Gamma"]
+    block, dim_info=data_block["Gamma"]
 
     Or you can also use:
 
     block, dim_info=read_data.read_array("PATH/TO/FILE", scope="1:")["Gamma"]
+
+    datablock=read_data.read_array("PATH/TO/FILE", scope="1:")["Gamma"]
+    block = datablock.data()
+    dim_info = datablock.dim_info()
+    
     '''
-    index_list, name_list, length=__index(file, comment, separator)
+    index_list, name_list, length = __index__(file, comment, separator)
     name_dict=dict(zip(name_list,index_list))
     #print scope_bound
     data_block={}
     f=open(file,'r')
     #print len(scope_bound)
     if len(name)==0:
-        scope_bound, scope_name_list = __parse_scope(index_list,
+        scope_bound, scope_name_list = __parse_scope__(index_list,
                                                      name_list, length, scope)
         for i in range(0,len(scope_bound)):
-            block, dim_name=__read_one_block(f,scope_bound[i])
-            data_block[scope_name_list[i]]=[block,dim_name]
+            block, dim_name = __read_one_block(f,scope_bound[i])
+            data_block[scope_name_list[i]] = data_list([block, dim_name])
     else:
         for item in name:
             try:
-                bound=name_dict[item]
+                bound = name_dict[item]
             except:
                 print "[Warning]The name: "+item+" doesn't exist in data file!"
                 continue
-            block, dim_name=__read_one_block(f,bound)
-            data_block[item]=[block,dim_name]
+            block, dim_name = __read_one_block__(f,bound)
+            data_block[item] = data_list([block, dim_name])
 
     f.close()
-    print "returned block keys list: {}".format(data_block.keys())
+    print "returned block keys list: {0}".format(data_block.keys())
     return data_block
 
 if __name__=="__main__":
