@@ -114,8 +114,8 @@ SUBROUTINE calculate_Polar
             Gout = weight_G(1, omegaGout)
             Gam1 = weight_Gam(5, p, omegaGin, omegaGout)
           else
-            Gout = weight_G(1, omegaGout+MxT)
-            Gam1 = weight_Gam(5, p, omegaGin, omegaGout+MxT)
+            Gout = -1.d0*weight_G(1, omegaGout+MxT)
+            Gam1 = -1.d0*weight_Gam(5, p, omegaGin, omegaGout+MxT)
           endif
           
           Polar(px, py, omega) = Polar(px, py, omega)+d_times_cd(ratio, cdexp((0.d0, -1.d0) &
@@ -387,34 +387,3 @@ SUBROUTINE Gam_mc2matrix_mc
 END SUBROUTINE Gam_mc2matrix_mc
  
 
-
-
-!SUBROUTINE update_Gamma_matrix(norder)
-  !implicit none
-  !integer, intent(in) :: norder
-  !integer :: iorder, dx, dy, ityp, omega1, omega2, ib, jb
-  !double precision :: gam1, gam2, perr, norm, nmc
-  !double precision :: Ga0R, GaR1
-  !double precision :: tempGamMC(-MxOmegaGamG2:MxOmegaGamG2, -MxOmegaGamG2:MxOmegaGamG2)
-
-  !tempGamMC(:, :) = 0.d0
-
-
-  !if(norder==0) then
-    !call initialize_Gamma
-    !return
-  !endif
-
-  !norm = GamNormWeight*ime/GamNorm
-
-  !do ityp = 1, ntypGa
-    !do dx = 0, dL(1)
-      !do dy = 0, dL(2)
-
-
-      !enddo
-    !enddo
-  !enddo
-
-!END SUBROUTINE update_Gamma_matrix
-!====================================================================
