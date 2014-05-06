@@ -189,6 +189,7 @@ SUBROUTINE self_consistent
   integer :: iloop
   logical :: flag
 
+  !call output_Quantities
   !------- read the G, W, and Gamma  -------------------
   if(IsLoad==.false.) then
 
@@ -200,7 +201,7 @@ SUBROUTINE self_consistent
     call transfer_Sigma_t(-1)
     call output_Quantities
 
-    call write_GWGamma
+    !call write_GWGamma
     !!!======================================================================
   else if(IsLoad) then
 
