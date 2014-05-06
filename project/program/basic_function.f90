@@ -1517,9 +1517,9 @@ SUBROUTINE transfer_Gam0_t(BackForth)
     integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
     integer :: it1, it2
 
-    call FFT_shift_t_double(Gam0PF,1,L(1)*L(2),BackForth)
+    !call FFT_shift_t_double(Gam0PF,1,L(1)*L(2),BackForth)
     call FFT_tau_double(Gam0PF,1,L(1)*L(2),BackForth)
-    call FFT_shift_omega_double(Gam0PF,1,L(1)*L(2),BackForth)
+    !call FFT_shift_omega_double(Gam0PF,1,L(1)*L(2),BackForth)
 END SUBROUTINE
 
 SUBROUTINE transfer_G0(BackForth)
@@ -1554,7 +1554,9 @@ SUBROUTINE transfer_W_t(BackForth)
     implicit none
     integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
     call FFT_tau_single(W,NtypeW,L(1)*L(2),BackForth)
-END SUBROUTINE
+END SUBROUTINE transfer_W_t
+
+
 SUBROUTINE transfer_Gam_t(BackForth)
     implicit none
     integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
