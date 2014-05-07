@@ -12,7 +12,7 @@ com_dict={
     "Ly" :  4,
     "Jcp" :  1.0,
     "Beta" :  0.90,
-    "Order" :  2,
+    "Order" :  1,
     }
 
 readfile="{0:4.2f}_{1}_coll".format(com_dict["Beta"],com_dict["Order"])
@@ -21,11 +21,11 @@ print readfile
 # monte carlo job defintion
 mc_dict={
     "__Execute" : "./gamma3.exe",
-    "__Duplicate" : 3,
+    "__Duplicate" : 0,
     "__IsCluster" : False,
     "__AutoRun" : True,
     "IsLoad" : False,
-    "Reweight" : [0.5,0.25],
+    "Reweight" : [2],
     #"ReadFile" : "0.90_3_coll",
     "Sample" : 1000000,
     "Sweep" : 10,
@@ -40,7 +40,8 @@ sc_dict={
     "__Execute" : ["python", "./run_loop.py"],
     "__Duplicate" : 1,
     "__IsCluster" : False,
-    "__AutoRun" : True, 
+    #"__AutoRun" : True, 
+    "__AutoRun" : False, 
     "IsLoad" : True,
     "ReadFile" : readfile,
     }
