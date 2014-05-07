@@ -1044,13 +1044,13 @@ SUBROUTINE output_Quantities
 
         if(IsBasis2D(ibin)) then
           gam1 = (0.d0, 0.d0)
-          do  ibasis = 1, NBasisGam
+          do ibasis = 1, NBasisGam
             gam1 = gam1 + GamMCBasis(iorder, 1, 0, 0, ibin, ibasis)* weight_basis_Gam( &
               & CoefGam(:,:,ibasis,ibin), tau1, tau2)
           enddo
         else
           gam1 = (0.d0, 0.d0)
-          do  ibasis = 1, NBasis
+          do ibasis = 1, NBasis
             gam1 = gam1 + GamMCBasis(iorder, 1, 0, 0, ibin, ibasis)* weight_basis( &
               & CoefGam(:,0,ibasis,ibin), tau1)
           enddo

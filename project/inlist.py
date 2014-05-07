@@ -65,8 +65,7 @@ ol_dict={
     "__Execute" : ["python", "./run_loop.py"],
     "__Duplicate" : 0,
     "__IsCluster" : False,
-    "__AutoRun" : True,
-    #"__AutoRun" : False,
+    "__AutoRun" : False,
     "IsLoad" : True,
     "ReadFile" : readfile,
     }

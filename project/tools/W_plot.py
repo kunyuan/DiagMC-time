@@ -25,9 +25,9 @@ ax = plt.subplot(111)
 for i in range(len(BoldSigma)):
     for key in target:
         print BoldSigma[i][key][0].shape
-        ax.plot(tau, BoldSigma[i][key][0][0,0,:].real, label="{0}, Order{1}".format(key, i+2))
-        ax.plot(tau, BoldSigma[i][key][0][1,0,:].real, label="{0}, Order{1}".format(key, i+2))
-        ax.plot(tau, BoldSigma[i][key][0][1,1,:].real, label="{0}, Order{1}".format(key, i+2))
+        ax.plot(tau, BoldSigma[i][key][0][0,0,:].real, label="{0}, {1}".format(key, (0, 0)))
+        ax.plot(tau, BoldSigma[i][key][0][1,0,:].real, label="{0}, {1}".format(key, (1, 0)))
+        ax.plot(tau, BoldSigma[i][key][0][1,1,:].real, label="{0}, {1}".format(key, (1, 1)))
 
 ax.legend()
 
