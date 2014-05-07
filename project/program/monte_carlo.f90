@@ -263,11 +263,14 @@ SUBROUTINE markov(IsToss)
 
 
       call check_config
+
       call statistics
+
       call output_GamMC
       call output_test
       call print_status
       call print_config
+
       call LogFile%QuickLog("Check if there is a new G,W data...")
       call read_flag
 
@@ -290,9 +293,9 @@ SUBROUTINE markov(IsToss)
       CoefOfWeight(:)=TimeRatio(:)*CoefOfWeight(:)*x/(GamWormOrder(:)+50.d0)
       CoefOfWeight(1:MCOrder) = CoefOfWeight(1:MCOrder)/CoefOfWeight(0)
       CoefOfWeight(0) = 1.d0
+
       !x=sum(GamWormOrder(:)/Error(0:MCOrder))
       !CoefOfWeight(:)=x/(GamWormOrder(:)/Error(0:MCOrder)+50.d0)
-
 
       call LogFile%WriteLine("Reweight Ratios:")
 
@@ -2647,7 +2650,6 @@ SUBROUTINE measure
       factorM = factorM * (-1.d0)
     endif
 
-
     factorM = factorM *CoefOfSymmetry(dx, dy)* CoefOfWeight(Order) *abs(WeightVertex(MeasureGam))
 
     !================= accumulation ===================================
@@ -2678,11 +2680,9 @@ SUBROUTINE measure
       enddo
     endif
 
-
     Quan(Order) = Quan(Order) + real(Phase)/factorM
     Norm(Order) = Norm(Order) + 1.d0
     !print *, Order, Quan(Order), Norm(Order)
-
 
     !==============  Error renormalization =========================
     if(Order==1 .and. ityp==1 .and. dx==0 .and. dy==0) then

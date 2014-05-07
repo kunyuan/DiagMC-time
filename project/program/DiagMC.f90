@@ -5,7 +5,7 @@ PROGRAM MAIN
   USE logging_module
   USE vrbls_mc
   implicit none
-  integer :: it, i, ISub,ID
+  integer :: it, i, ISub,ID, ios
   logical :: IsLoad
   character(len=128) :: infile
 
@@ -139,9 +139,12 @@ PROGRAM MAIN
   if(ISub==1) then
     call self_consistent
   else if(ISub==2) then
-    open(10,access="append", file="read_list.dat")
-    write(10, *) trim(adjustl(title_mc))//"_monte_carlo_data.bin.dat"
-    close(10)
+    ios=1
+    do while(ios/=0) 
+      open(10,access="append", iostat=ios, file="read_list.dat")
+      write(10, *) trim(adjustl(title_mc))//"_monte_carlo_data.bin.dat"
+      close(10)
+    enddo
     call monte_carlo
   else if(ISub==3) then
     call numerical_integeration
@@ -201,7 +204,7 @@ SUBROUTINE self_consistent
     call transfer_Sigma_t(-1)
     call output_Quantities
 
-    !call write_GWGamma
+    call write_GWGamma
     !!!======================================================================
   else if(IsLoad) then
 
