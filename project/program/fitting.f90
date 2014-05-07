@@ -120,8 +120,6 @@
 !CONTAINS
 
 
-
-
 !============== divide the space into N bins for G,W, Gamma =============================
 SUBROUTINE initialize_bins
   implicit none
