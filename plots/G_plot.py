@@ -15,12 +15,6 @@ target=["G"]
 
 BoldSigma=[]
 BoldSigma.append(read_data.read_array("../0.90_quantities.dat",target))
-#BoldSigma.append(read_data.read_array("./../0.90_quantities.dat",target))
-#BoldSigma.append(read_data.read_array("./../bold_0.90_1_quantities.dat",target))
-#BoldSigma.append(read_data.read_array("./../bold_0.90_2_quantities.dat",target))
-#BoldSigma.append(read_data.read_array("./../bold_0.90_3_quantities.dat",target))
-#BoldSigma.append(read_data.read_array("./../bold_0.90_4_quantities.dat",target))
-#BoldSigma.append(read_data.read_array("../program/test/test_fourier.dat",target))
 
 fig = plt.figure()
 ax = plt.subplot(111)
