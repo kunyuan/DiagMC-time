@@ -19,6 +19,7 @@ MODULE vrbls_mc
   double precision, parameter :: Pi4   = 2.0d0*Pi2
   double precision, parameter :: tm32  = 1.d0/(2.d0**32)
   double precision, parameter :: macheps = epsilon(0d0)
+  double precision, parameter :: epstau= 0.000001d0
   integer, parameter          :: Mxint = 2147483647
   integer, parameter          :: Mnint =-2147483647
 

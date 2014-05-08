@@ -1095,6 +1095,17 @@ SUBROUTINE output_Quantities
     enddo
   enddo
 
+  write(104, *) "##################################Polar"
+  write(104, *) "#x:", L(1), ",y:", L(2), ",tau:", MxT
+  write(104, *) "#Beta", Beta, "L", L(1), L(2), "Order", MCOrder
+  do it = 0, MxT-1
+    do dy = 0, L(2)-1
+      do dx = 0, L(1)-1
+        write(104, *) real(Polar(dx, dy, it)),dimag(Polar(dx, dy, it))
+      enddo
+    enddo
+  enddo
+
   write(104, *) "##################################Sigma"
   write(104, *) "#tau:", MxT
   write(104, *) "#Beta", Beta, "L", L(1), L(2), "Order", MCOrder

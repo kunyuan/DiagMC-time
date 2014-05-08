@@ -100,7 +100,6 @@ SUBROUTINE calculate_Polar
   double precision :: ratio
 
   Polar(:,:,:) = (0.d0, 0.d0)
-
   ratio = 2.d0/real(MxT)*(Beta/real(MxT))**4.d0
   do omega = 0, MxT-1
     do omegaGin = 0, MxT-1
@@ -118,12 +117,14 @@ SUBROUTINE calculate_Polar
             Gam1 = weight_Gam(5, p, omegaGin, omegaGout+MxT)
           endif
           
-          Polar(px, py, omega) = Polar(px, py, omega)+d_times_cd(ratio, cdexp((0.d0, -1.d0) &
-            & *2.d0*omegaGout*Pi/MxT)*Gin*Gout*Gam1)
+          Polar(px, py, omega) = Polar(px, py, omega)+ratio*cdexp((0.d0, -1.d0) &
+            & *omega*epstau)*Gin*Gout*Gam1
+          !Polar(px, py, omega) = Polar(px, py, omega)+ratio*Gin*Gout*Gam1
         enddo
       enddo
     enddo
   enddo
+  Polar(:, :, :) = dcmplx(real(Polar(:,:,:))+dimag(Polar(:,:,:)), 0.d0)
   return
 END SUBROUTINE calculate_Polar
 
@@ -140,24 +141,27 @@ SUBROUTINE calculate_Sigma
   ratio = -3.d0/(real(L(1))*real(L(2))*real(MxT))*(Beta/real(MxT))**4.d0
   do omega = 0, MxT-1
     do omegaG = 0, MxT-1
+      omegaW = omega - omegaG
+      G1 = weight_G(1, omegaG)
       do py = 0, L(2)-1
         do px = 0, L(1)-1
           p = (/px, py/)
-          omegaW = omega-omegaG
 
-          G1 = weight_G(1, omegaG)
           if(omegaW>=0) then
             W1 = weight_W(1, p, omegaW)
           else
             W1 = weight_W(1, p, omegaW+MxT)
           endif
+          
           Gam1 = weight_Gam(5, p, omegaG, omega)
           
-          Sigma(omega) = Sigma(omega)+d_times_cd(ratio, G1*W1*Gam1)
+          !Sigma(omega) = Sigma(omega) + ratio*G1*W1*Gam1
+          Sigma(omega) = Sigma(omega)+ratio*cdexp((0.d0, -1.d0)*omega*epstau)*G1*W1*Gam1
         enddo
       enddo
     enddo
   enddo
+  Sigma(:) = dcmplx(0.d0, real(Sigma(:))+dimag(Sigma(:)))
   return
 END SUBROUTINE calculate_Sigma
 

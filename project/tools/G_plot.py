@@ -9,11 +9,13 @@ import matplotlib.pyplot as plt
 Beta = 0.90
 N = 64
 
-tau = np.arange(0, Beta, Beta/N)
+tau = np.arange(Beta/N, Beta, Beta/N)
+tau2 = np.arange(Beta*1.0/N, Beta+Beta*1.0/N, Beta/N)
 target=["G"]
 
 BoldSigma=[]
 BoldSigma.append(read_data.read_array("../0.90_quantities.dat",target))
+#BoldSigma.append(read_data.read_array("./0.90_G0_quantities.dat",target))
 #BoldSigma.append(read_data.read_array("./0.90_2_quantities.dat",target))
 #BoldSigma.append(read_data.read_array("./0.90_3_quantities.dat",target))
 #BoldSigma.append(read_data.read_array("./0.90_4_quantities.dat",target))
@@ -23,7 +25,8 @@ ax = plt.subplot(111)
 
 for i in range(len(BoldSigma)):
     for key in target:
-        ax.plot(tau, BoldSigma[i][key][0].real, label="{0}, Order{1}".format(key, i+2))
+        ax.plot(tau, BoldSigma[i][key][0][1:].real, label="{0}, Order{1}".format(key, i+2))
+        ax.plot(tau2, BoldSigma[i][key][0][::-1].real, label="{0}, Order{1}".format(key, i+2))
 
 ax.legend()
 
