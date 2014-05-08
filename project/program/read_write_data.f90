@@ -977,9 +977,9 @@ SUBROUTINE output_Gam1
   integer :: dx, dy, it
   complex*16 :: gam1
 
-  open(104, status='replace', file=trim(title_loop)//"_Gam1.dat")
+  open(104, access='append', file=trim(title_loop)//"_quantities.dat")
 
-  write(104, *) "##################################Gamma"
+  write(104, *) "##################################GammaInt"
   write(104, *) "#tau1:", MxT, ",tau2:", MxT
   write(104, *) "#Beta", Beta, "L", L(1), L(2), "Order", MCOrder
   do it2 = 0, MxT-1
