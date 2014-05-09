@@ -198,9 +198,9 @@ SUBROUTINE self_consistent
     !call transfer_Chi_r(-1)
     !call transfer_Chi_t(-1)
 
-    call transfer_Polar_r(-1)
-    call transfer_Polar_t(-1)
-    call transfer_Sigma_t(-1)
+    !call transfer_Polar_r(-1)
+    !call transfer_Polar_t(-1)
+    !call transfer_Sigma_t(-1)
 
     call output_Quantities
 
@@ -263,11 +263,11 @@ LOGICAL FUNCTION self_consistent_GW(err)
     WOld = WNow
     iloop = iloop + 1
 
-    call calculate_Sigma
-    call calculate_Polar
+    !call calculate_Sigma
+    !call calculate_Polar
 
-    call calculate_G
-    call calculate_W
+    !call calculate_G
+    !call calculate_W
 
     WNow = weight_W(1, (/0, 0/), 0)
 
@@ -280,11 +280,11 @@ LOGICAL FUNCTION self_consistent_GW(err)
   !call calculate_Chi
 
   !!-------------------------------------------------------
-  call plus_minus_W0(-1)
-  call plus_minus_Gam0(-1)
+  !call plus_minus_W0(-1)
+  !call plus_minus_Gam0(-1)
 
-  call transfer_r(-1)
-  call transfer_t(-1)
+  !call transfer_r(-1)
+  !call transfer_t(-1)
   return
 END FUNCTION self_consistent_GW
 
