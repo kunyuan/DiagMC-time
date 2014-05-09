@@ -7,43 +7,41 @@ PROGRAM MAIN
   implicit none
   integer :: it, i, ISub,ID
   logical :: IsLoad
-  character(len=100) :: infile
+  character(len=128) :: infile
 
-  print *, "Please give me the input file path: "
-  read(*,'(A)') infile
-  open(100,file=trim(adjustl(infile)))
-  write(*,*) "Opened!"
-  read(100,*) ID
-  read(100,*) L(1)
-  read(100,*) L(2)
-  read(100,*) J1
-  read(100,*) J2
-  read(100,*) Beta
-  read(100,*) MCOrder
-  read(100,*) IsLoad
-  read(100,*) ISub
-  if(ISub==2) then
-    read(100,*) IsForever
-    read(100,*) Ntoss
-    read(100,*) Nsamp
-    read(100,*) Nstep
-    read(100,*) Seed
-    !read(100,*) title
-    read(100,*) CoefOfWorm
-    CoefOfWeight(0) = 1.d0
-    read(100,*) CoefOfWeight(1:MCOrder)
-  elseif(ISub==1 .or. ISub==4) then
-    read(100,*) title
+  call get_command_argument(1,infile)
+  if(len_trim(infile)==0) then
+    call LogFile%QuickLog("No input file is specified!",'e')
+    stop
   endif
-
-  close(100)
-
-  isbold = .true.
+  open(unit=11, file=trim(infile), action='read')
+    read(11,*) ID
+    read(11,*) L(1)
+    read(11,*) L(2)
+    read(11,*) J1
+    read(11,*) J2
+    read(11,*) Beta
+    read(11,*) MCOrder
+    read(11,*) IsLoad
+    read(11,*) ISub
+    if(ISub==2) then
+      read(11,*) Ntoss
+      read(11,*) Nsamp
+      read(11,*) Nstep
+      read(11,*) Seed
+      read(11,*) CoefOfWorm
+      CoefOfWeight(0) = 1.d0
+      read(11,*) CoefOfWeight(1:MCOrder)
+    elseif(ISub==1 .or. ISub==4) then
+      read(11,*) title
+    endif
+  close(11)
 
   logL(:)=dlog(L(:)*1.d0)
   SpatialWeight(:,:)=0.d0
 
 
+  write(*,*) Beta, MCOrder
   write(title1, '(f5.2)') beta
   write(title2, '(f5.2)') J2
   write(title3, '(i2)')  MCOrder
@@ -79,15 +77,6 @@ PROGRAM MAIN
   Vol = L(1)*L(2)
   dL(1) = Floor(L(1)/2.d0)
   dL(2) = Floor(L(2)/2.d0)
-
-  !================ irreducibility check ===============================
-  CheckG = .true.
-  CheckW = .true.
-  if(isbold) then
-    CheckGam = .true.
-  else
-    CheckGam = .false.
-  endif
 
   !================ updates frequency   ================================
   Pupdate( :)  = 0.d0
@@ -128,13 +117,21 @@ PROGRAM MAIN
   allocate(ReGamSqMC(0:MCOrder,1:NTypeGam/2, 0:L(1)-1, 0:L(2)-1, 0:MxT-1, 0:MxT-1))
   allocate(ImGamSqMC(0:MCOrder,1:NTypeGam/2, 0:L(1)-1, 0:L(2)-1, 0:MxT-1, 0:MxT-1))
 
+  allocate(GamMCBasis(0:MCOrder,1:NTypeGam/2, 0:L(1)-1, 0:L(2)-1, 1:NbinGam, 1:NBasisGam))
+
   MaxStat=1024
-  allocate(ObsRecord(1:MaxStat,1:NObs))
+  allocate(ObsRecord(1:MaxStat,0:NObs-1))
 
   call LogFile%QuickLog("Initializing time and RNG...")
 
   call set_time_elapse
   call set_RNG
+
+  !=========== initialization of basis =======================
+  call initialize_polynomials
+  call initialize_bins
+  call calculate_basis_GWGam
+
   call initialize_self_consistent
   call def_symmetry
 
@@ -157,13 +154,14 @@ PROGRAM MAIN
   endif
 
 CONTAINS
+
 INCLUDE "basic_function.f90"
 INCLUDE "self_consistent.f90"
 INCLUDE "monte_carlo.f90"
 INCLUDE "check_conf.f90"
 INCLUDE "analytic_integration.f90"
 INCLUDE "read_write_data.f90"
-
+INCLUDE "fitting.f90"
 
 subroutine numerical_integeration
   implicit none
@@ -175,9 +173,9 @@ end subroutine
 
 subroutine just_output
   implicit none
-  call LogFile%QuickLog("Just output something!")
-  call LogFile%QuickLog("Reading G,W, and Gamma...")
-  call read_GWGamma
+  !call LogFile%QuickLog("Just output something!")
+  !call LogFile%QuickLog("Reading G,W, and Gamma...")
+  !call read_GWGamma
 
   call LogFile%QuickLog("Reading MC data...")
   call read_monte_carlo_data
@@ -274,6 +272,8 @@ LOGICAL FUNCTION self_consistent_GW(err)
   enddo
   call calculate_Sigma
   call calculate_Polar
+  call calculate_Denom
+  call calculate_Chi
 
   !!-------------------------------------------------------
   call plus_minus_W0(-1)
@@ -286,12 +286,13 @@ END FUNCTION self_consistent_GW
 
 SUBROUTINE monte_carlo
   implicit none
-  integer :: isamp, iblck, mc_version
+  integer :: i, mc_version
   double precision :: WR, GamR
 
   call LogFile%QuickLog("Initializing monte carlo...")
   call read_GWGamma
-  call calculate_Gam1
+
+  !call calculate_Gam1
 
   call calculate_GamNormWeight
 
@@ -299,7 +300,9 @@ SUBROUTINE monte_carlo
 
   call LogFile%QuickLog("Initializing monte carlo done!")
 
-  QuanName(1) = "(1st-Gamma(0,0))"
+  do i= 0, MCOrder
+    QuanName(i) = "(Order "+str(i)+"Gamma)"
+  enddo
 
   if(IsLoad==.false.) then
 
@@ -310,8 +313,7 @@ SUBROUTINE monte_carlo
     BalenceCheck(:,:,:)=0.d0
 
     !-------- throw away some configurations to thermalize -----------
-    IsToss=.true.
-    call markov(Ntoss)
+    call markov(.true.)
 
     call LogFile%QuickLog("Thermalization done!")
 
@@ -335,6 +337,9 @@ SUBROUTINE monte_carlo
     GamMC(:,:,:,:,:,:) = (0.d0, 0.d0)
     ReGamSqMC(:,:,:,:,:,:) = 0.d0
     ImGamSqMC(:,:,:,:,:,:) = 0.d0
+
+    GamMCBasis(:,:,:,:,:,:) = (0.d0, 0.d0)
+
     GamNorm = (0.d0, 0.d0)
     TestData(:)=0.d0
 
@@ -356,8 +361,7 @@ SUBROUTINE monte_carlo
 
   call LogFile%QuickLog("Running MC Simulations...")
 
-  IsToss=.false.
-  call markov(Nsamp)
+  call markov(.false.)
 
   call time_elapse
   t_simu = t_elap
@@ -448,7 +452,6 @@ SUBROUTINE test_subroutine
 
     return
 END SUBROUTINE
-
 
 END PROGRAM MAIN
 

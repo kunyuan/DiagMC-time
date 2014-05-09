@@ -175,11 +175,16 @@ SUBROUTINE calculate_W
 
   !-------- calculate W = W0/(1-W0*G^2*Gamma) ----------------------------
   W(:,:,:,:) = (0.d0, 0.d0)
-  W(1,:,:,:) = W0PF(:,:,:)/((1.d0, 0.d0)-W0PF(:,:,:)*Polar(:,:,:))
 
   do  omega = 0, MxT-1
     do py = 0, L(2)-1
       do px = 0, L(1)-1
+        Denom(px,py,omega) = (1.d0, 0.d0) -W0PF(px,py,omega)*Polar(px,py,omega)
+        W(1,px,py,omega) = W0PF(px,py,omega)/Denom(px,py,omega)
+        if(W(1,px,py,omega)/=W(1,px,py,omega)) then
+          call LogFile%QuickLog("calculate_W NaN appears!")
+          stop
+        endif
         W(3,px,py,omega) = d_times_cd(-1.d0,W(1,px,py,omega))
         W(5,px,py,omega) = d_times_cd( 2.d0,W(1,px,py,omega))
       enddo
@@ -197,16 +202,33 @@ END SUBROUTINE calculate_W
 SUBROUTINE calculate_G
   implicit none
   complex(kind=8) :: G0
+  integer :: omega
 
   G(:,:) = (0.d0, 0.d0)
 
   !--------- G = G0/(1-G0*Sigma)----------------------
-  G(1, :) =  G0F(:)/((1.d0,0.d0)-G0F(:)*Sigma(:))
-  G(2, :) =  G(1, :)
+  do omega = 0, MxT-1
+
+    G(1, omega) =  G0F(omega)/((1.d0,0.d0)-G0F(omega)*Sigma(omega))
+
+    if(G(1,omega)/=G(1,omega)) then
+      call LogFile%QuickLog("calculate_G NaN appears!")
+      stop
+    endif
+
+    G(2, omega) =  G(1, omega)
+  enddo
 
   !!-------------- update the matrix and tail ------------
 END SUBROUTINE calculate_G
 
+
+!!------------- calculate the denominator of the susceptibility ---------
+SUBROUTINE calculate_Denom
+  implicit none
+  Denom(:,:,:) = (1.d0, 0.d0) -W0PF(:,:,:)*Polar(:,:,:)
+  return
+END SUBROUTINE calculate_Denom
 
 
 
@@ -218,20 +240,16 @@ SUBROUTINE calculate_Chi
 
   !!-------- calculate Chi = Pi/(1 - W0 * Pi) ------------------
   !!--------- already sum over the spins -----------------------
-  Chi(:,:,:) = 0.d0
   ratio = -1.d0*(real(MxT)/Beta)**2.d0*0.75d0
 
-  Denom(:,:,:) = (1.d0, 0.d0) -W0PF(:,:,:)*Polar(:,:,:)
-  Chi(:,:,:) = Polar(:,:,:)/Denom(:,:,:)
-
-  do omega = 0, MxT-1
+  do  omega = 0, MxT-1
     do py = 0, L(2)-1
       do px = 0, L(1)-1
-        Chi(px, py, omega) = d_times_cd(ratio, Chi(px, py, omega))
+        Chi(px,py,omega) = Polar(px,py,omega)/Denom(px,py,omega)
+        Chi(px,py,omega) = d_times_cd(ratio, Chi(px,py,omega))
       enddo
     enddo
   enddo
-
   return
 END SUBROUTINE calculate_Chi
 
@@ -285,178 +303,88 @@ SUBROUTINE plus_minus_Gam0(Backforth)
 END SUBROUTINE
 
 
-!!======================== WEIGHT EXTRACTING =========================
-
-!--------- weight for bare propagator ----------------
-Complex*16 FUNCTION weight_G0(typ, t)
-  implicit none
-  integer, intent(in)  :: typ, t  
-  double precision     :: tau
-  complex(kind=8)      :: muc  
-
-  muc = dcmplx(0.d0, Mu(1)*pi/(2.d0*Beta))
-  tau = real(t)*Beta/MxT
-  if(tau>=0) then
-    weight_G0 = cdexp(muc*tau)/(1.d0, 1.d0) 
-  else
-    weight_G0 = -cdexp(muc*(tau+Beta))/(1.d0, 1.d0) 
-  endif
-  return
-END FUNCTION weight_G0
-
-
-!!--------- calculate weight for bare interaction ----
-Complex*16 FUNCTION weight_W0(typ, dr)
-  implicit none
-  integer, intent(in) :: dr(2), typ
-  integer :: dx1, dy1
-
-  dx1 = dr(1);       dy1 = dr(2)
-  if(dx1>=0  .and. dx1<L(1) .and. dy1>=0 .and. dy1<L(2)) then
-    if(dx1>dL(1))     dx1 = L(1)-dx1
-    if(dy1>dL(2))     dy1 = L(2)-dy1
-
-    weight_W0 = (0.d0, 0.d0)
-
-    if((dx1==1.and.dy1==0).or.(dx1==0.and.dy1==1)) then
-      if(typ ==1 .or. typ == 2) then
-        weight_W0 = dcmplx(0.25d0*J1, 0.d0)
-      else if(typ == 3 .or. typ == 4) then
-        weight_W0 = dcmplx(-0.25d0*J1, 0.d0)
-      else if(typ == 5 .or. typ == 6) then
-        weight_W0 = dcmplx(0.5d0*J1, 0.d0)
-      endif
-    else if(dx1==1 .and. dy1==1) then
-      if(typ ==1 .or. typ == 2) then
-        weight_W0 = dcmplx(0.25d0*J2, 0.d0)
-      else if(typ == 3 .or. typ == 4) then
-        weight_W0 = dcmplx(-0.25d0*J2, 0.d0)
-      else if(typ == 5 .or. typ == 6) then
-        weight_W0 = dcmplx(0.5d0*J2, 0.d0)
-      endif
-    endif
-  else
-    call LogFile%QuickLog("Weight_W"+str(dx1)+str(dy1)+"dx, dy bigger than system size!")
-    stop
-  endif
-END FUNCTION weight_W0
-
-
-!!--------- calculate weight for bare Gamma ---------
-COMPLEX*16 FUNCTION weight_Gam0(typ, dr)
-  implicit none
-  integer, intent(in)  :: dr(2), typ
-  double precision :: ratio
-
-  weight_Gam0 = (0.d0, 0.d0)
-
-  if(dr(1)>=0 .and. dr(1)<L(1) .and. dr(2)>=0 .and. dr(2)<L(2)) then
-    if(dr(1)==0.and.dr(2)==0) then
-      if(typ==1 .or. typ==2 .or. typ==5 .or. typ==6) then
-        weight_Gam0 = (1.d0, 0.d0)
-      endif
-    endif
-  else
-    call logFile%QuickLog("Weight_Gam"//str(dr(1))//str(dr(2))//"dx, dy bigger than system size!")
-    stop
-  endif
-END FUNCTION weight_Gam0
-
-!!--------- extract weight for G ---------
-COMPLEX*16 FUNCTION weight_G(typ1, t1)
-  implicit none
-  integer, intent(in)  :: t1, typ1
-
-  if(t1>=0) then
-    weight_G = G(typ1, t1)
-  else
-    weight_G = -G(typ1, t1+MxT)
-  endif
-END FUNCTION weight_G
-
-!!--------- extract weight for W ---------
-COMPLEX*16 FUNCTION weight_W(typ1, dr, t1)
-  implicit none
-  integer, intent(in)  :: dr(2), t1, typ1
-
-  if(t1>=0) then
-    weight_W = W(typ1, dr(1), dr(2), t1)
-  else
-    weight_W = W(typ1, dr(1), dr(2), t1+MxT)
-  endif
-END FUNCTION weight_W
-
-!!--------- extract weight for Gamma ---------
-COMPLEX*16 FUNCTION weight_Gam(typ1, dr, t1, t2)
-  implicit none
-  integer, intent(in)  :: dr(2), t1, t2, typ1
-  double precision :: GaR
-
-  if(t1>=0 .and. t2>=0) then
-    weight_Gam = Gam(typ1, dr(1), dr(2), t1, t2)
-  else if(t1<0 .and. t2>=0) then
-    weight_Gam = -Gam(typ1, dr(1), dr(2), t1+MxT, t2)
-  else if(t1>=0 .and. t2<0) then
-    weight_Gam = -Gam(typ1, dr(1), dr(2), t1, t2+MxT)
-  else
-    weight_Gam = Gam(typ1, dr(1), dr(2), t1+MxT, t2+MxT)
-  endif
-END FUNCTION weight_Gam
-
-!!====================================================================
-
 
 
 SUBROUTINE Gam_mc2matrix_mc
   implicit none
   integer :: iorder, dx, dy, ityp, iloop, it1, it2, typ
   complex*16 :: cgam, normal
-  double precision :: rgam2, igam2, rerr, ierr, rpercenterr, ipercenterr
+  logical :: flag(MxOrder)
+  double precision :: totrerr, totierr
+  double precision :: rgam, igam, rgam2, igam2, rerr, ierr, rpercenterr, ipercenterr
 
   call initialize_Gam
 
   normal = GamNormWeight*Z_normal/GamNorm
 
-  do it2 = 0, MxT-1
-    do it1 = 0, MxT-1
-      do dy = 0, L(2)-1
-        do dx = 0, L(1)-1
-          do ityp = 1, NTypeGam/2
-            do iorder = 1, MCOrder
+  call LogFile%QuickLog("(ErrorRatio):"+str(ratioerr))
 
-              cgam = GamMC(iorder,ityp,dx,dy,it1,it2) /Z_normal
+  flag(:) = .true.
 
-              rgam2 = ReGamSqMC(iorder, ityp, dx, dy, it1, it2)/Z_normal
-              rerr = sqrt(abs(rgam2)-(real(cgam))**2.d0)/sqrt(Z_normal-1)
-              rerr = rerr* ratioerr
+  call LogFile%WriteStamp('i')
 
-              if(abs(real(cgam))<1.d-30) then
-                rpercenterr = 0.d0
-              else
-                rpercenterr = rerr/abs(real(cgam))
-              endif
-              if(rpercenterr>MxError)  cycle
+  looporder: do iorder = 1, MCOrder
+    totrerr = 0.d0
+    totierr = 0.d0
+    do it2 = 0, MxT-1
+      do it1 = 0, MxT-1
+        rgam = real(GamMC(iorder, 1, 0, 0, it1, it2))/Z_normal
+        rgam2 = ReGamSqMC(iorder, 1, 0, 0, it1, it2)/Z_normal
 
-              igam2 = ImGamSqMC(iorder,1, 0, 0, it1, it2)/Z_normal
-              ierr = sqrt(abs(igam2)-(dimag(cgam))**2.d0)/sqrt(Z_normal-1)
-              ierr = ierr* ratioerr
+        rerr = sqrt(abs(rgam2)-rgam**2.d0)/sqrt(Z_normal-1)
+        rerr = rerr* ratioerr
+        totrerr = totrerr + abs(rerr)
 
-              if(abs(dimag(cgam))<1.d-30) then
-                ipercenterr = 0.d0
-              else
-                ipercenterr = ierr/abs(dimag(cgam))
-              endif
-              if(ipercenterr>MxError)  cycle
+        igam = dimag(GamMC(iorder, 1, 0, 0, it1, it2))/Z_normal
+        igam2 = ImGamSqMC(iorder, 1, 0, 0, it1, it2)/Z_normal
 
-              typ = 2*(ityp-1)+1
-              Gam(typ,dx,dy,it1,it2) = Gam(typ,dx,dy,it1,it2)+ cgam*normal
+        ierr = sqrt(abs(igam2)-igam**2.d0)/sqrt(Z_normal-1)
+        ierr = ierr* ratioerr
+        totierr = totierr + abs(ierr)
+      enddo
+    enddo
+
+    rgam = SUM(abs(real(GamMC(iorder, 1,0,0,:,:))))/Z_normal
+    if(rgam<1.d-30) then
+      rpercenterr = 0.d0
+    else
+      rpercenterr = totrerr/rgam
+    endif
+
+    if(rpercenterr>MxError) then
+      flag(iorder)=.false.
+    endif
+
+    igam = SUM(abs(dimag(GamMC(iorder, 1,0,0,:,:))))/Z_normal
+    if(igam<1.d-30) then
+      ipercenterr = 0.d0
+    else
+      ipercenterr = totierr/igam
+    endif
+
+    if(ipercenterr>MxError) then
+      flag(iorder)=.false.
+    endif
+
+    call LogFile%WriteLine("Order "+str(iorder)+" relative error: "+str(rpercenterr,'(f6.3)')+","+str(ipercenterr,'(f6.3)')+", accept: "+str(flag(iorder)))
+
+    if(flag(iorder)) then
+      do it2 = 0, MxT-1
+        do it1 = 0, MxT-1
+          do dx = 0, L(1)-1
+            do dy = 0, L(2)-1
+              do ityp = 1, NTypeGam/2
+                cgam = GamMC(iorder,ityp,dx,dy,it1,it2)/Z_normal
+                typ = 2*(ityp-1)+1
+                Gam(typ,dx,dy,it1,it2) = Gam(typ,dx,dy,it1,it2)+ cgam*normal
+              enddo
             enddo
           enddo
         enddo
       enddo
-    enddo
-  enddo
+    endif
 
+  enddo looporder
   Gam(2,:,:,:,:) = Gam(1,:,:,:,:)
   Gam(4,:,:,:,:) = Gam(3,:,:,:,:)
   Gam(6,:,:,:,:) = Gam(5,:,:,:,:)
@@ -464,34 +392,3 @@ SUBROUTINE Gam_mc2matrix_mc
 END SUBROUTINE Gam_mc2matrix_mc
  
 
-
-
-!SUBROUTINE update_Gamma_matrix(norder)
-  !implicit none
-  !integer, intent(in) :: norder
-  !integer :: iorder, dx, dy, ityp, omega1, omega2, ib, jb
-  !double precision :: gam1, gam2, perr, norm, nmc
-  !double precision :: Ga0R, GaR1
-  !double precision :: tempGamMC(-MxOmegaGamG2:MxOmegaGamG2, -MxOmegaGamG2:MxOmegaGamG2)
-
-  !tempGamMC(:, :) = 0.d0
-
-
-  !if(norder==0) then
-    !call initialize_Gamma
-    !return
-  !endif
-
-  !norm = GamNormWeight*ime/GamNorm
-
-  !do ityp = 1, ntypGa
-    !do dx = 0, dL(1)
-      !do dy = 0, dL(2)
-
-
-      !enddo
-    !enddo
-  !enddo
-
-!END SUBROUTINE update_Gamma_matrix
-!====================================================================

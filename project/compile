@@ -9,10 +9,15 @@ target2="./collapse_data.exe"
 if [ -n "$1" ]
 then
   if [ $1 = "-g" ] || [ $1 = "g" ]; then
-      $compilor $sourcecode1 -o $target1 -g -no_pie
+      $compilor $sourcecode1 -o $target1 -g -no-pie
       $compilor $sourcecode2 -o $target2 -g -no_pie
       echo "Debug version done!"
-  #elif []
+  elif [ $1 = "-p" ] || [ $1 = "p" ]; then
+  #"loopprofileviewer.sh loop_prof_*.xml" to view profile
+ 
+      $compilor -profile-functions -profile-loops=all -profile-loops-report=2 $sourcecode1 -O3 -o $target1
+      $compilor $sourcecode2 -O3 -o $target2
+      echo "Profile version done!"
   else
       $compilor $sourcecode1 -O3 -o $target1
       $compilor $sourcecode2 -O3 -o $target2

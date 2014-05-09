@@ -1,6 +1,425 @@
 !============== BASIC PROCEDURES IN UPDATE ==========================
 
+!============== translate G,W,Gamma state ===========================
 
+logical FUNCTION is_mea_worm_near_G(stat)
+  implicit none
+  integer :: stat
+  if(stat==0)then
+    is_mea_worm_near_G=.false.
+  elseif(stat==1) then
+    is_mea_worm_near_G=.true.
+  else
+    call LogFile%WriteStamp('e')
+    call LogFile%WriteLine("The number of update: "+str(imc)+",imc: "+str(imc))
+    call LogFile%WriteLine("line status error!"+str(stat))
+    call print_config
+    stop
+  endif
+end FUNCTION
+
+logical FUNCTION is_mea_near_W(stat)
+  implicit none
+  integer :: stat
+  if(stat==1 .or. stat==3)then
+    is_mea_near_W=.true.
+  else
+    is_mea_near_W=.false.
+  endif
+end FUNCTION
+
+logical FUNCTION is_worm_near_W(stat)
+  implicit none
+  integer :: stat
+  if(stat==2)then
+    is_worm_near_W=.true.
+  else
+    is_worm_near_W=.false.
+  endif
+end FUNCTION
+
+logical FUNCTION is_mea_near_Gamma(stat)
+  implicit none
+  integer :: stat
+  if(stat==1 .or. stat==3)then
+    is_mea_near_Gamma=.true.
+  else
+    is_mea_near_Gamma=.false.
+  endif
+end FUNCTION
+
+logical FUNCTION is_worm_near_Gamma(stat)
+  implicit none
+  integer :: stat
+  if(stat==2)then
+    is_worm_near_Gamma=.true.
+  else
+    is_worm_near_Gamma=.false.
+  endif
+end FUNCTION
+
+!====================================================================
+!============================== WEIGHTS =============================
+!====================================================================
+
+!-------- the weight of a gline -------------------------
+! tau = tau2-tau1
+COMPLEX*16 FUNCTION weight_gline(stat, tau, typ)
+  implicit none
+  integer :: stat, typ
+  double precision :: tau
+  integer :: t, flag
+
+  t = Floor(tau*MxT/Beta)
+
+  if(stat == 0) then
+    weight_gline = weight_G(typ, t)
+  else if(stat == 1) then
+    !  Have measuring vertex around
+    weight_gline = weight_meas_G(t)
+  else
+    call LogFile%WriteStamp('e')
+    call LogFile%WriteLine("The number of update: "+str(iupdate))
+    call LogFile%WriteLine("line status error!"+str(stat))
+    call print_config
+    stop
+  endif
+
+  !---------------------- test1: fake function ------------------------------
+  !t = Floor(tau*MxT/Beta)
+
+  !flag = 0
+  !if(t<0) then
+    !tau = tau +Beta
+    !flag = 1
+  !endif
+
+  !if(stat == 0) then
+
+    !!weight_gline = cdexp(-(0.d0, 1.d0)*pi*tau/(2.d0*Beta))
+    !weight_gline = (1.d0, 0.d0)
+    !!weight_gline = dcmplx(Beta-tau, 0.d0)
+    !if(flag==1) then
+      !weight_gline = -1.d0*weight_gline
+    !endif
+
+  !else if(stat==1) then
+    !weight_gline = weight_meas_G(t)
+  !else
+    !call LogFile%WriteStamp('e')
+    !call LogFile%WriteLine("The number of update: "+str(iupdate))
+    !call LogFile%WriteLine("line status error!"+str(stat))
+    !stop
+
+  !endif
+
+  !---------------------- test2: uniform function -----------------------
+  !if(stat==0 .or. stat==1) then
+    !weight_gline = weight_meas_G(t)
+  !else
+    !call LogFile%WriteStamp('e')
+    !call LogFile%WriteLine("The number of update: "+str(iupdate))
+    !call LogFile%WriteLine("line status error!"+str(stat))
+    !stop
+  !endif
+  !------------------------ end -----------------------------------------
+
+  return
+END FUNCTION weight_gline
+
+
+
+!-------- the weight of a wline -------------------------
+
+! dx = x2-x1;  dy = y2- y1; tau = tau2-tau1
+COMPLEX*16 FUNCTION weight_wline(stat, isdelta, dr0, tau, typ)
+  implicit none
+  integer :: stat, isdelta, dx, dy, typ
+  integer :: dr0(2)
+  integer :: dr(2)
+  double precision :: tau
+  integer :: t
+
+  t = Floor(tau*MxT/Beta)
+  call diff_r(dr0, dr)
+
+  if(stat == 0) then
+    if(isdelta==0) weight_wline = weight_W(typ, dr, t)
+    if(isdelta==1) weight_wline = weight_W0(typ, dr)
+  else if(stat == 2) then
+    ! Have Ira or Masha around 
+    if(isdelta==0) weight_wline = weight_W(1, dr, t)
+    if(isdelta==1) weight_wline = weight_W0(1, dr)
+  else if(stat == 1 .or. stat==3) then
+    ! Have measuring vertex around
+    if(isdelta==0) weight_wline = weight_meas_W(dr, t)
+    if(isdelta==1) weight_wline = (0.d0, 0.d0)
+  else
+    call LogFile%WriteStamp('e')
+    call LogFile%WriteLine("The number of update: "+str(iupdate))
+    call LogFile%WriteLine("line status error!"+str(stat))
+    call print_config
+    stop
+  endif
+
+  !---------------------- test1: fake function ----------------------------
+  !if(stat >= 0 .and. stat<=3) then
+    !if(isdelta==0 .and. dr(1)==0 .and. dr(2)==0) then
+      !weight_wline = weight_meas_W(dr, t)
+    !else 
+      !weight_wline = (0.d0, 0.d0)
+    !endif
+
+    !!if(isdelta==0) weight_wline = weight_meas_W(dr, t)
+    !!if(isdelta==1) weight_wline = weight_meas_W(dr, 0)
+  !else
+      !call LogFile%WriteStamp('e')
+      !call LogFile%WriteLine("The number of update: "+str(iupdate))
+      !call LogFile%WriteLine("line status error!"+str(stat))
+      !stop
+  !endif
+
+  !---------------------- test2: uniform function ----------------------------
+  !if(stat >= 0 .and. stat<=3) then
+    !if(isdelta==0 .and. dr(1)==0 .and. dr(2)==0) then
+      !weight_wline = weight_meas_W(dr, t)
+    !else 
+      !weight_wline = (0.d0, 0.d0)
+    !endif
+
+  !else
+      !call LogFile%WriteStamp('e')
+      !call LogFile%WriteLine("The number of update: "+str(iupdate))
+      !call LogFile%WriteLine("line status error!"+str(stat))
+      !stop
+  !endif
+  !------------------------ end -----------------------------------------
+
+  return
+END FUNCTION weight_wline
+
+!-------- the weight of a vertex ------------------------
+ !dx = xg-xw;  dy = yg-yw; dtau1 = tau3-tau2; dtau2 = tau1-tau3
+
+COMPLEX*16 FUNCTION weight_vertex(stat, isdelta, dr0, dtau1, dtau2, typ)
+  implicit none
+  integer :: stat, dr(2), t1, t2, typ, isdelta
+  integer :: dr0(2), flag
+  double precision :: weight
+  double precision :: dtau1, dtau2
+
+  t1 = Floor(dtau1*MxT/Beta)
+  t2 = Floor(dtau2*MxT/Beta)
+
+  call diff_r(dr0, dr)
+
+  if(stat==0) then
+    if(IS_BOLD) then
+      !----------------- for bold Gamma ------------------------------
+      if(isdelta==0) weight_vertex = weight_Gam(typ, dr, t1, t2)
+      if(isdelta==1) weight_vertex = weight_Gam0(typ, dr)
+    else
+      !----------------- for bare Gamma ------------------------------
+      if(isdelta==0) weight_vertex = (0.d0, 0.d0)
+      if(isdelta==1) weight_vertex = weight_Gam0(typ, dr)
+    endif
+
+  else if(stat==2) then
+    if(IS_BOLD) then
+      !----------------- for bold Gamma ------------------------------
+      if(isdelta==0) weight_vertex = weight_Gam(typ, dr, t1, t2)
+      if(isdelta==1) weight_vertex = weight_Gam0(typ, dr)
+    else 
+      !----------------- for bare Gamma ------------------------------
+      if(isdelta==0) weight_vertex = (0.d0, 0.d0)
+      if(isdelta==1) weight_vertex = weight_Gam0(typ, dr)
+    endif
+
+  else if(stat==1 .or. stat==3) then
+    if(isdelta==0) weight_vertex = (0.d0, 0.d0)
+    if(isdelta==1) weight_vertex = weight_meas_Gam0(typ, dr)
+  else
+    call LogFile%WriteStamp('e')
+    call LogFile%WriteLine("The number of update: "+str(iupdate))
+    call LogFile%WriteLine("vertex status error!"+str(stat))
+    stop
+  endif
+
+  !---------------------- test1: fake function -----------------------------------
+  !flag = 0
+  !if(t1<0) then
+    !dtau1 = dtau1 + Beta
+    !flag = flag + 1
+  !endif
+  !if(t2<0) then
+    !dtau2 = dtau2 + Beta
+    !flag = flag + 1
+  !endif
+
+  !if(stat==0 .or. stat==2) then
+    !if(isdelta==1) weight_vertex = weight_meas_Gam0(typ, dr)
+    !if(isdelta==0) then
+      !weight_vertex = (0.d0, 0.d0)
+      !if(dr(1)==0 .and. dr(2)==0) then
+        !if(typ==1 .or. typ==2 .or. typ==5 .or. typ==6) then
+          !if(mod(flag, 2)==0) the
+            !weight_vertex = dcmplx(dtau1**2.d0+dtau2**2.d0+1.d0, 0.d0)
+            !!weight_vertex = (1.d0, 0.d0)
+          !else 
+            !weight_vertex = dcmplx(-1.d0*(dtau1**2.d0+dtau2**2.d0+1.d0), 0.d0)
+            !!weight_vertex = (-1.d0, 0.d0)
+          !endif
+        !endif
+      !endif
+    !endif
+
+  !else if(stat==1 .or. stat==3) then
+    !if(isdelta==1) weight_vertex = weight_meas_Gam0(typ, dr)
+    !if(isdelta==0) weight_vertex = (0.d0, 0.d0)
+
+  !else
+    !call LogFile%WriteStamp('e')
+    !call LogFile%WriteLine("The number of update: "+str(iupdate))
+    !call LogFile%WriteLine("vertex status error!"+str(stat))
+    !stop
+  !endif
+
+  !---------------------- test2: uniform function ---------------------
+  !if(stat>=0 .and. stat<=3) then
+    !if(isdelta==1) weight_vertex = weight_meas_Gam0(typ, dr)
+    !if(isdelta==0) weight_vertex = weight_meas_Gam0(1,   dr)
+
+  !else
+    !call LogFile%WriteStamp('e')
+    !call LogFile%WriteLine("The number of update: "+str(iupdate))
+    !call LogFile%WriteLine("vertex status error!"+str(stat))
+    !stop
+  !endif
+  !------------------------ end -----------------------------------------
+  return
+END FUNCTION weight_vertex
+
+
+!!======================== WEIGHT EXTRACTING =========================
+!! most basic interface to the matrix element
+
+!--------- weight for bare propagator ----------------
+Complex*16 FUNCTION weight_G0(typ, t)
+  implicit none
+  integer, intent(in)  :: typ, t  
+  double precision     :: tau
+  complex(kind=8)      :: muc  
+
+  muc = dcmplx(0.d0, Mu(1)*pi/(2.d0*Beta))
+  tau = real(t)*Beta/MxT
+  if(tau>=0) then
+    weight_G0 = cdexp(muc*tau)/(1.d0, 1.d0) 
+  else
+    weight_G0 = -cdexp(muc*(tau+Beta))/(1.d0, 1.d0) 
+  endif
+  return
+END FUNCTION weight_G0
+
+
+!!--------- calculate weight for bare interaction ----
+Complex*16 FUNCTION weight_W0(typ, dr)
+  implicit none
+  integer, intent(in) :: dr(2), typ
+  integer :: dx1, dy1
+
+  dx1 = dr(1);       dy1 = dr(2)
+  if(dx1>=0  .and. dx1<L(1) .and. dy1>=0 .and. dy1<L(2)) then
+    if(dx1>dL(1))     dx1 = L(1)-dx1
+    if(dy1>dL(2))     dy1 = L(2)-dy1
+
+    weight_W0 = (0.d0, 0.d0)
+
+    if((dx1==1.and.dy1==0).or.(dx1==0.and.dy1==1)) then
+      if(typ ==1 .or. typ == 2) then
+        weight_W0 = dcmplx(0.25d0*J1, 0.d0)
+      else if(typ == 3 .or. typ == 4) then
+        weight_W0 = dcmplx(-0.25d0*J1, 0.d0)
+      else if(typ == 5 .or. typ == 6) then
+        weight_W0 = dcmplx(0.5d0*J1, 0.d0)
+      endif
+    else if((dx1==1.and.dy1==1)) then
+      if(typ ==1 .or. typ == 2) then
+        weight_W0 = dcmplx(0.25d0*J2, 0.d0)
+      else if(typ == 3 .or. typ == 4) then
+        weight_W0 = dcmplx(-0.25d0*J2, 0.d0)
+      else if(typ == 5 .or. typ == 6) then
+        weight_W0 = dcmplx(0.5d0*J2, 0.d0)
+      endif
+    endif
+  else
+    call LogFile%QuickLog("Weight_W"+str(dx1)+str(dy1)+"dx, dy bigger than system size!")
+    stop
+  endif
+END FUNCTION weight_W0
+
+
+!!--------- calculate weight for bare Gamma ---------
+COMPLEX*16 FUNCTION weight_Gam0(typ, dr)
+  implicit none
+  integer, intent(in)  :: dr(2), typ
+  double precision :: ratio
+
+  weight_Gam0 = (0.d0, 0.d0)
+
+  if(dr(1)>=0 .and. dr(1)<L(1) .and. dr(2)>=0 .and. dr(2)<L(2)) then
+    if(dr(1)==0.and.dr(2)==0) then
+      if(typ==1 .or. typ==2 .or. typ==5 .or. typ==6) then
+        weight_Gam0 = (1.d0, 0.d0)
+      endif
+    endif
+  else
+    call logFile%QuickLog("Weight_Gam"//str(dr(1))//str(dr(2))//"dx, dy bigger than system size!")
+    stop
+  endif
+END FUNCTION weight_Gam0
+
+!!--------- extract weight for G ---------
+COMPLEX*16 FUNCTION weight_G(typ1, t1)
+  implicit none
+  integer, intent(in)  :: t1, typ1
+
+  if(t1>=0) then
+    weight_G = G(typ1, t1)
+  else
+    weight_G = -G(typ1, t1+MxT)
+  endif
+END FUNCTION weight_G
+
+!!--------- extract weight for W ---------
+COMPLEX*16 FUNCTION weight_W(typ1, dr, t1)
+  implicit none
+  integer, intent(in)  :: dr(2), t1, typ1
+
+  if(t1>=0) then
+    weight_W = W(typ1, dr(1), dr(2), t1)
+  else
+    weight_W = W(typ1, dr(1), dr(2), t1+MxT)
+  endif
+END FUNCTION weight_W
+
+!!--------- extract weight for Gamma ---------
+COMPLEX*16 FUNCTION weight_Gam(typ1, dr, t1, t2)
+  implicit none
+  integer, intent(in)  :: dr(2), t1, t2, typ1
+  double precision :: GaR
+
+  if(t1>=0 .and. t2>=0) then
+    weight_Gam = Gam(typ1, dr(1), dr(2), t1, t2)
+  else if(t1<0 .and. t2>=0) then
+    weight_Gam = -Gam(typ1, dr(1), dr(2), t1+MxT, t2)
+  else if(t1>=0 .and. t2<0) then
+    weight_Gam = -Gam(typ1, dr(1), dr(2), t1, t2+MxT)
+  else
+    weight_Gam = Gam(typ1, dr(1), dr(2), t1+MxT, t2+MxT)
+  endif
+END FUNCTION weight_Gam
+
+!!====================================================================
 !=====================================================================
 !==================FAKE WEIGHT FOR MEASURING AND WORM=================
 !=====================================================================
@@ -38,20 +457,36 @@ complex*16 FUNCTION weight_meas_W(dr, t1)
   return
 END FUNCTION weight_meas_W
 
-complex*16 FUNCTION weight_meas_Gam(ityp, dr, t1, t2)
-  implicit none
-  integer, intent(in)  :: dr(2), ityp, t1, t2
+!complex*16 FUNCTION weight_meas_Gam(ityp, dr, t1, t2)
+  !implicit none
+  !integer, intent(in)  :: dr(2), ityp, t1, t2
 
-  weight_meas_Gam = (0.d0, 0.d0)
-  if(dr(1)==0 .and. dr(2)==0) then
-    weight_meas_Gam = (1.d0, 0.d0)
-  endif
-  return
-END FUNCTION weight_meas_Gam
+  !weight_meas_Gam = (0.d0, 0.d0)
+  !if(dr(1)==0 .and. dr(2)==0) then
+    !weight_meas_Gam = (1.d0, 0.d0)
+  !endif
+  !return
+!END FUNCTION weight_meas_Gam
 
 complex*16 FUNCTION weight_meas_Gam0(ityp, dr)
   implicit none
   integer, intent(in)  :: dr(2), ityp
+
+  !----------------------------------------------------------------------------
+  !                       (out)
+  !                 (out) / b
+  !                   d /||
+  !                ====  ||
+  !                   c \||
+  !                  (in) \ a
+  !                       (in)
+  !----- type = 1:  a = up;   b = up;    c = up;   d = up  -------------------
+  !----- type = 2:  a = down; b = down;  c = down; d = down  -----------------
+  !----- type = 3:  a = up;   b = up;    c = down; d = down  -----------------
+  !----- type = 4:  a = down; b = down;  c = up;   d = up  -------------------
+  !----- type = 5:  a = up;   b = down;  c = up;   d = down  -------------------
+  !----- type = 6:  a = down; b = up;    c = down; d = up  -----------------
+  !----------------------------------------------------------------------------
 
   weight_meas_Gam0 = (0.d0, 0.d0)
   if(dr(1)==0 .and. dr(2)==0) then
@@ -255,72 +690,59 @@ END FUNCTION generate_vertex
 
 
 !!=======================================================================
-!!================= IRREDUCIBILITY CHECK ================================
+!!================= Hash Table operations     ===========================
 !!=======================================================================
 
 !-------- update G Hash table -----------------------------------
-SUBROUTINE update_Hash4G(oldk, newk)
+SUBROUTINE update_Hash4G(newk, GLn)
+  !the newk and oldk is alway about the same G,
+  !PLEASE MAKE SURE THAT!!!
+  !ALSO MAKE SURE Hash4G(newk)==0 BEFORE CALL THIS SUBROUTINE
   implicit none
-  integer, intent(in) :: oldk, newk
+  integer, intent(in) :: newk, GLn
+  integer :: oldk
+  oldk=kLn(GLn)
 
-  if(Hash4G(oldk)==1) then
-    Hash4G(oldk)=0
-  else
-    if(CheckG) then
+  if(HEAVY_DEBUG .and. CHECK_G) then
+    if(Hash4G(newk)/=0 .or. Hash4G(oldk)/=GLn) then
       call LogFile%WriteStamp('e')
       call LogFile%WriteLine("Oops, update_Hash4G found a bug!")
-      call LogFile%WriteLine("IsWormPresent:"+str(IsWormPresent)+", update number:"+str(iupdate))
-      call LogFile%WriteLine("G Hash table for old k"+str(oldk)+" is not 1!!"+str(Hash4G(oldk)))
+      call LogFile%WriteLine("IsWormPresent:"+str(IsWormPresent)+", update number:"+str(imc))
+      call LogFile%WriteLine("G Hash table for old k"+str(newk)+" is not 1!!"+str(Hash4G(newk)))
       call print_config
       stop
     endif
   endif
 
-  if(Hash4G(newk)==0) then
-    Hash4G(newk)=1
-  else
-    if(CheckG) then
-      call LogFile%WriteStamp('e')
-      call LogFile%WriteLine("Oops, update_Hash4G found a bug!")
-      call LogFile%WriteLine("IsWormPresent:"+str(IsWormPresent)+", update number:"+str(iupdate))
-      call LogFile%WriteLine("G Hash table for new k"+str(newk)+" is not 0!!"+str(Hash4G(newk)))
-      call print_config
-      stop
-    endif
-  endif
-
-  return
+  Hash4G(newk)=Hash4G(oldk)
+  Hash4G(oldk)=0
 END SUBROUTINE update_Hash4G
 
-SUBROUTINE add_Hash4G(newk)
+SUBROUTINE add_Hash4G(newk, GLn)
   implicit none
-  integer, intent(in) :: newk
-
-  if(Hash4G(newk)==0) then
-    Hash4G(newk)=1
-  else
-    if(CheckG) then
-      call LogFile%WriteStamp('e')
-      call LogFile%WriteLine("Oops, add_Hash4G found a bug!")
-      call LogFile%WriteLine("IsWormPresent:"+str(IsWormPresent)+", update number:"+str(iupdate))
-      call LogFile%WriteLine("G Hash table for new k"+str(newk)+" is not 0!!"+str(Hash4G(newk)))
-      call print_config
-      stop
-    endif
+  integer, intent(in) :: newk, GLn
+  !MAKE SURE Hash4G(newk)==0 BEFORE CALL THIS SUBROUTINE
+  if(HEAVY_DEBUG .and. CHECK_G .and. Hash4G(newk)/=0) then
+    call LogFile%WriteStamp('e')
+    call LogFile%WriteLine("Oops, add_Hash4G found a bug!")
+    call LogFile%WriteLine("IsWormPresent:"+str(IsWormPresent)+", update number:"+str(imc))
+    call LogFile%WriteLine("G Hash table for old k"+str(newk)+" is not 1!!"+str(Hash4G(newk)))
+    call print_config
+    stop
   endif
-  return
+  Hash4G(newk)=GLn
 END SUBROUTINE add_Hash4G
 
-SUBROUTINE delete_Hash4G(oldk)
+SUBROUTINE delete_Hash4G(oldk, GLn)
   implicit none
-  integer, intent(in) :: oldk
-  if(Hash4G(oldk)==1) then
+  integer, intent(in) :: oldk, GLn
+  if(Hash4G(oldk)==GLn) then
     Hash4G(oldk)=0
   else
-    if(CheckG) then
+    if(HEAVY_DEBUG .and. CHECK_G) then
       call LogFile%WriteStamp('e')
       call LogFile%WriteLine("Oops, delete_Hash4G found a bug!")
-      call LogFile%WriteLine("IsWormPresent:"+str(IsWormPresent)+", update number:"+str(iupdate))
+      call LogFile%WriteLine("IsWormPresent:"+str(IsWormPresent)+", update number:"+str(imc))
       call LogFile%WriteLine("G Hash table for old k"+str(oldk)+" is not 1!!"+str(Hash4G(oldk)))
       call print_config
       stop
@@ -331,241 +753,234 @@ END SUBROUTINE delete_Hash4G
 
 
 !-------- update W Hash table -----------------------------------
-SUBROUTINE update_Hash4W(oldk, newk)
+SUBROUTINE update_Hash4W(newk, WLn)
   implicit none
-  integer, intent(in) :: oldk, newk
+  integer, intent(in) :: newk, WLn
   integer :: aoldk, anewk
-  aoldk = abs(oldk)
+  !COME ON, MAKE SURE Hash4W(aoldk)==0 BEFORE YOU CALL IT
+  aoldk = abs(kLn(WLn))
   anewk = abs(newk)
-
-  if(Hash4W(aoldk)==1) then
-    Hash4W(aoldk)=0
-  else
-    if(CheckW) then
-      call LogFile%WriteStamp('e')
-      call LogFile%WriteLine("Oops, update_Hash4W found a bug!")
-      call LogFile%WriteLine("IsWormPresent:"+str(IsWormPresent)+", update number:"+str(iupdate))
-      call LogFile%WriteLine("W Hash table for old k"+str(aoldk)+" is not 1!!"+str(Hash4W(aoldk)))
-      call print_config
-      stop
-    endif
-  endif
-
-  if(Hash4W(anewk)==0) then
-    Hash4W(anewk)=1
-  else
-    if(CheckW) then
-      call LogFile%WriteStamp('e')
-      call LogFile%WriteLine("Oops, update_Hash4W found a bug!")
-      call LogFile%WriteLine("IsWormPresent:"+str(IsWormPresent)+", update number:"+str(iupdate))
-      call LogFile%WriteLine("W Hash table for new k"+str(anewk)+" is not 0!!"+str(Hash4W(anewk)))
-      call print_config
-      stop
-    endif
-  endif
+  Hash4W(anewk)=Hash4W(aoldk)
+  Hash4W(aoldk)=0
   return
 END SUBROUTINE update_Hash4W
 
-SUBROUTINE add_Hash4W(newk)
+SUBROUTINE add_Hash4W(newk, WLn)
   implicit none
-  integer, intent(in) :: newk
+  integer, intent(in) :: newk, WLn
   integer :: anewk
-
   anewk = abs(newk)
-
-  if(Hash4W(anewk)==0) then
-    Hash4W(anewk)=1
-  else
-    if(CheckW) then
-      call LogFile%WriteStamp('e')
-      call LogFile%WriteLine("Oops, add_Hash4W found a bug!")
-      call LogFile%WriteLine("IsWormPresent:"+str(IsWormPresent)+", update number:"+str(iupdate))
-      call LogFile%WriteLine("W Hash table for new k"+str(anewk)+" is not 0!!"+str(Hash4W(anewk)))
-      call print_config
-      stop
-    endif
-  endif
-  return
+  Hash4W(anewk)=WLn
 END SUBROUTINE add_Hash4W
 
-SUBROUTINE delete_Hash4W(oldk)
+SUBROUTINE delete_Hash4W(oldk, WLn)
   implicit none
-  integer, intent(in) :: oldk
+  integer, intent(in) :: oldk, WLn
   integer :: aoldk
 
   aoldk = abs(oldk)
 
-  if(Hash4W(aoldk)==1) then
-    Hash4W(aoldk)=0
-  else
-    if(CheckW) then
-      call LogFile%WriteStamp('e')
-      call LogFile%WriteLine("Oops, delete_Hash4W found a bug!")
-      call LogFile%WriteLine("IsWormPresent:"+str(IsWormPresent)+", update number:"+str(iupdate))
-      call LogFile%WriteLine("W Hash table for old k"+str(aoldk)+" is not 1!!"+str(Hash4W(aoldk)))
-      call print_config
-      stop
-    endif
-  endif
+  Hash4W(aoldk)=0
   return
 END SUBROUTINE delete_Hash4W
 
 
+!!=======================================================================
+!!================= IRREDUCIBILITY CHECK ================================
+!!=======================================================================
+!reducibility check strategy
+!for both worm and normal space, pick up two G lines and one W line, the following rule give the definition
+!of reducibility:
+!     |k_G1-kG2|==|k_W|
+!unless: G1, G2 and W are connect to the same Gamma and this Gamma is not Ira or Masha
+!You may refer check_conf.f90: check_irreducibility subroutine to find the implementation of the rule
 
 !--------- check the irreducibility for G -----------------------
-LOGICAL FUNCTION Is_reducible_G(GLn)
+LOGICAL FUNCTION Is_k_valid_for_G(k)
   implicit none
-  integer, intent(in) :: GLn
-  integer :: newk
-
-  Is_reducible_G = .false.
-  newk = kLn(GLn)
-
-  if(Is_k_valid(newk) .eqv. .false.) then
-    Is_reducible_G = .true.
-    return
+  integer,intent(in) :: k
+  if(CHECK_G .and. Hash4G(k)/=0) then
+    Is_k_valid_for_G=.false.
+  else
+    Is_k_valid_for_G=.true.
   endif
+END FUNCTION
+!--------- check the irreducibility for W -----------------------
 
-  if(CheckG) then
-    if(Hash4G(newk)==1) then
-      Is_reducible_G = .true.
-      return
-    else if(Hash4G(newk)/=0) then
-      call LogFile%WriteStamp('e')
-      call LogFile%WriteLine("Oops, Is_reducible_G found a bug!")
-      call LogFile%WriteLine("IsWormPresent:"+str(IsWormPresent)+", update number:"+str(iupdate))
-      call LogFile%WriteLine("G Hash table for new k"+str(newk)+" is not 0 or 1!!"+str(Hash4G(newk)))
-      call print_config
-      stop
-    endif
-  endif
-    
-  return
-END FUNCTION Is_reducible_G
-
-
-LOGICAL FUNCTION Is_reducible_G_Gam(GLn)
+LOGICAL FUNCTION Is_k_valid_for_W(k)
   implicit none
-  integer, intent(in) :: GLn
-  integer :: nG, Gam1, Gam2, W1, W2, nW
-  integer :: newk, kG 
-  integer :: i, nnk1, nnk2
+  integer,intent(in) :: k
+  integer :: ak
+  ak=abs(k)
+  if(CHECK_W .and. (ak==0 .or. Hash4W(ak)/=0)) then
+    Is_k_valid_for_W=.false.
+  else
+    Is_k_valid_for_W=.true.
+  endif
+END FUNCTION
+!-------------- check the ireeducibility of Gamma --------------
+LOGICAL FUNCTION Is_reducible_G_Gam_one_side(kG, kNeighG)
+  implicit none
+  integer, intent(in) :: kG, kNeighG
+  integer :: i, knG
 
-  Is_reducible_G_Gam = .false.
-  newk = kLn(GLn)
+  Is_reducible_G_Gam_one_side = .false.
+  if(.not. CHECK_GAM) return
 
-  Gam1 = NeighLn(1, GLn)
-  Gam2 = NeighLn(2, GLn)
-  W1 = NeighVertex(3, Gam1)
-  W2 = NeighVertex(3, Gam2)
-
-  if(CheckGam) then
-    do i = 1, NGLn
-      nG = GLnKey2Value(i)
-      kG = kLn(nG)
-      if(nG==GLn)   cycle             !! rule out the line itself
-      if(nG==NeighVertex(1, Gam1) .or. nG==NeighVertex(2, Gam2)) cycle
-      if(abs(add_k(newk,-kG))==abs(kLn(W1)) .or. &
-        & abs(add_k(newk,-kG))==abs(kLn(W2))) cycle !! rule out the neighbor wlines of newk
-      nnk1 = kLn(NeighVertex(3, NeighLn(1, nG)))
-      nnk2 = kLn(NeighVertex(3, NeighLn(2, nG)))
-      if(abs(add_k(newk, -kG))==abs(nnk1) .or. &
-        & abs(add_k(newk, -kG))==abs(nnk2)) cycle !! rule out the neighbor wlines of neighbor of newk
-
-      if(Hash4W(abs(add_k(newk,-kG)))==1) then
-        Is_reducible_G_Gam = .true.
+  do i = 1, NGLn
+    knG = kLn(GLnKey2Value(i))
+    if(knG/=kG .and. knG/=kNeighG) then
+      if(Hash4W(abs(add_k(knG, -kG)))/=0) then
+          Is_reducible_G_Gam_one_side = .true.
+          return
       endif
-    enddo
-  endif
-    
-  return
-END FUNCTION Is_reducible_G_Gam
-
-
-
-
-!--------- check the irreducibility for W -----------------------
-LOGICAL FUNCTION Is_reducible_W(WLn)
-  implicit none
-  integer, intent(in) :: WLn
-  integer :: absk 
-
-  absk = abs(kLn(WLn))
-  Is_reducible_W = .false.
-
-  if(Is_k_valid(absk) .eqv. .false. ) then
-    Is_reducible_W = .true.
-    return
-  endif
-
-  if(CheckW) then
-    if(absk==0) then
-      Is_reducible_W = .true.
-      return
     endif
-
-    if(Hash4W(absk)==1) then
-      Is_reducible_W = .true.
-      return
-    else if(Hash4W(absk)/=0) then
-      call LogFile%WriteStamp('e')
-      call LogFile%WriteLine("Oops, Is_reducible_W found a bug!")
-      call LogFile%WriteLine("IsWormPresent:"+str(IsWormPresent)+", update number:"+str(iupdate))
-      call LogFile%WriteLine("W Hash table for new k"+str(absk)+" is not 0 or 1!!"+str(Hash4W(absk)))
-      call print_config
-      stop
-    endif
-  endif
+  enddo
 
   return
-END FUNCTION Is_reducible_W
+END FUNCTION Is_reducible_G_Gam_one_side
 
-
-
-!--------- check the irreducibility for W -----------------------
-LOGICAL FUNCTION Is_reducible_W_Gam(WLn)
+LOGICAL FUNCTION Is_reducible_W_Gam(kW)
   implicit none
-  integer, intent(in) :: WLn
-  integer :: absk, i, Gam1, Gam2, G1, G2, G3, G4, kG5, kG6
-  integer :: nG, kG, pkGG, nkGG
+  integer, intent(in) :: kW
+  integer :: i, ktemp, kG
 
-  absk = abs(kLn(WLn))
   Is_reducible_W_Gam = .false.
-  Gam1 = NeighLn(1, WLn)
-  Gam2 = NeighLn(2, WLn)
-  G1 = NeighVertex(1, Gam1)
-  G2 = NeighVertex(2, Gam1)
-  G3 = NeighVertex(1, Gam2)
-  G4 = NeighVertex(2, Gam2)
+  if(.not. CHECK_GAM) return
 
-  if(CheckGam) then
-    do i = 1, NGLn
-      nG = GLnKey2Value(i)
-      kG5 = kLn(NeighVertex(1, NeighLn(1,nG)))
-      kG6 = kLn(NeighVertex(2, NeighLn(2,nG)))
-      kG = kLn(nG)
-      if(nG==G1 .or. nG==G2 .or. nG==G3 .or. nG==G4) cycle
-      pkGG = add_k(kG, absk)
-      nkGG = add_k(kG, -absk)
-      if(pkGG==kLn(G1) .or. pkGG==kLn(G2) .or. pkGG==kLn(G3) .or. pkGG==kLn(G4)) cycle
-      if(nkGG==kLn(G1) .or. nkGG==kLn(G2) .or. nkGG==kLn(G3) .or. nkGG==kLn(G4)) cycle
-      if(pkGG==kG5 .or. pkGG==kG6 .or. nkGG==kG5 .or. nkGG==kG6) cycle
+  do i = 1, NGLn
+    kG = kLn(GLnKey2Value(i))
+    ktemp = add_k(kG, kW)
+    if(Hash4G(ktemp)/=0) then
+      Is_reducible_W_Gam=.true.
+      return
+    endif
 
-      if(Hash4G(pkGG)==1 .or. Hash4G(nkGG)==1) then
-        Is_reducible_W_Gam = .true.
-      endif
-    enddo
-  endif
-  return
+    ktemp = add_k(kG, -kW)
+    if(Hash4G(ktemp)/=0) then
+      Is_reducible_W_Gam=.true.
+      return
+    endif
+  enddo
 END FUNCTION Is_reducible_W_Gam
 
+LOGICAL FUNCTION Is_reducible_W_Gam_one_side(kW, kG1, kG2)
+  implicit none
+  integer, intent(in) :: kW, kG1, kG2
+  integer :: i, ktemp, kG
+
+  Is_reducible_W_Gam_one_side = .false.
+  if(.not. CHECK_GAM) return
+
+  do i = 1, NGLn
+    kG = kLn(GLnKey2Value(i))
+    ktemp = add_k(kG, kW)
+    if((kG/=kG1 .or. ktemp/=kG2) .and. (kG/=kG2 .or. ktemp/=kG1)) then
+      if(Hash4G(ktemp)/=0) then
+        Is_reducible_W_Gam_one_side=.true.
+        return
+      endif
+    endif
+
+    ktemp = add_k(kG, -kW)
+    if((kG/=kG1 .or. ktemp/=kG2) .and. (kG/=kG2 .or. ktemp/=kG1)) then
+      if(Hash4G(ktemp)/=0) then
+        Is_reducible_W_Gam_one_side=.true.
+        return
+      endif
+    endif
+  enddo
+END FUNCTION Is_reducible_W_Gam_one_side
+
+
+LOGICAL FUNCTION Is_reducible_W_Gam_both_side(kW, kIA, kIC, kMB, kMD)
+  implicit none
+  integer,intent(in) :: kW, kIA, kMB, kIC, kMD
+  integer :: kG
+  integer :: ktemp
+
+  Is_reducible_W_Gam_both_side = .false.
+  if(.not. CHECK_GAM) return
+
+  do i = 1, NGLn
+    kG = kLn(GLnKey2Value(i))
+    ktemp = add_k(kG, kW)
+    !ktemp is G here
+    if((kG/=kIA .or. ktemp/=kIC) .and. (kG/=kIC .or. ktemp/=kIA) &
+      & .and. (kG/=kMB .or. ktemp/=kMD) .and. (kG/=kMD .or. ktemp/=kMB)) then
+      if(Hash4G(ktemp)/=0) then
+          Is_reducible_W_Gam_both_side=.true.
+          return
+      endif
+    endif
+
+    ktemp = add_k(kG, -kW)
+    !ktemp is G here
+    if((kG/=kIA .or. ktemp/=kIC) .and. (kG/=kIC .or. ktemp/=kIA) &
+      & .and. (kG/=kMB .or. ktemp/=kMD) .and. (kG/=kMD .or. ktemp/=kMB)) then
+      if(Hash4G(ktemp)/=0) then
+          Is_reducible_W_Gam_both_side=.true.
+          return
+      endif
+    endif
+  enddo 
+end FUNCTION
+
+!------------- check the irreducibility for add interaction operation --------------------
+
+LOGICAL FUNCTION Is_reducible_add_interaction(kW, kIA, kIC, kMB, kMD)
+  implicit none
+  integer,intent(in) :: kW, kIA, kMB, kIC, kMD
+  integer :: kG
+  integer :: ktemp
+
+  Is_reducible_add_interaction = .false.
+  if(.not. CHECK_GAM) return
+
+  do i = 1, NGLn
+    kG = kLn(GLnKey2Value(i))
+    !check the W which is the new interaction line added
+    ktemp = add_k(kG, kW)
+    !ktemp is G here
+    if((kG/=kIA .or. ktemp/=kIC) .and. (kG/=kIC .or. ktemp/=kIA) &
+      & .and. (kG/=kMB .or. ktemp/=kMD) .and. (kG/=kMD .or. ktemp/=kMB)) then
+      if(Hash4G(ktemp)/=0) then
+          Is_reducible_add_interaction=.true.
+          return
+      endif
+    endif
+
+    ktemp = add_k(kG, -kW)
+    !ktemp is G here
+    if((kG/=kIA .or. ktemp/=kIC) .and. (kG/=kIC .or. ktemp/=kIA) &
+      & .and. (kG/=kMB .or. ktemp/=kMD) .and. (kG/=kMD .or. ktemp/=kMB)) then
+      if(Hash4G(ktemp)/=0) then
+          Is_reducible_add_interaction=.true.
+          return
+      endif
+    endif
+
+    if(kG/=kIA .and. kG/=kIC) then
+    !check GIA
+      if(Hash4W(abs(add_k(kG, -kIA)))/=0) then
+        Is_reducible_add_interaction=.true.
+        return
+      endif
+    endif
+
+    if(kG/=kMB .and. kG/=kMD) then
+    !check GMB
+      if(Hash4W(abs(add_k(kG, -kMB)))/=0) then
+        Is_reducible_add_interaction=.true.
+        return
+      endif
+    endif
+  enddo
+END FUNCTION Is_reducible_add_interaction
+
 !!=======================================================================
 !!=======================================================================
 !!=======================================================================
-
-
-
-
 
 
 !!=======================================================================
@@ -587,7 +1002,7 @@ INTEGER FUNCTION add_ira_stat(stat)
     add_ira_stat = stat
   endif
   if(add_ira_stat>=4) then
-    call LogFile%QuickLog(str(iupdate)+" add_ira_stat(stat>3): "+str(add_ira_stat),'e')
+    call LogFile%QuickLog(str(imc)+" add_ira_stat(stat>3): "+str(add_ira_stat),'e')
     call print_config
     stop
   endif
@@ -606,7 +1021,7 @@ INTEGER FUNCTION delete_ira_stat(stat)
   if(delete_ira_stat == -2) delete_ira_stat = 0
   if(delete_ira_stat == -1) delete_ira_stat = 1
   if(delete_ira_stat<0) then
-    call LogFile%QuickLog(str(iupdate)+" del_ira_stat(stat<0): "+str(delete_ira_stat),'e')
+    call LogFile%QuickLog(str(imc)+" del_ira_stat(stat<0): "+str(delete_ira_stat),'e')
     call print_config
     stop
   endif
@@ -626,7 +1041,7 @@ INTEGER FUNCTION add_mea_stat(stat)
   if(add_mea_stat == 2)   add_mea_stat = 1
 
   if(add_mea_stat>=4) then
-    call LogFile%QuickLog(str(iupdate)+" add_mea(stat>3): "+str(add_mea_stat),'e')
+    call LogFile%QuickLog(str(imc)+" add_mea(stat>3): "+str(add_mea_stat),'e')
     call print_config
     stop
   endif
@@ -643,7 +1058,7 @@ INTEGER FUNCTION delete_mea_stat(stat)
   endif
   delete_mea_stat = stat - 1
   if(delete_mea_stat<0) then
-    call LogFile%QuickLog(str(iupdate)+"del_mea_stat(stat<0): "+str(delete_mea_stat),'e')
+    call LogFile%QuickLog(str(imc)+"del_mea_stat(stat<0): "+str(delete_mea_stat),'e')
     call print_config
     stop
   endif
@@ -696,6 +1111,32 @@ INTEGER FUNCTION gline_stat(stat1, stat2)
   return
 END FUNCTION gline_stat
 
+!------------- update a line  -------------------------------
+!mainly to add the new k to the hash table
+SUBROUTINE update_line(CurLine, k, knd)
+  implicit none
+  integer, intent(in) :: CurLine, k, knd
+
+  if(knd==1) then
+    call update_Hash4G(k, CurLine)
+  else
+    call update_Hash4W(k, CurLine)
+  endif
+  kLn(CurLine)=k
+end SUBROUTINE 
+
+SUBROUTINE undo_update_line(CurLine, k, knd)
+  implicit none
+  integer, intent(in) :: CurLine, k, knd
+  if(knd==1) then
+    call update_Hash4G(k, CurLine)
+  else
+    call update_Hash4W(k, CurLine)
+  endif
+  kLn(CurLine)=k
+end SUBROUTINE
+
+
 !------------- insert a line to the link -------------------
 SUBROUTINE insert_line(newline, isdelta, k, knd, typ, stat, weigh)
   implicit none
@@ -706,7 +1147,7 @@ SUBROUTINE insert_line(newline, isdelta, k, knd, typ, stat, weigh)
   newline = TailLn
   TailLn  = NextLn(TailLn)
   if(StatusLn(TailLn)>=0) then
-    call LogFile%QuickLog("update: "+str(iupdate)+", insert_line error!!!", 'e')
+    call LogFile%QuickLog("update: "+str(imc)+", insert_line error!!!", 'e')
     call print_config
     stop
   endif
@@ -721,10 +1162,12 @@ SUBROUTINE insert_line(newline, isdelta, k, knd, typ, stat, weigh)
     NGLn = NGLn + 1
     GLnKey2Value(NGLn) = newline
     LnValue2Key(newline) = NGLn
+    call add_Hash4G(k,newline)
   else
     NWLn = NWLn + 1
     WLnKey2Value(NWLn) = newline
     LnValue2Key(newline) = NWLn
+    call add_Hash4W(k,newline)
   endif
 
   kLn(newline) = k
@@ -742,15 +1185,12 @@ SUBROUTINE undo_insert_line(occline, knd)
   integer, intent(in) :: occline, knd
   integer :: tmp
 
+
   if(StatusLn(occline)==-1) then
-    call LogFile%QuickLog("update: "+str(iupdate)+" , undo_insert_line error!!!", 'e')
+    call LogFile%QuickLog("update: "+str(imc)+" , undo_insert_line error!!!", 'e')
     call print_config
     stop
   endif
-
-  NextLn(occline) = TailLn
-  StatusLn(occline) = -1
-  TailLn = occline
 
   if(knd==1) then
 
@@ -759,19 +1199,27 @@ SUBROUTINE undo_insert_line(occline, knd)
     GLnKey2Value(LnValue2Key(occline)) = tmp
     LnValue2Key(tmp) = LnValue2Key(occline)
     NGLn = NGLn -1
+    call delete_Hash4G(kLn(occline),occline)
   else
-
     tmp = WLnKey2Value(NWLn)
     WLnKey2Value(NWLn) = 0
     WLnKey2Value(LnValue2Key(occline)) = tmp
     LnValue2Key(tmp) = LnValue2Key(occline)
     NWLn = NWLn -1
+    call delete_Hash4W(kLn(occline),occline)
   endif
+
+  NextLn(occline) = TailLn
+  StatusLn(occline) = -1
+  TailLn = occline
+
 
   if(TailLn == -1) then
     call LogFile%QuickLog("undo_insert_line error! tail=-1!", 'e')
     stop
   endif
+
+
   return
 END SUBROUTINE undo_insert_line
 
@@ -787,7 +1235,7 @@ SUBROUTINE insert_gamma(newgamma, isdelta, gx, gy, wx, wy, t1, t2, t3, dir, typ,
   newgamma = TailVertex
   TailVertex = NextVertex(TailVertex)
   if(StatusVertex(TailVertex)>=0) then
-    call LogFile%QuickLog("update: "+str(iupdate)+" , insert_gamma error!!!", 'e')
+    call LogFile%QuickLog("update: "+str(imc)+" , insert_gamma error!!!", 'e')
     call print_config
     stop
   endif
@@ -827,13 +1275,13 @@ SUBROUTINE delete_line(occline, knd)
 
   
   if(knd==1) then
-    !call delete_Hash4G(kLn(occline))
+    call delete_Hash4G(kLn(occline), occline)
   else
-    call delete_Hash4W(kLn(occline))
+    call delete_Hash4W(kLn(occline), occline)
   endif
 
   if(StatusLn(occline)==-1) then
-    call LogFile%QuickLog("update: "+str(iupdate)+" , delete_gamma error!!!", 'e')
+    call LogFile%QuickLog("update: "+str(imc)+" , delete_gamma error!!!", 'e')
     call print_config
     stop
   endif
@@ -866,12 +1314,12 @@ SUBROUTINE delete_line(occline, knd)
 END SUBROUTINE delete_line
 
 !------------- insert a gamma to the link -------------------
-SUBROUTINE undo_delete_line(newline, knd, stat)
+SUBROUTINE undo_delete_line(newline, knd, stat, k)
   implicit none
-  integer, intent(in) :: newline, knd, stat
+  integer, intent(in) :: newline, knd, stat, k
 
   if(TailLn/=newline)    then
-    call LogFile%QuickLog("update: "+str(iupdate)+"  ,undo_delete_line error!!!", 'e')
+    call LogFile%QuickLog("update: "+str(imc)+"  ,undo_delete_line error!!!", 'e')
     call print_config
     stop
   endif
@@ -887,12 +1335,12 @@ SUBROUTINE undo_delete_line(newline, knd, stat)
     NGLn = NGLn + 1
     GLnKey2Value(NGLn) = newline
     LnValue2Key(newline) = NGLn
-    !call add_Hash4G(kLn(newline))
+    call add_Hash4G(k, newline)
   else
     NWLn = NWLn + 1
     WLnKey2Value(NWLn) = newline
     LnValue2Key(newline) = NWLn
-    call add_Hash4W(kLn(newline))
+    call add_Hash4W(k, newline)
   endif
   return
 END SUBROUTINE undo_delete_line
@@ -905,7 +1353,7 @@ SUBROUTINE delete_gamma(occgamma)
   integer :: tmp
 
   if(StatusVertex(occgamma)==-1) then
-    call LogFile%QuickLog("update: "+str(iupdate)+" , delete_gamma error!!!", 'e')
+    call LogFile%QuickLog("update: "+str(imc)+" , delete_gamma error!!!", 'e')
     call print_config
     stop
   endif
@@ -932,7 +1380,7 @@ SUBROUTINE undo_delete_gamma(newgamma)
   integer, intent(in) :: newgamma
 
   if(TailVertex/=newgamma)    then
-    call LogFile%QuickLog("update: "+str(iupdate)+" , undo_delete_gamma error!!!", 'e')
+    call LogFile%QuickLog("update: "+str(imc)+" , undo_delete_gamma error!!!", 'e')
     stop
   endif
   StatusVertex(newgamma) = 0
@@ -954,434 +1402,6 @@ END SUBROUTINE undo_delete_gamma
 !!=======================================================================
 
 
-
-
-
-!!============== GRAM-SCHMIDT BASIS ==================================
-
-!!-------------- generate the Gram-Schmidt basis --------------
-!SUBROUTINE calculate_basis(nbasis, OmegaMin, OmegaMax, EP, EN)
-  !implicit none
-  !integer, intent(in):: nbasis, OmegaMin, OmegaMax
-  !double precision :: EP(nbasis, nbasis), EN(nbasis, nbasis)
-  !double precision :: VP(nbasis, nbasis), VN(nbasis, nbasis)
-  !double precision :: norm
-  !integer :: i, j, k
-
-  !EP(:,:) = 0.d0
-  !EN(:,:) = 0.d0
-  !VP(:,:) = 0.d0
-  !VN(:,:) = 0.d0
-
-  !do i = 1, nbasis
-    !VP(i, i) = 1.d0
-    !EP(i, :) = VP(i, :)
-
-    !do j = 1, i-1
-      !do k = 1, j
-        !EP(i, k) = EP(i, k) - EP(j, k) *projector(EP(j,:), VP(i, :), OmegaMin, OmegaMax)
-      !enddo
-    !enddo
-
-    !norm = dsqrt(projector(EP(i,:), EP(i,:), OmegaMin, OmegaMax))
-    !EP(i, :) = EP(i, :)/norm
-  !enddo
-
-  !do i = 1, nbasis
-    !VN(i, i) = 1.d0
-    !EN(i, :) = VN(i, :)
-
-    !do k = 1, j
-      !do j = 1, i-1
-        !EN(i, k) = EN(i, k) - EN(j, k) *projector(EN(j,:), VN(i, :), -OmegaMax, -OmegaMin)
-      !enddo
-    !enddo
-    !norm = dsqrt(projector(EN(i,:), EN(i,:), -OmegaMax, -OmegaMin))
-    !EN(i, :) = EN(i, :)/norm
-  !enddo
-
-!END SUBROUTINE calculate_basis
-
-
-
-!SUBROUTINE calculate_Gamma_basis(nbasisGamma, OmegaMin, OmegaMax, EPN, ENP, &
-  !&  EPPR, ENNR, EPPL, ENNL)
-  !implicit none
-  !integer, intent(in):: nbasisGamma, OmegaMin, OmegaMax
-  !double precision :: ENP(nbasisGamma, nbasisGamma),  EPN(nbasisGamma, nbasisGamma)
-  !double precision :: EPPR(nbasisGamma, nbasisGamma), ENNR(nbasisGamma, nbasisGamma)
-  !double precision :: EPPL(nbasisGamma, nbasisGamma), ENNL(nbasisGamma, nbasisGamma)
-  !double precision :: VNP(nbasisGamma, nbasisGamma),  VPN(nbasisGamma, nbasisGamma)
-  !double precision :: VPPR(nbasisGamma, nbasisGamma), VNNR(nbasisGamma, nbasisGamma)
-  !double precision :: VPPL(nbasisGamma, nbasisGamma), VNNL(nbasisGamma, nbasisGamma)
-  !double precision :: norm
-  !integer :: i, j, k
-  !VPN(:,:) = 0.d0
-  !VNP(:,:) = 0.d0
-  !VPPR(:,:) = 0.d0
-  !VNNR(:,:) = 0.d0
-  !VPPL(:,:) = 0.d0
-  !VNNL(:,:) = 0.d0
-
-  !EPN(:,:) = 0.d0
-  !ENP(:,:) = 0.d0
-  !EPPR(:,:) = 0.d0
-  !ENNR(:,:) = 0.d0
-  !EPPL(:,:) = 0.d0
-  !ENNL(:,:) = 0.d0
-
-  !do i = 1, nbasisGamma
-    !VPN(i, i) = 1.d0
-    !EPN(i, :) = VPN(i, :)
-
-    !do j = 1, i-1
-      !do k = 1, j
-        !EPN(i, k) = EPN(i, k) - EPN(j, k) *projector_Gamma(EPN(j,:), VPN(i, :), OmegaMin, OmegaMax, &
-          !& -OmegaMax, -OmegaMin)
-      !enddo
-    !enddo
-
-    !norm = dsqrt(projector_Gamma(EPN(i, :), EPN(i,:), OmegaMin, OmegaMax, &
-      !& -OmegaMax, -OmegaMin))
-    !EPN(i, :) = EPN(i, :)/norm 
-  !enddo
-
-  !do i = 1, nbasisGamma
-    !VNP(i, i) = 1.d0
-    !ENP(i, :) = VNP(i, :)
-
-    !do j = 1, i-1
-      !do k = 1, j
-        !ENP(i, k) = ENP(i, k) - ENP(j, k) *projector_Gamma(ENP(j,:), VNP(i, :), -OmegaMax, -OmegaMin, &
-          !& OmegaMin, OmegaMax)
-      !enddo
-    !enddo
-
-    !norm = dsqrt(projector_Gamma(ENP(i, :), ENP(i,:), -OmegaMax, -OmegaMin, &
-      !& OmegaMin, OmegaMax))
-    !ENP(i, :) =  ENP(i, :)/norm
-  !enddo
-
-  !do i = 1, nbasisGamma
-    !VPPR(i, i) = 1.d0
-    !EPPR(i, :) = VPPR(i, :)
-
-    !do j = 1, i-1
-      !do k = 1, j
-        !EPPR(i, k) = EPPR(i, k) - EPPR(j, k) *projector_Gamma(EPPR(j,:), VPPR(i, :), OmegaMin, OmegaMax, &
-          !& OmegaMin, 0)
-      !enddo
-    !enddo
-
-    !norm = dsqrt(projector_Gamma(EPPR(i, :), EPPR(i,:), OmegaMin, OmegaMax, &
-      !& OmegaMin, 0))
-    !EPPR(i, :) = EPPR(i, :)/norm 
-  !enddo
-
-  !do i = 1, nbasisGamma
-    !VPPL(i, i) = 1.d0
-    !EPPL(i, :) = VPPL(i, :)
-
-    !do j = 1, i-1
-      !do k = 1, j
-        !EPPL(i, k) = EPPL(i, k) - EPPL(j, k) *projector_Gamma(EPPL(j,:), VPPL(i, :), OmegaMin, OmegaMax, &
-          !& 0, OmegaMax)
-      !enddo
-    !enddo
-
-    !norm = dsqrt(projector_Gamma(EPPL(i, :), EPPL(i,:), OmegaMin, OmegaMax, &
-      !& 0, OmegaMax))
-    !EPPL(i, :) = EPPL(i, :)/norm 
-  !enddo
-
-  !do i = 1, nbasisGamma
-    !VNNR(i, i) = 1.d0
-    !ENNR(i, :) = VNNR(i, :)
-
-    !do j = 1, i-1
-      !do k = 1, j
-        !ENNR(i, k) = ENNR(i, k) - ENNR(j, k) *projector_Gamma(ENNR(j,:), VNNR(i, :), -OmegaMax, -OmegaMin, &
-          !& -OmegaMax, 0)
-      !enddo
-    !enddo
-
-    !norm = dsqrt(projector_Gamma(ENNR(i, :), ENNR(i,:), -OmegaMax, -OmegaMin, &
-      !& -OmegaMax, 0))
-    !ENNR(i, :) = ENNR(i, :)/norm
-  !enddo
-
-  !do i = 1, nbasisGamma
-    !VNNL(i, i) = 1.d0
-    !ENNL(i, :) = VNNL(i, :)
-
-    !do j = 1, i-1
-      !do k = 1, j
-        !ENNL(i, k) = ENNL(i, k) - ENNL(j, k) *projector_Gamma(ENNL(j,:), VNNL(i, :), -OmegaMax, -OmegaMin, &
-          !& 0, -OmegaMin)
-      !enddo
-    !enddo
-
-    !norm = dsqrt(projector_Gamma(ENNL(i, :), ENNL(i,:), -OmegaMax, -OmegaMin, &
-      !& 0, -OmegaMin))
-    !ENNL(i, :) = ENNL(i, :)/norm
-  !enddo
-  !return
-!END SUBROUTINE calculate_Gamma_basis
-
-
-
-
-!!---------- weight calculate f(omega) ------------------
-!DOUBLE PRECISION FUNCTION weight_basis(Coef, n)
-  !implicit none
-  !double precision :: Coef(nbasis)
-  !integer :: j, n
-  !weight_basis = 0.d0
-  !do j = 1, nbasis
-    !weight_basis = weight_basis + Coef(j)*OriginalBasis(j, n)
-  !enddo
-  !return 
-!END FUNCTION weight_basis
-
-
-!!---------- projector: \int_{omega} f1(omega)*f2(omega)  --------
-!DOUBLE PRECISION FUNCTION projector(Coef1, Coef2, OmegaMin, OmegaMax)
-  !implicit none
-  !double precision :: Coef1(nbasis), Coef2(nbasis)
-  !integer :: j, k, n, OmegaMin, OmegaMax
-
-  !projector  = 0.d0
-  !do j = 1, nbasis 
-    !do k = 1, nbasis
-      !do n = OmegaMin, OmegaMax
-        !projector = projector + Coef1(j)*OriginalBasis(j, n)*Coef2(k)*OriginalBasis(k, n)
-      !enddo
-    !enddo
-  !enddo
-  !return 
-!END FUNCTION projector
-
-
-
-!!---------- weight calculate f(omega) ------------------
-!DOUBLE PRECISION FUNCTION weight_basis_Gamma(Coef, n1, n2)
-  !implicit none
-  !double precision :: Coef(nbasisGamma)
-  !integer :: j, n1, n2
-  !weight_basis_Gamma = 0.d0
-  !do j = 1, nbasisGamma
-    !weight_basis_Gamma = weight_basis_Gamma+Coef(j)*OriginalBasisGamma(j, n1, n2)
-  !enddo
-  !return 
-!END FUNCTION weight_basis_Gamma
-
-
-!!---------- projector: \int_{omega1, omega2} f1(omega1,omega2)*f2(omega1,omega2)  --------
-!DOUBLE PRECISION FUNCTION projector_Gamma(Coef1, Coef2, OmegaMin1, OmegaMax1, OmegaMin2, OmegaMax2)
-  !implicit none
-  !double precision :: Coef1(nbasisGamma), Coef2(nbasisGamma)
-  !integer :: j, k, n1, n2, OmegaMin1, OmegaMax1, OmegaMin2, OmegaMax2
-
-  !projector_Gamma  = 0.d0
-
-  !do j = 1, nbasisGamma
-    !do k = 1, nbasisGamma
-      !do n1 = OmegaMin1, OmegaMax1
-        !if(OmegaMin2==0) then
-          !if(n1<OmegaMax1) then
-            !do n2 = n1+1, OmegaMax1
-              !projector_Gamma = projector_Gamma + Coef1(j)*OriginalBasisGamma(j, n1, n2)*Coef2(k)* &
-                !& OriginalBasisGamma(k, n1, n2)*ReweightBasis(n1, n2)
-            !enddo
-          !endif
-        !else if(OmegaMax2==0) then
-          !if(n1>OmegaMin1) then
-            !do n2 = OmegaMin2, n1-1
-              !projector_Gamma = projector_Gamma + Coef1(j)*OriginalBasisGamma(j, n1, n2)*Coef2(k)* &
-                !& OriginalBasisGamma(k, n1, n2)*ReweightBasis(n1, n2)
-            !enddo
-          !endif
-        !else
-          !do n2 = OmegaMin2, OmegaMax2
-            !projector_Gamma = projector_Gamma + Coef1(j)*OriginalBasisGamma(j, n1, n2)*Coef2(k)* &
-              !& OriginalBasisGamma(k, n1, n2)*ReweightBasis(n1, n2)
-          !enddo
-        !endif
-      !enddo
-    !enddo
-  !enddo
-  !return 
-!END FUNCTION projector_Gamma
-
-
-
-
-!!--------- test subroutine for the Gram-Schmidt basis ------
-!SUBROUTINE test_basis(nbasis, OmegaMin, OmegaMax, CoefP, CoefN)
-  !implicit none
-  !integer, intent(in) :: nbasis, OmegaMin, OmegaMax
-  !double precision :: CoefP(nbasis, nbasis), CoefN(nbasis, nbasis)
-  !integer :: i, j, k, l, n
-  !double precision :: omega, x, y
-
-  !do i = 1, nbasis
-
-    !y = 0.d0
-    !do  n = OmegaMin, OmegaMax
-      !y = y + weight_basis(CoefP(i,:), n)**2.d0
-    !enddo
-    !if(dabs(y-1.d0)>1.d-10) then
-      !write(logstr, *) i, y, "Positive Basis error!!"
-      !call write_log
-    !endif
-
-    !y = 0.d0
-    !do  n = -OmegaMax, -OmegaMin
-      !y = y + weight_basis(CoefN(i,:), n)**2.d0
-    !enddo
-    !if(dabs(y-1.d0)>1.d-10) then
-      !write(logstr, *) i, y, "Negative Basis error!!"
-      !call write_log
-    !endif
-  !enddo
-
-  !do i = 1, nbasis
-    !do j = i+1, nbasis
-      !y = projector(CoefP(i, :), CoefP(j, :), OmegaMin, OmegaMax)
-      !if(dabs(y)>1.d-10) then
-        !write(logstr, *) i, j, y, "Positive Basis error!!"
-        !call write_log
-      !endif
-      !y = projector(CoefN(i, :), CoefN(j, :), -OmegaMax, -OmegaMin)
-      !if(dabs(y)>1.d-10) then
-        !write(logstr, *) i, j, y, "Negative Basis error!!"
-        !call write_log
-      !endif
-    !enddo
-  !enddo
-
-!END SUBROUTINE test_basis
-
-
-
-
-!!--------- test subroutine for the Gram-Schmidt basis ------
-!SUBROUTINE test_basis_Gamma(nbasisGamma, OmegaMin, OmegaMax, EPN, ENP, &
-    !& EPPR, ENNR, EPPL, ENNL)
-  !implicit none
-  !integer, intent(in) :: nbasisGamma, OmegaMin, OmegaMax
-  !double precision :: ENP(nbasisGamma, nbasisGamma), EPN(nbasisGamma,nbasisGamma)
-  !double precision :: EPPR(nbasisGamma, nbasisGamma),ENNR(nbasisGamma,nbasisGamma)
-  !double precision :: EPPL(nbasisGamma, nbasisGamma),ENNL(nbasisGamma,nbasisGamma)
-  !integer :: i, j, k, l, n1, n2
-  !double precision :: omega, x, y
-
-  !do i = 1, nbasisGamma
-    !y = 0.d0
-    !do  n1 = OmegaMin+1, OmegaMax
-      !do n2 = OmegaMin, n1-1
-        !y = y + weight_basis_Gamma(EPPR(i,:), n1, n2)**2.d0*ReweightBasis(n1, n2)
-      !enddo
-    !enddo
-    !if(dabs(y-1.d0)>1.d-8) then
-      !write(logstr, *) i, y-1.d0, "++R Gamma Basis error!!"
-      !call write_log
-    !endif
-
-    !y = 0.d0
-    !do  n1 = OmegaMin, OmegaMax-1
-      !do n2 = n1+1, OmegaMax
-        !y = y + weight_basis_Gamma(EPPL(i,:), n1, n2)**2.d0*ReweightBasis(n1, n2)
-      !enddo
-    !enddo
-    !if(dabs(y-1.d0)>1.d-8) then
-      !write(logstr, *) i, y-1.d0, "++L Gamma Basis error!!"
-      !call write_log
-    !endif
-
-    !y = 0.d0
-    !do  n1 = OmegaMin, OmegaMax
-      !do n2 = -OmegaMax, -OmegaMin
-        !y = y + weight_basis_Gamma(EPN(i,:), n1, n2)**2.d0*ReweightBasis(n1, n2)
-      !enddo
-    !enddo
-    !if(dabs(y-1.d0)>1.d-8) then
-      !write(logstr, *) i, y-1.d0, "+- Gamma Basis error!!"
-      !call write_log
-    !endif
-
-    !y = 0.d0
-    !do  n1 = -OmegaMax, -OmegaMin
-      !do n2 = OmegaMin, OmegaMax
-        !y = y + weight_basis_Gamma(ENP(i,:), n1, n2)**2.d0*ReweightBasis(n1, n2)
-      !enddo
-    !enddo
-    !if(dabs(y-1.d0)>1.d-8) then
-      !write(logstr, *) i, y-1.d0, "-+ Gamma Basis error!!"
-      !call write_log
-    !endif
-
-    !y = 0.d0
-    !do  n1 = -OmegaMax+1, -OmegaMin
-      !do n2 = -OmegaMax, n1-1
-        !y = y + weight_basis_Gamma(ENNR(i,:), n1, n2)**2.d0*ReweightBasis(n1, n2)
-      !enddo
-    !enddo
-    !if(dabs(y-1.d0)>1.d-8) then
-      !write(logstr, *) i, y-1.d0, "--R Gamma Basis error!!"
-      !call write_log
-    !endif
-
-    !y = 0.d0
-    !do  n1 = -OmegaMax, -OmegaMin-1
-      !do n2 = n1+1, -OmegaMin
-        !y = y + weight_basis_Gamma(ENNL(i,:), n1, n2)**2.d0*ReweightBasis(n1, n2)
-      !enddo
-    !enddo
-    !if(dabs(y-1.d0)>1.d-8) then
-      !write(logstr, *) i, y-1.d0, "--L Gamma Basis error!!"
-      !call write_log
-    !endif
-  !enddo
-
-
-  !do i = 1, nbasisGamma
-    !do j = i+1, nbasisGamma
-      !y = projector_Gamma(EPN(i, :), EPN(j, :), OmegaMin, OmegaMax,-OmegaMax,-OmegaMin)
-      !if(dabs(y)>1.d-8) then
-        !write(logstr, *) i, j, y, "+- Gamma Basis error!!"
-        !call write_log
-      !endif
-      !y = projector_Gamma(ENP(i, :), ENP(j, :),-OmegaMax,-OmegaMin, OmegaMin, OmegaMax)
-      !if(dabs(y)>1.d-8) then
-        !write(logstr, *) i, j, y, "-+ Gamma Basis error!!"
-        !call write_log
-      !endif
-      !y = projector_Gamma(EPPR(i, :), EPPR(j, :), OmegaMin, OmegaMax, OmegaMin, 0)
-      !if(dabs(y)>1.d-7) then
-        !write(logstr, *) i, j, y, "++R Gamma Basis error!!"
-        !call write_log
-      !endif
-      !y = projector_Gamma(EPPL(i, :), EPPL(j, :), OmegaMin, OmegaMax, 0, OmegaMax)
-      !if(dabs(y)>1.d-7) then
-        !write(logstr, *) i, j, y, "++L Gamma Basis error!!"
-        !call write_log
-      !endif
-      !y = projector_Gamma(ENNR(i, :), ENNR(j, :),-OmegaMax,-OmegaMin,-OmegaMax, 0)
-      !if(dabs(y)>1.d-7) then
-        !write(logstr, *) i, j, y, "--R Gamma Basis error!!"
-        !call write_log
-      !endif
-      !y = projector_Gamma(ENNL(i, :), ENNL(j, :),-OmegaMax,-OmegaMin, 0, -OmegaMin)
-      !if(dabs(y)>1.d-7) then
-        !write(logstr, *) i, j, y, "--L Gamma Basis error!!"
-        !call write_log
-      !endif
-    !enddo
-  !enddo
-
-!END SUBROUTINE test_basis_Gamma
-!====================================================================
 
 !======================= Complex Operations =============================
 COMPLEX*16 FUNCTION d_times_cd(nd, ncd)
@@ -2091,17 +2111,22 @@ SUBROUTINE first_order_diagram
 
   ! the momentum on line 1, 2, and 3
   kLn(1) = 100
-  Hash4G(kLn(1)) = 1
+  call add_Hash4G(kLn(1),1)
   kLn(2) = 32
-  Hash4G(kLn(2)) = 1
+  call add_Hash4G(kLn(2),2)
+
   kLn(3) = add_k(kLn(2), -kLn(1))
-  Hash4W(abs(kLn(3))) = 1
+  call add_Hash4W(kLn(3),3)
+
   kLn(4) = 23
-  Hash4G(kLn(4)) = 1
+  call add_Hash4G(kLn(4),4)
+
+
   kLn(5) = add_k(kLn(3), kLn(4))
-  Hash4G(kLn(5)) = 1
+  call add_Hash4G(kLn(5),5)
+
   kLn(6) = add_k(kLn(1), -kLn(4))
-  Hash4W(abs(kLn(6))) = 1
+  call add_Hash4W(kLn(6),6)
 
 
   ! NeighLn(i, j): the ith neighbor gamma of line j
@@ -2242,18 +2267,19 @@ SUBROUTINE first_order_diagram_with_bubble
 
 
   ! the momentum on line 1, 2, and 3
-  kLn(1) = 100
-  Hash4G(kLn(1)) = 1
-  kLn(2) = 32
-  Hash4G(kLn(2)) = 1
-  kLn(3) = add_k(kLn(1), -kLn(1))
-  Hash4W(abs(kLn(3))) = 1
-  kLn(4) = 23
-  Hash4G(kLn(4)) = 1
-  kLn(5) = add_k(kLn(4), kLn(3))
-  Hash4G(kLn(5)) = 1
-  kLn(6) = add_k(kLn(4), -kLn(2))
-  Hash4W(abs(kLn(6))) = 1
+  !TODO: UPDATE THE HASH TABLE
+  !kLn(1) = 100
+  !Hash4G(kLn(1)) = 1
+  !kLn(2) = 32
+  !Hash4G(kLn(2)) = 1
+  !kLn(3) = add_k(kLn(1), -kLn(1))
+  !Hash4W(abs(kLn(3))) = 1
+  !kLn(4) = 23
+  !Hash4G(kLn(4)) = 1
+  !kLn(5) = add_k(kLn(4), kLn(3))
+  !Hash4G(kLn(5)) = 1
+  !kLn(6) = add_k(kLn(4), -kLn(2))
+  !Hash4W(abs(kLn(6))) = 1
 
 
   ! NeighLn(i, j): the ith neighbor gamma of line j
@@ -2397,24 +2423,25 @@ SUBROUTINE second_order_diagram
 
 
   ! the momentum on line 1, 2, and 3
-  kLn(1) = 10
-  Hash4G(kLn(1)) = 1
-  kLn(2) = 21
-  Hash4G(kLn(2)) = 1
-  kLn(3) = add_k(kLn(1), -kLn(2))
-  Hash4W(abs(kLn(3))) = 1
-  kLn(4) = 33
-  Hash4G(kLn(4)) = 1
-  kLn(5) = add_k(kLn(4), -kLn(3))
-  Hash4G(kLn(5)) = 1
-  kLn(6) = 46
-  Hash4W(abs(kLn(6))) = 1
-  kLn(7) = add_k(kLn(4), -kLn(6))
-  Hash4G(kLn(7)) = 1
-  kLn(8) = add_k(kLn(2), kLn(6))
-  Hash4G(kLn(8)) = 1
-  kLn(9) = add_k(kLn(1), -kLn(8))
-  Hash4W(abs(kLn(9))) = 1
+  !TODO: UPDATE THE HASH TABLE
+  !kLn(1) = 10
+  !Hash4G(kLn(1)) = 1
+  !kLn(2) = 21
+  !Hash4G(kLn(2)) = 1
+  !kLn(3) = add_k(kLn(1), -kLn(2))
+  !Hash4W(abs(kLn(3))) = 1
+  !kLn(4) = 33
+  !Hash4G(kLn(4)) = 1
+  !kLn(5) = add_k(kLn(4), -kLn(3))
+  !Hash4G(kLn(5)) = 1
+  !kLn(6) = 46
+  !Hash4W(abs(kLn(6))) = 1
+  !kLn(7) = add_k(kLn(4), -kLn(6))
+  !Hash4G(kLn(7)) = 1
+  !kLn(8) = add_k(kLn(2), kLn(6))
+  !Hash4G(kLn(8)) = 1
+  !kLn(9) = add_k(kLn(1), -kLn(8))
+  !Hash4W(abs(kLn(9))) = 1
 
 
   ! NeighLn(i, j): the ith neighbor gamma of line j

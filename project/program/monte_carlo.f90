@@ -1,9 +1,22 @@
-!!====================== initialization =================================
+!====================== initialization =================================
 !!=======================================================================
 
 SUBROUTINE initialize_markov
     implicit none
     integer :: i
+    double precision :: ratioleft
+
+
+    call LogFile%QuickLog("Initializing the configuration...")
+
+    !------- assign the config ratio for each order ------
+    TimeRatio(0) = 0.25d0
+    ratioleft = 1.d0 - TimeRatio(0)
+    do i = MCOrder, 1, -1
+      TimeRatio(i) = 0.5d0*(ratioleft)
+      ratioleft = ratioleft - TimeRatio(i)
+    enddo
+    TimeRatio(1) = TimeRatio(1) + ratioleft
 
     !--------------- initialize variables ---------------
     GLnKey2Value(:) = 0
@@ -28,8 +41,6 @@ SUBROUTINE initialize_markov
       NextVertex(i) = i+1
       if(i==MxNVertex)  NextVertex(i) = -1
     enddo
-
-    call LogFile%QuickLog("Initializing the configuration...")
 
     call def_prob
     call def_spatial_weight
@@ -149,148 +160,174 @@ END SUBROUTINE def_diagram
 !========================= UPDATES =====================================
 !=======================================================================
 
-SUBROUTINE markov(MaxSamp)
+SUBROUTINE markov(IsToss)
   implicit none
-  integer :: iflag, istep,isamp,i,MaxSamp,seg
+  integer :: istep,isamp,i,MaxSamp,iblck
   double precision :: nr,x
+  logical :: IsToss
 
-  if(IsToss .or. .not. IsForever) then
-    seg=1
+  iblck=0
+  mc_version = 0
+  if(IsToss) then
+    MaxSamp = Ntoss
   else
-    seg=0
+    MaxSamp = Nsamp
   endif
 
-  isamp=0
-  mc_version = 0
-
   call LogFile%QuickLog("Starting Markov...")
-  call check_weight
+  !call check_weight
+  call check_config
 
-  do while(isamp<=MaxSamp)
-    isamp=isamp+seg
+  do while(.true.)
+    iblck = iblck +1
+    !call LogFile%QuickLog("Block:"+str(iblck),"i")
+    do isamp = 1, MaxSamp
+      do istep=1, Nstep
+        imc = imc + 1.0
 
-    if(IsWormPresent .and. rn()<0.50) call switch_ira_and_masha
+        if(IsWormPresent .and. rn()<0.50) call switch_ira_and_masha
 
-    nr=rn()
-    if(nr<Fupdate(1)) then
-      iupdate = 1
-      call create_worm_along_wline          
-    else if(nr<Fupdate(2)) then
-      iupdate = 2
-      call delete_worm_along_wline                       
-    else if(nr<Fupdate(3)) then
-      iupdate = 3
-      !call create_worm_along_gline  
-    else if(nr<Fupdate(4)) then
-      iupdate = 4
-      !call delete_worm_along_gline  
-    else if(nr<Fupdate(5)) then
-      iupdate = 5
-      call move_worm_along_wline             
-    else if(nr<Fupdate(6)) then
-      iupdate = 6
-      call move_worm_along_gline              
-    else if(nr<Fupdate(7)) then
-      iupdate = 7
-      call add_interaction                  
-    else if(nr<Fupdate(8)) then
-      iupdate = 8
-      call remove_interaction             
-    else if(nr<Fupdate(9)) then
-      iupdate = 9
-      !call add_interaction_cross              
-    else if(nr<Fupdate(10)) then
-      iupdate = 10
-      !call remove_interaction_cross                  
-    else if(nr<Fupdate(11)) then
-      iupdate = 11
-      call reconnect                      
-    else if(nr<Fupdate(12)) then
-      iupdate = 12
-      call change_gline_space          
-    else if(nr<Fupdate(13)) then
-      iupdate = 13
-      call change_wline_space         
-    else if(nr<Fupdate(14)) then
-      iupdate = 14
-      call change_Gamma_type     
-    else if(nr<Fupdate(15)) then
-      iupdate = 15
-      call move_measuring_index       
-    else if(nr<Fupdate(16)) then
-      iupdate = 16
-      call change_Gamma_time        
-    else if(nr<Fupdate(17)) then
-      iupdate = 17
-      call change_wline_isdelta       
-    else if(nr<Fupdate(18)) then
-      iupdate = 18
-      call change_Gamma_isdelta       
-    endif
+        nr=rn()
+        if(nr<Fupdate(1)) then
+          iupdate = 1
+          call create_worm_along_wline          
+        else if(nr<Fupdate(2)) then
+          iupdate = 2
+          call delete_worm_along_wline                       
+        else if(nr<Fupdate(3)) then
+          iupdate = 3
+          !call create_worm_along_gline  
+        else if(nr<Fupdate(4)) then
+          iupdate = 4
+          !call delete_worm_along_gline  
+        else if(nr<Fupdate(5)) then
+          iupdate = 5
+          call move_worm_along_wline             
+        else if(nr<Fupdate(6)) then
+          iupdate = 6
+          !call move_worm_along_gline              
+          call move_worm_along_gline_test           
+        else if(nr<Fupdate(7)) then
+          iupdate = 7
+          call add_interaction                  
+        else if(nr<Fupdate(8)) then
+          iupdate = 8
+          call remove_interaction             
+        else if(nr<Fupdate(9)) then
+          iupdate = 9
+          !call add_interaction_cross              
+        else if(nr<Fupdate(10)) then
+          iupdate = 10
+          !call remove_interaction_cross                  
+        else if(nr<Fupdate(11)) then
+          iupdate = 11
+          call reconnect                      
+        else if(nr<Fupdate(12)) then
+          iupdate = 12
+          call change_gline_space          
+        else if(nr<Fupdate(13)) then
+          iupdate = 13
+          call change_wline_space         
+        else if(nr<Fupdate(14)) then
+          iupdate = 14
+          call change_Gamma_type     
+        else if(nr<Fupdate(15)) then
+          iupdate = 15
+          call move_measuring_index       
+        else if(nr<Fupdate(16)) then
+          iupdate = 16
+          call change_Gamma_time        
+        else if(nr<Fupdate(17)) then
+          iupdate = 17
+          call change_wline_isdelta       
+        else if(nr<Fupdate(18)) then
+          iupdate = 18
+          call change_Gamma_isdelta       
+        endif
 
-    imc = imc + 1.0
-    !if(imc>100000000.d0 .and. imc<=110000000.d0) then
-      !call print_config
-      !call check_config
-    !endif
+        !call check_config
+        !call check_irreducibility
 
-    if(mod(imc,Nstep*1.d0)==0 .and. .not. IsToss) call measure
+      enddo
 
-    if(mod(imc,1.e7)==0) then
+
+      !call check_irreducibility
+      if( .not. IsToss) call measure
+
+    enddo 
+
+    if(IsToss .and. iblck==1) return
+
+    !========================== REWEIGHTING =========================
+    if(mod(iblck, 10)==0) then
+
+
+      call check_config
       call statistics
       call output_GamMC
-      !call output_test
+      call output_test
       call print_status
       call print_config
-      call check_config
-
       call LogFile%QuickLog("Check if there is a new G,W data...")
-
       call read_flag
+
       if(mc_version/=file_version) then
         call LogFile%QuickLog(str(mc_version)+', '+str(file_version))
         call LogFile%QuickLog("Updating G, W, and Gamma...")
 
         call read_GWGamma
+        call output_Quantities
         call update_WeightCurrent
+        call check_config
+        call print_config
         mc_version = file_version
       endif
-    endif
 
-    !========================== REWEIGHTING =========================
-    if(mod(imc,1.e8)==0) then
       call LogFile%WriteStamp()
       call LogFile%WriteLine("Reweighting order of diagrams...")
 
-      x=sum(GamWormOrder(:))
-      CoefOfWeight(:)=x/(GamWormOrder(:)+50.d0)
+      x = SUM(GamWormOrder(:))
+      CoefOfWeight(:)=TimeRatio(:)*CoefOfWeight(:)*x/(GamWormOrder(:)+50.d0)
+      CoefOfWeight(1:MCOrder) = CoefOfWeight(1:MCOrder)/CoefOfWeight(0)
+      CoefOfWeight(0) = 1.d0
+      !x=sum(GamWormOrder(:)/Error(0:MCOrder))
+      !CoefOfWeight(:)=x/(GamWormOrder(:)/Error(0:MCOrder)+50.d0)
+
 
       call LogFile%WriteLine("Reweight Ratios:")
 
       do i=0,MCOrder
         call LogFile%WriteLine('Order'+str(i)+' :'+str(CoefOfWeight(i)))
+        call LogFile%WriteLine('     worm: '+str(GamWormOrder(i)))
+        call LogFile%WriteLine('     phycical: '+str(GamOrder(i)))
       enddo
 
       call LogFile%WriteLine("Reweighting is done!")
 
-      if(imc<=2.e8) then
+      if(iblck <= 10) then
         GamWormOrder=0.d0
         GamOrder=0.d0
       endif
     endif
     !================================================================
 
-    if(mod(imc,5.e8)==0) then
+    if(mod(iblck,30)==0) then
+
+      call check_config
+
       call LogFile%QuickLog("Writing data and configuration...")
 
-      !call statistics
+      call statistics
       call write_monte_carlo_conf
       call write_monte_carlo_data
 
       call LogFile%QuickLog("Writing data and configuration done!")
     endif
 
-
+    if(iblck>Mxint) then
+      call LogFile%QuickLog("Block number:"+str(Mxint)+" achieved! Code stops.")
+      stop
+    endif
   enddo
 END SUBROUTINE markov
 
@@ -310,14 +347,15 @@ SUBROUTINE create_worm_along_wline
   integer :: iWLn, iGam, jGam, iGin, jGin, iGout, jGout
   integer :: statiGam, statjGam, statW
   integer :: statiGin, statiGout, statjGin, statjGout
-  integer :: k, kiW
-  integer :: kiWold, flag
+  integer :: k, kiW, ktemp
+  integer :: kiWold
   integer :: spin
   integer :: tempGam
   double precision :: tau, tau1, tau2, Pacc
   double precision :: WWorm
   complex*16 :: WiGin, WiGout, WjGin, WjGout
   complex*16 :: WIra, WMasha, WWNew, Anew, Aold, sgn
+  logical :: flag
 
   !------------ step1 : check if worm is present ------------------
   if(IsWormPresent .eqv. .true.)   return
@@ -334,19 +372,16 @@ SUBROUTINE create_worm_along_wline
 
   k = generate_k()
   kiWold = kLn(iWLn)
-  kLn(iWLn) = add_k(kiWold, k)
+  ktemp=add_k(kiWold, k)
+  if(Is_k_valid_for_W(ktemp)==.false.) return
+  call update_line(iWLn, ktemp, 2)
+   
 
   !------------ step3 : configuration check -------------------
-  flag=0
-  if(flag==0) then
-    if(Is_reducible_W(iWLn))                 flag=1
-  endif
-  if(flag==0) then
-    if(Is_reducible_W_Gam(iWLn))           flag=1
-  endif
+  flag=Is_reducible_W_Gam_both_side(ktemp, kLn(iGin), kLn(iGout), kLn(jGin), kLn(jGout))
 
-  if(flag==1) then
-    kLn(iWLn) = kiWold
+  if(flag) then
+    call undo_update_line(iWLn, kiWold, 2)
     return
   endif
 
@@ -389,7 +424,7 @@ SUBROUTINE create_worm_along_wline
   & *WeightLn(iGout) *WeightLn(jGin) *WeightLn(jGout)
 
   if(abs(Anew)==0.d0) then
-    kLn(iWLn) = kiWold
+    call undo_update_line(iWLn, kiWold, 2)
     return
   endif
 
@@ -426,11 +461,8 @@ SUBROUTINE create_worm_along_wline
     !---------- update Ira and Masha -------------------
     Ira = iGam
     Masha = jGam
-    kMasha = k
     SpinMasha = spin
-
-    !----------- update k and omega of elements --------
-    call update_Hash4W(kiWold, kLn(iWLn))
+    kMasha = k
 
     !----------- update status of elements -------------
     StatusVertex(Ira)  = statiGam
@@ -452,7 +484,7 @@ SUBROUTINE create_worm_along_wline
 
     ProbAcc(Order, 1) = ProbAcc(Order, 1) + 1
   else
-    kLn(iWLn) = kiWold
+    call undo_update_line(iWLn, kiWold, 2)
   endif
   return
 END SUBROUTINE create_worm_along_wline
@@ -471,10 +503,11 @@ SUBROUTINE delete_worm_along_wline
   integer :: typIra, typMasha, typW
   integer :: statIra, statMasha, statW
   integer :: statiGin, statiGout, statjGin, statjGout
-  integer :: k, kiW, kiWold, flag
+  integer :: k, kiW, kiWold,ktemp
   double precision :: Pacc, tau, tau1, tau2
   complex*16 :: WiGin, WiGout, WjGin, WjGout
   complex*16 :: Wi, Wj, WWNew, Anew, Aold, sgn
+  logical :: flag
 
   !------------ step1 : check if worm is present ------------------
   if(IsWormPresent .eqv. .false.)  return
@@ -490,19 +523,15 @@ SUBROUTINE delete_worm_along_wline
 
   k = kMasha
   kiWold = kLn(iWLn)
-  kLn(iWLn) = add_k(kiWold, (-1)**dir*k)
+  ktemp = add_k(kiWold, (-1)**dir*k)
+  if(Is_k_valid_for_W(ktemp)==.false.) return
+  call update_line(iWLn, ktemp, 2)
 
   !------------ step3 : configuration check ---------------------
-  flag=0
-  if(flag==0) then
-    if(Is_reducible_W(iWLn))   flag=1
-  endif
-  if(flag==0) then
-    if(Is_reducible_W_Gam(iWLn))  flag=1
-  endif
+  flag=Is_reducible_W_Gam_both_side(ktemp, kLn(iGin), kLn(iGout), kLn(jGin), kLn(jGout))
 
-  if(flag==1) then
-    kLn(iWLn) = kiWold
+  if(flag) then
+    call undo_update_line(iWLn, kiWold, 2)
     return
   endif
 
@@ -552,7 +581,7 @@ SUBROUTINE delete_worm_along_wline
   & *WeightLn(iGout) *WeightLn(jGin) *WeightLn(jGout)
 
   if(abs(Anew)==0.d0) then
-    kLn(iWLn) = kiWold
+    call undo_update_line(iWLn, kiWold, 2)
     return
   endif
 
@@ -588,9 +617,6 @@ SUBROUTINE delete_worm_along_wline
     Phase = Phase*sgn
     IsWormPresent = .false.
 
-    !----------- update k and omega of elements --------
-    call update_Hash4W(kiWold, kLn(iWLn))
-
     !----------- update type ---------------------------
     TypeVertex(Ira) = typIra
     TypeVertex(Masha) = typMasha
@@ -615,7 +641,7 @@ SUBROUTINE delete_worm_along_wline
 
     ProbAcc(Order, 2) = ProbAcc(Order, 2) + 1
   else
-    kLn(iWLn) = kiWold
+    call undo_update_line(iWLn, kiWold, 2)
   endif
   return
 END SUBROUTINE delete_worm_along_wline
@@ -629,14 +655,15 @@ END SUBROUTINE delete_worm_along_wline
 !-----------------------------------------------------------
 SUBROUTINE move_worm_along_wline
   implicit none
-  integer :: dir, kW, kWold, flag
-  integer :: iGam, jGam, WLn, GLn1, GLn2
+  integer :: dir, kW, kWold, ktemp
+  integer :: iGam, jGam, WLn, GLn1, GLn2, GLn3, GLn4
   integer :: typiGam, typW
   integer :: statiGam, statjGam, statW
   double precision :: tau1, tau2, tau
   double precision :: WWorm, Pacc
   complex*16 :: WiGam, WjGam, WW
   complex*16 :: Anew, Aold, sgn
+  logical :: flag
 
   !------- step1 : check if worm is present -------------
   if(IsWormPresent .eqv. .false.)  return
@@ -647,22 +674,20 @@ SUBROUTINE move_worm_along_wline
   WLn = NeighVertex(3, Ira)
   jGam = NeighLn(3-dir, WLn)
   if(jGam == Masha .or. jGam==Ira)  return
-
   GLn1 = NeighVertex(1, iGam);     GLn2 = NeighVertex(2, iGam)
+
 
   !------- step3 : configuration check ------------------
   !-------- irreducibility check ------------------------
   kWold = kLn(WLn)
-  kLn(WLn) = add_k(kWold, (-1)**dir *kMasha)
+  ktemp = add_k(kWold, (-1)**dir *kMasha)
+  if(Is_k_valid_for_W(ktemp)==.false.) return
+  call update_line(WLn, ktemp, 2)
 
-  flag = 0
-  if(Is_reducible_W(WLn))   flag=1
-  if(flag==0) then
-    if(Is_reducible_W_Gam(WLn))  flag=1
-  endif
+  flag=Is_reducible_W_Gam_one_side(ktemp, kLn(GLn1), kLn(GLn2))
 
-  if(flag==1) then
-    kLn(WLn) = kWold
+  if(flag) then
+    call undo_update_line(WLn, kWold, 2)
     return
   endif
 
@@ -709,9 +734,6 @@ SUBROUTINE move_worm_along_wline
     !------ update Ira ------------------------
     Ira = jGam
 
-    !------ update k --------------------------
-    call update_Hash4W(kWold, kLn(WLn)) 
-
     !------ update type of elements -----------
     TypeVertex(iGam) = typiGam
     TypeLn(WLn) = typW
@@ -732,7 +754,7 @@ SUBROUTINE move_worm_along_wline
 
     ProbAcc(Order, 5) = ProbAcc(Order, 5) + 1
   else
-    kLn(WLn) = kWold
+    call undo_update_line(WLn, kWold, 2)
   endif
   return
 END SUBROUTINE move_worm_along_wline
@@ -754,9 +776,9 @@ END SUBROUTINE move_worm_along_wline
 !-----------------------------------------------------------
 SUBROUTINE move_worm_along_gline
   implicit none
-  integer :: dir, kGold, flag, dr(2)
+  integer :: dir, kGold, ktemp, dr(2)
   double precision :: Ppro
-  integer :: iGam, jGam, iW, jW, GLn
+  integer :: iGam, jGam, iW, jW, GLn, kiGLn
   integer :: vertex1, vertex2
   integer :: typG, typiGam, typjGam, typiW
   integer, dimension(2) :: spiGam, spjGam
@@ -764,6 +786,7 @@ SUBROUTINE move_worm_along_gline
   double precision :: tau1, tau2, tau
   double precision :: WWorm, Pacc
   complex*16 :: WiW, WjW, WiGam, WjGam, WG, Anew, Aold, sgn
+  logical :: flag
 
   !------- step1 : check if worm is present -------------
   if(IsWormPresent .eqv. .false.)   return
@@ -784,18 +807,18 @@ SUBROUTINE move_worm_along_gline
   endif
   
   kGold = kLn(GLn)
-  kLn(GLn) = add_k(kGold, (-1)**(dir+1) *kMasha)
+  ktemp = add_k(kGold, (-1)**(dir+1) *kMasha)
+
+  if(Is_k_valid_for_G(ktemp)==.false.) return
+  call update_line(GLn, ktemp, 1)
 
   !------- step3 : configuration check ------------------
   !-------- irreducibility  check -----------------------
-  flag = 0
-  if(Is_reducible_G(GLn))          flag = 1
-  if(flag==0) then
-    if(Is_reducible_G_Gam(GLn))    flag = 1
-  endif
+  kiGLn = kLn(NeighVertex(3-dir, iGam))
+  flag=Is_reducible_G_Gam_one_side(ktemp, kiGLn)
 
-  if(flag == 1) then
-    kLn(GLn) = kGold
+  if(flag) then
+    call undo_update_line(GLn, kGold, 1)
     return
   endif
 
@@ -911,7 +934,7 @@ SUBROUTINE move_worm_along_gline
   Aold = WeightVertex(iGam) *WeightVertex(jGam) *WeightLn(iW) *WeightLn(jW) *WeightLn(GLn)
 
   if(abs(Anew)==0.d0) then
-    kLn(GLn) = kGold
+    call undo_update_line(GLn, kGold, 1)
     return
   endif
 
@@ -934,9 +957,6 @@ SUBROUTINE move_worm_along_gline
     !---- update Ira and Masha ------------------
     Ira = jGam
 
-    !---- update omega and k --------------------
-    call update_Hash4G(kGold, kLn(GLn))
-    
     !----- update type configuration ------------
     TypeLn(GLn) = typG
     TypeLn(iW)  = typiW
@@ -966,7 +986,7 @@ SUBROUTINE move_worm_along_gline
 
     ProbAcc(Order, 6) = ProbAcc(Order, 6) + 1
   else
-    kLn(GLn) = kGold
+    call undo_update_line(GLn, kGold, 1)
     return
   endif
 END SUBROUTINE move_worm_along_gline
@@ -975,6 +995,306 @@ END SUBROUTINE move_worm_along_gline
 
 
 
+!----- move worm along gline : Pupdate(6) --------------
+!---------------------- dir = 1 ----------------------------
+!-----      Ira   jGam              iGam    Ira
+!----- --<--||--<--||--<--  =>  --<--||--<--||--<--
+!-----      ||     ||                ||     ||  
+!-----      ||     ||                ||     ||
+!-----------------------------------------------------------
+!---------------------- dir = 2 ----------------------------
+!-----      Ira   jGam              iGam    Ira
+!----- -->--||-->--||-->--  =>  -->--||-->--||-->--
+!-----      ||     ||                ||     ||  
+!-----      ||     ||                ||     ||
+!-----------------------------------------------------------
+SUBROUTINE move_worm_along_gline_test
+  implicit none
+  integer :: iGam, jGam, iGam2, jGam2, iW, jW, GLn,kiGLn, kjGLn
+  integer :: vertex1, vertex2
+  integer :: sG, typG, typiGam, typjGam, typiW
+  integer, dimension(2) :: spiGam, spjGam
+  integer :: dir, kGold, dr(2), ktemp
+  double precision :: Ppro
+  integer :: statiGam, statjGam, statiW, statjW, statG, stat1, stat2
+  double precision :: tau1, tau2, tau
+  double precision :: WWorm, Pacc
+  complex*16 :: WiW, WjW, WiGam, WjGam, WG, Anew, Aold, sgn
+  logical :: flag
+
+  if(IsWormPresent .eqv. .false.)  return
+  iGam = Ira
+  dir = Floor(rn()*2.d0) + 1
+  GLn = NeighVertex(dir, iGam)
+  jGam = NeighLn(dir, GLn)
+  if(jGam==Ira .or. jGam==Masha) return
+
+  iW = NeighVertex(3, iGam)
+  jW = NeighVertex(3, jGam)
+
+  sG = get_spin_G(TypeLn(GLn))
+
+  !!deltasG+spinMasha*(-1)**dir==0
+  !!deltasG = -2*sG
+  if(-2*sG+SpinMasha*(-1)**dir/=0)  return
+
+  kGold = kLn(GLn)
+  ktemp = add_k(kGold, -(-1)**dir*kMasha)
+  if(Is_k_valid_for_G(ktemp)==.false.) return
+  call update_line(GLn, ktemp, 1)
+
+  !-------- irreducibility  check -----------------------
+  kiGLn = kLn(NeighVertex(3-dir, iGam))
+  flag=Is_reducible_G_Gam_one_side(ktemp, kiGLn)
+
+  if(flag) then
+    call undo_update_line(GLn, kGold, 1)
+    return
+  endif
+
+  statiGam = delete_ira_stat(StatusVertex(iGam))
+  statjGam = add_ira_stat(StatusVertex(jGam))
+
+  iGam2 = NeighLn(3-DirecVertex(iGam), iW)
+  statiW = wline_stat(statiGam, StatusVertex(iGam2))
+  if(iGam2==jGam) then
+    statiW = wline_stat(statiGam, statjGam)
+  endif
+
+  jGam2 = NeighLn(3-DirecVertex(jGam), jW)
+  statjW = wline_stat(statjGam, StatusVertex(jGam2))
+  if(jGam2==iGam) then
+    statjW = wline_stat(statiGam, statjGam)
+  endif
+
+  typG = flip_typ_G(TypeLn(GLn))
+
+  call flip_typ_Vertex(dir, TypeVertex(iGam), spiGam, typiGam)
+  call flip_typ_Vertex(3-dir, TypeVertex(jGam), spjGam, typjGam)
+
+  if(is_worm_nearby(statiW)) then
+    typiW = TypeLn(iW)
+  else
+    typiW = get_typW_from_Vertex(DirecVertex(iGam), typiGam, TypeVertex(iGam2))
+  endif
+
+  WWorm = weight_worm(GRVertex(:, jGam)-GRVertex(:, Masha), &
+    & WRVertex(:, jGam)-WRVertex(:, Masha), TVertex(3, jGam)-TVertex(3, Masha))
+
+  tau1 = TVertex(3, iGam)-TVertex(2, iGam)
+  tau2 = TVertex(1, iGam)-TVertex(3, iGam)
+  WiGam = weight_vertex(statiGam, IsDeltaVertex(iGam),GRVertex(:, iGam)-WRVertex(:, iGam),   &
+    & tau1, tau2, typiGam)
+
+  tau1 = TVertex(3, jGam)-TVertex(2, jGam)
+  tau2 = TVertex(1, jGam)-TVertex(3, jGam)
+  WjGam = weight_vertex(statjGam, IsDeltaVertex(jGam),GRVertex(:, jGam)-WRVertex(:, jGam),   &
+    & tau1, tau2, typjGam)
+
+  vertex1 = NeighLn(1, iW)
+  vertex2 = NeighLn(2, iW)
+  tau = TVertex(3, vertex2) - TVertex(3, vertex1)
+  dr  = WRVertex(:, vertex2) - WRVertex(:, vertex1)
+  WiW = weight_wline(statiW, IsDeltaLn(iW), dr, tau, typiW)
+
+  vertex1 = NeighLn(1, jW)
+  vertex2 = NeighLn(2, jW)
+  tau = TVertex(3, vertex2) - TVertex(3, vertex1)
+  dr  = WRVertex(:, vertex2) - WRVertex(:, vertex1)
+  WjW = weight_wline(statjW, IsDeltaLn(jW), dr, tau, TypeLn(jW))
+
+  tau = TVertex(2, NeighLn(2, GLn)) - TVertex(1, NeighLn(1, GLn))
+  WG = weight_gline(StatusLn(GLn), tau, typG)
+
+  Anew = WiGam *WjGam *WiW *WjW *WG
+  Aold = WeightVertex(iGam) *WeightVertex(jGam) *WeightLn(iW) *WeightLn(jW) *WeightLn(GLn)
+
+  if(abs(Anew)==0.d0) then
+    call undo_update_line(GLn, kGold, 1)
+    return
+  endif
+
+  if(iW==jW) then
+    Anew = Anew/WjW
+    Aold = Aold/WeightLn(jW)
+  endif
+
+  call weight_ratio(Pacc, sgn, Anew, Aold)
+
+  if(TypeVertex(iGam)==5 .or. TypeVertex(iGam)==6) then
+    Ppro = 0.5d0
+  else if(TypeVertex(iGam)<=4) then
+    Ppro = 2.0d0
+  endif
+
+  if(TypeVertex(jGam)==5 .or. TypeVertex(jGam)==6) then
+    Ppro = Ppro*0.5d0
+  else if(TypeVertex(jGam)<=4) then
+    Ppro = Ppro*2.0d0
+  endif
+
+  Pacc = Pacc *WWorm/WeightWorm/Ppro
+
+  !------- step5 : accept the update --------------------
+  ProbProp(Order, 6) = ProbProp(Order, 6) + 1
+  if(rn()<Pacc) then
+
+    !----- update the diagram info -------------- 
+    Phase = Phase *sgn
+
+    !---- update Ira and Masha ------------------
+    Ira = jGam
+
+    !----- update type configuration ------------
+    TypeLn(GLn) = typG
+    TypeLn(iW)  = typiW
+
+    TypeVertex(iGam) = typiGam
+    TypeVertex(jGam) = typjGam
+
+    SpInVertex(:, iGam) = spiGam(:)
+    SpInVertex(:, jGam) = spjGam(:)
+
+    !---- update the status of elements ---------
+    StatusVertex(iGam) = statiGam
+    StatusVertex(jGam) = statjGam
+    StatusLn(iW) = statiW
+    StatusLn(jW) = statjW
+
+    !---- update the weight of elements ---------
+    WeightWorm = WWorm
+
+    WeightLn(GLn) = WG
+    WeightLn(iW) = WiW
+    WeightLn(jW) = WjW
+    WeightVertex(iGam) = WiGam
+    WeightVertex(jGam) = WjGam
+
+    call update_weight(Anew, Aold)
+
+    ProbAcc(Order, 6) = ProbAcc(Order, 6) + 1
+  else
+    call undo_update_line(GLn, kGold, 1)
+    return
+  endif
+
+  return
+END SUBROUTINE move_worm_along_gline_test
+
+INTEGER FUNCTION get_spin_G(typ)
+  implicit none
+  integer, intent(in) :: typ
+  if(typ==1) then
+    get_spin_G = 1
+  else if(typ==2) then
+    get_spin_G = -1
+  endif
+  return
+END FUNCTION get_spin_G
+
+INTEGER FUNCTION flip_typ_G(typ)
+  implicit none
+  integer, intent(in) :: typ
+  if(typ==1) then
+    flip_typ_G = 2
+  elseif(typ==2) then
+    flip_typ_G = 1
+  endif
+  return
+END FUNCTION flip_typ_G
+
+
+SUBROUTINE get_spin_Vertex(typ, sp)
+  implicit none
+  integer, intent(in) :: typ
+  integer, intent(out) :: sp(4)
+
+  !TypeSp2Gam(1,1,1,1) = 1
+  !TypeSp2Gam(2,2,2,2) = 2
+  !TypeSp2Gam(1,1,2,2) = 3
+  !TypeSp2Gam(2,2,1,1) = 4
+  !TypeSp2Gam(1,2,1,2) = 5
+  !TypeSp2Gam(2,1,2,1) = 6
+
+  if(typ==1) then
+    sp(1)=1; sp(2)=1; sp(3)=1; sp(4)=1
+  else if(typ==2) then
+    sp(1)=2; sp(2)=2; sp(3)=2; sp(4)=2
+  else if(typ==3) then
+    sp(1)=1; sp(2)=1; sp(3)=2; sp(4)=2
+  else if(typ==4) then
+    sp(1)=2; sp(2)=2; sp(3)=1; sp(4)=1
+  else if(typ==5) then
+    sp(1)=1; sp(2)=2; sp(3)=1; sp(4)=2
+  else if(typ==6) then
+    sp(1)=2; sp(2)=1; sp(3)=2; sp(4)=1
+  endif
+  return
+END SUBROUTINE get_spin_Vertex
+
+SUBROUTINE flip_typ_Vertex(dir, typ, newspinside, newtyp)
+  implicit none
+  integer, intent(in) :: dir, typ
+  integer, intent(out) :: newspinside(2), newtyp
+  integer :: oldsp(4), newsp(4), oldspinside(2)
+
+  call get_spin_Vertex(typ, oldsp)
+
+  newsp(dir) = flip_typ_G(oldsp(dir))
+  newsp(3-dir) = oldsp(3-dir)
+
+  oldspinside(1) = oldsp(3)
+  oldspinside(2) = oldsp(4)
+
+  if(typ==1 .or. typ==2) then
+    newspinside(dir) = flip_typ_G(oldspinside(dir))
+    newspinside(3-dir) = oldspinside(3-dir)
+
+  else if(typ==3 .or. typ==4) then
+    newspinside(dir) = oldspinside(dir)
+    newspinside(3-dir) = flip_typ_G(oldspinside(3-dir))
+
+  else if(typ==5 .or. typ==6) then
+    if(rn()<0.5d0) then
+      newspinside(dir) = flip_typ_G(oldspinside(dir))
+      newspinside(3-dir) = oldspinside(3-dir)
+    else 
+      newspinside(dir) = oldspinside(dir)
+      newspinside(3-dir) = flip_typ_G(oldspinside(3-dir))
+    endif
+  endif
+
+  newtyp = TypeSp2Gam(newsp(1),newsp(2),newspinside(1), newspinside(2))
+
+  !call LogFile%QuickLog("flip_typ_Vertex")
+  !call LogFile%QuickLog(str(dir)+str(typ))
+  !call LogFile%QuickLog(str(newsp(1))+str(newsp(2)))
+  !call LogFile%QuickLog(str(newspinside(1))+str(newspinside(2)))
+
+  return
+END SUBROUTINE flip_typ_Vertex
+
+LOGICAL FUNCTION is_worm_nearby(statline)
+  implicit none
+  integer :: statline
+  if(statline==2 .or. statline==3) then
+    is_worm_nearby = .true.
+  else
+    is_worm_nearby = .false.
+  endif
+  return
+END FUNCTION is_worm_nearby
+
+INTEGER FUNCTION get_typW_from_Vertex(dir, typGam1, typGam2)
+  implicit none
+  integer, intent(in) :: dir, typGam2, typGam1
+  if(dir==1) then
+    get_typW_from_Vertex = TypeGam2W(typGam1, typGam2)
+  elseif(dir==2) then
+    get_typW_from_Vertex = TypeGam2W(typGam2, typGam1)
+  endif
+  return
+END FUNCTION get_typW_from_Vertex
 
 
 !------------- add interaction : Pupdate(7) -----------------
@@ -990,7 +1310,7 @@ END SUBROUTINE move_worm_along_gline
 !------    Ira ----<----            Ira ----<---||---<-----  -----
 !------                     ==>                 /\           -----
 !------  Masha ----<----          Masha ----<---||---<-----  -----
-!------               GamD                     GamB     GamD -----
+!------               GamD                     GamB     GamD ----
 !-----------------------------------------------------------------
 !---------------------- dir = 2, dirW = 1 ------------------------
 !------               GamC                     GamA     GamC -----
@@ -1008,8 +1328,8 @@ END SUBROUTINE move_worm_along_gline
 !-----------------------------------------------------------------
 SUBROUTINE add_interaction
   implicit none
-  integer :: isdelta, dir, dirW, flag, kIA, kMB, kM, q
-  integer :: GIC, GMD, GamC, GamD
+  integer :: isdelta, dir, dirW, kIA, kMB, kM, q, kIC, kMD
+  integer :: GIC, GMD, GamC, GamD, kNeighG
   integer :: WAB, GIA, GMB, GamA, GamB
   integer :: typGamA, typGamB, typAB
   integer :: statA, statB, statIA, statAC, statMB, statBD
@@ -1017,6 +1337,7 @@ SUBROUTINE add_interaction
   double precision :: tau, tau1, tau2, Pacc
   complex*16 :: WA, WB, WGIA, WGAC, WGMB, WGBD, WWAB, WMeasureGam
   complex*16 :: Anew, Aold, sgn
+  logical :: flag
   
   !---------- step1 : check if worm is present ------------------
   if(IsWormPresent .eqv. .false.)    return
@@ -1032,14 +1353,31 @@ SUBROUTINE add_interaction
   isdelta = 0
 
   q = generate_k()
+  if(Is_k_valid_for_W(q)==.false.) return
   kM = add_k(kMasha, -(-1)**dirW*q)
-  kIA = add_k(kLn(GIC), -(-1)**(dir+dirW)*q)
-  kMB = add_k(kLn(GMD), (-1)**(dir+dirW)*q)
+
+  kIC = kLn(GIC)
+  kIA = add_k(kIC, -(-1)**(dir+dirW)*q)
+
+  kNeighG=kLn(NeighVertex(3-dir, Ira))
+  if(abs(add_k(KIA,-kNeighG))==abs(kLn(NeighVertex(3,Ira))))return
+  !This line is used to reject the configuration with |k_GAC-kNeighG|==|k of W attached to Ira|
+  !Such configuration will always become reducibile once new interaction line is added
+  !Please refer to the comments in the reducibility check codes block in basic_function.f90
+  !for further information on the definition of reducibility
+
+  if(Is_k_valid_for_G(kIA)==.false.) return
+
+
+  kMD = kLn(GMD)
+  kMB = add_k(kMD, (-1)**(dir+dirW)*q)
+
+  kNeighG=kLn(NeighVertex(3-dir, Masha))
+  if(abs(add_k(KMB,-kNeighG))==abs(kLn(NeighVertex(3,Masha))))return
+
+  if(Is_k_valid_for_G(kMB)==.false.) return
 
   if(kIA==kMB)  return       
-  if(Hash4W(abs(add_k(kIA,-kMB)))==1)  return
-  if(Hash4W(abs(add_k(kIA,-kLn(GMD))))==1)  return
-  if(Hash4W(abs(add_k(kLn(GIC),-kMB)))==1)  return
 
   !-------- the new time, spin, type and status for the new config ----
   tauA = generate_tau()
@@ -1108,31 +1446,9 @@ SUBROUTINE add_interaction
   NeighLn(dirW, WAB)= GamA;          NeighLn(3-dirW,WAB)= GamB
 
   !------------ step4 : configuration check ---------------------
-  flag=0
-  if(Is_reducible_G(GIA))      flag=1
-  if(flag==0) then
-    if(Is_reducible_G_Gam(GIA)) flag=1
-  endif
-  if(flag==0) then
-    if(Is_reducible_G(GMB)) flag=1
-  endif
-  if(flag==0) then
-    if(Is_reducible_G_Gam(GMB)) flag=1
-  endif
-  if(flag==0) then
-    if(Is_reducible_G_Gam(GIC)) flag=1
-  endif
-  if(flag==0) then
-    if(Is_reducible_G_Gam(GMD)) flag=1
-  endif
-  if(flag==0) then
-    if(Is_reducible_W(WAB)) flag=1
-  endif
-  if(flag==0) then
-    if(Is_reducible_W_Gam(WAB)) flag=1
-  endif
+  flag=Is_reducible_add_interaction(q, kIA, kIC, kMB, kMD)
 
-  if(flag==1) then
+  if(flag) then
     Order = Order - 1
     call delete_gamma(GamA)
     call delete_gamma(GamB)
@@ -1176,9 +1492,6 @@ SUBROUTINE add_interaction
 
     !--------------- update k and omega -------------------------
     kMasha = kM
-    call add_Hash4G(kIA)
-    call add_Hash4G(kMB)
-    call add_Hash4W(q)
 
     !--------------- update the status of elements --------------
     StatusLn(GIC) = statAC
@@ -1244,13 +1557,14 @@ END SUBROUTINE add_interaction
 !-----------------------------------------------------------------
 SUBROUTINE remove_interaction
   implicit none
-  integer :: dir, dirW, flag, kM, kIA, kMB
+  integer :: dir, dirW, kM, kIA, kMB, kAB, kAC, kBD, kNeighG
   integer :: GAC, GBD, GamC, GamD
   integer :: WAB, GIA, GMB, GamA, GamB
   integer :: statIC, statMD, statIA, statMB, statAB
   double precision :: tau, tau1, tau2, Pacc
   complex*16 :: WGIC, WGMD, WMeasureGam
   complex*16 :: Anew, Aold, sgn
+  logical :: flag
   
   !---------- step1 : check if worm is present ------------------
   if(IsWormPresent .eqv. .false.)    return
@@ -1275,9 +1589,12 @@ SUBROUTINE remove_interaction
   GamC = NeighLn(dir, GAC);             GamD = NeighLn(dir, GBD)
 
   dirW = DirecVertex(GamA)
-  kM = add_k(kMasha, (-1)**dirW*kLn(WAB))
+  kAB=kLn(WAB)
+  kM = add_k(kMasha, (-1)**dirW*kAB)
   kIA = kLn(GIA)
   kMB = kLn(GMB)
+  kAC = kLn(GAC)
+  kBD = kLn(GBD)
 
   statIA = StatusLn(GIA)
   statMB = StatusLn(GMB)
@@ -1293,28 +1610,6 @@ SUBROUTINE remove_interaction
 
   NeighLn(3-dir, GAC) = Ira;            NeighLn(3-dir, GBD) = Masha
   NeighVertex(dir, Ira) = GAC;          NeighVertex(dir, Masha)=GBD
-
-  !------------ step3 : configuration check ---------------------
-  flag = 0
-  if(flag ==0) then
-    if(Is_reducible_G_Gam(GAC))     flag = 1
-  endif
-  if(flag ==0) then
-    if(Is_reducible_G_Gam(GAC))     flag = 1
-  endif
-
-  if(flag==1) then
-    Order = Order + 1
-    call undo_delete_gamma(GamB)
-    call undo_delete_gamma(GamA)
-    call undo_delete_line(WAB, 2, statAB)
-    call undo_delete_line(GMB, 1, statMB)
-    call undo_delete_line(GIA, 1, statIA)
-
-    NeighLn(3-dir, GAC) = GamA;        NeighLn(3-dir, GBD) = GamB
-    NeighVertex(dir, Ira) = GIA;       NeighVertex(dir, Masha)=GMB
-    return
-  endif
 
   !-------- the new status for the new config ----
   statIC = gline_stat(StatusVertex(Ira), StatusVertex(GamC))
@@ -1354,8 +1649,6 @@ SUBROUTINE remove_interaction
 
     !--------------- update k -----------------------------------
     kMasha = kM
-    call delete_Hash4G(kIA)
-    call delete_Hash4G(kMB)
 
     !--------------- update the status of elements --------------
     StatusLn(GAC) = statIC
@@ -1374,9 +1667,9 @@ SUBROUTINE remove_interaction
     Order = Order + 1
     call undo_delete_gamma(GamB)
     call undo_delete_gamma(GamA)
-    call undo_delete_line(WAB, 2, statAB)
-    call undo_delete_line(GMB, 1, statMB)
-    call undo_delete_line(GIA, 1, statIA)
+    call undo_delete_line(WAB, 2, statAB, kAB)
+    call undo_delete_line(GMB, 1, statMB, kMB)
+    call undo_delete_line(GIA, 1, statIA, kIA)
 
     NeighLn(3-dir, GAC) = GamA;        NeighLn(3-dir, GBD) = GamB
     NeighVertex(dir, Ira) = GIA;       NeighVertex(dir, Masha)=GMB
@@ -1405,11 +1698,12 @@ END SUBROUTINE remove_interaction
 SUBROUTINE reconnect
   implicit none
   integer :: GamA,GamB,dir
-  integer :: GIA,GMB
+  integer :: GIA,GMB, kNeighG
   integer :: statIA,statMB
   complex*16 :: Anew, Aold, sgn
   complex*16 :: WGIA,WGMB
   double precision :: tau, Pacc
+  logical :: flag
   !---------- step1 : check if worm is present ------------------
   if(IsWormPresent .eqv. .false.)    return
   if(GRVertex(1,Ira)/=GRVertex(1,Masha) .or. &
@@ -1419,6 +1713,10 @@ SUBROUTINE reconnect
   GIA=NeighVertex(dir,Ira)
   GMB=NeighVertex(dir,Masha)
   if(TypeLn(GIA)/=TypeLn(GMB))return
+  kNeighG=kLn(NeighVertex(3-dir, Ira))
+  if(abs(add_k(kLn(GMB),-kNeighG))==abs(kLn(NeighVertex(3,Ira))))return
+  kNeighG=kLn(NeighVertex(3-dir, Masha))
+  if(abs(add_k(kLn(GIA),-kNeighG))==abs(kLn(NeighVertex(3,Masha))))return
 
   GamA=NeighLn(dir,GIA)
   GamB=NeighLn(dir,GMB)
@@ -1429,17 +1727,10 @@ SUBROUTINE reconnect
   NeighLn(3-dir,GMB)=Ira
   NeighVertex(dir, Ira) = GMB
 
-  !Don't have change delta_k of Ira and Masha yet here
+  !Don't have changed delta_k of Ira and Masha yet here
 
   !------------ step4 : configuration check ---------------------
   ! do the step4 here so we can save some time
-  if(Is_reducible_G_Gam(GIA) .or. Is_reducible_G_Gam(GMB)) then
-    NeighLn(3-dir, GIA)=Ira
-    NeighVertex(dir, Ira)=GIA
-    NeighLn(3-dir, GMB)=Masha
-    NeighVertex(dir, Masha)=GMB
-    return
-  endif
 
   !-------- the new spin, type and status for the new config ----
   statIA = gline_stat(StatusVertex(GamA), StatusVertex(Masha))
@@ -2214,213 +2505,6 @@ END SUBROUTINE switch_ira_and_masha
 !====================================================================
 !====================================================================
 
-
-!====================================================================
-!============================== WEIGHTS =============================
-!====================================================================
-
-!-------- the weight of a gline -------------------------
-! tau = tau2-tau1
-COMPLEX*16 FUNCTION weight_gline(stat, tau, typ)
-  implicit none
-  integer :: stat, typ
-  double precision :: tau
-  integer :: t, flag
-
-  t = Floor(tau*MxT/Beta)
-
-  if(stat == 0) then
-    weight_gline = weight_G(typ, t)
-  else if(stat == 1) then
-    !  Have measuring vertex around
-    weight_gline = weight_meas_G(t)
-  else
-    call LogFile%WriteStamp('e')
-    call LogFile%WriteLine("The number of update: "+str(iupdate))
-    call LogFile%WriteLine("line status error!"+str(stat))
-    call print_config
-    stop
-  endif
-
-  !---------------------- for test --------------------------------------
-  !t = Floor(tau*MxT/Beta)
-
-  !flag = 0
-  !if(t<0) then
-    !tau = tau +Beta
-    !flag = 1
-  !endif
-
-  !if(stat == 0) then
-
-    !!weight_gline = cdexp(-(0.d0, 1.d0)*pi*tau/(2.d0*Beta))
-    !weight_gline = (1.d0, 0.d0)
-    !!weight_gline = dcmplx(Beta-tau, 0.d0)
-    !if(flag==1) then
-      !weight_gline = -1.d0*weight_gline
-    !endif
-
-  !else if(stat==1) then
-    !weight_gline = weight_meas_G(t)
-  !else
-    !call LogFile%WriteStamp('e')
-    !call LogFile%WriteLine("The number of update: "+str(iupdate))
-    !call LogFile%WriteLine("line status error!"+str(stat))
-    !stop
-  !endif
-  !------------------------ end -----------------------------------------
-
-  return
-END FUNCTION weight_gline
-
-
-
-!-------- the weight of a wline -------------------------
-
-! dx = x2-x1;  dy = y2- y1; tau = tau2-tau1
-COMPLEX*16 FUNCTION weight_wline(stat, isdelta, dr0, tau, typ)
-  implicit none
-  integer :: stat, isdelta, dx, dy, typ
-  integer :: dr0(2)
-  integer :: dr(2)
-  double precision :: tau
-  integer :: t
-
-  t = Floor(tau*MxT/Beta)
-
-  call diff_r(dr0, dr)
-
-  if(stat == 0) then
-    if(isdelta==0) weight_wline = weight_W(typ, dr, t)
-    if(isdelta==1) weight_wline = weight_W0(typ, dr)
-  else if(stat == 2) then
-    ! Have Ira or Masha around 
-    if(isdelta==0) weight_wline = weight_W(1, dr, t)
-    if(isdelta==1) weight_wline = weight_W0(1, dr)
-  else if(stat == 1 .or. stat==3) then
-    ! Have measuring vertex around
-    if(isdelta==0) weight_wline = weight_meas_W(dr, t)
-    if(isdelta==1) weight_wline = (0.d0, 0.d0)
-  else
-    call LogFile%WriteStamp('e')
-    call LogFile%WriteLine("The number of update: "+str(iupdate))
-    call LogFile%WriteLine("line status error!"+str(stat))
-    call print_config
-    stop
-  endif
-
-  !---------------------- for test --------------------------------------
-  !if(stat >= 0 .and. stat<=3) then
-    !if(isdelta==0 .and. dr(1)==0 .and. dr(2)==0) then
-      !weight_wline = weight_meas_W(dr, t)
-    !else 
-      !weight_wline = (0.d0, 0.d0)
-    !endif
-
-    !!if(isdelta==0) weight_wline = weight_meas_W(dr, t)
-    !!if(isdelta==1) weight_wline = weight_meas_W(dr, 0)
-  !else
-    !call LogFile%WriteStamp('e')
-    !call LogFile%WriteLine("The number of update: "+str(iupdate))
-    !call LogFile%WriteLine("line status error!"+str(stat))
-    !stop
-  !endif
-  !------------------------ end -----------------------------------------
-
-  return
-END FUNCTION weight_wline
-
-!-------- the weight of a vertex ------------------------
- !dx = xg-xw;  dy = yg-yw; dtau1 = tau3-tau2; dtau2 = tau1-tau3
-
-COMPLEX*16 FUNCTION weight_vertex(stat, isdelta, dr0, dtau1, dtau2, typ)
-  implicit none
-  integer :: stat, dr(2), t1, t2, typ, isdelta
-  integer :: dr0(2), flag
-  double precision :: weight
-  double precision :: dtau1, dtau2
-
-  t1 = Floor(dtau1*MxT/Beta)
-  t2 = Floor(dtau2*MxT/Beta)
-
-  call diff_r(dr0, dr)
-
-  if(stat==0) then
-    if(isbold) then
-      !----------------- for bold Gamma ------------------------------
-      if(isdelta==0) weight_vertex = weight_Gam(typ, dr, t1, t2)
-      if(isdelta==1) weight_vertex = weight_Gam0(typ, dr)
-    else
-      !----------------- for bare Gamma ------------------------------
-      if(isdelta==0) weight_vertex = (0.d0, 0.d0)
-      if(isdelta==1) weight_vertex = weight_Gam0(typ, dr)
-    endif
-
-  else if(stat==2) then
-    if(isbold) then
-      !----------------- for bold Gamma ------------------------------
-      if(isdelta==0) weight_vertex = weight_Gam(typ, dr, t1, t2)
-      if(isdelta==1) weight_vertex = weight_Gam0(typ, dr)
-    else 
-      !----------------- for bare Gamma ------------------------------
-      if(isdelta==0) weight_vertex = (0.d0, 0.d0)
-      if(isdelta==1) weight_vertex = weight_Gam0(typ, dr)
-    endif
-
-  else if(stat==1 .or. stat==3) then
-    if(isdelta==0) weight_vertex = (0.d0, 0.d0)
-    if(isdelta==1) weight_vertex = weight_meas_Gam0(typ, dr)
-  else
-    call LogFile%WriteStamp('e')
-    call LogFile%WriteLine("The number of update: "+str(iupdate))
-    call LogFile%WriteLine("vertex status error!"+str(stat))
-    stop
-  endif
-
-  !---------------------- for test --------------------------------------
-  !flag = 0
-  !if(t1<0) then
-    !dtau1 = dtau1 + Beta
-    !flag = flag + 1
-  !endif
-  !if(t2<0) then
-    !dtau2 = dtau2 + Beta
-    !flag = flag + 1
-  !endif
-
-  !if(stat==0 .or. stat==2) then
-    !if(isdelta==1) weight_vertex = weight_meas_Gam(typ, dr)
-    !if(isdelta==0) then
-      !weight_vertex = (0.d0, 0.d0)
-      !if(dr(1)==0 .and. dr(2)==0) then
-        !if(typ==1 .or. typ==2 .or. typ==5 .or. typ==6) then
-          !if(mod(flag, 2)==0) then
-            !weight_vertex = dcmplx(dtau1**2.d0+dtau2**2.d0+1.d0, 0.d0)
-            !!weight_vertex = (1.d0, 0.d0)
-          !else 
-            !weight_vertex = dcmplx(-1.d0*(dtau1**2.d0+dtau2**2.d0+1.d0), 0.d0)
-            !!weight_vertex = (-1.d0, 0.d0)
-          !endif
-        !endif
-      !endif
-    !endif
-
-  !else if(stat==1 .or. stat==3) then
-    !if(isdelta==1) weight_vertex = weight_meas_Gam(typ, dr)
-    !if(isdelta==0) weight_vertex = (0.d0, 0.d0)
-
-  !else
-    !call LogFile%WriteStamp('e')
-    !call LogFile%WriteLine("The number of update: "+str(iupdate))
-    !call LogFile%WriteLine("vertex status error!"+str(stat))
-    !stop
-  !endif
-  !------------------------ end -----------------------------------------
-  return
-END FUNCTION weight_vertex
-
-
-
 !-------- the weight ratio of new/old config -------------------------
 SUBROUTINE weight_ratio(Pacc, sgn, Anew, Aold)
   implicit none
@@ -2461,14 +2545,16 @@ SUBROUTINE measure
   implicit none
   integer :: i, iln,iGam,jGam, iW
   integer :: flag, it
+  integer :: ibasis, ibin
   integer :: spg, spw
   integer :: ityp, nloop
   integer :: MeaGin, MeaGout, MeaW, rg(2), rw(2), dir, typ
   integer :: dr(2), dt1, dt2
   integer :: dx, dy
-  integer :: ikey, sumt
+  integer :: ikey, sumt, sumd
   double precision  :: factorM
   double precision :: tau1, tau2, tau3
+  double precision :: dtau1, dtau2
 
   GamWormOrder(Order) = GamWormOrder(Order) + 1.d0
   !===========  Measure in worm space  ==========================
@@ -2545,24 +2631,31 @@ SUBROUTINE measure
     tau3 = TVertex(3, NeighLn(3-dir, MeaW))
 
     factorM = 1.d0
-    dt1 = Floor((tau3-tau2)*MxT/Beta)
+    dtau1 = tau3-tau2
+    dt1 = Floor(dtau1*MxT/Beta)
     if(dt1<0) then
+      dtau1 = dtau1 + Beta
       dt1 = dt1 + MxT
       factorM = factorM * (-1.d0)
     endif
 
-    dt2 = Floor((tau1-tau3)*MxT/Beta)
+    dtau2 = tau1-tau3
+    dt2 = Floor(dtau2*MxT/Beta)
     if(dt2<0) then
+      dtau2 = dtau2 + Beta
       dt2 = dt2 + MxT
       factorM = factorM * (-1.d0)
     endif
 
+
     factorM = factorM *CoefOfSymmetry(dx, dy)* CoefOfWeight(Order) *abs(WeightVertex(MeasureGam))
+
     !================= accumulation ===================================
     if(Order==0 .and. IsDeltaVertex(NeighLn(3-dir, MeaW))==1) then
       GamNorm = GamNorm + Phase/CoefOfWeight(0)
     endif
 
+    !============== save Gamma in the matrix =============================================
     GamMC(Order, ityp, dx, dy, dt1, dt2) = GamMC(Order, ityp, dx, dy, dt1, dt2) &
       & + Phase/factorM
     ReGamSqMC(Order, ityp, dx, dy, dt1, dt2 ) = ReGamSqMC(Order, ityp, dx, dy, dt1, dt2) &
@@ -2570,22 +2663,52 @@ SUBROUTINE measure
     ImGamSqMC(Order, ityp, dx, dy, dt1, dt2 ) = ImGamSqMC(Order, ityp, dx, dy, dt1, dt2) &
       & + (dimag(Phase)/factorM)**2.d0
 
-    !===============  test variables =================================
-    Norm(1) = Z_normal
+    !============ save Gamma in the fitting coeffecients =====================================
+    ibin = get_bin_Gam(dt1, dt2)
 
+    if(IsBasis2D(ibin)) then
+      do ibasis = 1, NBasisGam
+        GamMCBasis(Order, ityp, dx, dy, ibin, ibasis) = GamMCBasis(Order, ityp, dx, dy, ibin, &
+          & ibasis) + (Phase/factorM)*weight_basis_Gam(CoefGam(:,:,ibasis,ibin), dtau1, dtau2)
+      enddo
+    else 
+      do ibasis = 1, NBasis
+        GamMCBasis(Order, ityp, dx, dy, ibin, ibasis) = GamMCBasis(Order, ityp, dx, dy, ibin, &
+          & ibasis) + (Phase/factorM)*weight_basis(CoefGam(:,0,ibasis,ibin), dtau1)
+      enddo
+    endif
+
+
+    Quan(Order) = Quan(Order) + real(Phase)/factorM
+    Norm(Order) = Norm(Order) + 1.d0
+    !print *, Order, Quan(Order), Norm(Order)
+
+
+    !==============  Error renormalization =========================
     if(Order==1 .and. ityp==1 .and. dx==0 .and. dy==0) then
       if(dt1==0 .and. dt2==0) then
-        Quan(1) = Quan(1) + real(Phase)/factorM
+        Norm(MCOrder+1) = Norm(MCOrder+1)+1.d0
+        Quan(MCOrder+1) = Quan(MCOrder+1) + real(Phase)/factorM
       endif
     endif
     !================================================================
+
+    !===============  test variables =================================
     sumt = 0
     do ikey = 1, NWLn
       i = WLnKey2Value(ikey)
       sumt = sumt+ TypeLn(i)
     enddo
-    if(sumt==NWLn) then
-      Quan(Order+2) = Quan(Order+2) + 1.d0/factorM
+
+    sumd = 0
+    do ikey = 1, NVertex
+      i = VertexKey2Value(ikey)
+      sumd = sumd+ IsDeltaVertex(i)
+    enddo
+
+    if(sumt==NWLn .and. sumd==NVertex) then
+      Quan(MCOrder+Order+2) = Quan(MCOrder+Order+2) + 1.d0/CoefOfWeight(Order)
+      Norm(MCOrder+Order+2) = Norm(MCOrder+Order+2) + 1.d0
     endif
     !=============================================================
 
@@ -2615,13 +2738,14 @@ SUBROUTINE statistics
       deallocate(temp)
     endif
 
-    Norm(2:MCOrder+2) = 1.d0
-    do i=1,NObs
+    do i=0,NObs-1
       if(Norm(i)>1e-6) then
         x=Quan(i)/Norm(i)
         ObsRecord(StatNum,i)=x 
         call ERSTAT(ObsRecord(:,i),StatNum,amax,tmax,amin,tmin) 
         Error(i)=(amax-amin)/2.d0;
+      else
+        Error(i)=100.d0
       endif
     enddo
 end SUBROUTINE

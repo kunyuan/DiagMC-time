@@ -6,10 +6,10 @@ import subprocess
 import time
 import logging
 
-INTERVAL = 300
+INTERVAL = 100
 EXEC = "./gamma3.exe"
 
-def run_loop(infile, outfile):
+def run_loop(infile):
     '''the loop to do self consisent calculation or output variables'''
     homedir = os.getcwd()
     logging.basicConfig(filename=homedir+"/project.log", level=logging.INFO,
@@ -38,7 +38,8 @@ def run_loop(infile, outfile):
             logging.error('Collapse_data failed!')
         else:
             try:
-                os.system('echo '+infile+' | '+execf+" >"+outfile)
+                #the execf process share the same stdout as the run_loop.py has
+                os.system('exec '+execf+' '+infile)
             except:
                 logging.error('loop error!')
 
@@ -47,20 +48,8 @@ def run_loop(infile, outfile):
         time.sleep(INTERVAL)
         logging.info("Loop daemon ended!")
 
-INFILE = raw_input("Please input the infile path: ")
+INFILE = sys.argv[1]
 INFILE = os.path.abspath(INFILE)
-TYPENAME = INFILE.split("/")[-1]
-if TYPENAME.find('_in') is -1:
-    if TYPENAME.find('in') is -1: 
-        OUTFILE = "&1"
-    else:
-        TYPENAME = TYPENAME.replace('in','out')+'.txt'
-        OUTFILE = '/'.join(INFILE.split('/')[:-2])+'/'+TYPENAME
-else:
-    TYPENAME = TYPENAME.replace('_in','out')+'.txt'
-    OUTFILE = '/'.join(INFILE.split('/')[:-2])+'/'+TYPENAME
-
-print INFILE, OUTFILE
 
 print "Start loop..."
-run_loop(INFILE, OUTFILE)
+run_loop(INFILE)

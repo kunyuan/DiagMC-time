@@ -11,3 +11,5 @@ rm read_list.dat
 rm -r graph
 rm *.o
 rm *.dwarf
+rm loop_prof_*
+rm out*.txt

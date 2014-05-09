@@ -17,25 +17,14 @@ SUBROUTINE print_status
     call LogFile%WriteLine("Printing interval:"+str(t_elap,'(f12.3)')+'s')
     call LogFile%WriteLine("Efficiency: "+str(imc/t_elap,'(f12.0)')+"steps per second.")
     call LogFile%WriteLine('Statistics Number ='+str(StatNum))
-    !i = 1
-    !if(Norm(i)>1e-6) then
-      !write(logstr,"(i2, A,f15.6,'+/-',f15.6)") i,QuanName(i),Quan(i)/Norm(i),Error(i)*sqrt(Norm(i))
-      !call LogFile%WriteLine(logstr)
-    !endif
 
-    do i=1,MCOrder+1
+    do i=0,MCOrder
       if(Norm(i)>1e-6) then
-        write(logstr,"(i2, A,f15.6,'+/-',f15.6)") i-1,QuanName(i),Quan(i)/Norm(i),Error(i) 
+        write(logstr,"(i2, A,f15.6,'+/-',f15.6)") i,QuanName(i),Quan(i)/Norm(i),Error(i) 
         call LogFile%WriteLine(logstr)
       endif
     enddo
 
-    do i=MCOrder+2,2*MCOrder+1
-      if(Norm(i)>1e-6) then
-        write(logstr,"(i2, A,f15.6,'+/-',f15.6)") i-MCOrder-1,QuanName(i),Quan(i)/Norm(i),Error(i) 
-        call LogFile%WriteLine(logstr)
-      endif
-    enddo
     call LogFile%WriteLine("------------------------------------------------")
 
     updatename(1)= " 1: create worm along wline"
@@ -76,6 +65,8 @@ SUBROUTINE print_status
       write(logstr, '(A,3f17.5)') "Gamma Type 1,2 <==> 3,4:",BalenceCheck(iorder,1,:)
       call LogFile%WriteLine(logstr)
     enddo
+    call LogFile%WriteLine("------------------------------------------------")
+    call LogFile%WriteLine("Reducibility ratio "+str(TestData(2)/TestData(1))+" : "+str(TestData(3)/TestData(1)))
 
 END SUBROUTINE print_status
 
@@ -133,7 +124,7 @@ SUBROUTINE print_config
     & 'direction:', i2,2x, 'stat:',i2, 2x,'neigh:', i6,i6,i6)
 
   close(108)
-  !call DRAW
+  call DRAW
 END SUBROUTINE print_config
 
 !=================== VISUALIZATION  ==================================
@@ -279,11 +270,6 @@ SUBROUTINE DRAW
       x2=scx*TVertex(3, Vertex2)
       y2=scy*site_num(GRVertex(1, Vertex2),GRVertex(2, Vertex2))
 
-      !if(TypeLn(iWLn)<=4) then
-        !write(11,*) '0 0 0 setrgbcolor'
-      !else
-        !write(11,*) '1 0 1 setrgbcolor'
-      !endif
       ra=dsqrt((x2-x1)**2+(y2-y1)**2)/2.d0
       if(dabs(ra)<1e-6) then
         write(11,792) x1, y1+scy/5. , scy/5. 
@@ -307,7 +293,6 @@ SUBROUTINE DRAW
       a2=a2*radian 
 
       write(11,791)  ca1, ca2, ra, a1, a2
-      !write(11,791) x1,y1,x2,y2 
     enddo
   
     do i=1,NGLn;
@@ -397,7 +382,7 @@ SUBROUTINE DRAW
          & GRVertex(1, Vertex1),GRVertex(2, Vertex1)
       ini=ini-seg
     enddo
-    !write G info
+
     write(11,*) '0 0 0 setrgbcolor'
     write(11,"(f6.1,x,f6.1,x,' M (G info) C')") 530.0,ini
     ini=ini-seg
@@ -522,9 +507,21 @@ SUBROUTINE read_GWGamma
     enddo
   enddo
 
-  if(ios/=0) then
-    call LogFile%QuickLog("Failed to read G,W or Gamma information!",'e')
-    stop -1
+  if(ISub==2) then
+    if(ios/=0) then
+      call LogFile%QuickLog("Failed to read G,W or Gamma information!",'e')
+    else 
+      call update_WeightCurrent
+      mc_version = file_version
+    endif
+  else 
+    if(ios/=0) then
+      call LogFile%QuickLog("Failed to read G,W or Gamma information!",'e')
+      close(100)
+      close(101)
+      close(102)
+      stop -1
+    endif
   endif
 
   close(100)
@@ -584,12 +581,14 @@ SUBROUTINE write_monte_carlo_data
   implicit none
   integer :: iorder, itopo, ix, iy, ityp, it1, it2
   double precision :: rgam2, rerr
-  complex*16 :: gam
+  integer :: ibin, ibasis
+  complex*16 :: gam1
 
-  gam = GamMC(1, 1, 0, 0, 0, 0)/Z_normal
+  gam1 = GamMC(1, 1, 0, 0, 0, 0)/Z_normal
   rgam2 = ReGamSqMC(1, 1, 0, 0, 0, 0)/Z_normal
-  rerr = sqrt(abs(rgam2)-(real(gam))**2.d0)/sqrt(Z_normal-1)
-  ratioerr = Error(1)/rerr
+  rerr = sqrt(abs(rgam2)-(real(gam1))**2.d0)/sqrt(Z_normal-1)
+  !ratioerr = Error(MCOrder+1)/rerr
+  ratioerr = 1.d0
 
   !=========== write into files =========================================
   open(104, status="replace", &
@@ -613,6 +612,20 @@ SUBROUTINE write_monte_carlo_data
       enddo
     enddo
   enddo
+
+  do ibasis = 1, NBasisGam
+    do ibin = 1, NbinGam
+      do iy = 0, L(2)-1
+        do ix = 0, L(1)-1
+          do ityp = 1, NtypeGam/2
+            do iorder = 0, MCOrder
+              write(104) GamMCBasis(iorder, ityp, ix, iy, ibin, ibasis)
+            enddo
+          enddo
+        enddo
+      enddo
+    enddo
+  enddo
   !=========  write on the screen ========================================
 
   
@@ -623,6 +636,7 @@ END SUBROUTINE write_monte_carlo_data
 SUBROUTINE read_monte_carlo_data
   implicit none
   integer :: iorder, ix, iy, ityp, it1, it2, itopo,ios
+  integer :: ibin, ibasis
   logical :: alive
 
   inquire(file=trim(title)//"_monte_carlo_data.bin.dat",exist=alive)
@@ -645,6 +659,20 @@ SUBROUTINE read_monte_carlo_data
               read(105,iostat=ios)  GamMC(iorder, ityp, ix, iy, it1, it2)
               read(105,iostat=ios)  ReGamSqMC(iorder, ityp, ix, iy, it1, it2)
               read(105,iostat=ios)  ImGamSqMC(iorder, ityp, ix, iy, it1, it2)
+            enddo
+          enddo
+        enddo
+      enddo
+    enddo
+  enddo
+
+  do ibasis = 1, NBasisGam
+    do ibin = 1, NbinGam
+      do iy = 0, L(2)-1
+        do ix = 0, L(1)-1
+          do ityp = 1, NtypeGam/2
+            do iorder = 0, MCOrder
+              read(105) GamMCBasis(iorder, ityp, ix, iy, ibin, ibasis)
             enddo
           enddo
         enddo
@@ -835,7 +863,12 @@ SUBROUTINE read_monte_carlo_conf
 
   do ikeyG = 1, NGLn
     i = GLnKey2Value(ikeyG)
-    call add_Hash4G(kLn(i))
+    if(Is_k_valid_for_G(kLn(i))) then
+      call add_Hash4G(kLn(i),i)
+    else
+      call LogFile%QuickLog("read_monte_carlo_conf: k of G Error!",'e')
+      stop
+    endif
     TypeLn(i) = mod(TypeVertex(NeighLn(2,i)), 2)
     if(TypeLn(i)==0)  TypeLn(i) = 2
     tau = TVertex(2, NeighLn(2, i))-TVertex(1,NeighLn(1,i))
@@ -845,7 +878,12 @@ SUBROUTINE read_monte_carlo_conf
 
   do ikeyW = 1, NWLn
     i = WLnKey2Value(ikeyW)
-    call add_Hash4W(abs(kLn(i)))
+    if(Is_k_valid_for_W(kLn(i))) then
+      call add_Hash4W(kLn(i),i)
+    else
+      call LogFile%QuickLog("read_monte_carlo_conf: k of W Error!",'e')
+      stop
+    endif
     iGam = NeighLn(1, i)
     jGam = NeighLn(2, i)
     TypeLn(i) = TypeGam2W(TypeVertex(iGam), TypeVertex(jGam))
@@ -888,7 +926,8 @@ SUBROUTINE output_GamMC
   gam = GamMC(1, 1, 0, 0, 0, 0)/Z_normal
   rgam2 = ReGamSqMC(1, 1, 0, 0, 0, 0)/Z_normal
   rerr = sqrt(abs(rgam2)-(real(gam))**2.d0)/sqrt(Z_normal-1)
-  ratioerr = Error(1)/rerr
+  !ratioerr = Error(MCOrder+1)/rerr
+  ratioerr = 1.d0
 
 
   write(35, *) "============================================"
@@ -958,9 +997,12 @@ END SUBROUTINE output_Gam1
 
 SUBROUTINE output_Quantities
   implicit none
-  integer :: ityp, it1, it2
+  integer :: ityp, it1, it2, iorder
   integer :: dx, dy, it
   complex*16 :: gam1
+  double precision :: normal
+  integer :: ibin, ibasis
+  double precision :: tau1, tau2
 
   open(104, status='replace', file=trim(title_loop)//"_quantities.dat")
 
@@ -974,6 +1016,53 @@ SUBROUTINE output_Quantities
   enddo
   write(104, *)
 
+  normal = GamNormWeight/GamNorm
+
+  do iorder = 1, MCOrder
+    write(104, *) "##################################Gamma",trim(adjustl(str(iorder)))
+    write(104, *) "#tau1:", MxT, ",tau2:", MxT
+    write(104, *) "#Beta", Beta, "L", L(1), L(2), "Order", MCOrder
+    do it2 = 0, MxT-1
+      do it1 = 0, MxT-1
+        write(104, *)  real(GamMC(iorder, 1, 0, 0, it1, it2))*normal &
+          & , dimag(GamMC(iorder, 1, 0, 0, it1, it2))*normal
+      enddo
+    enddo
+    write(104, *)
+  enddo
+
+  do iorder = 1, MCOrder
+    write(104, *) "##################################GammaBasis",trim(adjustl(str(iorder)))
+    write(104, *) "#tau1:", MxT, ",tau2:", MxT
+    write(104, *) "#Beta", Beta, "L", L(1), L(2), "Order", MCOrder
+    do it2 = 0, MxT-1
+      do it1 = 0, MxT-1
+        ibin = get_bin_Gam(it1, it2)
+
+        tau1 = dble(it1)*Beta/dble(MxT)
+        tau2 = dble(it2)*Beta/dble(MxT)
+
+        if(IsBasis2D(ibin)) then
+          gam1 = (0.d0, 0.d0)
+          do  ibasis = 1, NBasisGam
+            gam1 = gam1 + GamMCBasis(iorder, 1, 0, 0, ibin, ibasis)* weight_basis_Gam( &
+              & CoefGam(:,:,ibasis,ibin), tau1, tau2)
+          enddo
+        else
+          gam1 = (0.d0, 0.d0)
+          do  ibasis = 1, NBasis
+            gam1 = gam1 + GamMCBasis(iorder, 1, 0, 0, ibin, ibasis)* weight_basis( &
+              & CoefGam(:,0,ibasis,ibin), tau1)
+          enddo
+        endif
+
+        write(104, *) real(gam1)*normal, dimag(gam1)*normal
+      enddo
+    enddo
+    write(104, *)
+  enddo
+
+
   write(104, *) "##################################G"
   write(104, *) "#tau:", MxT
   write(104, *) "#Beta", Beta,"J2", J2,  "L", L(1), L(2), "Order", MCOrder
@@ -983,10 +1072,14 @@ SUBROUTINE output_Quantities
   write(104, *)
 
   write(104, *) "##################################W"
-  write(104, *) "#tau:", MxT
-  write(104, *) "#Beta", Beta,"J2", J2,  "L", L(1), L(2), "Order", MCOrder
+  write(104, *) "#x:", L(1), ",y:", L(2), ",tau:", MxT
+  write(104, *) "#Beta", Beta, "J2", J2, "L", L(1), L(2), "Order", MCOrder
   do it1 = 0, MxT-1
-    write(104, *)  real(W(1, 0, 0, it1)), dimag(W(1, 0, 0, it1))
+    do dy = 0, L(2)-1
+      do dx = 0, L(1)-1
+        write(104, *)  real(W(1, dx, dy, it1)), dimag(W(1, dx, dy, it1))
+      enddo
+    enddo
   enddo
   write(104, *)
 
@@ -1031,16 +1124,25 @@ SUBROUTINE output_Quantities
   close(104)
 END SUBROUTINE output_Quantities
 
-!SUBROUTINE output_test
-  !implicit none
-  !integer :: iorder
+SUBROUTINE output_test
+  implicit none
+  integer :: iorder
   !open(104, status='replace', file=trim(title_mc)//"_Gam_Order_test.dat")
-  !do iorder = 1, MCOrder
-    !write(104, *) iorder, Quan(iorder+2)/Quan(iorder+1), Error(iorder+2)/Quan(iorder+1)
-  !enddo
-  !write(104, *)
-  !close(104)
-!END SUBROUTINE
+  open(104, access='append', file=trim(title_mc)//"_Gam_Order_test.dat")
+  do iorder = 1, MCOrder
+    write(104, *) iorder, Quan(iorder+2)/Quan(2), Error(iorder+2)/Quan(2)
+  enddo
+  write(104, *)
+
+  write(104, *) "Type 1,2 <==> 3,4"
+  do iorder = 0, MCOrder
+    BalenceCheck(iorder,1,3)=(BalenceCheck(iorder,1,1)-BalenceCheck(iorder,1,2)) &
+      & /sqrt(BalenceCheck(iorder,1,1))
+    write(104, '(i3,3f17.5)') iorder, BalenceCheck(iorder,1,:)
+  enddo
+  write(104, *)
+  close(104)
+END SUBROUTINE
 !!================================================================
 !!================================================================
 !!================================================================

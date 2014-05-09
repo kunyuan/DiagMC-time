@@ -3,6 +3,16 @@ MODULE vrbls_mc
   USE logging_module
   IMPLICIT NONE
 
+  !======================== code mode control ============================
+  logical, parameter  ::  DEBUG=.true.          
+  !light weight debug switch, suggest to turn it on even if you are running large-scale simulation
+  logical, parameter  ::  HEAVY_DEBUG=.false.
+  !heavy deug mode will turn on checking for all low level subroutines, it will significantly slow down the code
+  !Please use it if you are debugging
+  logical, parameter  ::  IS_BOLD=.true.
+  logical, parameter  ::  CHECK_G=.true.
+  logical, parameter  ::  CHECK_W=.true.
+  logical, parameter  ::  CHECK_GAM=IS_BOLD
   !======================== Parameters ====================================
   double precision, parameter :: Pi    = 3.14159265358979323846d0
   double precision, parameter :: Pi2   = 6.2831853071795865d0
@@ -17,10 +27,10 @@ MODULE vrbls_mc
   integer, parameter,dimension(2) :: MxL =(/8,8/)   ! the largest system
   integer, parameter :: MxVol = MxL(1)**D           ! the maximum system volume
   integer, parameter :: MxT   =   64                ! the maximum number of time segments
+  !integer, parameter :: MxK   = 1000               ! the maximum momentum
   integer, parameter :: MxK   = 1000000             ! the maximum momentum
-  !integer, parameter :: MxOmegaBasis = 2048        ! the maximum omega used in basis
 
-  double precision, parameter :: MxError = 1000.0    ! the maximum error for MC
+  double precision, parameter :: MxError = 0.5d0    ! the maximum error for MC
   integer, parameter          :: MxNblck = 1000000   ! the maximum memory blocks in MC simulations
 
   integer, parameter :: MxOrder =  10               ! the maximum order of the diagram
@@ -46,7 +56,6 @@ MODULE vrbls_mc
 
   type(logging) :: LogFile
   type(logging) :: LogTerm
-  logical :: isbold
 
   !======================== Input parameter ==============================
   integer          ::  L(2), Vol                ! System size
@@ -56,7 +65,6 @@ MODULE vrbls_mc
   double precision ::  Mu(2)                      ! Chem. potential for spin down & up
   double precision ::  Beta                       ! inverse temperature
   integer          ::  MCOrder                    ! the max order for Gamma in MC
-  logical          ::  CheckG, CheckW, CheckGam ! if turn on the irreducibility check
   !=======================================================================
 
 
@@ -89,12 +97,12 @@ MODULE vrbls_mc
   !                   c \||
   !                  (in) \ a
   !                       (in)
-  !----- type = 1:  a = up;   d = up;   b = up;    c = up  -------------------
-  !----- type = 2:  a = down; d = down; b = down;  c = down  -----------------
-  !----- type = 3:  a = up;   d = down; b = up;    c = down  -----------------
-  !----- type = 4:  a = down; d = up;   b = down;  c = up  -------------------
-  !----- type = 5:  a = up;   d = down; b = down;  c = up  -------------------
-  !----- type = 6:  a = down; d = up;   b = up;    c = down  -----------------
+  !----- type = 1:  a = up;   b = up;    c = up;   d = up  -------------------
+  !----- type = 2:  a = down; b = down;  c = down; d = down  -----------------
+  !----- type = 3:  a = up;   b = up;    c = down; d = down  -----------------
+  !----- type = 4:  a = down; b = down;  c = up;   d = up  -------------------
+  !----- type = 5:  a = up;   b = down;  c = up;   d = down  -------------------
+  !----- type = 6:  a = down; b = up;    c = down; d = up  -----------------
   !----------------------------------------------------------------------------
   integer, parameter :: NTypeChi = 4                  ! types of Chi 
   !----------------------------------------------------------------------------
@@ -133,11 +141,14 @@ MODULE vrbls_mc
   !====================== MC Simulation ==================================
   complex*16 :: GamNorm, GamNormWeight           ! the weight of the normalization diagram
   complex*16, allocatable :: GamMC(:,:,:,:,:,:)      ! the measurement of Gamma in MC
-  double precision, allocatable :: ReGamSqMC(:,:,:,:,:,:)      ! the measurement of Gamma in MC
-  double precision, allocatable :: ImGamSqMC(:,:,:,:,:,:)      ! the measurement of Gamma in MC
+  double precision, allocatable :: ReGamSqMC(:,:,:,:,:,:)   ! the measurement of Gamma in MC
+  double precision, allocatable :: ImGamSqMC(:,:,:,:,:,:)   ! the measurement of Gamma in MC
+
+  complex*16, allocatable :: GamMCBasis(:,:,:,:,:,:)      ! the measurement of Gamma in MC
 
   double precision :: GamOrder(0:MxOrder)              ! the configuration number of different orders
   double precision :: GamWormOrder(0:MxOrder)          ! the configuration number in whole section
+  double precision :: TimeRatio(0:MxOrder)
 
   double precision :: WeightCurrent            ! the current weight of the configuration
   double precision :: CoefOfWorm
@@ -153,8 +164,6 @@ MODULE vrbls_mc
   integer          :: NSamp             ! # total MC steps
   integer          :: NToss             ! # MC steps for toss
   integer          :: NStep             ! # MC steps for one measurement
-  logical          :: IsToss
-  logical          :: IsForever
 
   !------------ basic variables for a diagram --------------------------
   integer          :: Order             ! order of the simulating diagram 
@@ -229,16 +238,46 @@ MODULE vrbls_mc
   integer          :: MaxStat
   integer          :: StatNum
   integer, parameter :: NObs = 20              ! Total # observables
-  double precision   :: Quan(NObs)             ! 1st--#quan.  2nd--#block
-  double precision   :: Norm(NObs)
-  double precision   :: Error(NObs)
+  double precision   :: Quan(0:NObs-1)             ! 1st--#quan.  2nd--#block
+  double precision   :: Norm(0:NObs-1)
+  double precision   :: Error(0:NObs-1)
   double precision   :: ratioerr
-  character(len=30),dimension(NObs) :: QuanName
+  character(len=30),dimension(0:NObs-1) :: QuanName
 
   double precision, allocatable :: ObsRecord(:,:)                 ! 1st--#quan.  2nd--#block
   double precision :: Z_normal
   double precision :: Z_worm
 	DOUBLE PRECISION :: amax, tmax, amin, tmin
+
+
+  !================ Grand-Schmit Basis ===================================
+  integer, parameter :: BasisOrder=6
+  integer, parameter :: Nbasis=BasisOrder+1
+
+  integer, parameter :: NbinG=1
+  integer, dimension(1:NbinG) :: FromG, ToG
+  integer, parameter :: NbinW=1
+  integer, dimension(1:NbinW) :: FromW, ToW
+
+  double precision, dimension(0:BasisOrder, 1:Nbasis) :: Polynomial
+  double precision, dimension(0:BasisOrder, 1:Nbasis, 1:NbinG) :: CoefG
+  double precision, dimension(0:BasisOrder, 1:Nbasis, 1:NbinW) :: CoefW
+
+
+
+  integer, parameter :: BasisOrderGam=3
+  integer, parameter :: NbasisGam=(BasisOrderGam+1)**2
+
+  integer, parameter :: NbinGam=3
+  integer, dimension(1:NbinGam) :: FromGamT1, ToGamT1
+  integer, dimension(0:MxT-1, 1:NbinGam) :: FromGamT2, ToGamT2
+  logical, dimension(1:NbinGam) :: IsBasis2D
+
+  double precision, dimension(0:BasisOrderGam,0:BasisOrderGam,1:NbasisGam) :: PolynomialGam
+  double precision, dimension(0:BasisOrder,0:BasisOrder,1:NbasisGam,1:NbinGam) :: CoefGam
+  !=======================================================================
+
+
   !================= Random-number generator =============================
   integer                      :: Seed              ! random-number seed
   integer, parameter           :: mult=32781

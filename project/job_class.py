@@ -26,8 +26,8 @@ class Job:
             for i in range(0, len(execu)):
                 if os.path.isfile(execu[i]):
                     execu[i] = os.path.abspath(execu[i])
+        #self.execute is the execute file str
         self.execute = execu
-
         self.is_cluster = para.pop("__IsCluster")
         self.auto_run = para.pop("__AutoRun")
         self.keep_cpu_busy = True
@@ -89,14 +89,10 @@ class JobMonteCarlo(Job):
         if para["Order"] is not len(para["Reweight"]):
             print "The Reweight numbers should be equal to Order!"
             return False
-        if type(para["IsForever"]) is not bool:
-            print "IsForever should be a bool!"
-            return False
 
     def to_string(self, pid=0):
         input_str = Job.to_string(self, pid)
         input_str += self.key_to_string("Type: MC")
-        input_str += self.key_to_string("IsForever")
         input_str += self.key_to_string("Toss")
         input_str += self.key_to_string("Sample")
         input_str += self.key_to_string("Sweep")
