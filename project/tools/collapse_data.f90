@@ -50,7 +50,7 @@ PROGRAM MAIN
       inquire(file=title_file(i),exist=alive)
       if(alive) then
         open(101, status="old", file=title_file(i), form="binary")
-        read(101, iostat=ios) Beta, MCOrder, L(1), L(2)
+        read(101, iostat=ios) Beta, J2, MCOrder, L(1), L(2)
         if(ios==0) then
           flag=.false.
           close(101)
@@ -64,7 +64,7 @@ PROGRAM MAIN
         stop -1
     endif
 
-    title_mc = str(Beta,'(f4.2)')+'_'+str(MCOrder,'(i1)')+'_coll'
+    title_mc = str(Beta,'(f4.2)')+'_'+str(J2,'(f4.2)')+'_'+str(MCOrder,'(i1)')+'_coll'
 
     allocate(GamMC(0:MCOrder, 0:L(1)-1, 0:L(2)-1, 0:MxT-1))
     allocate(ReGamSqMC(0:MCOrder, 0:L(1)-1, 0:L(2)-1, 0:MxT-1))
@@ -100,7 +100,7 @@ PROGRAM MAIN
       if(alive) then
         open(101, status="old", file=title_file(i), form="binary")
 
-        read(101) Beta, MCOrder, L(1), L(2)
+        read(101) Beta, J2, MCOrder, L(1), L(2)
         read(101,iostat=ios) imctmp, iGamNorm, iGamNormWeight
         read(101) Ztmp, ratioerr
         do it1 = 0, MxT-1
@@ -170,7 +170,7 @@ PROGRAM MAIN
     open(104, status="replace", &
       & file=trim(title_mc)//"_monte_carlo_data.bin.dat",form="binary")
 
-    write(104) Beta, MCOrder, L(1), L(2)
+    write(104) Beta, J2, MCOrder, L(1), L(2)
     write(104) imc, GamNorm, GamNormWeight
     write(104) Z_normal, ratioerr
     do it1 = 0, MxT-1
@@ -212,7 +212,7 @@ PROGRAM MAIN
 
     !=========== write into files =========================================
     open(104, status="replace", file=trim(title_mc)//"_GamMC.dat")
-    write(104, *) Beta, MCOrder, L(1), L(2)
+    write(104, *) Beta, J2, MCOrder, L(1), L(2)
     write(104, *) imc, GamNorm, GamNormWeight
     write(104, *) Z_normal, ratioerr
     
