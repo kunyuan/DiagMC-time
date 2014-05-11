@@ -276,7 +276,7 @@ SUBROUTINE markov(IsToss)
         call LogFile%QuickLog("Updating G, W, and Gamma...")
 
         call read_GWGamma
-        call output_Quantities
+        !call output_Quantities
         call update_WeightCurrent
         call check_config
         call print_config

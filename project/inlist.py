@@ -11,18 +11,18 @@ com_dict={
     "Lx" :  4,
     "Ly" :  4,
     "J1" :  1.0,
-    "J2" :  1.0,
-    "Beta" :  0.90,
+    "J2" :  0.4,
+    "Beta" :  0.50,
     "Order" :  1,
     }
 
-readfile="{0:4.2f}_{1}_coll".format(com_dict["Beta"],com_dict["Order"])
+readfile="{0:4.2f}_{1:4.2f}_{2}_coll".format(com_dict["Beta"],com_dict["J2"],com_dict["Order"])
 print readfile
 
 # monte carlo job defintion
 mc_dict={
     "__Execute" : "./gamma3.exe",
-    "__Duplicate" : 0,
+    "__Duplicate" : 3,
     "__IsCluster" : False,
     "__AutoRun" : True,
     "IsLoad" : False,
@@ -41,8 +41,7 @@ sc_dict={
     "__Execute" : ["python", "./run_loop.py"],
     "__Duplicate" : 1,
     "__IsCluster" : False,
-    #"__AutoRun" : True, 
-    "__AutoRun" : False, 
+    "__AutoRun" : True, 
     "IsLoad" : True,
     "ReadFile" : readfile,
     }
@@ -52,7 +51,7 @@ TO_DO.append(job.JobConsistLoop(sc_dict))
 # self consist loop job to initialize the simulation
 sc_ini_dict={
     "__Execute" : ["python", "./run_loop.py"],
-    "__Duplicate" : 0,
+    "__Duplicate" : 1,
     "__IsCluster" : False,
     "__AutoRun" : False, 
     "IsLoad" : False,

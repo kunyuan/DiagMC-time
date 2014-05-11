@@ -6,24 +6,22 @@ from matplotlib import cm
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
 import matplotlib.pyplot as plt
 
-Beta = 0.90
+Beta = 0.50
 N = 64
+
+Quans=["Sigma"]
 
 tau = np.arange(0, Beta, Beta/N)
 
 BoldSigma=[]
-Sigma,dim_name=read_data.read_array("./0.90_2_quantities.dat")["Sigma"]
-BoldSigma.append(Sigma)
-Sigma,dim_name=read_data.read_array("./0.90_3_quantities.dat")["Sigma"]
-BoldSigma.append(Sigma)
-Sigma,dim_name=read_data.read_array("./0.90_4_quantities.dat")["Sigma"]
-BoldSigma.append(Sigma)
+BoldSigma.append(read_data.read_array("../0.50_0.40_quantities.dat", Quans))
 
 fig = plt.figure()
 ax = plt.subplot(111)
 
 for i in range(len(BoldSigma)):
-    ax.plot(tau, BoldSigma[i].real, label="Order"+str(i+2))
+    for key in Quans:
+        ax.plot(tau, BoldSigma[i][key][0].real, label="{0}, Order{1}".format(key, i+2))
 
 ax.legend()
 
