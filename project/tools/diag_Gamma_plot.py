@@ -8,24 +8,16 @@ N = 64
 
 tau = np.arange(0, Beta, Beta/N)
 
-#Quans=["Gamma1"]
-#Quans=["Gamma1","Gamma2","Gamma3","Gamma4"]
-#Quans=["Gamma1","Gamma2","Gamma3"]
-Quan2D=["Gamma1","Gamma2","Gamma"]
-#Quans=["Gamma1","Gamma"]
-
-Quan1D=["GammaDiag1","GammaDiag2"]
-Quans=Quan2D+Quan1D
-print Quans
+#Gamma=["Gamma1","Gamma2","Gamma3","Gamma4"]
+#Gamma=["Gamma1","Gamma2","Gamma3"]
+#Gamma=["Gamma1","Gamma2","Gamma"]
+Quan2D=["Gamma1"]
+Quan1D=["GammaDiag1"]
+Quans = Quan1D+Quan2D
 
 DiagGamma=[]
-#DiagGamma.append(read_data.read_array("./0.90_1_bold_quantities.dat", Quans))
-#DiagGamma.append(read_data.read_array("./0.90_2_bold_quantities.dat", Quans))
-#DiagGamma.append(read_data.read_array("./bare_1/0.90_quantities.dat", Quans))
-#DiagGamma.append(read_data.read_array("./bare_2/0.90_quantities.dat", Quans))
-#DiagGamma.append(read_data.read_array("./bare_3/0.90_quantities.dat", Quans))
-#DiagGamma.append(read_data.read_array("../0.90_Gam1.dat", Quans))
-DiagGamma.append(read_data.read_array("../0.90_quantities.dat", Quans))
+DiagGamma.append(read_data.read_array("../0.50_0.40_quantities.dat", Quans))
+
 
 fig = plt.figure()
 ax = plt.subplot(111)
