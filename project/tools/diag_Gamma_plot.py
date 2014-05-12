@@ -3,13 +3,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 import read_data
 
-Beta = 0.90
+Beta = 0.50
 N = 64
 
 tau = np.arange(0, Beta, Beta/N)
 
 #Gamma=["Gamma1","Gamma2","Gamma3","Gamma4"]
-#Gamma=["Gamma1","Gamma2","Gamma3"]
+Gamma=["Gamma1","Gamma2","Gamma3"]
 #Gamma=["Gamma1","Gamma2","Gamma"]
 Quan2D=["Gamma1"]
 Quan1D=["GammaDiag1"]
