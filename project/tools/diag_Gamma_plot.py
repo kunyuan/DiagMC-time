@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import read_data
 
-Beta = 0.90
+Beta = 0.50
 N = 64
 
 tau = np.arange(0, Beta, Beta/N)
