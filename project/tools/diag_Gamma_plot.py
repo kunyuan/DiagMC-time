@@ -3,18 +3,19 @@ import numpy as np
 import matplotlib.pyplot as plt
 import read_data
 
-Beta = 0.90
+Beta = 0.50
 N = 64
 
 tau = np.arange(0, Beta, Beta/N)
 
 #Gamma=["Gamma1","Gamma2","Gamma3","Gamma4"]
-#Gamma=["Gamma1","Gamma2","Gamma3"]
+Gamma=["Gamma1","Gamma2","Gamma3"]
 #Gamma=["Gamma1","Gamma2","Gamma"]
-Gamma=["Gamma1"]
+#Gamma=["Gamma1"]
 
-quan = read_data.read_array("../0.50_0.40_quantities.dat", Gamma)
-#quan = read_data.read_array("./1_loop/0.90_quantities.dat", Gamma)
+#quan = read_data.read_array("../0.50_0.50_quantities.dat", Gamma)
+#quan = read_data.read_array("./bare_1/0.90_quantities.dat", Gamma)
+quan = read_data.read_array("./2_loop/0.90_quantities.dat", Gamma)
 #quan = read_data.read_array("./../../data/conservation/bare_0.90_4_quantities.dat", Gamma)
 #quan = read_data.read_array("../0.90_quantities.dat", Gamma)
 #quan2 = read_data.read_array("./0.90_quantities.dat", Gamma)

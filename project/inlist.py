@@ -11,9 +11,9 @@ com_dict={
     "Lx" :  4,
     "Ly" :  4,
     "J1" :  1.0,
-    "J2" :  0.4,
+    "J2" :  0.5,
     "Beta" :  0.50,
-    "Order" :  1,
+    "Order" :  2,
     }
 
 readfile="{0:4.2f}_{1:4.2f}_{2}_coll".format(com_dict["Beta"],com_dict["J2"],com_dict["Order"])
@@ -26,7 +26,7 @@ mc_dict={
     "__IsCluster" : False,
     "__AutoRun" : True,
     "IsLoad" : False,
-    "Reweight" : [2],
+    "Reweight" : [2,1],
     #"ReadFile" : "0.90_3_coll",
     "Sample" : 1000000,
     "Sweep" : 10,
@@ -51,7 +51,7 @@ TO_DO.append(job.JobConsistLoop(sc_dict))
 # self consist loop job to initialize the simulation
 sc_ini_dict={
     "__Execute" : ["python", "./run_loop.py"],
-    "__Duplicate" : 1,
+    "__Duplicate" : 0,
     "__IsCluster" : False,
     "__AutoRun" : False, 
     "IsLoad" : False,
