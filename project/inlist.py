@@ -11,7 +11,7 @@ com_dict={
     "Lx" :  4,
     "Ly" :  4,
     "J1" :  1.0,
-    "J2" :  0.4,
+    "J2" :  0.5,
     "Beta" :  0.50,
     "Order" :  4,
     }
@@ -51,7 +51,7 @@ TO_DO.append(job.JobConsistLoop(sc_dict))
 # self consist loop job to initialize the simulation
 sc_ini_dict={
     "__Execute" : ["python", "./run_loop.py"],
-    "__Duplicate" : 1,
+    "__Duplicate" : 0,
     "__IsCluster" : False,
     "__AutoRun" : False, 
     "IsLoad" : False,
