@@ -31,6 +31,7 @@ SUBROUTINE calculate_Gam1
   integer :: omega1, omega2, omega3
   integer :: omegaW, omegaout
   integer :: tg(5), tgam1(5), tgam2(5), tgam3(5), tw(5)
+  integer :: x1, y1, x3, y3
   complex*16 :: Gin, Gout, iW, Gam1, Gam2, Gam3
   complex*16 :: weight
   complex*16 :: FGam(0:MxT-1, 0:MxT-1)
@@ -99,19 +100,29 @@ SUBROUTINE calculate_Gam1
 
           Gin = weight_G(tg(ityp), omega3)
           Gout = weight_G(tg(ityp), omegaout)
-          Gam1 = weight_Gam(tgam1(ityp), (/0,0/), omega1, omega3)
           Gam2 = weight_Gam(tgam2(ityp), (/0,0/), omega3, omegaout)
-          Gam3 = weight_Gam(tgam3(ityp), (/0,0/), omegaout, omega2)
-          iW = weight_W(tw(ityp), (/0,0/), omegaW)
 
-          weight = Gin *Gout *iW *Gam1 *Gam2 *Gam3
+          do x1 = 0, L(1)-1
+            do y1 = 0, L(2)-1
+              do x3 = 0, L(1)-1
+                do y3 = 0, L(2)-1
+                  Gam1 = weight_Gam(tgam1(ityp), (/x1,y1/), omega1, omega3)
+                  Gam3 = weight_Gam(tgam3(ityp), (/x3,y3/), omegaout, omega2)
+                  iW = weight_W(tw(ityp), (/x1-x3,y1-y3/), omegaW)
 
-          GamOrder1(1,omega1, omega2)=GamOrder1(1, omega1, omega2)+d_times_cd(ratio, weight)
+                  weight = Gin *Gout *iW *Gam1 *Gam2 *Gam3
+                  GamOrder1(1,omega1, omega2)=GamOrder1(1, omega1, omega2)+ratio*weight
+                enddo
+              enddo
+            enddo
+          enddo
+
         enddo
       enddo
 
     enddo
   enddo
+
 
   call plus_minus_Gam0(-1)
   call transfer_Gam0_r(1)
@@ -121,6 +132,8 @@ SUBROUTINE calculate_Gam1
   call transfer_Gam_t(-1)
 
   call transfer_GamOrder1_t(-1)
+  print *, GamOrder1(1,0,0)
+
   call output_Gam1
 
   !================== bare Gamma ===============================

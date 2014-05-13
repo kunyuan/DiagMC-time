@@ -25,7 +25,7 @@ mc_dict={
     "__IsCluster" : False,
     "__AutoRun" : True,
     "IsLoad" : False,
-    "Reweight" : [2],
+    "Reweight" : [3.0],
     #"ReadFile" : "0.90_3_coll",
     "Sample" : 1000000,
     "Sweep" : 10,
@@ -38,7 +38,7 @@ TO_DO.append(job.JobMonteCarlo(mc_dict))
 # self consist loop job definition
 sc_dict={
     "__Execute" : ["python", "./run_loop.py"],
-    "__Duplicate" : 1,
+    "__Duplicate" : 0,
     "__IsCluster" : False,
     #"__AutoRun" : True, 
     "__AutoRun" : False, 
@@ -77,9 +77,9 @@ TO_DO.append(job.JobOutputLoop(ol_dict))
 # output numerical integration job definition
 ni_dict={
     "__Execute" : ["./gamma3.exe"],
-    "__Duplicate" : 0,
+    "__Duplicate" : 1,
     "__IsCluster" : False,
-    "__AutoRun" : True,
+    "__AutoRun" : False,
     "IsLoad" : False,
     }
 ni_dict.update(com_dict)
