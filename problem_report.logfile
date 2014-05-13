@@ -341,6 +341,15 @@ branch abandoned!!!
 
 21. Re(G) is symmetric or not?
 
+05/11:use tau=1/2 as the value for the first bin, found that the FFT for the delta functions should be 
+changed. get wrong result for Gamma in self-consistent loop
+
+====================================================
+
+22. debug for fitting 
+
+05/13: for 1st order Gamma, the fitting doesn't work for tau1+tau2>MxT-1
+
 ====================================================
 
 ====================================================
