@@ -386,9 +386,12 @@ COMPLEX*16 FUNCTION weight_G(typ1, t1)
 END FUNCTION weight_G
 
 !!--------- extract weight for W ---------
-COMPLEX*16 FUNCTION weight_W(typ1, dr, t1)
+COMPLEX*16 FUNCTION weight_W(typ1, dr0, t1)
   implicit none
-  integer, intent(in)  :: dr(2), t1, typ1
+  integer, intent(in)  :: dr0(2), t1, typ1
+  integer :: dr(2)
+
+  call diff_r(dr0, dr)
 
   if(t1>=0) then
     weight_W = W(typ1, dr(1), dr(2), t1)
@@ -398,10 +401,14 @@ COMPLEX*16 FUNCTION weight_W(typ1, dr, t1)
 END FUNCTION weight_W
 
 !!--------- extract weight for Gamma ---------
-COMPLEX*16 FUNCTION weight_Gam(typ1, dr, t1, t2)
+COMPLEX*16 FUNCTION weight_Gam(typ1, dr0, t1, t2)
   implicit none
-  integer, intent(in)  :: dr(2), t1, t2, typ1
+  integer, intent(in)  :: dr0(2), t1, t2, typ1
   double precision :: GaR
+  integer :: dr(2)
+
+  call diff_r(dr0, dr)
+
 
   if(t1>=0 .and. t2>=0) then
     weight_Gam = Gam(typ1, dr(1), dr(2), t1, t2)
