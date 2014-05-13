@@ -166,8 +166,8 @@ INCLUDE "fitting.f90"
 
 subroutine numerical_integeration
   implicit none
-  !call LogFile%QuickLog("Reading G,W, and Gamma...")
-  !call read_GWGamma
+  call LogFile%QuickLog("Reading G,W, and Gamma...")
+  call read_GWGamma
 
   call calculate_Gam1
 end subroutine
@@ -229,8 +229,8 @@ SUBROUTINE self_consistent
 
     call output_Quantities
 
-    call update_flag
-    call write_GWGamma
+    !call update_flag
+    !call write_GWGamma
   endif
   return
 END SUBROUTINE self_consistent
@@ -294,7 +294,7 @@ SUBROUTINE monte_carlo
   call LogFile%QuickLog("Initializing monte carlo...")
   call read_GWGamma
 
-  !call calculate_Gam1
+  call calculate_Gam1
 
   call calculate_GamNormWeight
 

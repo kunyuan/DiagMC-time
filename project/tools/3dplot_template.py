@@ -13,7 +13,9 @@ Beta = 0.90
 N = 64
 
 #GamInt, dim_name = read_data.read_array("./../0.90_Gam1.dat")["Gamma"]
-GamMC, dim_name = read_data.read_array("./../../data/conservation/bare_0.90_4_quantities.dat")["Gamma2"]
+#GamMC, dim_name = read_data.read_array("./../../data/conservation/bare_0.90_4_quantities.dat")["Gamma2"]
+#GamMC, dim_name = read_data.read_array("./1_loop/0.90_quantities.dat")["Gamma"]
+GamMC, dim_name = read_data.read_array("../0.90_quantities.dat")["Gamma"]
 
 if is2d is True:
     tau = np.arange(0, Beta, Beta/N)
@@ -35,7 +37,7 @@ else:
     ax = fig.gca(projection='3d')
 
     surf = ax.plot_surface(
-        X, Y, GamMC.imag, rstride=1, cstride=1, cmap=cm.coolwarm,
+        X, Y, GamMC.real, rstride=1, cstride=1, cmap=cm.coolwarm,
         linewidth=0, antialiased=False)
     # ax.set_zlim(-1.01, 1.01)
 

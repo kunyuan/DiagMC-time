@@ -24,7 +24,7 @@ then
       echo "Done!"
   fi
 else
-  $compilor $sourcecode1 -O3 -o $target1
+  $compilor $sourcecode1  -o $target1
   $compilor $sourcecode2 -O3 -o $target2
   echo "Done!"
 fi
