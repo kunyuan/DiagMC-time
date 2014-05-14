@@ -985,7 +985,8 @@ SUBROUTINE output_Gam1
   write(104, *) "#Beta", Beta, "L", L(1), L(2), "Order", MCOrder
   do it2 = 0, MxT-1
     do it1 = 0, MxT-1
-      write(104, *)  real(GamOrder1(1, it1, it2)), dimag(GamOrder1(1,it1,it2))
+      !write(104, *)  real(GamOrder1(1, it1, it2)), dimag(GamOrder1(1,it1,it2))
+      write(104, *)  real(Gam(1, 0, 0, it1, it2)), dimag(Gam(1,0, 0,it1,it2))
     enddo
   enddo
   write(104, *)
@@ -1072,15 +1073,14 @@ SUBROUTINE output_Quantities
         tau1 = dble(it1)*Beta/dble(MxT)
         tau2 = dble(it2)*Beta/dble(MxT)
 
+        gam1 = (0.d0, 0.d0)
         if(IsBasis2D(ibin)) then
-          gam1 = (0.d0, 0.d0)
-          do  ibasis = 1, NBasisGam
+          do ibasis = 1, NBasisGam
             gam1 = gam1 + GamMCBasis(iorder, 1, 0, 0, ibin, ibasis)*  &
               & weight_basis_Gam(CoefGam(0:BasisOrderGam,0:BasisOrderGam,ibasis,ibin), tau1, tau2)
           enddo
         else
-          gam1 = (0.d0, 0.d0)
-          do  ibasis = 1, NBasis
+          do ibasis = 1, NBasis
             gam1 = gam1 + GamMCBasis(iorder, 1, 0, 0, ibin, ibasis)* weight_basis( &
               & CoefGam(0:BasisOrder,0,ibasis,ibin), tau1)
           enddo
