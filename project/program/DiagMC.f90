@@ -18,7 +18,8 @@ PROGRAM MAIN
     read(11,*) ID
     read(11,*) L(1)
     read(11,*) L(2)
-    read(11,*) Jcp
+    read(11,*) J1
+    read(11,*) J2
     read(11,*) Beta
     read(11,*) MCOrder
     read(11,*) IsLoad
