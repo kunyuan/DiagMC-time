@@ -169,25 +169,34 @@ subroutine numerical_integeration
   call LogFile%QuickLog("Reading G,W, and Gamma...")
   call read_GWGamma
 
-  !call calculate_Gam1
-  call calculate_Gamma_in_basis
-  call output_Gam1
+  call calculate_Gam1
 end subroutine
 
-subroutine just_output
+SUBROUTINE just_output
   implicit none
-  !call LogFile%QuickLog("Just output something!")
-  !call LogFile%QuickLog("Reading G,W, and Gamma...")
-  !call read_GWGamma
+  logical :: flag
+  call LogFile%QuickLog("Just output something!")
+  call LogFile%QuickLog("Reading G,W, and Gamma...")
+  call read_GWGamma
+
 
   call LogFile%QuickLog("Reading MC data...")
   call read_monte_carlo_data
 
+  call LogFile%QuickLog("Reading Done!...")
+
+  !!-------- update the Gamma matrix with MC data -------
   call Gam_mc2matrix_mc
 
-  call LogFile%QuickLog("Reading Done!...")
+  flag = self_consistent_GW(1.d-8)
+
+  call calculate_Chi
+  call transfer_Chi_r(-1)
+  call transfer_Chi_t(-1)
+  call transfer_Sigma_t(-1)
+
   call output_Quantities
-end subroutine just_output
+end SUBROUTINE just_output
 
 SUBROUTINE self_consistent
   implicit none
@@ -295,8 +304,6 @@ SUBROUTINE monte_carlo
 
   call LogFile%QuickLog("Initializing monte carlo...")
   call read_GWGamma
-
-  !call calculate_Gam1
 
   call calculate_GamNormWeight
 

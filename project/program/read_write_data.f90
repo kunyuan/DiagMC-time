@@ -991,35 +991,35 @@ SUBROUTINE output_Gam1
   enddo
   write(104, *)
 
-  write(104, *) "##################################GammaBasis"
-  write(104, *) "#tau1:", MxT, ",tau2:", MxT
-  write(104, *) "#Beta", Beta, "L", L(1), L(2), "Order", MCOrder
-  do it2 = 0, MxT-1
-    do it1 = 0, MxT-1
+  !write(104, *) "##################################GammaBasis"
+  !write(104, *) "#tau1:", MxT, ",tau2:", MxT
+  !write(104, *) "#Beta", Beta, "L", L(1), L(2), "Order", MCOrder
+  !do it2 = 0, MxT-1
+    !do it1 = 0, MxT-1
 
-      ibin = get_bin_Gam(it1, it2)
+      !ibin = get_bin_Gam(it1, it2)
 
-      tau1 = dble(it1)*Beta/dble(MxT)
-      tau2 = dble(it2)*Beta/dble(MxT)
+      !tau1 = dble(it1)*Beta/dble(MxT)
+      !tau2 = dble(it2)*Beta/dble(MxT)
 
-      if(IsBasis2D(ibin)) then
-        gam1 = (0.d0, 0.d0)
-        do  ibasis = 1, NBasisGam
-          gam1 = gam1 + GamMCBasis(1, 1, 0, 0, ibin, ibasis)* weight_basis_Gam( &
-            & CoefGam(0:BasisOrderGam,0:BasisOrderGam,ibasis,ibin), tau1, tau2)
-        enddo
-      else
-        gam1 = (0.d0, 0.d0)
-        do  ibasis = 1, NBasis
-          gam1 = gam1 + GamMCBasis(1, 1, 0, 0, ibin, ibasis)* weight_basis( &
-            & CoefGam(0:BasisOrder,0,ibasis,ibin), tau1)
-        enddo
-      endif
+      !if(IsBasis2D(ibin)) then
+        !gam1 = (0.d0, 0.d0)
+        !do  ibasis = 1, NBasisGam
+          !gam1 = gam1 + GamMCBasis(1, 1, 0, 0, ibin, ibasis)* weight_basis_Gam( &
+            !& CoefGam(0:BasisOrderGam,0:BasisOrderGam,ibasis,ibin), tau1, tau2)
+        !enddo
+      !else
+        !gam1 = (0.d0, 0.d0)
+        !do  ibasis = 1, NBasis
+          !gam1 = gam1 + GamMCBasis(1, 1, 0, 0, ibin, ibasis)* weight_basis( &
+            !& CoefGam(0:BasisOrder,0,ibasis,ibin), tau1)
+        !enddo
+      !endif
 
-      write(104, *) real(gam1), dimag(gam1)
-    enddo
-  enddo
-  write(104, *)
+      !write(104, *) real(gam1), dimag(gam1)
+    !enddo
+  !enddo
+  !write(104, *)
   close(104)
   return
 END SUBROUTINE output_Gam1
