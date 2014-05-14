@@ -2671,12 +2671,13 @@ SUBROUTINE measure
     if(IsBasis2D(ibin)) then
       do ibasis = 1, NBasisGam
         GamMCBasis(Order, ityp, dx, dy, ibin, ibasis) = GamMCBasis(Order, ityp, dx, dy, ibin, &
-          & ibasis) + (Phase/factorM)*weight_basis_Gam(CoefGam(:,:,ibasis,ibin), dtau1, dtau2)
+          & ibasis) + (Beta/dble(MxT))**2.d0*(Phase/factorM)*weight_basis_Gam(CoefGam &
+          & (0:BasisOrderGam,0:BasisOrderGam, ibasis,ibin), dtau1, dtau2)
       enddo
     else 
       do ibasis = 1, NBasis
         GamMCBasis(Order, ityp, dx, dy, ibin, ibasis) = GamMCBasis(Order, ityp, dx, dy, ibin, &
-          & ibasis) + (Phase/factorM)*weight_basis(CoefGam(:,0,ibasis,ibin), dtau1)
+          & ibasis) + (Beta/dble(MxT))*(Phase/factorM)*weight_basis(CoefGam(0:BasisOrder,0,ibasis,ibin), dtau1)
       enddo
     endif
 
