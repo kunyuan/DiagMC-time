@@ -267,7 +267,9 @@ SUBROUTINE markov(IsToss)
       call statistics
 
       call output_GamMC
+      !call output_GamMC
       !call output_test
+
       call print_status
       call print_config
 
@@ -2558,6 +2560,7 @@ SUBROUTINE measure
   double precision  :: factorM
   double precision :: tau1, tau2, tau3
   double precision :: dtau1, dtau2
+  double precision :: wbasis
 
   GamWormOrder(Order) = GamWormOrder(Order) + 1.d0
   !===========  Measure in worm space  ==========================
@@ -2655,28 +2658,31 @@ SUBROUTINE measure
       GamNorm = GamNorm + Phase/CoefOfWeight(0)
     endif
 
-    !============== save Gamma in the matrix =============================================
-    GamMC(Order, ityp, dx, dy, dt1, dt2) = GamMC(Order, ityp, dx, dy, dt1, dt2) &
-      & + Phase/factorM
-    ReGamSqMC(Order, ityp, dx, dy, dt1, dt2 ) = ReGamSqMC(Order, ityp, dx, dy, dt1, dt2) &
-      & + (real(Phase)/factorM)**2.d0
-    ImGamSqMC(Order, ityp, dx, dy, dt1, dt2 ) = ImGamSqMC(Order, ityp, dx, dy, dt1, dt2) &
-      & + (dimag(Phase)/factorM)**2.d0
-
     !============ save Gamma in the fitting coeffecients =====================================
     ibin = get_bin_Gam(dt1, dt2)
 
     if(IsBasis2D(ibin)) then
       do ibasis = 1, NBasisGam
-        GamMCBasis(Order, ityp, dx, dy, ibin, ibasis) = GamMCBasis(Order, ityp, dx, dy, ibin, &
-          & ibasis) + (Beta/dble(MxT))**2.d0*(Phase/factorM)*weight_basis_Gam(CoefGam &
+        wbasis = (Beta/dble(MxT))**2.d0*weight_basis_Gam(CoefGam &
           & (0:BasisOrderGam,0:BasisOrderGam, ibasis,ibin), dt1*Beta/MxT, dt2*Beta/MxT)
+
+        GamBasis(Order, ityp, dx, dy, ibin, ibasis) = GamBasis(Order, ityp, dx, dy, ibin, &
+          & ibasis) + (Phase/factorM)*wbasis
+        ReGamSqBasis(Order, ityp, dx, dy, ibin, ibasis) = ReGamSqBasis(Order, ityp, dx, dy, ibin, &
+          & ibasis) + (real(Phase)/factorM)**2.d0*wbasis
+        ImGamSqBasis(Order, ityp, dx, dy, ibin, ibasis) = ImGamSqBasis(Order, ityp, dx, dy, ibin, &
+          & ibasis) + (dimag(Phase)/factorM)**2.d0*wbasis
       enddo
     else 
       do ibasis = 1, NBasis
-        GamMCBasis(Order, ityp, dx, dy, ibin, ibasis) = GamMCBasis(Order, ityp, dx, dy, ibin, &
-          & ibasis) + (Beta/dble(MxT))*(Phase/factorM)*weight_basis(CoefGam(0:BasisOrder,0, &
+        wbasis = (Beta/dble(MxT))*weight_basis(CoefGam(0:BasisOrder,0, &
           & ibasis,ibin), dt1*Beta/MxT)
+        GamBasis(Order, ityp, dx, dy, ibin, ibasis) = GamBasis(Order, ityp, dx, dy, ibin, &
+          & ibasis) + (Phase/factorM)*wbasis
+        ReGamSqBasis(Order, ityp, dx, dy, ibin, ibasis) = ReGamSqBasis(Order, ityp, dx, dy, ibin, &
+          & ibasis) + (real(Phase)/factorM)**2.d0*wbasis
+        ImGamSqBasis(Order, ityp, dx, dy, ibin, ibasis) = ImGamSqBasis(Order, ityp, dx, dy, ibin, &
+          & ibasis) + (dimag(Phase)/factorM)**2.d0*wbasis
       enddo
     endif
 
