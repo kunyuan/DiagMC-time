@@ -111,11 +111,13 @@ PROGRAM MAIN
   allocate(Denom(0:L(1)-1, 0:L(2)-1, 0:MxT-1))
   allocate(Chi(0:L(1)-1, 0:L(2)-1, 0:MxT-1))
 
-  allocate(GamMC(0:MCOrder,1:NTypeGam/2, 0:L(1)-1, 0:L(2)-1, 0:MxT-1, 0:MxT-1))
-  allocate(ReGamSqMC(0:MCOrder,1:NTypeGam/2, 0:L(1)-1, 0:L(2)-1, 0:MxT-1, 0:MxT-1))
-  allocate(ImGamSqMC(0:MCOrder,1:NTypeGam/2, 0:L(1)-1, 0:L(2)-1, 0:MxT-1, 0:MxT-1))
+  !allocate(GamMC(0:MCOrder,1:NTypeGam/2, 0:L(1)-1, 0:L(2)-1, 0:MxT-1, 0:MxT-1))
+  !allocate(ReGamSqMC(0:MCOrder,1:NTypeGam/2, 0:L(1)-1, 0:L(2)-1, 0:MxT-1, 0:MxT-1))
+  !allocate(ImGamSqMC(0:MCOrder,1:NTypeGam/2, 0:L(1)-1, 0:L(2)-1, 0:MxT-1, 0:MxT-1))
 
-  allocate(GamMCBasis(0:MCOrder,1:NTypeGam/2, 0:L(1)-1, 0:L(2)-1, 1:NbinGam, 1:NBasisGam))
+  allocate(GamBasis(0:MCOrder,1:NTypeGam/2, 0:L(1)-1, 0:L(2)-1, 1:NbinGam, 1:NBasisGam))
+  allocate(ReGamSqBasis(0:MCOrder,1:NTypeGam/2, 0:L(1)-1, 0:L(2)-1, 1:NbinGam, 1:NBasisGam))
+  allocate(ImGamSqBasis(0:MCOrder,1:NTypeGam/2, 0:L(1)-1, 0:L(2)-1, 1:NbinGam, 1:NBasisGam))
 
   MaxStat=1024
   allocate(ObsRecord(1:MaxStat,0:NObs-1))
@@ -345,11 +347,13 @@ SUBROUTINE monte_carlo
     GamOrder(:) = 0.d0
     GamWormOrder(:) = 0.d0
 
-    GamMC(:,:,:,:,:,:) = (0.d0, 0.d0)
-    ReGamSqMC(:,:,:,:,:,:) = 0.d0
-    ImGamSqMC(:,:,:,:,:,:) = 0.d0
+    !GamMC(:,:,:,:,:,:) = (0.d0, 0.d0)
+    !ReGamSqMC(:,:,:,:,:,:) = 0.d0
+    !ImGamSqMC(:,:,:,:,:,:) = 0.d0
 
-    GamMCBasis(:,:,:,:,:,:) = (0.d0, 0.d0)
+    GamBasis(:,:,:,:,:,:) = (0.d0, 0.d0)
+    ReGamSqBasis(:,:,:,:,:,:) = 0.d0
+    ImGamSqBasis(:,:,:,:,:,:) = 0.d0
 
     GamNorm = (0.d0, 0.d0)
     TestData(:)=0.d0
