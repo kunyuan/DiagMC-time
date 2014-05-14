@@ -8,15 +8,12 @@ N = 64
 
 tau = np.arange(0, Beta, Beta/N)
 
-#Gamma=["Gamma1","Gamma2","Gamma3","Gamma4"]
-Gamma=["Gamma1","Gamma2","Gamma3"]
-#Gamma=["Gamma1","Gamma2","Gamma"]
 Quan2D=["Gamma1"]
 Quan1D=["GammaDiag1"]
 Quans = Quan1D+Quan2D
 
 DiagGamma=[]
-DiagGamma.append(read_data.read_array("../0.50_0.40_quantities.dat", Quans))
+DiagGamma.append(read_data.read_array("../0.50_0.50_quantities.dat", Quans))
 
 
 fig = plt.figure()
