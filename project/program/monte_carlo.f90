@@ -2658,6 +2658,13 @@ SUBROUTINE measure
       GamNorm = GamNorm + Phase/CoefOfWeight(0)
     endif
 
+    !============ save the diagonal Gamma ================================
+    if(dt1==dt2 .and. ityp==1) then
+      GamMC(Order, dx, dy, dt1) = GamMC(Order, dx, dy, dt1) + (Phase/factorM)
+      ReGamSqMC(Order, dx, dy, dt1) = ReGamSqMC(Order, dx, dy, dt1) + (Real(Phase/factorM))**2.d0
+      ImGamSqMC(Order, dx, dy, dt1) = ImGamSqMC(Order, dx, dy, dt1) + (dimag(Phase/factorM))**2.d0
+    endif
+
     !============ save Gamma in the fitting coeffecients =====================================
     ibin = get_bin_Gam(dt1, dt2)
 
@@ -2677,6 +2684,7 @@ SUBROUTINE measure
       do ibasis = 1, NBasis
         wbasis = (Beta/dble(MxT))*weight_basis(CoefGam(0:BasisOrder,0, &
           & ibasis,ibin), dt1*Beta/MxT)
+
         GamBasis(Order, ityp, dx, dy, ibin, ibasis) = GamBasis(Order, ityp, dx, dy, ibin, &
           & ibasis) + (Phase/factorM)*wbasis
         ReGamSqBasis(Order, ityp, dx, dy, ibin, ibasis) = ReGamSqBasis(Order, ityp, dx, dy, ibin, &

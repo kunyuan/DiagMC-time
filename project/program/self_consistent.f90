@@ -407,38 +407,82 @@ SUBROUTINE Gam_mc2matrix_mc
   call LogFile%WriteStamp('i')
 
   looporder: do iorder = 1, MCOrder
+    totrerr = 0.d0
+    totierr = 0.d0
+    do it1 = 0, MxT-1
+      rgam = real(GamMC(iorder, 0, 0, it1))/Z_normal
+      rgam2 = ReGamSqMC(iorder, 0, 0, it1)/Z_normal
 
-    do it2 = 0, MxT-1
-      do it1 = 0, MxT-1
-        tau1 = dble(it1)*Beta/dble(MxT)
-        tau2 = dble(it2)*Beta/dble(MxT)
-        ibin = get_bin_Gam(it1, it2)
+      rerr = sqrt(abs(rgam2)-rgam**2.d0)/sqrt(Z_normal-1)
+      rerr = rerr* ratioerr
+      totrerr = totrerr + abs(rerr)
 
-        do dx = 0, L(1)-1
-          do dy = 0, L(2)-1
-            do ityp = 1, NTypeGam/2
-              typ = 2*(ityp-1)+1
+      igam = dimag(GamMC(iorder, 0, 0, it1))/Z_normal
+      igam2 = ImGamSqMC(iorder, 0, 0, it1)/Z_normal
 
-              if(IsBasis2D(ibin)) then
-                do ibasis = 1, NBasisGam
-                  cgam = GamBasis(iorder,ityp,dx,dy,ibin,ibasis)* weight_basis_Gam( &
-                    & CoefGam(0:BasisOrderGam,0:BasisOrderGam,ibasis,ibin), tau1, tau2)
-                  Gam(typ,dx,dy,it1,it2) = Gam(typ,dx,dy,it1,it2) + cgam*normal
-                enddo
-              else 
-                do ibasis = 1, NBasis
-                  cgam = GamBasis(iorder, ityp, dx, dy, ibin, ibasis)* weight_basis( &
-                    & CoefGam(0:BasisOrder,0,ibasis,ibin), tau1)
-                  Gam(typ,dx,dy,it1,it2) = Gam(typ,dx,dy,it1,it2) + cgam*normal
-                enddo
-              endif
+      ierr = sqrt(abs(igam2)-igam**2.d0)/sqrt(Z_normal-1)
+      ierr = ierr* ratioerr
+      totierr = totierr + abs(ierr)
+    enddo
+
+    rgam = SUM(abs(real(GamMC(iorder, 0,0,:))))/Z_normal
+    if(rgam<1.d-30) then
+      rpercenterr = 0.d0
+    else
+      rpercenterr = totrerr/rgam
+    endif
+
+    if(rpercenterr>MxError) then
+      flag(iorder)=.false.
+    endif
+
+    igam = SUM(abs(dimag(GamMC(iorder, 0,0,:))))/Z_normal
+    if(igam<1.d-30) then
+      ipercenterr = 0.d0
+    else
+      ipercenterr = totierr/igam
+    endif
+
+    if(ipercenterr>MxError) then
+      flag(iorder)=.false.
+    endif
+
+    call LogFile%WriteLine("Order "+str(iorder)+" relative error: "+str(rpercenterr,'(f6.3)')+","+str(ipercenterr,'(f6.3)')+", accept: "+str(flag(iorder)))
+
+
+    if(flag(iorder)) then
+      do it2 = 0, MxT-1
+        do it1 = 0, MxT-1
+          tau1 = dble(it1)*Beta/dble(MxT)
+          tau2 = dble(it2)*Beta/dble(MxT)
+          ibin = get_bin_Gam(it1, it2)
+
+          do dx = 0, L(1)-1
+            do dy = 0, L(2)-1
+              do ityp = 1, NTypeGam/2
+                typ = 2*(ityp-1)+1
+
+                if(IsBasis2D(ibin)) then
+                  do ibasis = 1, NBasisGam
+                    cgam = GamBasis(iorder,ityp,dx,dy,ibin,ibasis)* weight_basis_Gam( &
+                      & CoefGam(0:BasisOrderGam,0:BasisOrderGam,ibasis,ibin), tau1, tau2)
+                    Gam(typ,dx,dy,it1,it2) = Gam(typ,dx,dy,it1,it2) + cgam*normal
+                  enddo
+                else 
+                  do ibasis = 1, NBasis
+                    cgam = GamBasis(iorder, ityp, dx, dy, ibin, ibasis)* weight_basis( &
+                      & CoefGam(0:BasisOrder,0,ibasis,ibin), tau1)
+                    Gam(typ,dx,dy,it1,it2) = Gam(typ,dx,dy,it1,it2) + cgam*normal
+                  enddo
+                endif
+              enddo
             enddo
           enddo
         enddo
       enddo
-    enddo
-
+    endif
   enddo looporder
+
   Gam(2,:,:,:,:) = Gam(1,:,:,:,:)
   Gam(4,:,:,:,:) = Gam(3,:,:,:,:)
   Gam(6,:,:,:,:) = Gam(5,:,:,:,:)

@@ -598,21 +598,17 @@ SUBROUTINE write_monte_carlo_data
   write(104) Beta, MCOrder, L(1), L(2)
   write(104) imc, GamNorm, GamNormWeight
   write(104) Z_normal, ratioerr
-  !do it2 = 0, MxT-1
-    !do it1 = 0, MxT-1
-      !do iy = 0, L(2)-1
-        !do ix = 0, L(1)-1
-          !do ityp = 1, NtypeGam/2
-            !do iorder = 0, MCOrder
-              !write(104)  GamMC(iorder,  ityp, ix, iy, it1, it2)
-              !write(104)  ReGamSqMC(iorder,  ityp, ix, iy, it1, it2)
-              !write(104)  ImGamSqMC(iorder,  ityp, ix, iy, it1, it2)
-            !enddo
-          !enddo
-        !enddo
-      !enddo
-    !enddo
-  !enddo
+  do it1 = 0, MxT-1
+    do iy = 0, L(2)-1
+      do ix = 0, L(1)-1
+        do iorder = 0, MCOrder
+          write(104)  GamMC(iorder, ix, iy, it1)
+          write(104)  ReGamSqMC(iorder, ix, iy, it1)
+          write(104)  ImGamSqMC(iorder, ix, iy, it1)
+        enddo
+      enddo
+    enddo
+  enddo
 
   do ibasis = 1, NBasisGam
     do ibin = 1, NbinGam
@@ -653,21 +649,17 @@ SUBROUTINE read_monte_carlo_data
   read(105,iostat=ios) imc, GamNorm, GamNormWeight
   read(105,iostat=ios) Z_normal, ratioerr
 
-  !do it2 = 0, MxT-1
-    !do it1 = 0, MxT-1
-      !do iy = 0, L(2)-1
-        !do ix = 0, L(1)-1
-          !do ityp = 1, NtypeGam/2
-            !do iorder = 0, MCOrder
-              !read(105,iostat=ios)  GamMC(iorder, ityp, ix, iy, it1, it2)
-              !read(105,iostat=ios)  ReGamSqMC(iorder, ityp, ix, iy, it1, it2)
-              !read(105,iostat=ios)  ImGamSqMC(iorder, ityp, ix, iy, it1, it2)
-            !enddo
-          !enddo
-        !enddo
-      !enddo
-    !enddo
-  !enddo
+  do it1 = 0, MxT-1
+    do iy = 0, L(2)-1
+      do ix = 0, L(1)-1
+        do iorder = 0, MCOrder
+          read(105,iostat=ios)  GamMC(iorder, ix, iy, it1)
+          read(105,iostat=ios)  ReGamSqMC(iorder,  ix, iy, it1)
+          read(105,iostat=ios)  ImGamSqMC(iorder,  ix, iy, it1)
+        enddo
+      enddo
+    enddo
+  enddo
 
   do ibasis = 1, NBasisGam
     do ibin = 1, NbinGam
@@ -1053,20 +1045,6 @@ SUBROUTINE output_Quantities
   write(104, *)
 
   normal = GamNormWeight/GamNorm
-
-  !do iorder = 1, MCOrder
-    !write(104, *) "##################################Gamma",trim(adjustl(str(iorder)))
-    !write(104, *) "#tau1:", MxT, ",tau2:", MxT
-    !write(104, *) "#Beta", Beta, "L", L(1), L(2), "Order", MCOrder
-    !do it2 = 0, MxT-1
-      !do it1 = 0, MxT-1
-        !write(104, *)  real(GamMC(iorder, 1, 0, 0, it1, it2))*normal &
-          !& , dimag(GamMC(iorder, 1, 0, 0, it1, it2))*normal
-      !enddo
-    !enddo
-    !write(104, *)
-  !enddo
-
   do iorder = 1, MCOrder
     write(104, *) "##################################Gamma",trim(adjustl(str(iorder)))
     write(104, *) "#tau1:", MxT, ",tau2:", MxT
@@ -1098,6 +1076,15 @@ SUBROUTINE output_Quantities
   enddo
 
   do iorder = 1, MCOrder
+    write(104, *) "##################################GammaDiag",trim(adjustl(str(iorder)))
+    write(104, *) "#tau1:", MxT
+    write(104, *) "#Beta", Beta, "L", L(1), L(2), "Order", MCOrder
+    do it1 = 0, MxT-1
+      gam1 = GamMC(iorder, 0, 0, it1)
+      write(104, *) real(gam1)*normal, dimag(gam1)*normal
+    enddo
+    write(104, *)
+
     write(104, *) "##################################GammaAntiDiag",trim(adjustl(str(iorder)))
     write(104, *) "#tau1:", MxT
     write(104, *) "#Beta", Beta, "L", L(1), L(2), "Order", MCOrder
