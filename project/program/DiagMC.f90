@@ -290,7 +290,7 @@ SUBROUTINE monte_carlo
   call LogFile%QuickLog("Initializing monte carlo...")
   call read_GWGamma
 
-  call calculate_Gam1
+  !call calculate_Gam1
 
   call calculate_GamNormWeight
 
