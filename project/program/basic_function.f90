@@ -326,9 +326,6 @@ Complex*16 FUNCTION weight_W0(typ, dr)
   implicit none
   integer, intent(in) :: dr(2), typ
   integer :: dx1, dy1
-  double precision :: ratio
-
-  ratio = Jcp
 
   dx1 = dr(1);       dy1 = dr(2)
   if(dx1>=0  .and. dx1<L(1) .and. dy1>=0 .and. dy1<L(2)) then
@@ -339,11 +336,19 @@ Complex*16 FUNCTION weight_W0(typ, dr)
 
     if((dx1==1.and.dy1==0).or.(dx1==0.and.dy1==1)) then
       if(typ ==1 .or. typ == 2) then
-        weight_W0 = dcmplx(0.25d0*ratio, 0.d0)
+        weight_W0 = dcmplx(0.25d0*J1, 0.d0)
       else if(typ == 3 .or. typ == 4) then
-        weight_W0 = dcmplx(-0.25d0*ratio, 0.d0)
+        weight_W0 = dcmplx(-0.25d0*J1, 0.d0)
       else if(typ == 5 .or. typ == 6) then
-        weight_W0 = dcmplx(0.5d0*ratio, 0.d0)
+        weight_W0 = dcmplx(0.5d0*J1, 0.d0)
+      endif
+    else if(dx1==1.and.dy1==1) then
+      if(typ ==1 .or. typ == 2) then
+        weight_W0 = dcmplx(0.25d0*J2, 0.d0)
+      else if(typ == 3 .or. typ == 4) then
+        weight_W0 = dcmplx(-0.25d0*J2, 0.d0)
+      else if(typ == 5 .or. typ == 6) then
+        weight_W0 = dcmplx(0.5d0*J2, 0.d0)
       endif
     endif
   else
