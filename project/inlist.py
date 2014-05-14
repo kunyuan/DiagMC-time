@@ -64,7 +64,7 @@ TO_DO.append(job.JobConsistLoop(sc_ini_dict))
 # output loop job definition
 ol_dict={
     "__Execute" : ["python", "./run_loop.py"],
-    "__Duplicate" : 0,
+    "__Duplicate" : 1,
     "__IsCluster" : False,
     "__AutoRun" : True,
     #"__AutoRun" : False,
@@ -77,7 +77,7 @@ TO_DO.append(job.JobOutputLoop(ol_dict))
 # output numerical integration job definition
 ni_dict={
     "__Execute" : ["./gamma3.exe"],
-    "__Duplicate" : 1,
+    "__Duplicate" : 0,
     "__IsCluster" : False,
     "__AutoRun" : False,
     "IsLoad" : False,
