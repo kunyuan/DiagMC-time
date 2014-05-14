@@ -267,7 +267,7 @@ SUBROUTINE markov(IsToss)
       call statistics
 
       call output_GamMC
-      call output_test
+      !call output_test
       call print_status
       call print_config
 
@@ -2635,21 +2635,19 @@ SUBROUTINE measure
 
     factorM = 1.d0
     dtau1 = tau3-tau2
-    dt1 = Floor(dtau1*MxT/Beta)
-    if(dt1<0) then
+    if(dtau1<0) then
       dtau1 = dtau1 + Beta
-      dt1 = dt1 + MxT
       factorM = factorM * (-1.d0)
     endif
 
     dtau2 = tau1-tau3
-    dt2 = Floor(dtau2*MxT/Beta)
-    if(dt2<0) then
+    if(dtau2<0) then
       dtau2 = dtau2 + Beta
-      dt2 = dt2 + MxT
       factorM = factorM * (-1.d0)
     endif
 
+    dt1 = Floor(dtau1*MxT/Beta)
+    dt2 = Floor(dtau2*MxT/Beta)
     factorM = factorM *CoefOfSymmetry(dx, dy)* CoefOfWeight(Order) *abs(WeightVertex(MeasureGam))
 
     !================= accumulation ===================================
@@ -2672,12 +2670,13 @@ SUBROUTINE measure
       do ibasis = 1, NBasisGam
         GamMCBasis(Order, ityp, dx, dy, ibin, ibasis) = GamMCBasis(Order, ityp, dx, dy, ibin, &
           & ibasis) + (Beta/dble(MxT))**2.d0*(Phase/factorM)*weight_basis_Gam(CoefGam &
-          & (0:BasisOrderGam,0:BasisOrderGam, ibasis,ibin), dtau1, dtau2)
+          & (0:BasisOrderGam,0:BasisOrderGam, ibasis,ibin), dt1*Beta/MxT, dt2*Beta/MxT)
       enddo
     else 
       do ibasis = 1, NBasis
         GamMCBasis(Order, ityp, dx, dy, ibin, ibasis) = GamMCBasis(Order, ityp, dx, dy, ibin, &
-          & ibasis) + (Beta/dble(MxT))*(Phase/factorM)*weight_basis(CoefGam(0:BasisOrder,0,ibasis,ibin), dtau1)
+          & ibasis) + (Beta/dble(MxT))*(Phase/factorM)*weight_basis(CoefGam(0:BasisOrder,0, &
+          & ibasis,ibin), dt1*Beta/MxT)
       enddo
     endif
 
