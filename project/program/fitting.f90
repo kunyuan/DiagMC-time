@@ -121,43 +121,43 @@
 
 
 !========= for test purpose =========================================
-SUBROUTINE calculate_Gamma_in_basis
-  implicit none
-  integer :: ibin, dt1, dt2, ibasis, ityp, dx, dy, typ
-  double precision :: dtau1, dtau2
+!SUBROUTINE calculate_Gamma_in_basis
+  !implicit none
+  !integer :: ibin, dt1, dt2, ibasis, ityp, dx, dy, typ
+  !double precision :: dtau1, dtau2
 
-  dx = 0
-  dy = 0
-  Order = 1
-  ityp = 1
-  GamMCBasis(:,:,:,:,:,:) = (0.d0, 0.d0)
+  !dx = 0
+  !dy = 0
+  !Order = 1
+  !ityp = 1
+  !GamMCBasis(:,:,:,:,:,:) = (0.d0, 0.d0)
 
-  do dt1 = 0, MxT-1
-    do dt2 = 0, MxT-1
-      ibin = get_bin_Gam(dt1, dt2)
-      dtau1 =  dble(dt1)*Beta/dble(MxT)
-      dtau2 =  dble(dt2)*Beta/dble(MxT)
+  !do dt1 = 0, MxT-1
+    !do dt2 = 0, MxT-1
+      !ibin = get_bin_Gam(dt1, dt2)
+      !dtau1 =  dble(dt1)*Beta/dble(MxT)
+      !dtau2 =  dble(dt2)*Beta/dble(MxT)
 
-      if(IsBasis2D(ibin)) then
-        do ibasis = 1, NBasisGam
-          GamMCBasis(Order, ityp, dx, dy, ibin, ibasis) = GamMCBasis(Order, ityp, dx, dy, ibin, &
-            & ibasis) + (Beta/dble(MxT))**2.d0*Gam(ityp, dx, dy, dt1, dt2)*weight_basis_Gam( &
-            & CoefGam(0:BasisOrderGam,0:BasisOrderGam,ibasis,ibin),  dtau1, dtau2)
-          !print *, ibin, ibasis, GamMCBasis(Order, ityp, dx, dy, ibin, ibasis)
-        enddo
-      else 
-        do ibasis = 1, NBasis
-          GamMCBasis(Order, ityp, dx, dy, ibin, ibasis) = GamMCBasis(Order, ityp, dx, dy, ibin, &
-            & ibasis) + (Beta/dble(MxT))*Gam(ityp, dx, dy, dt1, dt2)*weight_basis(CoefGam( &
-            & 0:BasisOrder,0, ibasis,ibin), dtau1)
-          !print *, ibin, ibasis, GamMCBasis(Order, ityp, dx, dy, ibin, ibasis)
-        enddo
-      endif
-    enddo
-  enddo
+      !if(IsBasis2D(ibin)) then
+        !do ibasis = 1, NBasisGam
+          !GamMCBasis(Order, ityp, dx, dy, ibin, ibasis) = GamMCBasis(Order, ityp, dx, dy, ibin, &
+            !& ibasis) + (Beta/dble(MxT))**2.d0*Gam(ityp, dx, dy, dt1, dt2)*weight_basis_Gam( &
+            !& CoefGam(0:BasisOrderGam,0:BasisOrderGam,ibasis,ibin),  dtau1, dtau2)
+          !!print *, ibin, ibasis, GamMCBasis(Order, ityp, dx, dy, ibin, ibasis)
+        !enddo
+      !else 
+        !do ibasis = 1, NBasis
+          !GamMCBasis(Order, ityp, dx, dy, ibin, ibasis) = GamMCBasis(Order, ityp, dx, dy, ibin, &
+            !& ibasis) + (Beta/dble(MxT))*Gam(ityp, dx, dy, dt1, dt2)*weight_basis(CoefGam( &
+            !& 0:BasisOrder,0, ibasis,ibin), dtau1)
+          !!print *, ibin, ibasis, GamMCBasis(Order, ityp, dx, dy, ibin, ibasis)
+        !enddo
+      !endif
+    !enddo
+  !enddo
 
-  return
-END SUBROUTINE calculate_Gamma_in_basis
+  !return
+!END SUBROUTINE calculate_Gamma_in_basis
 
 
 !============== divide the space into N bins for G,W, Gamma =============================

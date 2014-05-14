@@ -132,9 +132,6 @@ SUBROUTINE calculate_Gam1
   call transfer_Gam_t(-1)
 
   call transfer_GamOrder1_t(-1)
-
-  Gam(1,0,0,:,:) = GamOrder1(1,:,:)
-  call calculate_Gamma_in_basis
   call output_Gam1
 
   !================== bare Gamma ===============================
