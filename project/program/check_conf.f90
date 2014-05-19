@@ -5,7 +5,7 @@
 SUBROUTINE check_config
   implicit none
 
-  call LogFile%QuickLog("Checking the configuration...")
+  !call LogFile%QuickLog("Checking the configuration...")
   call check_topo
   call check_stat
   call check_irreducibility
@@ -15,7 +15,7 @@ SUBROUTINE check_config
   call check_time
   call check_site
   call check_weight
-  call LogFile%QuickLog("Checking configuration is done!")
+  !call LogFile%QuickLog("Checking configuration is done!")
   return
 END SUBROUTINE check_config
 

@@ -124,7 +124,7 @@ SUBROUTINE print_config
     & 'direction:', i2,2x, 'stat:',i2, 2x,'neigh:', i6,i6,i6)
 
   close(108)
-  call DRAW
+  !call DRAW
 END SUBROUTINE print_config
 
 !=================== VISUALIZATION  ==================================
