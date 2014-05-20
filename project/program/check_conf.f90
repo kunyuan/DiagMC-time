@@ -522,8 +522,7 @@ logical FUNCTION is_connected(Gam, G1, G2)
   if((NeighVertex(1,Gam)==G1 .and. NeighVertex(2,Gam)==G2) .or. &
    & (NeighVertex(2,Gam)==G1 .and. NeighVertex(1,Gam)==G2)) then
     if(IsWormPresent .and. (Gam==Ira .or. Gam==Masha)) then
-      is_connected=.false.
-      !is_connected=.true.
+      is_connected=.true.
     else
       is_connected=.true.
     endif
