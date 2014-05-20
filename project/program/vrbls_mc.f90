@@ -9,7 +9,7 @@ MODULE vrbls_mc
   logical, parameter  ::  HEAVY_DEBUG=.false.
   !heavy deug mode will turn on checking for all low level subroutines, it will significantly slow down the code
   !Please use it if you are debugging
-  logical, parameter  ::  IS_BOLD=.true.
+  logical, parameter  ::  IS_BOLD=.false.
   logical, parameter  ::  CHECK_G=.true.
   logical, parameter  ::  CHECK_W=.true.
   logical, parameter  ::  CHECK_GAM=IS_BOLD
@@ -28,7 +28,7 @@ MODULE vrbls_mc
   integer, parameter :: MxVol = MxL(1)**D           ! the maximum system volume
   integer, parameter :: MxT   =   64                ! the maximum number of time segments
   !integer, parameter :: MxK   = 1000               ! the maximum momentum
-  integer, parameter :: MxK   = 1000000             ! the maximum momentum
+  integer, parameter :: MxK   = 1000             ! the maximum momentum
 
   double precision, parameter :: MxError = 0.1d0    ! the maximum error for MC
   integer, parameter          :: MxNblck = 1000000   ! the maximum memory blocks in MC simulations
@@ -222,6 +222,7 @@ MODULE vrbls_mc
   double precision :: Pupdate(Nupdate)  ! the probabilities to call different subroutines       
   double precision :: Fupdate(Nupdate)  ! a function of the summation of Pcall
 
+  double precision :: ProbCall(0:MxOrder, Nupdate)
   double precision :: ProbProp(0:MxOrder, Nupdate)
   double precision :: ProbAcc(0:MxOrder, Nupdate)
   double precision :: BalenceCheck(0:MxOrder,Nupdate,3)  ! a function of the check balence

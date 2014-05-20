@@ -50,7 +50,8 @@ SUBROUTINE print_status
       call LogFile%WriteLine("Order"+str(iorder))
       do i = 1, Nupdate
         if(ProbProp(iorder, i)/=0.d0) then
-          write(logstr, '(A,3f17.5)') updatename(i), ProbProp(iorder, i), ProbAcc(iorder, i), &
+          write(logstr, '(A,2f13.1,f13.5,f13.1,f13.5)') updatename(i), ProbCall(iorder, i), ProbProp(iorder, i), &
+            & ProbProp(iorder, i)/ProbCall(iorder, i), ProbAcc(iorder, i), &
             & ProbAcc(iorder, i)/ProbProp(iorder, i)
           call LogFile%WriteLine(logstr)
         endif
@@ -710,6 +711,7 @@ SUBROUTINE write_monte_carlo_conf
   write(103)  IsDeltaVertex(:)
   write(103)  IsDeltaLn(:)
   write(103)  kLn(:)
+  write(103)  KindLn(:)
 
   do i = 1, 2
     write(103)  NeighLn(i,:)
@@ -760,6 +762,7 @@ SUBROUTINE read_monte_carlo_conf
   read(106,iostat=ios)  IsDeltaVertex(:)
   read(106,iostat=ios)  IsDeltaLn(:)
   read(106,iostat=ios)  kLn(:)
+  !read(106,iostat=ios)  KindLn(:)
 
   do i = 1, 2
     read(106,iostat=ios)  NeighLn(i,:)
@@ -769,6 +772,7 @@ SUBROUTINE read_monte_carlo_conf
     read(106,iostat=ios)  NeighVertex(i,:) 
   enddo
   close(106)
+
   if(ios/=0) then
     call LogFile%QuickLog("The monte carlo binary configuration is broken?",'e')
     stop -1
@@ -823,7 +827,7 @@ SUBROUTINE read_monte_carlo_conf
       SpInVertex(:, i) = 2
     else if(TypeVertex(i)==5 .or. TypeVertex(i)==6) then
       SpInVertex(2, i) = Mod(TypeVertex(i), 2)+1
-      SpInVertex(1, i) = 3 - SpInVertex(1, i)
+      SpInVertex(1, i) = 3 - SpInVertex(2, i)
     endif
 
     WeightVertex(i) = weight_vertex(StatusVertex(i), IsDeltaVertex(i), &
@@ -837,13 +841,24 @@ SUBROUTINE read_monte_carlo_conf
   ikeyW = 1
   do i = 1, MxNLn
     if(StatusLn(i)==-1) cycle
-    if(KindLn(i)==1) then
+    !if(KindLn(i)==1) then
+      !LnValue2Key(i) = ikeyG
+      !GLnKey2Value(ikeyG) = i
+      !ikeyG = ikeyG + 1
+    !else if(KindLn(i)==2) then
+      !LnValue2Key(i) = ikeyW
+      !GLnKey2Value(ikeyW) = i
+      !ikeyW = ikeyW + 1
+    !endif
+    if(IsDeltaLn(i)==-1) then
+      KindLn(i)=1
       LnValue2Key(i) = ikeyG
       GLnKey2Value(ikeyG) = i
       ikeyG = ikeyG + 1
-    else if(KindLn(i)==2) then
+    else 
+      KindLn(i)=2
       LnValue2Key(i) = ikeyW
-      GLnKey2Value(ikeyW) = i
+      WLnKey2Value(ikeyW) = i
       ikeyW = ikeyW + 1
     endif
   enddo
@@ -883,7 +898,11 @@ SUBROUTINE read_monte_carlo_conf
     endif
     iGam = NeighLn(1, i)
     jGam = NeighLn(2, i)
-    TypeLn(i) = TypeGam2W(TypeVertex(iGam), TypeVertex(jGam))
+    if(StatusLn(i)<=1) then
+      TypeLn(i) = TypeGam2W(TypeVertex(iGam), TypeVertex(jGam))
+    else
+      TypeLn(i) = 1
+    endif
 
     tau = TVertex(3, iGam)-TVertex(3, jGam)
     WeightLn(i) = weight_wline(StatusLn(i), IsDeltaLn(i), WRVertex(:,jGam)-WRVertex(:,iGam), &

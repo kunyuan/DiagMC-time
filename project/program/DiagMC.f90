@@ -28,6 +28,7 @@ PROGRAM MAIN
       read(11,*) Nsamp
       read(11,*) Nstep
       read(11,*) Seed
+      read(11,*) title
       read(11,*) CoefOfWorm
       CoefOfWeight(0) = 1.d0
       read(11,*) CoefOfWeight(1:MCOrder)
@@ -321,6 +322,7 @@ SUBROUTINE monte_carlo
 
     call LogFile%QuickLog("Start Thermalization ...")
 
+    ProbCall(:,:) = 0.d0
     ProbProp(:,:) = 0.d0
     ProbAcc(:,:) = 0.d0
     BalenceCheck(:,:,:)=0.d0
@@ -341,6 +343,7 @@ SUBROUTINE monte_carlo
     Z_worm=0.0
     StatNum=0
 
+    ProbCall(:,:) = 0.d0
     ProbProp(:,:) = 0.d0
     ProbAcc(:,:) = 0.d0
 
@@ -368,10 +371,24 @@ SUBROUTINE monte_carlo
 
     call read_monte_carlo_conf
     call read_monte_carlo_data
-    call print_config
-    call check_config
-
     call LogFile%QuickLog("Read the previous MC data Done!...")
+
+    call LogFile%QuickLog(str(mc_version)+', '+str(file_version))
+    call LogFile%QuickLog("Updating G, W, and Gamma...")
+
+    call read_GWGamma
+    call output_Quantities
+    call update_WeightCurrent
+
+    call check_config
+    call print_config
+
+    ProbCall(:,:) = 0.d0
+    ProbProp(:,:) = 0.d0
+    ProbAcc(:,:) = 0.d0
+
+    GamOrder(:) = 0.d0
+    GamWormOrder(:) = 0.d0
   endif
 
   call LogFile%QuickLog("Running MC Simulations...")

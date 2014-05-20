@@ -209,9 +209,11 @@ SUBROUTINE markov(IsToss)
           call move_worm_along_gline_test           
         else if(nr<Fupdate(7)) then
           iupdate = 7
+          ProbCall(Order, iupdate) = ProbCall(Order, iupdate) + 1
           call add_interaction                  
         else if(nr<Fupdate(8)) then
           iupdate = 8
+          ProbCall(Order, iupdate) = ProbCall(Order, iupdate) + 1
           call remove_interaction             
         else if(nr<Fupdate(9)) then
           iupdate = 9
@@ -245,15 +247,12 @@ SUBROUTINE markov(IsToss)
           call change_Gamma_isdelta       
         endif
 
-        !call check_config
-        !call check_irreducibility
-
+        if(iupdate/=7 .and. iupdate/=8) then
+          ProbCall(Order, iupdate) = ProbCall(Order, iupdate) + 1
+        endif
       enddo
 
-
-      !call check_irreducibility
       if( .not. IsToss) call measure
-
     enddo 
 
     if(IsToss .and. iblck==1) return
@@ -265,10 +264,7 @@ SUBROUTINE markov(IsToss)
       call check_config
 
       call statistics
-
       call output_GamMC
-      !call output_GamMC
-      !call output_test
 
       call print_status
       call print_config
@@ -295,9 +291,6 @@ SUBROUTINE markov(IsToss)
       CoefOfWeight(:)=TimeRatio(:)*CoefOfWeight(:)*x/(GamWormOrder(:)+50.d0)
       CoefOfWeight(1:MCOrder) = CoefOfWeight(1:MCOrder)/CoefOfWeight(0)
       CoefOfWeight(0) = 1.d0
-
-      !x=sum(GamWormOrder(:)/Error(0:MCOrder))
-      !CoefOfWeight(:)=x/(GamWormOrder(:)/Error(0:MCOrder)+50.d0)
 
       call LogFile%WriteLine("Reweight Ratios:")
 
@@ -516,7 +509,6 @@ SUBROUTINE delete_worm_along_wline
 
   !------------ step1 : check if worm is present ------------------
   if(IsWormPresent .eqv. .false.)  return
-
   if(NeighVertex(3, Ira)/= NeighVertex(3, Masha))   return
 
   !------------ step2 : propose the new config ------------------
@@ -686,6 +678,11 @@ SUBROUTINE move_worm_along_wline
   !-------- irreducibility check ------------------------
   kWold = kLn(WLn)
   ktemp = add_k(kWold, (-1)**dir *kMasha)
+
+  !print *, Ira, kWold, kMasha, ktemp
+  !call print_config
+  !if(SignFermiloop==1.d0) stop
+
   if(Is_k_valid_for_W(ktemp)==.false.) return
   call update_line(WLn, ktemp, 2)
 
@@ -813,7 +810,7 @@ SUBROUTINE move_worm_along_gline
   
   kGold = kLn(GLn)
   ktemp = add_k(kGold, (-1)**(dir+1) *kMasha)
-
+  
   if(Is_k_valid_for_G(ktemp)==.false.) return
   call update_line(GLn, ktemp, 1)
 
@@ -1028,6 +1025,7 @@ SUBROUTINE move_worm_along_gline_test
   logical :: flag
 
   if(IsWormPresent .eqv. .false.)  return
+
   iGam = Ira
   dir = Floor(rn()*2.d0) + 1
   GLn = NeighVertex(dir, iGam)
@@ -1045,6 +1043,7 @@ SUBROUTINE move_worm_along_gline_test
 
   kGold = kLn(GLn)
   ktemp = add_k(kGold, -(-1)**dir*kMasha)
+
   if(Is_k_valid_for_G(ktemp)==.false.) return
   call update_line(GLn, ktemp, 1)
 
@@ -1365,7 +1364,7 @@ SUBROUTINE add_interaction
   kIA = add_k(kIC, -(-1)**(dir+dirW)*q)
 
   kNeighG=kLn(NeighVertex(3-dir, Ira))
-  if(abs(add_k(KIA,-kNeighG))==abs(kLn(NeighVertex(3,Ira))))return
+  if(Is_Bold .and. abs(add_k(KIA,-kNeighG))==abs(kLn(NeighVertex(3,Ira))))  return
   !This line is used to reject the configuration with |k_GAC-kNeighG|==|k of W attached to Ira|
   !Such configuration will always become reducibile once new interaction line is added
   !Please refer to the comments in the reducibility check codes block in basic_function.f90
@@ -1378,7 +1377,7 @@ SUBROUTINE add_interaction
   kMB = add_k(kMD, (-1)**(dir+dirW)*q)
 
   kNeighG=kLn(NeighVertex(3-dir, Masha))
-  if(abs(add_k(KMB,-kNeighG))==abs(kLn(NeighVertex(3,Masha))))return
+  if(Is_Bold .and. abs(add_k(KMB,-kNeighG))==abs(kLn(NeighVertex(3,Masha))))  return
 
   if(Is_k_valid_for_G(kMB)==.false.) return
 
@@ -1596,9 +1595,11 @@ SUBROUTINE remove_interaction
   dirW = DirecVertex(GamA)
   kAB=kLn(WAB)
   kM = add_k(kMasha, (-1)**dirW*kAB)
+
   kIA = kLn(GIA)
-  kMB = kLn(GMB)
   kAC = kLn(GAC)
+
+  kMB = kLn(GMB)
   kBD = kLn(GBD)
 
   statIA = StatusLn(GIA)
@@ -1718,10 +1719,6 @@ SUBROUTINE reconnect
   GIA=NeighVertex(dir,Ira)
   GMB=NeighVertex(dir,Masha)
   if(TypeLn(GIA)/=TypeLn(GMB))return
-  kNeighG=kLn(NeighVertex(3-dir, Ira))
-  if(abs(add_k(kLn(GMB),-kNeighG))==abs(kLn(NeighVertex(3,Ira))))return
-  kNeighG=kLn(NeighVertex(3-dir, Masha))
-  if(abs(add_k(kLn(GIA),-kNeighG))==abs(kLn(NeighVertex(3,Masha))))return
 
   GamA=NeighLn(dir,GIA)
   GamB=NeighLn(dir,GMB)
