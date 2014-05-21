@@ -118,9 +118,9 @@ SUBROUTINE calculate_Polar
             Gam1 = -1.d0*weight_Gam(5, p, omegaGin, omegaGout+MxT)
           endif
           
-          !Polar(px, py, omega) = Polar(px, py, omega)+d_times_cd(ratio, cdexp((0.d0, -1.d0) &
-            !& *2.d0*omegaGout*Pi/MxT)*Gin*Gout*Gam1)
-          Polar(px, py, omega) = Polar(px, py, omega)+d_times_cd(ratio, Gin*Gout*Gam1)
+          Polar(px, py, omega) = Polar(px, py, omega)+d_times_cd(ratio, cdexp((0.d0, -1.d0) &
+            & *2.d0*omegaGout*Pi/MxT)*Gin*Gout*Gam1)
+          !Polar(px, py, omega) = Polar(px, py, omega)+d_times_cd(ratio, Gin*Gout*Gam1)
         enddo
       enddo
     enddo
