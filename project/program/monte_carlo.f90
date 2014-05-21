@@ -260,7 +260,6 @@ SUBROUTINE markov(IsToss)
     !========================== REWEIGHTING =========================
     if(mod(iblck, 10)==0) then
 
-
       call check_config
 
       call statistics
@@ -308,7 +307,7 @@ SUBROUTINE markov(IsToss)
     endif
     !================================================================
 
-    if(mod(iblck,30)==0) then
+    if(mod(iblck,50)==0) then
 
       call check_config
 

@@ -1001,8 +1001,8 @@ SUBROUTINE output_Gam1
   write(104, *) "#Beta", Beta, "L", L(1), L(2), "Order", MCOrder
   do it2 = 0, MxT-1
     do it1 = 0, MxT-1
-      !write(104, *)  real(GamOrder1(1, it1, it2)), dimag(GamOrder1(1,it1,it2))
-      write(104, *)  real(Gam(1, 0, 0, it1, it2)), dimag(Gam(1,0, 0,it1,it2))
+      write(104, *)  real(GamOrder1(1, it1, it2)), dimag(GamOrder1(1,it1,it2))
+      !write(104, *)  real(Gam(1, 0, 0, it1, it2)), dimag(Gam(1,0, 0,it1,it2))
     enddo
   enddo
   write(104, *)
