@@ -34,7 +34,7 @@ Quan=Quan2D+Quan1D
 #print Quans
 
 DiagGamma=[]
-DiagGamma.append(read_data.read_array("../0.50_0.50_quantities.dat", Quans))
+DiagGamma.append(read_data.read_array("./0.50_0.50_4_quantities.dat", Quans))
 
 
 fig = plt.figure()
