@@ -1513,6 +1513,7 @@ END SUBROUTINE
 
 
 
+!========W0 and Gam0 are just constants in omega domain ====================
 SUBROUTINE transfer_W0_t(BackForth)
     implicit none
     integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
@@ -1524,27 +1525,38 @@ SUBROUTINE transfer_Gam0_t(BackForth)
     integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
     integer :: it1, it2
 
-    !call FFT_shift_t_double(Gam0PF,1,L(1)*L(2),BackForth)
     call FFT_tau_double(Gam0PF,1,L(1)*L(2),BackForth)
-    !call FFT_shift_omega_double(Gam0PF,1,L(1)*L(2),BackForth)
 END SUBROUTINE
+!===========================================================================
 
 SUBROUTINE transfer_G0(BackForth)
     implicit none
     integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
     integer :: it
-    call FFT_shift_t_single(G0F,1,1,BackForth)
-    call FFT_tau_single(G0F,1,1,BackForth)
-    call FFT_shift_omega_single(G0F,1,1,BackForth)
+    if(BackForth/=-1) then
+      call FFT_shift_t_single(G0F,1,1,BackForth)
+      call FFT_tau_single(G0F,1,1,BackForth)
+      !call FFT_shift_omega_single(G0F,1,1,BackForth)
+    else
+      !call FFT_shift_omega_single(G0F,1,1,BackForth)
+      call FFT_tau_single(G0F,1,1,BackForth)
+      call FFT_shift_t_single(G0F,1,1,BackForth)
+    endif
 END SUBROUTINE
 
 SUBROUTINE transfer_GamOrder1_t(BackForth)
     implicit none
     integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
     integer ::it1, it2
-    call FFT_shift_t_double(GamOrder1,NtypeGam,1,BackForth)
-    call FFT_tau_double(GamOrder1,NtypeGam,1,BackForth)
-    call FFT_shift_omega_double(GamOrder1,NtypeGam,1,BackForth)
+    if(BackForth/=-1) then
+      call FFT_shift_t_double(GamOrder1,NtypeGam,1,BackForth)
+      call FFT_tau_double(GamOrder1,NtypeGam,1,BackForth)
+      !call FFT_shift_omega_double(GamOrder1,NtypeGam,1,BackForth)
+    else 
+      !call FFT_shift_omega_double(GamOrder1,NtypeGam,1,BackForth)
+      call FFT_tau_double(GamOrder1,NtypeGam,1,BackForth)
+      call FFT_shift_t_double(GamOrder1,NtypeGam,1,BackForth)
+    endif
 END SUBROUTINE
 
 
@@ -1552,9 +1564,15 @@ SUBROUTINE transfer_G_t(BackForth)
     implicit none
     integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
     integer            :: it
-    call FFT_shift_t_single(G,NtypeG,1,BackForth)
-    call FFT_tau_single(G,NtypeG,1,BackForth)
-    call FFT_shift_omega_single(G,NtypeG,1,BackForth)
+    if(BackForth/=-1) then
+      call FFT_shift_t_single(G,NtypeG,1,BackForth)
+      call FFT_tau_single(G,NtypeG,1,BackForth)
+      !call FFT_shift_omega_single(G,NtypeG,1,BackForth)
+    else
+      !call FFT_shift_omega_single(G,NtypeG,1,BackForth)
+      call FFT_tau_single(G,NtypeG,1,BackForth)
+      call FFT_shift_t_single(G,NtypeG,1,BackForth)
+    endif
 END SUBROUTINE transfer_G_t
 
 SUBROUTINE transfer_W_t(BackForth)
@@ -1568,9 +1586,16 @@ SUBROUTINE transfer_Gam_t(BackForth)
     implicit none
     integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
     integer :: it1, it2
-    call FFT_shift_t_double(Gam,NtypeGam,L(1)*L(2),BackForth)
-    call FFT_tau_double(Gam,NtypeGam,L(1)*L(2),BackForth)
-    call FFT_shift_omega_double(Gam,NtypeGam,L(1)*L(2),BackForth)
+    if(BackForth/=-1) then
+      call FFT_shift_t_double(Gam,NtypeGam,L(1)*L(2),BackForth)
+      call FFT_tau_double(Gam,NtypeGam,L(1)*L(2),BackForth)
+      !call FFT_shift_omega_double(Gam,NtypeGam,L(1)*L(2),BackForth)
+    else
+      !call FFT_shift_omega_double(Gam,NtypeGam,L(1)*L(2),BackForth)
+      call FFT_tau_double(Gam,NtypeGam,L(1)*L(2),BackForth)
+      call FFT_shift_t_double(Gam,NtypeGam,L(1)*L(2),BackForth)
+    endif
+
 END SUBROUTINE
 
 SUBROUTINE transfer_Chi_t(BackForth)
@@ -1583,9 +1608,15 @@ SUBROUTINE transfer_Sigma_t(BackForth)
     implicit none
     integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
     integer       :: it
-    call FFT_shift_t_single(Sigma,1,1,BackForth)
-    call FFT_tau_single(Sigma,1,1,BackForth)
-    call FFT_shift_omega_single(Sigma,1,1,BackForth)
+    if(BackForth/=-1) then
+      call FFT_shift_t_single(Sigma,1,1,BackForth)
+      call FFT_tau_single(Sigma,1,1,BackForth)
+      !call FFT_shift_omega_single(Sigma,1,1,BackForth)
+    else
+      !call FFT_shift_omega_single(Sigma,1,1,BackForth)
+      call FFT_tau_single(Sigma,1,1,BackForth)
+      call FFT_shift_t_single(Sigma,1,1,BackForth)
+    endif
 END SUBROUTINE
 
 !SUBROUTINE transfer_Polar_t(BackForth)

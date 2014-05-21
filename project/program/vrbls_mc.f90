@@ -28,7 +28,7 @@ MODULE vrbls_mc
   integer, parameter :: MxVol = MxL(1)**D           ! the maximum system volume
   integer, parameter :: MxT   =   64                ! the maximum number of time segments
   !integer, parameter :: MxK   = 1000               ! the maximum momentum
-  integer, parameter :: MxK   = 1000             ! the maximum momentum
+  integer, parameter :: MxK   = 1000000             ! the maximum momentum
 
   double precision, parameter :: MxError = 0.1d0    ! the maximum error for MC
   integer, parameter          :: MxNblck = 1000000   ! the maximum memory blocks in MC simulations
