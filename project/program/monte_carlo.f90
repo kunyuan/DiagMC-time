@@ -307,7 +307,7 @@ SUBROUTINE markov(IsToss)
     endif
     !================================================================
 
-    if(mod(iblck,50)==0) then
+    if(mod(iblck,30)==0) then
 
       call check_config
 
