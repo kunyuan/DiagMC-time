@@ -14,7 +14,9 @@ tau = np.arange(0, Beta, Beta/N)
 Quans=["SUMChi"]
 
 BoldChi=[]
+BoldChi.append(read_data.read_array("./0.90_2_bold_quantities.dat", Quans))
 BoldChi.append(read_data.read_array("./0.90_4_bold_quantities.dat", Quans))
+BoldChi.append(read_data.read_array("./0.90_4_bare_quantities.dat", Quans))
 
 fig = plt.figure()
 ax = plt.subplot(111)
