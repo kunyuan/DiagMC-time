@@ -1047,7 +1047,7 @@ SUBROUTINE output_Quantities
   integer :: ityp, it1, it2, iorder
   integer :: dx, dy, it
   complex*16 :: gam1
-  double precision :: normal
+  double precision :: normal, ratio
   integer :: ibin, ibasis
   double precision :: tau1, tau2
 
@@ -1150,13 +1150,12 @@ SUBROUTINE output_Quantities
 
 
   write(104, *) "##################################Chi"
-  write(104, *) "#x:", L(1), ",y:", L(2), ",tau:", MxT
+  write(104, *) "#x:", L(1), ",y:", L(2)
   write(104, *) "#Beta", Beta, "L", L(1), L(2), "Order", MCOrder
-  do it = 0, MxT-1
-    do dy = 0, L(2)-1
-      do dx = 0, L(1)-1
-        write(104, *) real(Chi(dx, dy, it)),dimag(Chi(dx, dy, it))
-      enddo
+  ratio = 1.d0/dble(MxT)
+  do dy = 0, L(2)-1
+    do dx = 0, L(1)-1
+      write(104, *) ratio*real(SUM(Chi(dx, dy, :))),ratio*dimag(SUM(Chi(dx, dy, :)))
     enddo
   enddo
 
