@@ -30,7 +30,7 @@ MODULE vrbls_mc
   !integer, parameter :: MxK   = 1000               ! the maximum momentum
   integer, parameter :: MxK   = 1000000             ! the maximum momentum
 
-  double precision, parameter :: MxError = 0.1d0    ! the maximum error for MC
+  double precision, parameter :: MxError = 1.0d0    ! the maximum error for MC
   integer, parameter          :: MxNblck = 1000000   ! the maximum memory blocks in MC simulations
 
   integer, parameter :: MxOrder =  10               ! the maximum order of the diagram
