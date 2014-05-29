@@ -11,8 +11,8 @@ L = np.arange(0, 4)
 Quans=["Chi1", "Chi2", "Chi3", "Chi4"]
 
 Files=[]
-#Files.append(read_data.read_array("../bold_Chi.dat", Quans))
-Files.append(read_data.read_array("../bare_Chi.dat", Quans))
+Files.append(read_data.read_array("./bold_Chi.dat", Quans))
+#Files.append(read_data.read_array("./bare_Chi.dat", Quans))
 
 fig = plt.figure()
 ax = plt.subplot(111)
