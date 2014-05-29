@@ -451,8 +451,8 @@ SUBROUTINE Gam_mc2matrix_mc
 
 
     if(flag(iorder)) then
-      do it2 = 0, MxT-1
-        do it1 = 0, MxT-1
+      do it2 = 0, mxt-1
+        do it1 = 0, mxt-1
           tau1 = dble(it1)*Beta/dble(MxT)
           tau2 = dble(it2)*Beta/dble(MxT)
           ibin = get_bin_Gam(it1, it2)
@@ -486,5 +486,5 @@ SUBROUTINE Gam_mc2matrix_mc
   Gam(2,:,:,:,:) = Gam(1,:,:,:,:)
   Gam(4,:,:,:,:) = Gam(3,:,:,:,:)
   Gam(6,:,:,:,:) = Gam(5,:,:,:,:)
-  
+
 END SUBROUTINE Gam_mc2matrix_mc

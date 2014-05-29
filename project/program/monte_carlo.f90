@@ -2544,7 +2544,7 @@ END SUBROUTINE update_weight
 SUBROUTINE measure
   implicit none
   integer :: i, iln,iGam,jGam, iW
-  integer :: flag, it
+  integer :: it
   integer :: ibasis, ibin
   integer :: spg, spw
   integer :: ityp, nloop
@@ -2556,28 +2556,17 @@ SUBROUTINE measure
   double precision :: tau1, tau2, tau3
   double precision :: dtau1, dtau2
   double precision :: wbasis
+  logical :: flag
 
   GamWormOrder(Order) = GamWormOrder(Order) + 1.d0
   !===========  Measure in worm space  ==========================
   if(IsWormPresent) then
     Z_worm=Z_worm+1.d0
-    !Quan(2)=Quan(2)+Greenfunction/factorM
-    !Norm(2)=Norm(2)+1/factorM
   endif
+
+
   !=============================================================
   if(.not. IsWormPresent) then
-    !do ikey=1,NVertex
-
-      !i=VertexKey2Value(ikey)
-      !!call LogFile%QuickLog(str(TypeVertex(i)))
-
-      !if(TypeVertex(i)==3 .or. TypeVertex(i)==4) then
-        !call LogFile%QuickLog("Oops, type 3 and type 4 is there!")
-        !call print_config
-        !stop
-      !endif
-    !enddo
-
     !===========  Measure in normal space  ==========================
     Z_normal=Z_normal+1.d0
     GamOrder(Order) = GamOrder(Order) + 1.d0
@@ -2661,6 +2650,13 @@ SUBROUTINE measure
     endif
 
     !============ save Gamma in the fitting coeffecients =====================================
+    !flag = .false.
+    !if(dt1+dt2>MxT-1) then
+      !flag= .true.
+      !dt1 = MxT-1-dt1
+      !dt2 = MxT-1-dt2
+    !endif
+
     ibin = get_bin_Gam(dt1, dt2)
 
     if(IsBasis2D(ibin)) then
@@ -2668,8 +2664,15 @@ SUBROUTINE measure
         wbasis = (Beta/dble(MxT))**2.d0*weight_basis_Gam(CoefGam &
           & (0:BasisOrderGam,0:BasisOrderGam, ibasis,ibin), dt1*Beta/MxT, dt2*Beta/MxT)
 
+        !if(flag) then
+        !else 
+          !GamBasis(Order, ityp, dx, dy, ibin, ibasis) = GamBasis(Order, ityp, dx, dy, ibin, &
+            !& ibasis) + (dcmplx(real(Phase), -dimag(Phase))/factorM)*wbasis
+        !endif
+
         GamBasis(Order, ityp, dx, dy, ibin, ibasis) = GamBasis(Order, ityp, dx, dy, ibin, &
           & ibasis) + (Phase/factorM)*wbasis
+
         ReGamSqBasis(Order, ityp, dx, dy, ibin, ibasis) = ReGamSqBasis(Order, ityp, dx, dy, ibin, &
           & ibasis) + (real(Phase)/factorM)**2.d0*wbasis
         ImGamSqBasis(Order, ityp, dx, dy, ibin, ibasis) = ImGamSqBasis(Order, ityp, dx, dy, ibin, &
