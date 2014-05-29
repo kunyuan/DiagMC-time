@@ -207,6 +207,9 @@ SUBROUTINE self_consistent
   logical :: flag
 
   !call output_Quantities
+  !call transfer_t(1)
+  !call transfer_t(-1)
+  !call output_Quantities
   !------- read the G, W, and Gamma  -------------------
   if(IsLoad==.false.) then
 
