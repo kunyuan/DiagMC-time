@@ -367,9 +367,10 @@ SUBROUTINE monte_carlo
   else if(IsLoad) then
 
     !------- read the configuration and MC data from previous simulation --
-    call LogFile%QuickLog("Reading the previous MC data...")
+    call LogFile%QuickLog("Reading the previous MC ...")
 
     call read_monte_carlo_conf
+    call LogFile%QuickLog("Read the previous MC conf Done!...")
     call read_monte_carlo_data
     call LogFile%QuickLog("Read the previous MC data Done!...")
 
@@ -382,13 +383,6 @@ SUBROUTINE monte_carlo
 
     call check_config
     call print_config
-
-    ProbCall(:,:) = 0.d0
-    ProbProp(:,:) = 0.d0
-    ProbAcc(:,:) = 0.d0
-
-    GamOrder(:) = 0.d0
-    GamWormOrder(:) = 0.d0
   endif
 
   call LogFile%QuickLog("Running MC Simulations...")
