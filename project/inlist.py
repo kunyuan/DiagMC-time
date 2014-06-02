@@ -24,7 +24,7 @@ mc_dict={
     "__Duplicate" : 1,
     "__IsCluster" : False,
     "__AutoRun" : True,
-    "IsLoad" : False,
+    "IsLoad" : True,
     "Reweight" : [1.0, 0.5, 0.5, 0.25],
     "ReadFile" : "2_0.90_4",
     "Sample" : 5000000,
