@@ -2736,7 +2736,7 @@ SUBROUTINE statistics
     double precision,allocatable :: temp(:,:)
     StatNum=StatNum+1
     if(StatNum>=MaxStat) then
-      allocate(temp(MaxStat,NObs))
+      allocate(temp(MaxStat,0:NObs-1))
       temp=ObsRecord
       MaxStat=MaxStat*2
       if(MaxStat>MxNblck) then
@@ -2744,7 +2744,7 @@ SUBROUTINE statistics
         stop
       endif
       deallocate(ObsRecord)
-      allocate(ObsRecord(MaxStat,NObs))
+      allocate(ObsRecord(MaxStat,0:NObs-1))
       ObsRecord=0.0
       ObsRecord(1:MaxStat/2,:)=temp
       deallocate(temp)

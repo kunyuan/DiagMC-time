@@ -354,7 +354,8 @@ changed. get wrong result for Gamma in self-consistent loop
 
 24.  shift tau to 1/2*deltat, 3/2*deltat, ...
 
-05/29
+05/29: try to shift but the FFT and integration is not consistent with each other, and 
+don't know how to define Gamma in this way ...
 
 ====================================================
 
