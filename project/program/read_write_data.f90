@@ -693,7 +693,7 @@ SUBROUTINE write_monte_carlo_conf
    & file=trim(title_mc)//"_monte_carlo_conf.bin.dat",form="binary")
 
   write(103)  mc_version, Z_normal, Z_worm, StatNum
-  write(103)  ProbProp(:,:), ProbAcc(:,:)
+  write(103)  ProbCall(:,:), ProbProp(:,:), ProbAcc(:,:)
   write(103)  GamOrder(:), GamWormOrder(:)
   write(103)  CoefOfWorm, CoefOfWeight(:)
   write(103)  TestData(:)
@@ -744,7 +744,7 @@ SUBROUTINE read_monte_carlo_conf
   open(106, status="old", file=trim(title)//"_monte_carlo_conf.bin.dat",form="binary")
 
   read(106,iostat=ios)  mc_version, Z_normal, Z_worm, StatNum
-  read(106,iostat=ios)  ProbProp(:,:), ProbAcc(:,:)
+  read(106,iostat=ios)  ProbCall(:,:), ProbProp(:,:), ProbAcc(:,:)
   read(106,iostat=ios)  GamOrder(:), GamWormOrder(:)
   read(106,iostat=ios)  CoefOfWorm, CoefOfWeight(:)
   read(106,iostat=ios)  TestData(:)
