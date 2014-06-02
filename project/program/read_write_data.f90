@@ -762,7 +762,7 @@ SUBROUTINE read_monte_carlo_conf
   read(106,iostat=ios)  IsDeltaVertex(:)
   read(106,iostat=ios)  IsDeltaLn(:)
   read(106,iostat=ios)  kLn(:)
-  !read(106,iostat=ios)  KindLn(:)
+  read(106,iostat=ios)  KindLn(:)
 
   do i = 1, 2
     read(106,iostat=ios)  NeighLn(i,:)
@@ -841,22 +841,11 @@ SUBROUTINE read_monte_carlo_conf
   ikeyW = 1
   do i = 1, MxNLn
     if(StatusLn(i)==-1) cycle
-    !if(KindLn(i)==1) then
-      !LnValue2Key(i) = ikeyG
-      !GLnKey2Value(ikeyG) = i
-      !ikeyG = ikeyG + 1
-    !else if(KindLn(i)==2) then
-      !LnValue2Key(i) = ikeyW
-      !GLnKey2Value(ikeyW) = i
-      !ikeyW = ikeyW + 1
-    !endif
-    if(IsDeltaLn(i)==-1) then
-      KindLn(i)=1
+    if(KindLn(i)==1) then
       LnValue2Key(i) = ikeyG
       GLnKey2Value(ikeyG) = i
       ikeyG = ikeyG + 1
-    else 
-      KindLn(i)=2
+    else if(KindLn(i)==2) then
       LnValue2Key(i) = ikeyW
       WLnKey2Value(ikeyW) = i
       ikeyW = ikeyW + 1
