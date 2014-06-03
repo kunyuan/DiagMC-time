@@ -1801,6 +1801,7 @@ SUBROUTINE change_gline_space
 
   WeightR=1.d0
   call generate_xy(GRVertex(:,iGam),NewRG,dR,WeightR,.true.)
+  if(WeightR<1.d-12)  return
 
   flagW(:) = 0
   Num=0
@@ -1821,6 +1822,7 @@ SUBROUTINE change_gline_space
     iGam = GamList(i)
     iWLn=NeighVertex(3,iGam)
     call generate_xy(WRVertex(:,iGam),NewRW(:,i),dR,WeightR,.false.)
+    if(WeightR<1.d-12)  return
 
     if(flagW(iWLn)==1) then
       jGam=NeighLn(3-DirecVertex(iGam),iWLn)
@@ -1883,10 +1885,12 @@ SUBROUTINE change_wline_space
     jGam = NeighLn(2, iWLn)
 
     WeightR=1.0
-    call generate_xy(WRVertex(:, iGam),rwi,dr,WeightR,.true.);
+    call generate_xy(WRVertex(:, iGam),rwi,dr,WeightR,.true.)
+    if(WeightR<1.d-12)  return
 
     if(IsDeltaLn(iWLn)==0) then
-      call generate_xy(WRVertex(:, jGam),rwj,dr,WeightR,.true.);
+      call generate_xy(WRVertex(:, jGam),rwj,dr,WeightR,.true.)
+      if(weightr<1.d-12)  return
     !else
       !rwj(:)=rwi(:)
     endif

@@ -23,14 +23,12 @@ MODULE vrbls_mc
   integer, parameter          :: Mnint =-2147483647
 
   integer, parameter :: D = 2                       ! 2-dimensional system
-  !integer, parameter :: MxL(1)  = 8, MxL(2) = 8         ! the largest system
-  integer, parameter,dimension(2) :: MxL =(/8,8/)   ! the largest system
+  integer, parameter,dimension(2) :: MxL =(/32,32/)   ! the largest system
   integer, parameter :: MxVol = MxL(1)**D           ! the maximum system volume
   integer, parameter :: MxT   =   64                ! the maximum number of time segments
-  !integer, parameter :: MxK   = 1000               ! the maximum momentum
   integer, parameter :: MxK   = 1000000             ! the maximum momentum
 
-  double precision, parameter :: MxError = 1.0d0    ! the maximum error for MC
+  double precision, parameter :: MxError = 0.50d0    ! the maximum error for MC
   integer, parameter          :: MxNblck = 1000000   ! the maximum memory blocks in MC simulations
 
   integer, parameter :: MxOrder =  10               ! the maximum order of the diagram
