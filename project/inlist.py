@@ -8,8 +8,8 @@ TO_DO = []
 
 #common dictionary for all jobs
 com_dict={
-    "Lx" :  4,
-    "Ly" :  4,
+    "Lx" :  16,
+    "Ly" :  16,
     "J1" :  1.0,
     "J2" :  0.5,
     "Beta" :  0.50,
@@ -22,11 +22,11 @@ print readfile
 # monte carlo job defintion
 mc_dict={
     "__Execute" : "./gamma3.exe",
-    "__Duplicate" : 4,
+    "__Duplicate" : 3,
     "__IsCluster" : False,
     "__AutoRun" : True,
     "IsLoad" : False,
-    "Reweight" : [1.0],
+    "Reweight" : [1.0, 0.5, 0.5, 0.25],
     "ReadFile" : "null",
     "Sample" : 10000000,
     "Sweep" : 10,
@@ -51,7 +51,7 @@ TO_DO.append(job.JobConsistLoop(sc_dict))
 # self consist loop job to initialize the simulation
 sc_ini_dict={
     "__Execute" : ["python", "./run_loop.py"],
-    "__Duplicate" : 1,
+    "__Duplicate" : 0,
     "__IsCluster" : False,
     "__AutoRun" : False, 
     "IsLoad" : False,
