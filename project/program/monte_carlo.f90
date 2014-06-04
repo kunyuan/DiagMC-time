@@ -1789,7 +1789,7 @@ SUBROUTINE change_gline_space
   integer :: Num,InitialGam,iGam,jGam,iWLn,NewRG(2),dR(2)
   integer :: GamList(MxNVertex),NewRW(2,MxNVertex),i
   integer :: flagW(MxNLn)
-  double precision :: Pacc, WeightR, tau
+  double precision :: Pacc, WeightR, WeightRW, tau
   complex*16  ::  Anew, Aold, sgn, WeightW(MxNVertex)
 
   !------- step1 : check if worm is present -------------
@@ -1801,7 +1801,6 @@ SUBROUTINE change_gline_space
 
   WeightR=1.d0
   call generate_xy(GRVertex(:,iGam),NewRG,dR,WeightR,.true.)
-  if(WeightR<1.d-12)  return
 
   flagW(:) = 0
   Num=0
@@ -1821,8 +1820,8 @@ SUBROUTINE change_gline_space
   do i = 1, Num
     iGam = GamList(i)
     iWLn=NeighVertex(3,iGam)
-    call generate_xy(WRVertex(:,iGam),NewRW(:,i),dR,WeightR,.false.)
-    if(WeightR<1.d-12)  return
+    WeightRW = 1.d0
+    call generate_xy(WRVertex(:,iGam),NewRW(:,i),dR,WeightRW,.false.)
 
     if(flagW(iWLn)==1) then
       jGam=NeighLn(3-DirecVertex(iGam),iWLn)
@@ -1838,6 +1837,7 @@ SUBROUTINE change_gline_space
 
   call weight_ratio(Pacc, sgn, Anew, Aold)
 
+  if(WeightR<1.d-12)  return
   Pacc=Pacc/WeightR
 
   !------- step5 : accept the update --------------------
@@ -1886,13 +1886,11 @@ SUBROUTINE change_wline_space
 
     WeightR=1.0
     call generate_xy(WRVertex(:, iGam),rwi,dr,WeightR,.true.)
-    if(WeightR<1.d-12)  return
 
     if(IsDeltaLn(iWLn)==0) then
       call generate_xy(WRVertex(:, jGam),rwj,dr,WeightR,.true.)
-      if(weightr<1.d-12)  return
-    !else
-      !rwj(:)=rwi(:)
+    else
+      rwj(:)=rwi(:)
     endif
 
     !------- step3 : configuration check ------------------
@@ -1916,6 +1914,7 @@ SUBROUTINE change_wline_space
     Aold = WeightLn(iWLn)*WeightVertex(iGam)*WeightVertex(jGam)
 
     call weight_ratio(Pacc, sgn, Anew, Aold)
+    if(WeightR<1.d-12)  return
     Pacc = Pacc/WeightR
 
     !------- step5 : accept the update --------------------
