@@ -22,7 +22,7 @@ print readfile
 # monte carlo job defintion
 mc_dict={
     "__Execute" : "./gamma3.exe",
-    "__Duplicate" : 3,
+    "__Duplicate" : 4,
     "__IsCluster" : False,
     "__AutoRun" : True,
     "IsLoad" : False,

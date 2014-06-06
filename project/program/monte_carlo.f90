@@ -267,6 +267,12 @@ SUBROUTINE markov(IsToss)
       call print_status
       call print_config
 
+      if(imc==32000000000) then
+        call write_monte_carlo_conf
+        call write_monte_carlo_data
+        stop
+      endif
+
       call LogFile%QuickLog("Check if there is a new G,W data...")
       call read_flag
 

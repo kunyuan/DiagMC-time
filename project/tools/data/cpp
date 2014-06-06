@@ -1,0 +1,4 @@
+cp ../bare_0.90_4/0.90_quantities.dat 0.90_4_bare_quantities.dat
+cp ../bare_0.90_5/0.90_quantities.dat 0.90_5_bare_quantities.dat
+cp ../bold_0.90_4/0.90_quantities.dat 0.90_4_bold_quantities.dat
+cp ../bold_0.90_5/0.90_quantities.dat 0.90_5_bold_quantities.dat
