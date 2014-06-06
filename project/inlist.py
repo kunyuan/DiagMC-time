@@ -21,10 +21,10 @@ print readfile
 # monte carlo job defintion
 mc_dict={
     "__Execute" : "./gamma3.exe",
-    "__Duplicate" : 3,
+    "__Duplicate" : 4,
     "__IsCluster" : False,
     "__AutoRun" : True,
-    "IsLoad" : True,
+    "IsLoad" : False,
     "Reweight" : [1.0, 0.5, 0.5, 0.25],
     "ReadFile" : "null",
     "Sample" : 5000000,
@@ -38,7 +38,7 @@ TO_DO.append(job.JobMonteCarlo(mc_dict))
 # self consist loop job definition
 sc_dict={
     "__Execute" : ["python", "./run_loop.py"],
-    "__Duplicate" : 0,
+    "__Duplicate" : 1,
     "__IsCluster" : False,
     "__AutoRun" : True, 
     #"__AutoRun" : False, 

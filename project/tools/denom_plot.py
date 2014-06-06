@@ -1,33 +1,37 @@
-import read_data
+#!/usr/bin/env python
 import numpy as np
-from mpl_toolkits.mplot3d import Axes3D
-from matplotlib import cm
-from matplotlib.ticker import LinearLocator, FormatStrFormatter
 import matplotlib.pyplot as plt
+import read_data
 
+L = np.arange(0, 16)
 Beta = 0.90
 N = 64
-L = 4
-
 tau = np.arange(0, Beta, Beta/N)
 
-BoldDenom=[]
-Denom,dim_name=read_data.read_array("../data/bold_0.90_2_quantities.dat")["Denom"]
-BoldDenom.append(Denom[:][L/2][L/2])
-Denom,dim_name=read_data.read_array("../data/bold_0.90_3_quantities.dat")["Denom"]
-BoldDenom.append(Denom[:][L/2][L/2])
-Denom,dim_name=read_data.read_array("../data/bold_0.90_4_quantities.dat")["Denom"]
-BoldDenom.append(Denom[:][L/2][L/2])
+Quans=["Denom"]
+
+Files=[]
+Files.append(read_data.read_array("../0.90_quantities.dat", Quans))
+#Files.append(read_data.read_array("./0.90_4_bold_quantities.dat", Quans))
+#Files.append(read_data.read_array("./0.90_5_bold_quantities.dat", Quans))
+#Files.append(read_data.read_array("./0.90_4_bare_quantities.dat", Quans))
+
+#Files.append(read_data.read_array("./0.50_0.10_4_quantities.dat", Quans))
+#Files.append(read_data.read_array("./0.50_0.50_4_quantities.dat", Quans))
+#Files.append(read_data.read_array("./0.50_1.00_4_quantities.dat", Quans))
 
 fig = plt.figure()
 ax = plt.subplot(111)
 
-for i in range(len(BoldDenom)):
-    ax.plot(tau, BoldDenom[i].real, label="Order"+str(i+2))
+for i in range(len(Files)):
+    for key in Quans:
+        for j in range(0, 16):
+            for k in range(0, 16):
+                ax.plot(tau, Files[i][key][0][j][k].real, label=key)
 
 ax.legend()
 
 plt.xlabel("tau")
-plt.ylabel("Sigma")
+plt.ylabel("Denom(pi/2, pi/2)")
 
 plt.show()
