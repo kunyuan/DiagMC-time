@@ -1052,6 +1052,17 @@ SUBROUTINE output_Quantities
   enddo
   write(104, *)
 
+  write(104, *) "##################################GammaR"
+  write(104, *) "#x:", L(1), ",y:", L(2)
+  write(104, *) "#Beta", Beta, "L", L(1), L(2), "Order", MCOrder
+  do dx = 0, L(1)-1
+    do dy = 0, L(2)-1
+      write(104, *)  real(sum(Gam(1, dx, dy, :, :))/(MxT)**2.d0),  &
+        &  dimag(sum(Gam(1, dx, dy, :, :))/(MxT)**2.d0)
+    enddo
+  enddo
+  write(104, *)
+
   normal = GamNormWeight/GamNorm
   do iorder = 1, MCOrder
     write(104, *) "##################################Gamma",trim(adjustl(str(iorder)))
