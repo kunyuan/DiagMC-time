@@ -304,7 +304,7 @@ SUBROUTINE Gam_mc2matrix_mc
   implicit none
   integer :: iorder, dx, dy, ityp, iloop, it1, it2, typ
   complex*16 :: cgam, normal
-  logical :: flag(MxOrder)
+  logical :: flag
   double precision :: totrerr, totierr
   double precision :: rgam, igam, rgam2, igam2, rerr, ierr, rpercenterr, ipercenterr
 
@@ -314,48 +314,32 @@ SUBROUTINE Gam_mc2matrix_mc
 
   call LogFile%QuickLog("(ErrorRatio):"+str(ratioerr))
 
-  flag(:) = .true.
 
   call LogFile%WriteStamp('i')
 
   looporder: do iorder = 1, MCOrder
-    totrerr = 0.d0
-    totierr = 0.d0
+    flag=.true.
     do it2 = 0, MxT-1
       do it1 = 0, MxT-1
-        rgam = real(GamMC(iorder, 1, 0, 0, it1, it2))/Z_normal
-        rgam2 = ReGamSqMC(iorder, 1, 0, 0, it1, it2)/Z_normal
+        do dy = 0, Ly-1
+          do dx = 0, Lx-1
+            do ityp = 1, 3
+              rgam = real(GamMC(iorder, ityp, dx, dy, it1, it2))/Z_normal
+              rgam2 = ReGamSqMC(iorder, ityp, dx, dy, it1, it2)/Z_normal
 
-        rerr = sqrt(abs(rgam2)-rgam**2.d0)/sqrt(Z_normal-1)
-        rerr = rerr* ratioerr
-        totrerr = totrerr + abs(rerr)
+              rerr = (abs(rgam2)-rgam**2.d0)/(Z_normal-1)
+              rerr = rerr* ratioerr
 
-        igam = dimag(GamMC(iorder, 1, 0, 0, it1, it2))/Z_normal
-        igam2 = ImGamSqMC(iorder, 1, 0, 0, it1, it2)/Z_normal
+              igam = dimag(GamMC(iorder, 1, 0, 0, it1, it2))/Z_normal
+              igam2 = ImGamSqMC(iorder, 1, 0, 0, it1, it2)/Z_normal
 
-        ierr = sqrt(abs(igam2)-igam**2.d0)/sqrt(Z_normal-1)
-        ierr = ierr* ratioerr
-        totierr = totierr + abs(ierr)
+              ierr = sqrt(abs(igam2)-igam**2.d0)/sqrt(Z_normal-1)
+              ierr = ierr* ratioerr
+            enddo
+          enddo
+        enddo
       enddo
     enddo
-
-    rgam = SUM(abs(real(GamMC(iorder, 1,0,0,:,:))))/Z_normal
-    if(rgam<1.d-30) then
-      rpercenterr = 0.d0
-    else
-      rpercenterr = totrerr/rgam
-    endif
-
-    if(rpercenterr>MxError) then
-      flag(iorder)=.false.
-    endif
-
-    igam = SUM(abs(dimag(GamMC(iorder, 1,0,0,:,:))))/Z_normal
-    if(igam<1.d-30) then
-      ipercenterr = 0.d0
-    else
-      ipercenterr = totierr/igam
-    endif
 
     if(ipercenterr>MxError) then
       flag(iorder)=.false.
