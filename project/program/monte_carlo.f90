@@ -605,7 +605,7 @@ SUBROUTINE delete_worm_along_wline
 
   ProbProp(Order, 2) = ProbProp(Order, 2) + 1
   !------------ step5 : accept the update -----------------------
-  if(rn()<Pacc) then
+  if(Pacc>1.d-12 .and. rn()<Pacc) then
 
     !---------- update the diagram info ----------------
     Phase = Phase*sgn
@@ -725,7 +725,7 @@ SUBROUTINE move_worm_along_wline
 
   !------- step5 : accept the update --------------------
   ProbProp(Order, 5) = ProbProp(Order, 5) + 1
-  if(rn()<Pacc) then
+  if(Pacc>1.d-12 .and. rn()<Pacc) then
 
     !------ update diagram info ---------------
     Phase = Phase *sgn
@@ -948,7 +948,7 @@ SUBROUTINE move_worm_along_gline
 
   !------- step5 : accept the update --------------------
   ProbProp(Order, 6) = ProbProp(Order, 6) + 1
-  if(rn()<Pacc) then
+  if(Pacc>1.d-12 .and. rn()<Pacc) then
 
     !----- update the diagram info -------------- 
     Phase = Phase *sgn
@@ -1138,7 +1138,7 @@ SUBROUTINE move_worm_along_gline_test
 
   !------- step5 : accept the update --------------------
   ProbProp(Order, 6) = ProbProp(Order, 6) + 1
-  if(rn()<Pacc) then
+  if(Pacc>1.d-12 .and. rn()<Pacc) then
 
     !----- update the diagram info -------------- 
     Phase = Phase *sgn
@@ -1486,7 +1486,7 @@ SUBROUTINE add_interaction
 
   !------------ step5 : accept the update -----------------------
   ProbProp(Order-1, 7) = ProbProp(Order-1, 7) + 1
-  if(rn()<Pacc) then
+  if(Pacc>1.d-12 .and. rn()<Pacc) then
 
     !--------------- update the diagram info --------------------
     Phase = Phase *sgn
@@ -1645,7 +1645,7 @@ SUBROUTINE remove_interaction
 
   !------------ step5 : accept the update -----------------------
   ProbProp(Order+1, 8) = ProbProp(Order+1, 8) + 1
-  if(rn()<Pacc) then
+  if(Pacc>1.d-12 .and. rn()<Pacc) then
 
     !--------------- update the diagram info --------------------
     Phase = Phase *sgn
@@ -1749,7 +1749,7 @@ SUBROUTINE reconnect
 
   !------- step5 : accept the update --------------------
   ProbProp(Order, 11) = ProbProp(Order, 11) + 1
-  if(rn()<Pacc) then
+  if(Pacc>1.d-12 .and. rn()<Pacc) then
 
     !--------------- update the diagram info --------------------
     SignFermiloop=-SignFermiloop
@@ -1842,7 +1842,7 @@ SUBROUTINE change_gline_space
 
   !------- step5 : accept the update --------------------
   ProbProp(Order, 12) = ProbProp(Order, 12) + 1
-  if(rn()<Pacc) then
+  if(Pacc>1.d-12 .and. rn()<Pacc) then
 
     !------ update the diagram info -------------------
     Phase = Phase *sgn
@@ -1919,7 +1919,7 @@ SUBROUTINE change_wline_space
 
     !------- step5 : accept the update --------------------
     ProbProp(Order, 13) = ProbProp(Order, 13) + 1
-    if(rn()<Pacc) then
+    if(Pacc>1.d-12 .and. rn()<Pacc) then
 
       !------ update the diagram info -------------------
       Phase = Phase *sgn
@@ -1992,7 +1992,7 @@ SUBROUTINE change_Gamma_type
   !------- step5 : accept the update --------------------
   ProbProp(Order, 14) = ProbProp(Order, 14) + 1
 
-  if(rn()<Pacc) then
+  if(Pacc>1.d-12 .and. rn()<Pacc) then
 
     if(TypeVertex(iGam)==1 .or. TypeVertex(iGam)==2) then
       BalenceCheck(Order,1,1)=BalenceCheck(Order,1,1)+1.d0
@@ -2148,7 +2148,7 @@ SUBROUTINE move_measuring_index
   !------- step5 : accept the update --------------------
   ProbProp(Order, 15) = ProbProp(Order, 15) + 1
 
-  if(rn()<Pacc) then
+  if(Pacc>1.d-12 .and. rn()<Pacc) then
 
     !-------- update the diagram info ---------------
     Phase = Phase *sgn
@@ -2274,7 +2274,7 @@ SUBROUTINE change_Gamma_time
   !------- step5 : accept the update --------------------
   ProbProp(Order, 16) = ProbProp(Order, 16) + 1
 
-  if(rn()<Pacc) then
+  if(Pacc>1.d-12 .and. rn()<Pacc) then
 
     !------ update the diagram info ---------------------
     Phase = Phase *sgn
@@ -2379,7 +2379,7 @@ SUBROUTINE change_wline_isdelta
   !------- step5 : accept the update --------------------
   ProbProp(Order, 17) = ProbProp(Order, 17) + 1
 
-  if(rn()<Pacc) then
+  if(Pacc>1.d-12 .and. rn()<Pacc) then
 
     !------ update the diagram info -------------------
     Phase = Phase *sgn
@@ -2468,7 +2468,7 @@ SUBROUTINE change_gamma_isdelta
   !------- step5 : accept the update --------------------
   ProbProp(Order, 18) = ProbProp(Order, 18) + 1
 
-  if(rn()<Pacc) then
+  if(Pacc>1.d-12 .and. rn()<Pacc) then
 
     !------ update the diagram info -------------------
     Phase = Phase *sgn
@@ -2514,7 +2514,7 @@ SUBROUTINE weight_ratio(Pacc, sgn, Anew, Aold)
   double precision,intent(out) :: Pacc
   complex*16, intent(out) :: sgn
   Pacc = abs(Anew/Aold)
-  if(Pacc>=1.e-15) then
+  if(Pacc>=1.d-12) then
     sgn = (Anew/Aold)/Pacc
   else
     Pacc = 0.d0
@@ -2527,7 +2527,7 @@ SUBROUTINE update_weight(Anew, Aold)
   implicit none 
   complex*16 :: Anew, Aold
 
-  if(abs(Anew)<=1.e-12)  then
+  if(abs(Anew)<=1.d-12)  then
     call LogFile%WriteStamp('e')
     call LogFile%WriteLine("the weight for the new conf is too small, should not accept!")
     call LogFile%WriteLine("the new weight :"+str(Anew))
