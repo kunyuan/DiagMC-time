@@ -2527,14 +2527,14 @@ SUBROUTINE update_weight(Anew, Aold)
   implicit none 
   complex*16 :: Anew, Aold
 
-  if(abs(Anew)<=1.d-12)  then
-    call LogFile%WriteStamp('e')
-    call LogFile%WriteLine("the weight for the new conf is too small, should not accept!")
-    call LogFile%WriteLine("the new weight :"+str(Anew))
-    call LogFile%WriteLine("the previous weight :"+str(Aold))
-    call print_config
-    stop
-  endif
+  !if(abs(Anew)<=1.d-12)  then
+    !call LogFile%WriteStamp('e')
+    !call LogFile%WriteLine("the weight for the new conf is too small, should not accept!")
+    !call LogFile%WriteLine("the new weight :"+str(Anew))
+    !call LogFile%WriteLine("the previous weight :"+str(Aold))
+    !call print_config
+    !stop
+  !endif
 
   WeightCurrent = WeightCurrent *abs(Anew/Aold)
   return
