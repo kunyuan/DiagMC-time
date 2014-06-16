@@ -253,7 +253,7 @@ d_times_cd	basic_function.f90	/^COMPLEX*16 FUNCTION d_times_cd(/;"	f	language:Fo
 date	vrbls_mc.f90	/^  character( 8)         :: date$/;"	v	language:Fortran	module:vrbls_mc
 def_diagram	monte_carlo.f90	/^SUBROUTINE def_diagram$/;"	s	language:Fortran
 def_prob	monte_carlo.f90	/^SUBROUTINE def_prob$/;"	s	language:Fortran
-def_spatial_weight	monte_carlo.f90	/^SUBROUTINE def_spatial_weight$/;"	s	language:Fortran
+def_spatial_weight	monte_carlo.f90	/^subroutine def_spatial_weight$/;"	s	language:Fortran
 def_spin	monte_carlo.f90	/^SUBROUTINE def_spin$/;"	s	language:Fortran
 def_symmetry	basic_function.f90	/^SUBROUTINE def_symmetry$/;"	s	language:Fortran
 delete_Hash4G	basic_function.f90	/^SUBROUTINE delete_Hash4G(/;"	s	language:Fortran
@@ -378,6 +378,7 @@ read_monte_carlo_conf	read_write_data.f90	/^SUBROUTINE read_monte_carlo_conf$/;"
 read_monte_carlo_data	read_write_data.f90	/^SUBROUTINE read_monte_carlo_data$/;"	s	language:Fortran
 reconnect	monte_carlo.f90	/^SUBROUTINE reconnect$/;"	s	language:Fortran
 remove_interaction	monte_carlo.f90	/^SUBROUTINE remove_interaction$/;"	s	language:Fortran
+reweight_GamMC	monte_carlo.f90	/^SUBROUTINE reweight_GamMC$/;"	s	language:Fortran
 rn	basic_function.f90	/^DOUBLE PRECISION FUNCTION rn(/;"	f	language:Fortran
 second_order_diagram	basic_function.f90	/^SUBROUTINE second_order_diagram$/;"	s	language:Fortran
 self_consistent	DiagMC.f90	/^SUBROUTINE self_consistent$/;"	s	language:Fortran
@@ -404,7 +405,7 @@ t_simu	vrbls_mc.f90	/^  double precision      :: t_init, t_simu,/;"	v	language:F
 t_toss	vrbls_mc.f90	/^  double precision      :: t_init, t_simu, t_meas, t_toss$/;"	v	language:Fortran	module:vrbls_mc
 test_basis	fitting.f90	/^SUBROUTINE test_basis(/;"	s	language:Fortran
 test_basis_Gam	fitting.f90	/^SUBROUTINE test_basis_Gam(/;"	s	language:Fortran
-test_subroutine	DiagMC.f90	/^SUBROUTINE test_subroutine$/;"	s	language:Fortran
+test_subroutine	test.f90	/^SUBROUTINE test_subroutine$/;"	s	language:Fortran
 time	vrbls_mc.f90	/^  character(10)         :: time$/;"	v	language:Fortran	module:vrbls_mc
 time_elapse	basic_function.f90	/^SUBROUTINE time_elapse$/;"	s	language:Fortran
 title	vrbls_mc.f90	/^  character*128 :: title$/;"	v	language:Fortran	module:vrbls_mc
@@ -450,6 +451,7 @@ undo_delete_gamma	basic_function.f90	/^SUBROUTINE undo_delete_gamma(/;"	s	langua
 undo_delete_line	basic_function.f90	/^SUBROUTINE undo_delete_line(/;"	s	language:Fortran
 undo_insert_line	basic_function.f90	/^SUBROUTINE undo_insert_line(/;"	s	language:Fortran
 undo_update_line	basic_function.f90	/^SUBROUTINE undo_update_line(/;"	s	language:Fortran
+update_GW	monte_carlo.f90	/^SUBROUTINE update_GW$/;"	s	language:Fortran
 update_Hash4G	basic_function.f90	/^SUBROUTINE update_Hash4G(/;"	s	language:Fortran
 update_Hash4W	basic_function.f90	/^SUBROUTINE update_Hash4W(/;"	s	language:Fortran
 update_WeightCurrent	basic_function.f90	/^SUBROUTINE update_WeightCurrent$/;"	s	language:Fortran

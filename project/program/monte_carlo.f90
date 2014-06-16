@@ -65,9 +65,9 @@ SUBROUTINE def_prob
     Fupdate(k) = Fupdate(k)/Cupdate
   enddo
   return
-END SUBROUTINE def_prob
+end subroutine def_prob
 
-SUBROUTINE def_spatial_weight
+subroutine def_spatial_weight
   implicit none
   double precision :: tt
   integer :: ix,iy,i
@@ -267,43 +267,8 @@ SUBROUTINE markov(IsToss)
       call print_status
       call print_config
 
-      if(imc==32000000000) then
-        call write_monte_carlo_conf
-        call write_monte_carlo_data
-        stop
-      endif
-
-      call LogFile%QuickLog("Check if there is a new G,W data...")
-      call read_flag
-
-      if(mc_version/=file_version) then
-        call LogFile%QuickLog(str(mc_version)+', '+str(file_version))
-        call LogFile%QuickLog("Updating G, W, and Gamma...")
-
-        call read_GWGamma
-        call update_WeightCurrent
-        call check_config
-        call print_config
-        mc_version = file_version
-      endif
-
-      call LogFile%WriteStamp()
-      call LogFile%WriteLine("Reweighting order of diagrams...")
-
-      x = SUM(GamWormOrder(:))
-      CoefOfWeight(:)=TimeRatio(:)*CoefOfWeight(:)*x/(GamWormOrder(:)+50.d0)
-      CoefOfWeight(1:MCOrder) = CoefOfWeight(1:MCOrder)/CoefOfWeight(0)
-      CoefOfWeight(0) = 1.d0
-
-      call LogFile%WriteLine("Reweight Ratios:")
-
-      do i=0,MCOrder
-        call LogFile%WriteLine('Order'+str(i)+' :'+str(CoefOfWeight(i)))
-        call LogFile%WriteLine('     worm: '+str(GamWormOrder(i)))
-        call LogFile%WriteLine('     phycical: '+str(GamOrder(i)))
-      enddo
-
-      call LogFile%WriteLine("Reweighting is done!")
+      call update_GW
+      call reweight_GamMC
 
       if(iblck <= 10) then
         GamWormOrder=0.d0
@@ -333,6 +298,50 @@ SUBROUTINE markov(IsToss)
 END SUBROUTINE markov
 
 
+SUBROUTINE update_GW
+  implicit none
+
+  call LogFile%QuickLog("Check if there is a new G,W data...")
+  call read_flag
+
+  if(mc_version/=file_version) then
+    call LogFile%QuickLog(str(mc_version)+', '+str(file_version))
+    call LogFile%QuickLog("Updating G, W, and Gamma...")
+
+    call read_GWGamma
+    call update_WeightCurrent
+    call check_config
+    call print_config
+    mc_version = file_version
+  endif
+  return
+END SUBROUTINE update_GW
+
+
+SUBROUTINE reweight_GamMC
+  implicit none
+  integer :: i
+  double precision :: totweight
+
+  call LogFile%WriteStamp()
+  call LogFile%WriteLine("Reweighting order of diagrams...")
+
+  totweight = SUM(GamWormOrder(:))
+  CoefOfWeight(:)=TimeRatio(:)*CoefOfWeight(:)*totweight/(GamWormOrder(:)+50.d0)
+  CoefOfWeight(1:MCOrder) = CoefOfWeight(1:MCOrder)/CoefOfWeight(0)
+  CoefOfWeight(0) = 1.d0
+
+  call LogFile%WriteLine("Reweight Ratios:")
+
+  do i=0,MCOrder
+    call LogFile%WriteLine('Order'+str(i)+' :'+str(CoefOfWeight(i)))
+    call LogFile%WriteLine('     worm: '+str(GamWormOrder(i)))
+    call LogFile%WriteLine('     phycical: '+str(GamOrder(i)))
+  enddo
+
+  call LogFile%WriteLine("Reweighting is done!")
+  return
+END SUBROUTINE reweight_GamMC
 !====================================================================
 !============================== UPDATES =============================
 !====================================================================
@@ -2533,14 +2542,18 @@ SUBROUTINE update_weight(Anew, Aold)
   implicit none 
   complex*16 :: Anew, Aold
 
-  !if(abs(Anew)<=1.d-12)  then
-    !call LogFile%WriteStamp('e')
-    !call LogFile%WriteLine("the weight for the new conf is too small, should not accept!")
-    !call LogFile%WriteLine("the new weight :"+str(Anew))
-    !call LogFile%WriteLine("the previous weight :"+str(Aold))
-    !call print_config
-    !stop
-  !endif
+  if(abs(Anew)<=1.d-12 .or. abs(Anew)>=1.d7)  then
+    call LogFile%WriteStamp('e')
+    call LogFile%WriteLine("the weight for the new conf is weird, should not accept!")
+    call LogFile%WriteLine("the new weight :"+str(Anew))
+    call LogFile%WriteLine("the previous weight :"+str(Aold))
+
+    call print_config
+
+    call write_monte_carlo_data
+    call write_monte_carlo_conf
+    stop
+  endif
 
   WeightCurrent = WeightCurrent *abs(Anew/Aold)
   return
