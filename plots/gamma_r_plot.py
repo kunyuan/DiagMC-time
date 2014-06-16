@@ -14,6 +14,8 @@ N = 64.0
 Quans=["GammaR"]
 
 Files=[]
+Files.append(read_data.read_array("./0.50_0.50_quantities.dat", Quans))
+
 #Files.append(read_data.read_array("./0.90_2_bold_quantities.dat", Quans))
 #Files.append(read_data.read_array("./0.90_4_bold_quantities.dat", Quans))
 #Files.append(read_data.read_array("./0.90_5_bold_quantities.dat", Quans))
@@ -27,7 +29,8 @@ Files=[]
 #Files.append(read_data.read_array("../../data/cmp_L_dependence/L8_0.90_3_quantities.dat", Quans))
 #Files.append(read_data.read_array("../../data/cmp_L_dependence/L8_0.90_4_quantities.dat", Quans))
 #Files.append(read_data.read_array("../../data/cmp_L_dependence/L8_0.90_5_quantities.dat", Quans))
-Files.append(read_data.read_array("../../data/cmp_L_dependence/L8_0.90_6_quantities.dat", Quans))
+#Files.append(read_data.read_array("../../data/cmp_L_dependence/L8_0.90_6_quantities.dat", Quans))
+#Files.append(read_data.read_array("../../data/cmp_L_dependence/L8_0.90_1_bold_quantities.dat", Quans))
 
 #Files.append(read_data.read_array("../../data/cmp_L_dependence/L4_0.90_1_quantities.dat", Quans))
 #Files.append(read_data.read_array("../../data/cmp_L_dependence/L4_0.90_2_quantities.dat", Quans))
@@ -52,9 +55,9 @@ ax = plt.subplot(111)
 #Chi_4_pi=0.6457
 
 for key in Quans:
-    for i in range(len(Files)):
-        ax.plot(Lx, Files[i][key][0][0][0:4].real/(N*N), marker="o", label=key)
-        ax.plot(Lx, Files[i][key][0][0][0:4].imag/(N*N), marker="o", label=key)
+    ax.plot(Lx, Files[0][key][0][0][0:4].real/(N*N), marker="o", label=key)
+    ax.plot(Lx, Files[1][key][0][0][0:4].real, marker="o", label=key)
+        #ax.plot(Lx, Files[i][key][0][0][0:4].imag/(N*N), marker="o", label=key)
 #ax.set_xlim(0.0, 1.0)
 
 ################ Beta=0.50 ##########################
