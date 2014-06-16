@@ -23,7 +23,7 @@ MODULE vrbls_mc
   integer, parameter          :: Mnint =-2147483647
 
   integer, parameter :: D = 2                       ! 2-dimensional system
-  integer, parameter,dimension(2) :: MxL =(/32,32/)   ! the largest system
+  integer, parameter,dimension(D) :: MxL =(/32,32/)   ! the largest system
   integer, parameter :: MxVol = MxL(1)**D           ! the maximum system volume
   integer, parameter :: MxT   =   64                ! the maximum number of time segments
   integer, parameter :: MxK   = 1000000             ! the maximum momentum
@@ -54,11 +54,11 @@ MODULE vrbls_mc
   type(logging) :: LogTerm
 
   !======================== Input parameter ==============================
-  integer          ::  L(2), Vol                ! System size
-  double precision  ::  logL(2)
-  integer          ::  dL(2)
+  integer          ::  L(D), Vol, dVol(D)         ! System size
+  double precision ::  logL(D)
+  integer          ::  dL(D)
   double precision ::  Jcp                        ! interaction
-  double precision ::  Mu(2)                      ! Chem. potential for spin down & up
+  double precision ::  Mu(D)                      ! Chem. potential for spin down & up
   double precision ::  Beta                       ! inverse temperature
   integer          ::  MCOrder                    ! the max order for Gamma in MC
   !=======================================================================
@@ -120,15 +120,15 @@ MODULE vrbls_mc
   complex(kind=8) :: G0F(0:MxT-1)
   complex(kind=8) :: Sigma(0:MxT-1)
 
-  complex(kind=8), allocatable :: W(:,:,:,:)
-  complex(kind=8), allocatable :: Gam(:,:,:,:,:)
+  complex(kind=8), allocatable :: W(:,:,:)
+  complex(kind=8), allocatable :: Gam(:,:,:,:)
 
-  complex(kind=8), allocatable :: W0PF(:,:,:)
-  complex(kind=8), allocatable :: Gam0PF(:,:,:,:)
+  complex(kind=8), allocatable :: W0PF(:,:)
+  complex(kind=8), allocatable :: Gam0PF(:,:,:)
 
-  complex(kind=8), allocatable :: Polar(:,:,:)
-  complex(kind=8), allocatable :: Chi(:,:,:)
-  complex(kind=8), allocatable :: Denom(:,:,:)
+  complex(kind=8), allocatable :: Polar(:,:)
+  complex(kind=8), allocatable :: Chi(:,:)
+  complex(kind=8), allocatable :: Denom(:,:)
   !=======================================================================
 
   !======================== analytic integration =========================
@@ -136,13 +136,13 @@ MODULE vrbls_mc
 
   !====================== MC Simulation ==================================
   complex*16 :: GamNorm, GamNormWeight           ! the weight of the normalization diagram
-  complex*16, allocatable :: GamMC(:,:,:,:)      ! the measurement of Gamma in MC
-  double precision, allocatable :: ReGamSqMC(:,:,:,:)   ! the measurement of Gamma in MC
-  double precision, allocatable :: ImGamSqMC(:,:,:,:)   ! the measurement of Gamma in MC
+  complex*16, allocatable :: GamMC(:,:,:)      ! the measurement of Gamma in MC
+  double precision, allocatable :: ReGamSqMC(:,:,:)   ! the measurement of Gamma in MC
+  double precision, allocatable :: ImGamSqMC(:,:,:)   ! the measurement of Gamma in MC
 
-  complex*16, allocatable :: GamBasis(:,:,:,:,:,:)      ! the measurement of Gamma in MC
-  double precision, allocatable :: ReGamSqBasis(:,:,:,:,:,:)   ! the measurement of Gamma in MC
-  double precision, allocatable :: ImGamSqBasis(:,:,:,:,:,:)   ! the measurement of Gamma in MC
+  complex*16, allocatable :: GamBasis(:,:,:,:,:)      ! the measurement of Gamma in MC
+  double precision, allocatable :: ReGamSqBasis(:,:,:,:,:)   ! the measurement of Gamma in MC
+  double precision, allocatable :: ImGamSqBasis(:,:,:,:,:)   ! the measurement of Gamma in MC
 
   double precision :: GamOrder(0:MxOrder)              ! the configuration number of different orders
   double precision :: GamWormOrder(0:MxOrder)          ! the configuration number in whole section
@@ -151,8 +151,8 @@ MODULE vrbls_mc
   double precision :: WeightCurrent            ! the current weight of the configuration
   double precision :: CoefOfWorm
   double precision :: CoefOfWeight(0:MxOrder)  ! the coeffecients for different orders and worm section
-  double precision :: CoefOfSymmetry(0:MxL(1), 0:MxL(2))
-  double precision :: SpatialWeight(1:2,0:MxL(1)-1)  ! 1, fox x direction 2, for y direction;
+  double precision :: CoefOfSymmetry(0:MxVol)
+  double precision :: SpatialWeight(1:D,0:MxL(1))  ! 1, fox x direction 2, for y direction, ...
                                                  !!! attention: dx,dy=0~L!!!!
 
   !------------- MC steps -----------------------------------

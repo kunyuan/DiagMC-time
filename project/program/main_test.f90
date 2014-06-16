@@ -16,8 +16,7 @@ PROGRAM MAIN
   endif
   open(unit=11, file=trim(infile), action='read')
     read(11,*) ID
-    read(11,*) L(1)
-    read(11,*) L(2)
+    read(11,*) L(:)
     read(11,*) Jcp
     read(11,*) Beta
     read(11,*) MCOrder
@@ -69,9 +68,15 @@ PROGRAM MAIN
   Mu(2)  = 1.d0
 
   !================== space variables ==================================
-  Vol = L(1)*L(2)
-  dL(1) = Floor(L(1)/2.d0)
-  dL(2) = Floor(L(2)/2.d0)
+  Vol = 1.d0
+  do i = 1, D
+    Vol = Vol *L(i)
+    dL(i) = Floor(L(i)/2.d0)
+  enddo
+
+  do i = 1, D
+    dVol(i) = Vol/L(i)
+  enddo
 
   logL(:)=dlog(L(:)*1.d0)
   SpatialWeight(:,:)=0.d0
@@ -102,22 +107,22 @@ PROGRAM MAIN
   Error(:)=0.d0
   QuanName(:)="Undefined"
 
-  allocate(W(NTypeW, 0:L(1)-1, 0:L(2)-1, 0:MxT-1))
-  allocate(Gam(NTypeGam, 0:L(1)-1, 0:L(2)-1, 0:MxT-1, 0:MxT-1))
+  allocate(W(NTypeW, 0:Vol-1, 0:MxT-1))
+  allocate(Gam(NTypeGam, 0:Vol-1, 0:MxT-1, 0:MxT-1))
 
-  allocate(W0PF(0:L(1)-1, 0:L(2)-1, 0:MxT-1))
-  allocate(Gam0PF(0:L(1)-1, 0:L(2)-1, 0:MxT-1, 0:MxT-1))
-  allocate(Polar(0:L(1)-1, 0:L(2)-1, 0:MxT-1))
-  allocate(Denom(0:L(1)-1, 0:L(2)-1, 0:MxT-1))
-  allocate(Chi(0:L(1)-1, 0:L(2)-1, 0:MxT-1))
+  allocate(W0PF(0:Vol-1, 0:MxT-1))
+  allocate(Gam0PF(0:Vol-1, 0:MxT-1, 0:MxT-1))
+  allocate(Polar(0:Vol-1, 0:MxT-1))
+  allocate(Denom(0:Vol-1, 0:MxT-1))
+  allocate(Chi(0:Vol-1, 0:MxT-1))
 
-  allocate(GamMC(0:MCOrder, 0:L(1)-1, 0:L(2)-1, 0:MxT-1))
-  allocate(ReGamSqMC(0:MCOrder, 0:L(1)-1, 0:L(2)-1, 0:MxT-1))
-  allocate(ImGamSqMC(0:MCOrder, 0:L(1)-1, 0:L(2)-1, 0:MxT-1))
+  allocate(GamMC(0:MCOrder, 0:Vol-1, 0:MxT-1))
+  allocate(ReGamSqMC(0:MCOrder, 0:Vol-1, 0:MxT-1))
+  allocate(ImGamSqMC(0:MCOrder, 0:Vol-1, 0:MxT-1))
 
-  allocate(GamBasis(0:MCOrder,1:NTypeGam/2, 0:L(1)-1, 0:L(2)-1, 1:NbinGam, 1:NBasisGam))
-  allocate(ReGamSqBasis(0:MCOrder,1:NTypeGam/2, 0:L(1)-1, 0:L(2)-1, 1:NbinGam, 1:NBasisGam))
-  allocate(ImGamSqBasis(0:MCOrder,1:NTypeGam/2, 0:L(1)-1, 0:L(2)-1, 1:NbinGam, 1:NBasisGam))
+  allocate(GamBasis(0:MCOrder,1:NTypeGam/2, 0:Vol-1, 1:NbinGam, 1:NBasisGam))
+  allocate(ReGamSqBasis(0:MCOrder,1:NTypeGam/2, 0:Vol-1, 1:NbinGam, 1:NBasisGam))
+  allocate(ImGamSqBasis(0:MCOrder,1:NTypeGam/2, 0:Vol-1, 1:NbinGam, 1:NBasisGam))
 
   MaxStat=1024
   allocate(ObsRecord(1:MaxStat,0:NObs-1))
@@ -138,73 +143,71 @@ PROGRAM MAIN
   call LogFile%QuickLog("Initialization Done!...")
   !!=====================================================================
 
-  if(ISub==1) then
-    call self_consistent
-  else if(ISub==2) then
-    ios=1
-    do while(ios/=0) 
-      open(10,access="append", iostat=ios, file="read_list.dat")
-      write(10, *) trim(adjustl(title_mc))//"_monte_carlo_data.bin.dat"
-      close(10)
-    enddo
-    call monte_carlo
-  else if(ISub==3) then
-    call numerical_integeration
-  else if(ISub==4) then
-    call just_output
-  else if(ISub==5) then
-    call test_subroutine
-  endif
+  !if(ISub==1) then
+    !call self_consistent
+  !else if(ISub==2) then
+    !ios=1
+    !do while(ios/=0) 
+      !open(10,access="append", iostat=ios, file="read_list.dat")
+      !write(10, *) trim(adjustl(title_mc))//"_monte_carlo_data.bin.dat"
+      !close(10)
+    !enddo
+    !call monte_carlo
+  !else if(ISub==3) then
+    !call numerical_integeration
+  !else if(ISub==4) then
+    !call just_output
+  !else if(ISub==5) then
+    !call test_subroutine
+  !endif
 
 CONTAINS
 
-INCLUDE "basic_function.f90"
 INCLUDE "self_consistent.f90"
-INCLUDE "monte_carlo.f90"
-INCLUDE "check_conf.f90"
-INCLUDE "analytic_integration.f90"
-INCLUDE "read_write_data.f90"
+INCLUDE "functions_sc.f90"
+!INCLUDE "analytic_integration.f90"
+
+!INCLUDE "monte_carlo.f90"
+!INCLUDE "check_conf.f90"
+
+!INCLUDE "read_write_data.f90"
+
 INCLUDE "fitting.f90"
-INCLUDE "test.f90"
+!INCLUDE "test.f90"
 
-SUBROUTINE read_from_infile
-  implicit none
-  return
-END SUBROUTINE
+!subroutine numerical_integeration
+  !implicit none
+  !call LogFile%QuickLog("Reading G,W, and Gamma...")
+  !call read_GWGamma
 
-subroutine numerical_integeration
-  implicit none
-  call LogFile%QuickLog("Reading G,W, and Gamma...")
-  call read_GWGamma
+  !call calculate_Gam1
+!end subroutine
 
-  call calculate_Gam1
-end subroutine
-
-SUBROUTINE just_output
-  implicit none
-  logical :: flag
-  call LogFile%QuickLog("Just output something!")
-  call LogFile%QuickLog("Reading G,W, and Gamma...")
-  call read_GWGamma
+!SUBROUTINE just_output
+  !implicit none
+  !logical :: flag
+  !call LogFile%QuickLog("Just output something!")
+  !call LogFile%QuickLog("Reading G,W, and Gamma...")
+  !call read_GWGamma
 
 
-  call LogFile%QuickLog("Reading MC data...")
-  call read_monte_carlo_data
+  !call LogFile%QuickLog("Reading MC data...")
+  !call read_monte_carlo_data
 
-  call LogFile%QuickLog("Reading Done!...")
+  !call LogFile%QuickLog("Reading Done!...")
 
-  !!-------- update the Gamma matrix with MC data -------
-  call Gam_mc2matrix_mc
+  !!!-------- update the Gamma matrix with MC data -------
+  !call Gam_mc2matrix_mc
 
-  flag = self_consistent_GW(1.d-8)
+  !flag = self_consistent_GW(1.d-8)
 
-  call calculate_Chi
-  call transfer_Chi_r(-1)
-  call transfer_Chi_t(-1)
-  call transfer_Sigma_t(-1)
+  !call calculate_Chi
+  !call transfer_Chi_r(-1)
+  !call transfer_Chi_t(-1)
+  !call transfer_Sigma_t(-1)
 
-  call output_Quantities
-end SUBROUTINE just_output
+  !call output_Quantities
+!end SUBROUTINE just_output
 
 SUBROUTINE self_consistent
   implicit none
@@ -269,7 +272,7 @@ LOGICAL FUNCTION self_consistent_GW(err)
 
   !!------ calculate G, W in momentum domain --------------
   WOld = (10.d0, 0.d0)
-  WNow = weight_W(1, (/0, 0/), 0)
+  WNow = weight_W(1, 0, 0)
   self_consistent_GW = .true.
 
   iloop = 0
@@ -287,7 +290,7 @@ LOGICAL FUNCTION self_consistent_GW(err)
     call calculate_G
     call calculate_W
 
-    WNow = weight_W(1, (/0, 0/), 0)
+    WNow = weight_W(1, 0, 0)
 
     call LogFile%QuickLog("G-W loop:"//str(iloop)//str(real(WOld))//str(real(WNOw)))
   enddo
@@ -305,142 +308,142 @@ LOGICAL FUNCTION self_consistent_GW(err)
   return
 END FUNCTION self_consistent_GW
 
-SUBROUTINE monte_carlo
-  implicit none
-  integer :: i, mc_version
-  double precision :: WR, GamR
+!SUBROUTINE monte_carlo
+  !implicit none
+  !integer :: i, mc_version
+  !double precision :: WR, GamR
 
-  call LogFile%QuickLog("Initializing monte carlo...")
-  call read_GWGamma
+  !call LogFile%QuickLog("Initializing monte carlo...")
+  !call read_GWGamma
 
-  call calculate_GamNormWeight
+  !call calculate_GamNormWeight
 
-  call initialize_markov
+  !call initialize_markov
 
-  call LogFile%QuickLog("Initializing monte carlo done!")
+  !call LogFile%QuickLog("Initializing monte carlo done!")
 
-  do i= 0, MCOrder
-    QuanName(i) = "(Order "+str(i)+"Gamma)"
-  enddo
+  !do i= 0, MCOrder
+    !QuanName(i) = "(Order "+str(i)+"Gamma)"
+  !enddo
 
-  if(IsLoad==.false.) then
+  !if(IsLoad==.false.) then
 
-    call LogFile%QuickLog("Start Thermalization ...")
+    !call LogFile%QuickLog("Start Thermalization ...")
 
-    ProbCall(:,:) = 0.d0
-    ProbProp(:,:) = 0.d0
-    ProbAcc(:,:) = 0.d0
-    BalenceCheck(:,:,:)=0.d0
+    !ProbCall(:,:) = 0.d0
+    !ProbProp(:,:) = 0.d0
+    !ProbAcc(:,:) = 0.d0
+    !BalenceCheck(:,:,:)=0.d0
 
-    !-------- throw away some configurations to thermalize -----------
-    call markov(.true.)
+    !!-------- throw away some configurations to thermalize -----------
+    !call markov(.true.)
 
-    call LogFile%QuickLog("Thermalization done!")
+    !call LogFile%QuickLog("Thermalization done!")
 
-    call time_elapse
-    t_simu = t_elap
-    call LogFile%QuickLog('Thermalization time: '//trim(str(t_simu,'(f12.2)'))//'s')
+    !call time_elapse
+    !t_simu = t_elap
+    !call LogFile%QuickLog('Thermalization time: '//trim(str(t_simu,'(f12.2)'))//'s')
     
 
-    !!================ MC SIMULATION FOR GAMMA =============================
-    imc = 0.d0
-    Z_normal=0.0
-    Z_worm=0.0
-    StatNum=0
+    !!!================ MC SIMULATION FOR GAMMA =============================
+    !imc = 0.d0
+    !Z_normal=0.0
+    !Z_worm=0.0
+    !StatNum=0
 
-    ProbCall(:,:) = 0.d0
-    ProbProp(:,:) = 0.d0
-    ProbAcc(:,:) = 0.d0
+    !ProbCall(:,:) = 0.d0
+    !ProbProp(:,:) = 0.d0
+    !ProbAcc(:,:) = 0.d0
 
-    GamOrder(:) = 0.d0
-    GamWormOrder(:) = 0.d0
+    !GamOrder(:) = 0.d0
+    !GamWormOrder(:) = 0.d0
 
-    GamMC(:,:,:,:) = (0.d0, 0.d0)
-    ReGamSqMC(:,:,:,:) = 0.d0
-    ImGamSqMC(:,:,:,:) = 0.d0
+    !GamMC(:,:,:,:) = (0.d0, 0.d0)
+    !ReGamSqMC(:,:,:,:) = 0.d0
+    !ImGamSqMC(:,:,:,:) = 0.d0
 
-    GamBasis(:,:,:,:,:,:) = (0.d0, 0.d0)
-    ReGamSqBasis(:,:,:,:,:,:) = 0.d0
-    ImGamSqBasis(:,:,:,:,:,:) = 0.d0
+    !GamBasis(:,:,:,:,:,:) = (0.d0, 0.d0)
+    !ReGamSqBasis(:,:,:,:,:,:) = 0.d0
+    !ImGamSqBasis(:,:,:,:,:,:) = 0.d0
 
-    GamNorm = (0.d0, 0.d0)
-    TestData(:)=0.d0
+    !GamNorm = (0.d0, 0.d0)
+    !TestData(:)=0.d0
 
-    call read_flag
-    mc_version = file_version
+    !call read_flag
+    !mc_version = file_version
 
-  else if(IsLoad) then
+  !else if(IsLoad) then
 
-    !------- read the configuration and MC data from previous simulation --
-    call LogFile%QuickLog("Reading the previous MC ...")
+    !!------- read the configuration and MC data from previous simulation --
+    !call LogFile%QuickLog("Reading the previous MC ...")
 
-    call read_monte_carlo_conf
-    call LogFile%QuickLog("Read the previous MC conf Done!...")
-    call read_monte_carlo_data
-    call LogFile%QuickLog("Read the previous MC data Done!...")
+    !call read_monte_carlo_conf
+    !call LogFile%QuickLog("Read the previous MC conf Done!...")
+    !call read_monte_carlo_data
+    !call LogFile%QuickLog("Read the previous MC data Done!...")
 
-    call LogFile%QuickLog(str(mc_version)+', '+str(file_version))
-    call LogFile%QuickLog("Updating G, W, and Gamma...")
+    !call LogFile%QuickLog(str(mc_version)+', '+str(file_version))
+    !call LogFile%QuickLog("Updating G, W, and Gamma...")
 
-    call read_GWGamma
-    call output_Quantities
-    call update_WeightCurrent
+    !call read_GWGamma
+    !call output_Quantities
+    !call update_WeightCurrent
 
-    call check_config
-    call print_config
-  endif
+    !call check_config
+    !call print_config
+  !endif
 
-  call LogFile%QuickLog("Running MC Simulations...")
+  !call LogFile%QuickLog("Running MC Simulations...")
 
-  call markov(.false.)
+  !call markov(.false.)
 
-  call time_elapse
-  t_simu = t_elap
-  call LogFile%QuickLog('Simulation time: '//trim(str(t_simu,'(f12.2)'))//'s')
+  !call time_elapse
+  !t_simu = t_elap
+  !call LogFile%QuickLog('Simulation time: '//trim(str(t_simu,'(f12.2)'))//'s')
 
-  return
-END SUBROUTINE monte_carlo
+  !return
+!END SUBROUTINE monte_carlo
 
-SUBROUTINE read_flag
-  implicit none
-  integer :: ios
+!SUBROUTINE read_flag
+  !implicit none
+  !integer :: ios
 
-  open(11, status="old", iostat=ios, file="loop.inp")
-  read(11, *) file_version
-  close(11)
+  !open(11, status="old", iostat=ios, file="loop.inp")
+  !read(11, *) file_version
+  !close(11)
 
-  if(ios/=0) then
-    call LogFile%QuickLog(str(ios)+"Fail to read the loop number, continue to MC!")
-    return
-  endif
+  !if(ios/=0) then
+    !call LogFile%QuickLog(str(ios)+"Fail to read the loop number, continue to MC!")
+    !return
+  !endif
 
-  return
-END SUBROUTINE read_flag
+  !return
+!END SUBROUTINE read_flag
 
 
-SUBROUTINE update_flag
-  implicit none
-  integer :: ios 
+!SUBROUTINE update_flag
+  !implicit none
+  !integer :: ios 
 
-  open(11, status="old", iostat=ios, file="loop.inp")
-  read(11, *) file_version
-  close(11)
+  !open(11, status="old", iostat=ios, file="loop.inp")
+  !read(11, *) file_version
+  !close(11)
 
-  if(ios/=0) then
-    call LogFile%QuickLog(str(ios)+"Fail to read the loop number in loop.inp!")
-    return
-  endif
+  !if(ios/=0) then
+    !call LogFile%QuickLog(str(ios)+"Fail to read the loop number in loop.inp!")
+    !return
+  !endif
 
-  open(12, status="replace", iostat=ios, file="loop.inp")
-  write(12, *) file_version+1
-  close(12)
+  !open(12, status="replace", iostat=ios, file="loop.inp")
+  !write(12, *) file_version+1
+  !close(12)
 
-  if(ios/=0) then
-    call LogFile%QuickLog(str(ios)+"Fail to write the loop number to loop.inp!")
-    return
-  endif
-  return
-END SUBROUTINE update_flag
+  !if(ios/=0) then
+    !call LogFile%QuickLog(str(ios)+"Fail to write the loop number to loop.inp!")
+    !return
+  !endif
+  !return
+!END SUBROUTINE update_flag
 
 END PROGRAM MAIN
 
