@@ -9,10 +9,11 @@ MODULE vrbls_mc
   logical, parameter  ::  HEAVY_DEBUG=.false.
   !heavy deug mode will turn on checking for all low level subroutines, it will significantly slow down the code
   !Please use it if you are debugging
-  logical, parameter  ::  IS_BOLD=.true.
+  logical, parameter  ::  IS_BOLD=.false.
   logical, parameter  ::  CHECK_G=.true.
   logical, parameter  ::  CHECK_W=.true.
   logical, parameter  ::  CHECK_GAM=IS_BOLD
+
   !======================== Parameters ====================================
   double precision, parameter :: Pi    = 3.14159265358979323846d0
   double precision, parameter :: Pi2   = 6.2831853071795865d0

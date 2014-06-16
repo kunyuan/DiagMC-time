@@ -8,8 +8,8 @@ TO_DO = []
 
 #common dictionary for all jobs
 com_dict={
-    "Lx" :  16,
-    "Ly" :  16,
+    "Lx" :  8,
+    "Ly" :  8,
     "J1" :  1.0,
     "J2" :  0.5,
     "Beta" :  0.50,
