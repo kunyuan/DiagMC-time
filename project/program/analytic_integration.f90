@@ -15,8 +15,8 @@ SUBROUTINE calculate_GamNormWeight
   GamNormWeight = (0.d0, 0.d0)
   !--------- bare Gamma --------------------
   do ityp = 1, 6
-    Gam0 = weight_meas_Gam0(ityp, (/0, 0/))
-    Gam0 = Gam0 *weight_Gam0(ityp, (/0, 0/))
+    Gam0 = weight_Gam0(ityp, 0)
+    Gam0 = Gam0 *weight_Gam0(ityp, 0)
     GamNormWeight = GamNormWeight + Gam0*(real(MxT)/Beta)**2.d0
   enddo
 
@@ -37,11 +37,13 @@ SUBROUTINE calculate_Gam1
   complex*16 :: FGam(0:MxT-1, 0:MxT-1)
   DOUble precision :: ratio
 
+  !!============ fake G function =================================
   !do t1 = 0, MxT-1
     !!G(:, t1) = cdexp((0.d0, 1.d0)*pi*real(t1)/(2.d0*MxT))/(1.d0, 1.d0)
     !G(:, t1) = (1.d0, 0.d0)
   !enddo
 
+  !!============ fake W function =================================
   !W = (0.d0, 0.d0)
   !W(1,0,0,:) = (1.d0, 0.d0)
   !W(2,0,0,:) = (1.d0, 0.d0)
@@ -50,6 +52,7 @@ SUBROUTINE calculate_Gam1
   !W(5,0,0,:) = (2.d0, 0.d0)
   !W(6,0,0,:) = (2.d0, 0.d0)
 
+  !!============ fake Gamma function =================================
   !Gam = (0.d0, 0.d0)
   !do t1 = 0, MxT-1
     !do t2 = 0, MxT-1
@@ -141,13 +144,13 @@ SUBROUTINE calculate_Gam1
 
         Gin = weight_G(1, t1)
         Gout = weight_G(1, t2)
-        Gam1 = weight_Gam0(1, (/0, 0/))
-        Gam2 = weight_Gam0(1, (/0, 0/)) 
-        Gam3 = weight_Gam0(1, (/0, 0/)) 
+        Gam1 = weight_Gam0(1, 0)
+        Gam2 = weight_Gam0(1, 0) 
+        Gam3 = weight_Gam0(1, 0) 
         if(t1+t2<MxT) then
-          iW = weight_W(1, (/0, 0/), t1+t2)
+          iW = weight_W(1, 0, t1+t2)
         else 
-          iW = weight_W(1, (/0, 0/), t1+t2-MxT)
+          iW = weight_W(1, 0, t1+t2-MxT)
         endif
 
         weight = Gin *Gout *iW *Gam1 *Gam2 *Gam3

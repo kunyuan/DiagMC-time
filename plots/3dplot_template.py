@@ -13,17 +13,17 @@ Beta = 0.90
 N = 64
 
 #Quans = ["Gamma2"]
-Quans = ["Gamma"]
-#GamInt, dim_name = read_data.read_array("./../0.90_Gam1.dat")["Gamma"]
+#Quans = ["Gamma"]
+GamInt, dim_name = read_data.read_array("../project/0.90_Gam1.dat")["Gamma"]
 #GamMC, dim_name = read_data.read_array("./../../data/conservation/bare_0.90_4_quantities.dat")["Gamma2"]
 #GamMC, dim_name = read_data.read_array("./1_loop/0.90_quantities.dat")["Gamma"]
-GamMC = read_data.read_array("../0.90_quantities.dat", Quans)
+#GamMC = read_data.read_array("../0.90_quantities.dat", Quans)
 
 if is2d is True:
     tau = np.arange(0, Beta, Beta/N)
     fig = plt.figure()
-    plt.plot(tau, GamMC.diagonal().real, 'r', 
-            tau, GamInt.diagonal().real, 'b')
+    #plt.plot(tau, GamMC.diagonal().real, 'r', 
+    plt.plot(tau, GamInt.diagonal().real, 'b')
     plt.xlabel(dim_name[0])
     plt.ylabel("diag{Gamma}")
 
@@ -38,15 +38,15 @@ else:
     fig = plt.figure()
     ax = fig.gca(projection='3d')
 
-    for key in Quans:
-        surf = ax.plot_surface(X, Y, GamMC[key][0].real, rstride=1, cstride=1, cmap=cm.coolwarm,
-            linewidth=0, antialiased=False)
+    #for key in Quans:
+    surf = ax.plot_surface(X, Y, GamInt.real, rstride=1, cstride=1, cmap=cm.coolwarm,
+        linewidth=0, antialiased=False)
         #surf = ax.plot_surface(X, Y, GamMC[key][0].imag, rstride=1, cstride=1, cmap=cm.coolwarm,
             #linewidth=0, antialiased=False)
     # ax.set_zlim(-1.01, 1.01)
 
-        ax.set_xlabel(GamMC[key][1][0])
-        ax.set_ylabel(GamMC[key][1][1])
+    ax.set_xlabel(dim_name[0])
+    ax.set_ylabel(dim_name[1])
     ax.set_zlabel("Gamma")
 
     ax.zaxis.set_major_locator(LinearLocator(10))

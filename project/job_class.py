@@ -63,8 +63,7 @@ class Job:
         '''output the corresponding string of the job class'''
         self.para["pid"] = pid
         input_str = self.key_to_string("pid")
-        input_str += self.key_to_string("Lx")
-        input_str += self.key_to_string("Ly")
+        input_str += self.key_to_string("L")
         input_str += self.key_to_string("Jcp")
         input_str += self.key_to_string("Beta")
         input_str += self.key_to_string("Order")

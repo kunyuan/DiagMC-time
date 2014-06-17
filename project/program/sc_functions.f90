@@ -1,4 +1,17 @@
 !========= MODEL OR DIMENSION DEPENDENT ==============================
+
+!!------------- definition of the lattice and type symmetry ----------------
+SUBROUTINE def_symmetry
+  implicit none
+  integer :: i, j, omega
+
+  CoefOfSymmetry(:) = 2.d0   !typ 1,2; 3,4; 5,6
+
+  return
+END SUBROUTINE def_symmetry
+
+
+!!------------- definition of W0 function ----------------
 Logical Function is_W0_nonzero(dims, site)
   implicit none
   integer, intent(in) :: dims, site
@@ -6,7 +19,7 @@ Logical Function is_W0_nonzero(dims, site)
   integer :: dx, dy, dz 
   
   allocate(cord(1:dims))
-  cord = get_matrix_from_site(D, site)
+  cord = get_cord_from_site(D, site)
   
   !========2-d Heisenberg ============
   dx = cord(1)
@@ -21,8 +34,8 @@ Logical Function is_W0_nonzero(dims, site)
     stop
   endif
 
-  if(cord(1)==1 .and. cord(2)==0) is_w0_nonzero = .true.
-  if(cord(1)==0 .and. cord(2)==1) is_w0_nonzero = .true.
+  if(cord(1)==1 .and. cord(2)==0) is_W0_nonzero = .true.
+  if(cord(1)==0 .and. cord(2)==1) is_W0_nonzero = .true.
 
   !========3-d Heisenberg ============
   !dx = cord(1)
@@ -41,12 +54,13 @@ Logical Function is_W0_nonzero(dims, site)
     !stop
   !endif
 
-  !if(cord(1)==1 .and. cord)(2)==0 .and. cord(3)==0) is_w0_nonzero = .true.
-  !if(cord(1)==0 .and. cord)(2)==1 .and. cord(3)==0) is_w0_nonzero = .true.
-  !if(cord(1)==0 .and. cord)(2)==0 .and. cord(3)==1) is_w0_nonzero = .true.
+  !if(cord(1)==1 .and. cord)(2)==0 .and. cord(3)==0) is_W0_nonzero = .true.
+  !if(cord(1)==0 .and. cord)(2)==1 .and. cord(3)==0) is_W0_nonzero = .true.
+  !if(cord(1)==0 .and. cord)(2)==0 .and. cord(3)==1) is_W0_nonzero = .true.
   return
 END FUNCTION is_W0_nonzero
 
+!!------------- definition of Gam0 function ----------------
 Logical Function is_Gam0_nonzero(dims, site)
   implicit none
   integer, intent(in) :: dims, site
@@ -54,7 +68,7 @@ Logical Function is_Gam0_nonzero(dims, site)
   integer :: dx, dy, dz
   
   allocate(cord(1:dims))
-  cord = get_matrix_from_site(D, site)
+  cord = get_cord_from_site(D, site)
   is_Gam0_nonzero = .false.
 
   !========2-d Heisenberg ============
@@ -98,34 +112,73 @@ END FUNCTION is_Gam0_nonzero
 
 !========= MODEL OR DIMENSION INDEPENDENT ==============================
 !!====== transfer a D-dimensional space into a 1-d array =============
-integer function get_site_from_matrix(dims, matrix)
+integer function get_site_from_cord(dims, cord)
   implicit none
   integer :: dims
-  integer, dimension(dims) :: matrix
+  integer, dimension(dims) :: cord
   integer :: i, j
 
-  get_site_from_matrix = 0
+  get_site_from_cord = 0
   do i = 1, dims
-    get_site_from_matrix = get_site_from_matrix + matrix(i)*dVol(i)
+    get_site_from_cord = get_site_from_cord + cord(i)*dVol(i)
   enddo
   return
-END FUNCTION get_site_from_matrix
+END FUNCTION get_site_from_cord
 
 
-!!====== transfer to a D-dimensional matrix from a 1-d array =============
-function get_matrix_from_site(dims, site)
+!!====== transfer to a D-dimensional coordinates from a 1-d array =============
+function get_cord_from_site(dims, site)
   implicit none
   integer, intent(in) :: dims, site
-  integer, dimension(dims) :: get_matrix_from_site
+  integer, dimension(dims) :: get_cord_from_site
   integer :: i, tmp
 
   tmp = site
   do i = dims, 1, -1
-    get_matrix_from_site(i) =  tmp/dVol(i)
-    tmp = tmp - get_matrix_from_site(i)*dVol(i)
+    get_cord_from_site(i) =  tmp/dVol(i)
+    tmp = tmp - get_cord_from_site(i)*dVol(i)
   enddo
   return
-END FUNCTION get_matrix_from_site
+END FUNCTION get_cord_from_site
+
+!======= decompose a matrix from 1d array to D-dimensional matrix ==============
+SUBROUTINE decompose_matrix(Ntyp, Lx, Ly, Lz,Nleft, Mat1D, Mat)
+  implicit none
+  integer, intent(in) :: Ntyp, Lx, Ly, Lz, Nleft
+  complex*16, intent(in) :: Mat1D(Ntyp,0:Lx*Ly*Lz-1,0:Nleft-1)
+  complex*16, intent(out):: Mat(Ntyp,0:Lx-1,0:Ly-1,0:Lz-1,0:Nleft-1)
+  integer :: it, il, ix, iy, iz, site
+  do it = 1, Ntyp
+    do il = 0, Nleft-1
+      do ix = 0, Lx-1
+        do iy = 0, Ly-1
+          do iz = 0, Lz-1
+            site = get_site_from_cord(3, (/ix, iy, iz/))
+            Mat(it, ix, iy, iz, il) = Mat1D(it, site, il)
+          enddo
+        enddo
+      enddo
+    enddo
+  enddo
+  return
+END SUBROUTINE decompose_matrix
+
+!======= combine a matrix from D-dimensional matrix to 1-d matrix ==============
+SUBROUTINE combine_matrix(Ntyp, Lx, Ly, Lz, Nleft, Mat, Mat1D)
+  integer, intent(in) :: Ntyp, Lx, Ly, Lz, Nleft
+  complex*16, intent(in):: Mat(Ntyp,0:Lx-1,0:Ly-1,0:Lz-1,0:Nleft-1)
+  complex*16, intent(out) :: Mat1D(Ntyp,0:Lx*Ly*Lz-1,0:Nleft-1)
+  integer :: it, il, ir(3), site
+  do it = 1, Ntyp
+    do il = 0, Nleft-1
+      do site = 0, Lx*Ly*Lz-1
+        ir = get_cord_from_site(3, site)
+        Mat1D(it, site, il) = Mat(it, ir(1), ir(2), ir(3), il) 
+      enddo
+    enddo
+  enddo
+  return
+END SUBROUTINE combine_matrix
 
 
 !!======================== WEIGHT EXTRACTING =========================
@@ -342,7 +395,7 @@ END SUBROUTINE
 SUBROUTINE transfer_W0_t(BackForth)
     implicit none
     integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
-    call FFT_tau_single(W0PF,1,L(1)*L(2),BackForth)
+    call FFT_tau_single(W0PF,1,Vol,BackForth)
 END SUBROUTINE
 
 SUBROUTINE transfer_Gam0_t(BackForth)
@@ -350,7 +403,7 @@ SUBROUTINE transfer_Gam0_t(BackForth)
     integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
     integer :: it1, it2
 
-    call FFT_tau_double(Gam0PF,1,L(1)*L(2),BackForth)
+    call FFT_tau_double(Gam0PF,1,Vol,BackForth)
 END SUBROUTINE
 !===========================================================================
 
@@ -403,7 +456,7 @@ END SUBROUTINE transfer_G_t
 SUBROUTINE transfer_W_t(BackForth)
     implicit none
     integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
-    call FFT_tau_single(W,NtypeW,L(1)*L(2),BackForth)
+    call FFT_tau_single(W,NtypeW,Vol,BackForth)
 END SUBROUTINE transfer_W_t
 
 
@@ -412,13 +465,13 @@ SUBROUTINE transfer_Gam_t(BackForth)
     integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
     integer :: it1, it2
     if(BackForth/=-1) then
-      call FFT_shift_t_double(Gam,NtypeGam,L(1)*L(2),BackForth)
-      call FFT_tau_double(Gam,NtypeGam,L(1)*L(2),BackForth)
-      !call FFT_shift_omega_double(Gam,NtypeGam,L(1)*L(2),BackForth)
+      call FFT_shift_t_double(Gam,NtypeGam,Vol,BackForth)
+      call FFT_tau_double(Gam,NtypeGam,Vol,BackForth)
+      !call FFT_shift_omega_double(Gam,NtypeGam,Vol,BackForth)
     else
-      !call FFT_shift_omega_double(Gam,NtypeGam,L(1)*L(2),BackForth)
-      call FFT_tau_double(Gam,NtypeGam,L(1)*L(2),BackForth)
-      call FFT_shift_t_double(Gam,NtypeGam,L(1)*L(2),BackForth)
+      !call FFT_shift_omega_double(Gam,NtypeGam,Vol,BackForth)
+      call FFT_tau_double(Gam,NtypeGam,Vol,BackForth)
+      call FFT_shift_t_double(Gam,NtypeGam,Vol,BackForth)
     endif
 
 END SUBROUTINE
@@ -426,7 +479,7 @@ END SUBROUTINE
 SUBROUTINE transfer_Chi_t(BackForth)
     implicit none
     integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
-    call FFT_tau_single(Chi,1,L(1)*L(2),BackForth)
+    call FFT_tau_single(Chi,1,Vol,BackForth)
 END SUBROUTINE
 
 SUBROUTINE transfer_Sigma_t(BackForth)
@@ -447,7 +500,7 @@ END SUBROUTINE
 !SUBROUTINE transfer_Polar_t(BackForth)
     !implicit none
     !integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
-    !call FFT_tau_single(Polar,1,L(1)*L(2),BackForth)
+    !call FFT_tau_single(Polar,1,Vol,BackForth)
 !END SUBROUTINE
 
 
@@ -547,15 +600,13 @@ SUBROUTINE FFT_r(XR,Ntype,Nz,BackForth)
     integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
     integer,intent(in) :: Nz
     integer,intent(in) :: Ntype
-    complex*16    :: XR(Ntype,0:Vol-1,0:Nz-1)
-    complex*16, allocatable :: XR3D(:,:,:,:,:)
+    complex*16 :: XR(Ntype,0:Vol-1,0:Nz-1)
+    complex*16,allocatable :: XR3D(:,:,:,:,:)
     integer :: Power,Noma
     integer :: ix, iy, iz, iother,it
     integer :: FL(3)
     double precision,allocatable ::   Real1(:), Im1(:)
     
-    !call decompose_matrix(D, XR, Ntype, Nz, XR1D)
-
     do i =  1, 3
       if(D>=i) then
         FL(i) = L(i)
@@ -563,7 +614,11 @@ SUBROUTINE FFT_r(XR,Ntype,Nz,BackForth)
         FL(i) = 1
       endif
     enddo
+
+    allocate(XR3D(Ntype,0:FL(1)-1, 0:FL(2)-1, 0:FL(3)-1, 0:Nz-1))
     
+    call decompose_matrix(Ntype, FL(1), FL(2), FL(3), Nz, XR, XR3D)
+
 
     !do FFT in x direction
     if(D>=1) then
@@ -625,6 +680,9 @@ SUBROUTINE FFT_r(XR,Ntype,Nz,BackForth)
       enddo
       deallocate(Real1,Im1)
     endif
+
+    call combine_matrix(Ntype, FL(1), FL(2), FL(3), Nz, XR3D, XR)
+    deallocate(XR3D)
 
 end SUBROUTINE FFT_r
 
@@ -700,18 +758,6 @@ SUBROUTINE FFT_tau_double(XR,Ntype,Nz,BackForth)
 
 end SUBROUTINE FFT_tau_double
     
-
-
-!!------------- definition of the system symmetry ----------------
-SUBROUTINE def_symmetry
-  implicit none
-  integer :: i, j, omega
-
-  CoefOfSymmetry(:) = 2.d0   !typ 1,2; 3,4; 5,6
-
-  return
-END SUBROUTINE def_symmetry
-
 
 !-------------------------------------------------------------c
 !                                                             c
