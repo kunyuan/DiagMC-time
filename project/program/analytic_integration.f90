@@ -31,7 +31,7 @@ SUBROUTINE calculate_Gam1
   integer :: omega1, omega2, omega3
   integer :: omegaW, omegaout
   integer :: tg(5), tgam1(5), tgam2(5), tgam3(5), tw(5)
-  integer :: x1, y1, x3, y3
+  integer :: x1, y1, x3, y3, isite1, isite3, isiteW
   complex*16 :: Gin, Gout, iW, Gam1, Gam2, Gam3
   complex*16 :: weight
   complex*16 :: FGam(0:MxT-1, 0:MxT-1)
@@ -71,93 +71,91 @@ SUBROUTINE calculate_Gam1
 
   !================== bold gamma ===============================
 
-  !call transfer_G_t(1)
-  !call transfer_W_t(1)
-  !call transfer_Gam_t(1)
+  call transfer_G_t(1)
+  call transfer_W_t(1)
+  call transfer_Gam_t(1)
 
-  !call transfer_Gam0_r(-1)
-  !call plus_minus_Gam0(1)
+  call transfer_Gam0_r(-1)
+  call plus_minus_Gam0(1)
 
-  !tg(1:4)  = 1;   tgam2(1:4) = 1
-  !tgam1(1) = 1;   tgam3(1)   = 1;        tw(1) = 1
-  !tgam1(4) = 3;   tgam3(4)   = 3;        tw(4) = 2
-  !tgam1(3) = 1;   tgam3(3)   = 3;        tw(3) = 3
-  !tgam1(2) = 3;   tgam3(2)   = 1;        tw(2) = 4
+  tg(1:4)  = 1;   tgam2(1:4) = 1
+  tgam1(1) = 1;   tgam3(1)   = 1;        tw(1) = 1
+  tgam1(4) = 3;   tgam3(4)   = 3;        tw(4) = 2
+  tgam1(3) = 1;   tgam3(3)   = 3;        tw(3) = 3
+  tgam1(2) = 3;   tgam3(2)   = 1;        tw(2) = 4
 
-  !tg(5)   = 2;    tgam2(5)   = 4
-  !tgam1(5) = 5;   tgam3(5)   = 6;        tw(5) = 5
+  tg(5)   = 2;    tgam2(5)   = 4
+  tgam1(5) = 5;   tgam3(5)   = 6;        tw(5) = 5
 
-  !ratio = -1.d0/MxT *(Beta/MxT)**6.d0
+  ratio = -1.d0/MxT *(Beta/MxT)**6.d0
 
-  !GamOrder1(:,:,:) = (0.d0, 0.d0)
-  !do omega2 = 0, MxT-1
-    !do omega1 = 0, MxT-1
+  GamOrder1(:,:,:) = (0.d0, 0.d0)
+  do omega2 = 0, MxT-1
+    do omega1 = 0, MxT-1
 
-      !do ityp = 1, 5
-        !do omega3 = 0, MxT-1
+      do ityp = 1, 5
+        do omega3 = 0, MxT-1
 
-          !omegaW = omega1-omega3
-          !if(omegaW<0)  omegaW = omegaW+MxT
+          omegaW = omega1-omega3
+          if(omegaW<0)  omegaW = omegaW+MxT
 
-          !omegaout = omega2-omegaW
-          !if(omegaout<0)  omegaout = omegaout+MxT
+          omegaout = omega2-omegaW
+          if(omegaout<0)  omegaout = omegaout+MxT
 
-          !Gin = weight_G(tg(ityp), omega3)
-          !Gout = weight_G(tg(ityp), omegaout)
-          !Gam2 = weight_Gam(tgam2(ityp), (/0,0/), omega3, omegaout)
+          Gin = weight_G(tg(ityp), omega3)
+          Gout = weight_G(tg(ityp), omegaout)
+          Gam2 = weight_Gam(tgam2(ityp), 0, omega3, omegaout)
 
-          !do x1 = 0, L(1)-1
-            !do y1 = 0, L(2)-1
-              !do x3 = 0, L(1)-1
-                !do y3 = 0, L(2)-1
-                  !Gam1 = weight_Gam(tgam1(ityp), (/x1,y1/), omega1, omega3)
-                  !Gam3 = weight_Gam(tgam3(ityp), (/x3,y3/), omegaout, omega2)
-                  !iW = weight_W(tw(ityp), (/x1-x3,y1-y3/), omegaW)
+          do isite1 = 0, Vol-1
+            do isite3 = 0, Vol-1
 
-                  !weight = Gin *Gout *iW *Gam1 *Gam2 *Gam3
-                  !GamOrder1(1,omega1, omega2)=GamOrder1(1, omega1, omega2)+ratio*weight
-                !enddo
-              !enddo
-            !enddo
-          !enddo
+              isiteW = diff_r(D, isite1, isite3)
+              Gam1 = weight_Gam(tgam1(ityp), isite1, omega1, omega3)
+              Gam3 = weight_Gam(tgam3(ityp), isite3, omegaout, omega2)
+              iW = weight_W(tw(ityp), isiteW, omegaW)
 
-        !enddo
-      !enddo
+              weight = Gin *Gout *iW *Gam1 *Gam2 *Gam3
+              GamOrder1(1,omega1, omega2)=GamOrder1(1, omega1, omega2)+ratio*weight
+            enddo
+          enddo
 
-    !enddo
-  !enddo
+        enddo
+      enddo
 
-  !call plus_minus_Gam0(-1)
-  !call transfer_Gam0_r(1)
+    enddo
+  enddo
 
-  !call transfer_G_t(-1)
-  !call transfer_W_t(-1)
-  !call transfer_Gam_t(-1)
+  call plus_minus_Gam0(-1)
+  call transfer_Gam0_r(1)
 
-  !call transfer_GamOrder1_t(-1)
+  call transfer_G_t(-1)
+  call transfer_W_t(-1)
+  call transfer_Gam_t(-1)
+
+  call transfer_GamOrder1_t(-1)
 
 
   !================== bare Gamma ===============================
-  GamOrder1(:,:,:) = (0.d0, 0.d0)
-  do t2 = 0, MxT-1
-    do t1 = 0, MxT-1
+  !GamOrder1(:,:,:) = (0.d0, 0.d0)
+  !do t2 = 0, MxT-1
+    !do t1 = 0, MxT-1
 
-        Gin = weight_G(1, t1)
-        Gout = weight_G(1, t2)
-        Gam1 = weight_Gam0(1, 0)
-        Gam2 = weight_Gam0(1, 0) 
-        Gam3 = weight_Gam0(1, 0) 
-        if(t1+t2<MxT) then
-          iW = weight_W(1, 0, t1+t2)
-        else 
-          iW = weight_W(1, 0, t1+t2-MxT)
-        endif
+        !Gin = weight_G(1, t1)
+        !Gout = weight_G(1, t2)
+        !Gam1 = weight_Gam0(1, 0)
+        !Gam2 = weight_Gam0(1, 0) 
+        !Gam3 = weight_Gam0(1, 0) 
+        !if(t1+t2<MxT) then
+          !iW = weight_W(1, 0, t1+t2)
+        !else 
+          !iW = weight_W(1, 0, t1+t2-MxT)
+        !endif
 
-        weight = Gin *Gout *iW *Gam1 *Gam2 *Gam3
+        !weight = Gin *Gout *iW *Gam1 *Gam2 *Gam3
 
-        GamOrder1(1,t1,t2) = -1.d0* weight
-    enddo
-  enddo
+        !GamOrder1(1,t1,t2) = -1.d0* weight
+    !enddo
+  !enddo
 
 
   call output_Gam1

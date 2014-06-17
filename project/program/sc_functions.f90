@@ -165,6 +165,7 @@ END SUBROUTINE decompose_matrix
 
 !======= combine a matrix from D-dimensional matrix to 1-d matrix ==============
 SUBROUTINE combine_matrix(Ntyp, Lx, Ly, Lz, Nleft, Mat, Mat1D)
+  implicit none
   integer, intent(in) :: Ntyp, Lx, Ly, Lz, Nleft
   complex*16, intent(in):: Mat(Ntyp,0:Lx-1,0:Ly-1,0:Lz-1,0:Nleft-1)
   complex*16, intent(out) :: Mat1D(Ntyp,0:Lx*Ly*Lz-1,0:Nleft-1)
@@ -179,6 +180,25 @@ SUBROUTINE combine_matrix(Ntyp, Lx, Ly, Lz, Nleft, Mat, Mat1D)
   enddo
   return
 END SUBROUTINE combine_matrix
+
+Integer FUNCTION diff_r(dims, site1, site2)
+  implicit none
+  integer, intent(in) :: site1, site2
+  integer, intent(in) :: dims
+  integer :: r1(dims), r2(dims), dr(dims)
+
+  r1 = get_cord_from_site(dims, site1)
+  r2 = get_cord_from_site(dims, site2)
+
+  dr = r1 - r2
+
+  do i = 1, dims
+    if(dr(i)<0)  dr(i) = dr(i)+L(i)
+  enddo
+
+  diff_r = get_site_from_cord(dims, dr)
+  return
+END FUNCTION diff_r
 
 
 !!======================== WEIGHT EXTRACTING =========================
