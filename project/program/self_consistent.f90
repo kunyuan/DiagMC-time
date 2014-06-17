@@ -133,7 +133,7 @@ SUBROUTINE calculate_Sigma
 
   Sigma(:) = (0.d0, 0.d0)
 
-  ratio = -3.d0/(real(L(1))*real(L(2))*real(MxT))*(Beta/real(MxT))**4.d0
+  ratio = -3.d0/(Vol*real(MxT))*(Beta/real(MxT))**4.d0
   do omega = 0, MxT-1
     do omegaG = 0, MxT-1
       do p = 0, Vol-1

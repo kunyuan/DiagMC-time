@@ -54,11 +54,11 @@ MODULE vrbls_mc
   type(logging) :: LogTerm
 
   !======================== Input parameter ==============================
-  integer          ::  L(D), Vol, dVol(D)         ! System size
-  double precision ::  logL(D)
-  integer          ::  dL(D)
+  integer          ::  L(3), Vol, dVol(3)         ! System size
+  double precision ::  logL(3)
+  integer          ::  dL(3)
   double precision ::  Jcp                        ! interaction
-  double precision ::  Mu(D)                      ! Chem. potential for spin down & up
+  double precision ::  Mu(2)                      ! Chem. potential for spin down & up
   double precision ::  Beta                       ! inverse temperature
   integer          ::  MCOrder                    ! the max order for Gamma in MC
   !=======================================================================

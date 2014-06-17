@@ -18,14 +18,14 @@ tau = np.arange(0, Beta, Beta/N)
 
 #Quan2D=["Gamma1","Gamma2","Gamma3","Gamma4","Gamma5"]
 #Quan2D=["Gamma1","Gamma2","Gamma3","Gamma4"]
-Quan2D=["Gamma1","Gamma2","Gamma3"]
+#Quan2D=["Gamma1","Gamma2","Gamma3"]
 #Quan2D=["Gamma1","Gamma2"]
 #Quan2D=["Gamma1"]
 #Quan2D=[]
 
 #Quan1D=["GammaDiag1","GammaDiag2","GammaDiag3","GammaDiag4","GammaDiag5"]
 #Quan1D=["GammaDiag1","GammaDiag2","GammaDiag3","GammaDiag4"]
-Quan1D=["GammaDiag1","GammaDiag2","GammaDiag3"]
+#Quan1D=["GammaDiag1","GammaDiag2","GammaDiag3"]
 #Quan1D=["GammaDiag1","GammaDiag2"]
 #Quan1D=["GammaDiag1"]
 #Quan1D=[]
