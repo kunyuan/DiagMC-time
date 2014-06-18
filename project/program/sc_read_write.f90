@@ -52,14 +52,14 @@ SUBROUTINE read_GWGamma
     enddo
   enddo
 
-  !if(ISub==2) then
-    !if(ios/=0) then
-      !call LogFile%QuickLog("Failed to read G,W or Gamma information!",'e')
-    !else 
-      !call update_WeightCurrent
-      !mc_version = file_version
-    !endif
-  !else 
+  if(ISub==2) then
+    if(ios/=0) then
+      call LogFile%QuickLog("Failed to read G,W or Gamma information!",'e')
+    else 
+      call update_WeightCurrent
+      mc_version = file_version
+    endif
+  else 
     if(ios/=0) then
       call LogFile%QuickLog("Failed to read G,W or Gamma information!",'e')
       close(100)
@@ -67,7 +67,7 @@ SUBROUTINE read_GWGamma
       close(102)
       stop -1
     endif
-  !endif
+  endif
 
   close(100)
   close(101)
@@ -153,6 +153,17 @@ SUBROUTINE output_Quantities
   write(104, *)
 
   normal = GamNormWeight/GamNorm
+  do iorder = 1, MCOrder
+    write(104, *) "##################################GammaDiag",trim(adjustl(str(iorder)))
+    write(104, *) "#tau1:", MxT
+    write(104, *) "#Beta", Beta, "L", L(1), "Order", MCOrder
+    do it1 = 0, MxT-1
+      write(104, *) real(SUM(GamMC(iorder,:,it1))/Vol)*normal, dimag(SUM(GamMC(iorder, &
+        & :,it1))/Vol)*normal
+    enddo
+    write(104, *)
+  enddo
+
   do iorder = 1, MCOrder
     write(104, *) "##################################Gamma",trim(adjustl(str(iorder)))
     write(104, *) "#tau1:", MxT, ",tau2:", MxT

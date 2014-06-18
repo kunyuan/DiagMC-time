@@ -79,7 +79,7 @@ SUBROUTINE def_spatial_weight
   ! this gives you displacement ix in the affine basis called with probability
   ! SpatialWeight(i,ix)
 
-  do i=1,2
+  do i=1,D
     ix=0;
     SpatialWeight(i,ix)=dlog(2.d0)/(2.d0*logL(i))
     SpatialWeight(i,L(i)-1-ix)=SpatialWeight(i,ix)
@@ -399,20 +399,21 @@ SUBROUTINE create_worm_along_wline
 
   tau1 = TVertex(3, iGam)- TVertex(2, iGam)
   tau2 = TVertex(1, iGam)- TVertex(3, iGam)
-  WIra = weight_vertex(statiGam, IsDeltaVertex(iGam), GRVertex(:, iGam)-WRVertex(:, iGam),  &
+  WIra = weight_vertex(statiGam, IsDeltaVertex(iGam),diff_r(D,GRVertex(iGam),WRVertex(iGam)),  &
     & tau1, tau2, TypeVertex(iGam))
 
   tau1 = TVertex(3, jGam)- TVertex(2, jGam)
   tau2 = TVertex(1, jGam)- TVertex(3, jGam)
-  WMasha = weight_vertex(statjGam, IsDeltaVertex(jGam), GRVertex(:, jGam)-WRVertex(:, jGam),  &
+  WMasha = weight_vertex(statjGam, IsDeltaVertex(jGam), diff_r(D,GRVertex(jGam),WRVertex(jGam)),  &
     & tau1, tau2, TypeVertex(jGam))
 
   tau = TVertex(3, jGam) - TVertex(3, iGam)
-  WWNew = weight_wline(statW, IsDeltaLn(iWLn), WRVertex(:, jGam)-WRVertex(:, iGam), &
+  WWNew = weight_wline(statW, IsDeltaLn(iWLn), diff_r(D,WRVertex(jGam),WRVertex(iGam)), &
     & tau, TypeLn(iWLn))
 
   tau = TVertex(3, jGam) - TVertex(3, iGam)
-  WWorm = weight_worm(GRVertex(:,iGam)-GRVertex(:,jGam), WRVertex(:,iGam)-WRVertex(:,jGam), tau) 
+  WWorm = weight_worm(diff_r(D,GRVertex(iGam),GRVertex(jGam)), diff_r(D, WRVertex(iGam), &
+    & WRVertex(jGam)), tau) 
 
   Anew = WIra *WMasha *WWNew *WiGin *WiGout *WjGin *WjGout
   Aold = WeightLn(iWLn) *WeightVertex(iGam) *WeightVertex(jGam) *WeightLn(iGin) &
@@ -558,16 +559,16 @@ SUBROUTINE delete_worm_along_wline
 
   tau1 = TVertex(3, Ira)- TVertex(2, Ira)
   tau2 = TVertex(1, Ira)- TVertex(3, Ira)
-  Wi = weight_vertex(statIra, IsDeltaVertex(Ira), GRVertex(:, Ira)-WRVertex(:, Ira),  &
+  Wi = weight_vertex(statIra, IsDeltaVertex(Ira), diff_r(D, GRVertex(Ira),WRVertex(Ira)),  &
     & tau1, tau2, typIra)
 
   tau1 = TVertex(3, Masha)- TVertex(2, Masha)
   tau2 = TVertex(1, Masha)- TVertex(3, Masha)
-  Wj = weight_vertex(statMasha, IsDeltaVertex(Masha), GRVertex(:, Masha)-WRVertex(:, Masha),  &
+  Wj = weight_vertex(statMasha, IsDeltaVertex(Masha), diff_r(D,GRVertex(Masha),WRVertex(Masha)),  &
     & tau1, tau2, typMasha)
 
   tau = (-1)**dir*(TVertex(3, Ira) - TVertex(3, Masha))
-  WWNew = weight_wline(statW, IsDeltaLn(iWLn),WRVertex(:, Masha)-WRVertex(:, Ira), &
+  WWNew = weight_wline(statW, IsDeltaLn(iWLn),diff_r(D,WRVertex(Masha),WRVertex(Ira)), &
     & tau, typW)
 
   Anew = Wi *Wj *WWNew *WiGin *WiGout *WjGin *WjGout
@@ -699,21 +700,21 @@ SUBROUTINE move_worm_along_wline
   typiGam = TypeSp2Gam(TypeLn(GLn1), TypeLn(GLn2), SpInVertex(1, iGam), SpInVertex(2, iGam))
 
   !------- step4 : weight calculation -------------------
-  WWorm = weight_worm(GRVertex(:, jGam)-GRVertex(:, Masha), &
-    & WRVertex(:, jGam)-WRVertex(:, Masha), TVertex(3, jGam)-TVertex(3, Masha))
+  WWorm = weight_worm(diff_r(D, GRVertex(jGam),GRVertex(Masha)), &
+    & diff_r(D,WRVertex(jGam),WRVertex(Masha)), TVertex(3, jGam)-TVertex(3, Masha))
 
   tau1 = TVertex(3, iGam)-TVertex(2, iGam)
   tau2 = TVertex(1, iGam)-TVertex(3, iGam)
-  WiGam = weight_vertex(statiGam, IsDeltaVertex(iGam), GRVertex(:, iGam)-WRVertex(:, iGam), &
+  WiGam = weight_vertex(statiGam, IsDeltaVertex(iGam), diff_r(D, GRVertex(iGam),WRVertex(iGam)), &
     & tau1, tau2, typiGam)
 
   tau1 = TVertex(3, jGam)-TVertex(2, jGam)
   tau2 = TVertex(1, jGam)-TVertex(3, jGam)
-  WjGam = weight_vertex(statjGam, IsDeltaVertex(jGam), GRVertex(:, jGam)-WRVertex(:, jGam), &
+  WjGam = weight_vertex(statjGam, IsDeltaVertex(jGam), diff_r(D, GRVertex(jGam),WRVertex(jGam)), &
     & tau1, tau2, TypeVertex(jGam))
 
   tau = (-1.d0)**dir *(TVertex(3, iGam)-TVertex(3, jGam))
-  WW = weight_wline(statW, IsDeltaLn(WLn), WRVertex(:, iGam)-WRVertex(:, jGam), &
+  WW = weight_wline(statW, IsDeltaLn(WLn), diff_r(D, WRVertex(iGam),WRVertex(jGam)), &
     & tau, typW)
 
   Anew = WiGam *WjGam *WW 
@@ -775,7 +776,7 @@ END SUBROUTINE move_worm_along_wline
 !-----------------------------------------------------------
 SUBROUTINE move_worm_along_gline
   implicit none
-  integer :: dir, kGold, ktemp, dr(2)
+  integer :: dir, kGold, ktemp, dr
   double precision :: Ppro
   integer :: iGam, jGam, iW, jW, GLn, kiGLn
   integer :: vertex1, vertex2
@@ -901,29 +902,29 @@ SUBROUTINE move_worm_along_gline
   endif
 
   !------- step4 : weight calculation -------------------
-  WWorm = weight_worm(GRVertex(:, jGam)-GRVertex(:, Masha), &
-    & WRVertex(:, jGam)-WRVertex(:, Masha), TVertex(3, jGam)-TVertex(3, Masha))
+  WWorm = weight_worm(diff_r(D, GRVertex(jGam),GRVertex(Masha)), &
+    & diff_r(D, WRVertex(jGam), WRVertex(Masha)), TVertex(3, jGam)-TVertex(3, Masha))
 
   tau1 = TVertex(3, iGam)-TVertex(2, iGam)
   tau2 = TVertex(1, iGam)-TVertex(3, iGam)
-  WiGam = weight_vertex(statiGam, IsDeltaVertex(iGam),GRVertex(:, iGam)-WRVertex(:, iGam),   &
+  WiGam = weight_vertex(statiGam, IsDeltaVertex(iGam),diff_r(D, GRVertex(iGam),WRVertex(iGam)),   &
     & tau1, tau2, typiGam)
 
   tau1 = TVertex(3, jGam)-TVertex(2, jGam)
   tau2 = TVertex(1, jGam)-TVertex(3, jGam)
-  WjGam = weight_vertex(statjGam, IsDeltaVertex(jGam),GRVertex(:, jGam)-WRVertex(:, jGam),   &
+  WjGam = weight_vertex(statjGam, IsDeltaVertex(jGam),diff_r(D, GRVertex(jGam),WRVertex(jGam)),   &
     & tau1, tau2, typjGam)
 
   vertex1 = NeighLn(1, iW)
   vertex2 = NeighLn(2, iW)
   tau = TVertex(3, vertex2) - TVertex(3, vertex1)
-  dr  = WRVertex(:, vertex2) - WRVertex(:, vertex1)
+  dr  = diff_r(D, WRVertex(vertex2),WRVertex(vertex1))
   WiW = weight_wline(statiW, IsDeltaLn(iW), dr, tau, typiW)
 
   vertex1 = NeighLn(1, jW)
   vertex2 = NeighLn(2, jW)
   tau = TVertex(3, vertex2) - TVertex(3, vertex1)
-  dr  = WRVertex(:, vertex2) - WRVertex(:, vertex1)
+  dr  = diff_r(D, WRVertex(vertex2),WRVertex(vertex1))
   WjW = weight_wline(statjW, IsDeltaLn(jW), dr, tau, TypeLn(jW))
 
   tau = TVertex(2, NeighLn(2, GLn)) - TVertex(1, NeighLn(1, GLn))
@@ -1013,7 +1014,7 @@ SUBROUTINE move_worm_along_gline_test
   integer :: vertex1, vertex2
   integer :: sG, typG, typiGam, typjGam, typiW
   integer, dimension(2) :: spiGam, spjGam
-  integer :: dir, kGold, dr(2), ktemp
+  integer :: dir, kGold, dr, ktemp
   double precision :: Ppro
   integer :: statiGam, statjGam, statiW, statjW, statG, stat1, stat2
   double precision :: tau1, tau2, tau
@@ -1079,29 +1080,29 @@ SUBROUTINE move_worm_along_gline_test
     typiW = get_typW_from_Vertex(DirecVertex(iGam), typiGam, TypeVertex(iGam2))
   endif
 
-  WWorm = weight_worm(GRVertex(:, jGam)-GRVertex(:, Masha), &
-    & WRVertex(:, jGam)-WRVertex(:, Masha), TVertex(3, jGam)-TVertex(3, Masha))
+  WWorm = weight_worm(diff_r(D, GRVertex(jGam),GRVertex(Masha)), &
+    & diff_r(D,WRVertex(jGam),WRVertex(Masha)), TVertex(3, jGam)-TVertex(3, Masha))
 
   tau1 = TVertex(3, iGam)-TVertex(2, iGam)
   tau2 = TVertex(1, iGam)-TVertex(3, iGam)
-  WiGam = weight_vertex(statiGam, IsDeltaVertex(iGam),GRVertex(:, iGam)-WRVertex(:, iGam),   &
+  WiGam = weight_vertex(statiGam, IsDeltaVertex(iGam),diff_r(D, GRVertex(iGam),WRVertex(iGam)),   &
     & tau1, tau2, typiGam)
 
   tau1 = TVertex(3, jGam)-TVertex(2, jGam)
   tau2 = TVertex(1, jGam)-TVertex(3, jGam)
-  WjGam = weight_vertex(statjGam, IsDeltaVertex(jGam),GRVertex(:, jGam)-WRVertex(:, jGam),   &
+  WjGam = weight_vertex(statjGam, IsDeltaVertex(jGam),diff_r(D, GRVertex(jGam),WRVertex(jGam)),   &
     & tau1, tau2, typjGam)
 
   vertex1 = NeighLn(1, iW)
   vertex2 = NeighLn(2, iW)
   tau = TVertex(3, vertex2) - TVertex(3, vertex1)
-  dr  = WRVertex(:, vertex2) - WRVertex(:, vertex1)
+  dr  = diff_r(D, WRVertex(vertex2), WRVertex(vertex1))
   WiW = weight_wline(statiW, IsDeltaLn(iW), dr, tau, typiW)
 
   vertex1 = NeighLn(1, jW)
   vertex2 = NeighLn(2, jW)
   tau = TVertex(3, vertex2) - TVertex(3, vertex1)
-  dr  = WRVertex(:, vertex2) - WRVertex(:, vertex1)
+  dr  = diff_r(D, WRVertex(vertex2), WRVertex(vertex1))
   WjW = weight_wline(statjW, IsDeltaLn(jW), dr, tau, TypeLn(jW))
 
   tau = TVertex(2, NeighLn(2, GLn)) - TVertex(1, NeighLn(1, GLn))
@@ -1409,8 +1410,8 @@ SUBROUTINE add_interaction
   !-------------- step3 : weight calculation --------------------
   !! TVertex(:, GamA)=tauA
   !! TVertex(:, GamB)=tauB
-  WA = weight_vertex(statA, 1, (/0, 0/), 0.d0, 0.d0, typGamA)  
-  WB = weight_vertex(statB, 1, (/0, 0/), 0.d0, 0.d0, typGamB)  
+  WA = weight_vertex(statA, 1, 0, 0.d0, 0.d0, typGamA)  
+  WB = weight_vertex(statB, 1, 0, 0.d0, 0.d0, typGamB)  
 
   tau = (-1)**dir*(tauA - TVertex(3-dir, Ira))
   WGIA = weight_gline(statIA, tau, TypeLn(GIC))
@@ -1419,15 +1420,15 @@ SUBROUTINE add_interaction
   WGMB = weight_gline(statMB, tau, TypeLn(GMD))
 
   tau = (-1)**dirW*(tauA-tauB)
-  WWAB = weight_wline(0, isdelta, GRVertex(:, GamC)-GRVertex(:, GamD), &
+  WWAB = weight_wline(0, isdelta, diff_r(D, GRVertex(GamC),GRVertex(GamD)), &
     & tau, typAB)
   
   !---  change the topology for the configuration after update --
-  call insert_gamma(GamA, 1, GRVertex(1,GamC), GRVertex(2,GamC),GRVertex(1,GamC), &
-    &  GRVertex(2,GamC), tauA, tauA, tauA, dirW, typGamA, statA, WA)
+  call insert_gamma(GamA, 1, GRVertex(GamC), GRVertex(GamC), &
+    &  tauA, tauA, tauA, dirW, typGamA, statA, WA)
 
-  call insert_gamma(GamB, 1, GRVertex(1,GamD), GRVertex(2,GamD),GRVertex(1,GamD), &
-    &  GRVertex(2,GamD), tauB, tauB, tauB, 3-dirW, typGamB, statB, WB)
+  call insert_gamma(GamB, 1, GRVertex(GamD), GRVertex(GamD), &
+    &  tauB, tauB, tauB, 3-dirW, typGamB, statB, WB)
 
   call insert_line(GIA, -1, kIA, 1, TypeLn(GIC), statIA, WGIA)
   call insert_line(GMB, -1, kMB, 1, TypeLn(GMD), statMB, WGMB)
@@ -1472,7 +1473,7 @@ SUBROUTINE add_interaction
   tau1 = TVertex(3,MeasureGam)-TVertex(2,MeasureGam)
   tau2 = TVertex(1,MeasureGam)-TVertex(3,MeasureGam)
   WMeasureGam = weight_vertex(StatusVertex(MeasureGam), IsDeltaVertex(MeasureGam),  &
-    & GRVertex(:,MeasureGam)-WRVertex(:,MeasureGam), tau1, tau2, TypeVertex(MeasureGam))
+    & diff_r(D,GRVertex(MeasureGam),WRVertex(MeasureGam)), tau1, tau2, TypeVertex(MeasureGam))
 
   Anew = WA *WB *WGIA *WGMB *WWAB *WGAC *WGBD *WMeasureGam
   Anew = -1.d0*Anew
@@ -1581,8 +1582,8 @@ SUBROUTINE remove_interaction
   if(StatusVertex(GamA)/=0 .or. StatusVertex(GamB)/=0) return
   if(TypeVertex(GamA)>2 .or. TypeVertex(GamB)>2) return
   if(IsDeltaVertex(GamA)==0 .or. IsDeltaVertex(GamB)==0)  return
-  if(GRVertex(1,GamA)/=WRVertex(1,GamA) .or. GRVertex(2,GamA)/=WRVertex(2,GamA)) return
-  if(GRVertex(1,GamB)/=WRVertex(1,GamB) .or. GRVertex(2,GamB)/=WRVertex(2,GamB)) return
+  if(GRVertex(GamA)/=WRVertex(GamA)) return
+  if(GRVertex(GamB)/=WRVertex(GamB)) return
 
   WAB = NeighVertex(3, GamA)
   if(IsDeltaLn(WAB)==1)  return
@@ -1627,7 +1628,7 @@ SUBROUTINE remove_interaction
   tau1 = TVertex(3,MeasureGam)-TVertex(2,MeasureGam)
   tau2 = TVertex(1,MeasureGam)-TVertex(3,MeasureGam)
   WMeasureGam = weight_vertex(StatusVertex(MeasureGam), IsDeltaVertex(MeasureGam), &
-    & GRVertex(:,MeasureGam)-WRVertex(:,MeasureGam), &
+    & diff_r(D,GRVertex(MeasureGam),WRVertex(MeasureGam)), &
     & tau1, tau2, TypeVertex(MeasureGam))
 
   Anew = WGIC *WGMD *WMeasureGam
@@ -1709,8 +1710,7 @@ SUBROUTINE reconnect
   logical :: flag
   !---------- step1 : check if worm is present ------------------
   if(IsWormPresent .eqv. .false.)    return
-  if(GRVertex(1,Ira)/=GRVertex(1,Masha) .or. &
-      & GRVertex(2,Ira)/=GRVertex(2,Masha)) return
+  if(GRVertex(Ira)/=GRVertex(Masha))  return 
 
   dir=Floor(rn()*2.d0)+1
   GIA=NeighVertex(dir,Ira)
@@ -1786,8 +1786,8 @@ END SUBROUTINE reconnect
 !------------ change gline space: Pupdate(12) ------------
 SUBROUTINE change_gline_space
   implicit none
-  integer :: Num,InitialGam,iGam,jGam,iWLn,NewRG(2),dR(2)
-  integer :: GamList(MxNVertex),NewRW(2,MxNVertex),i
+  integer :: Num,InitialGam,iGam,jGam,iWLn,NewRG,dR
+  integer :: GamList(MxNVertex),NewRW(MxNVertex),i
   integer :: flagW(MxNLn)
   double precision :: Pacc, WeightR, WeightRW, tau
   complex*16  ::  Anew, Aold, sgn, WeightW(MxNVertex)
@@ -1800,7 +1800,8 @@ SUBROUTINE change_gline_space
   InitialGam=iGam
 
   WeightR=1.d0
-  call generate_xy(GRVertex(:,iGam),NewRG,dR,WeightR,.true.)
+
+  call generate_r(D,GRVertex(iGam),NewRG,dR,WeightR,.true.)
 
   flagW(:) = 0
   Num=0
@@ -1821,13 +1822,14 @@ SUBROUTINE change_gline_space
     iGam = GamList(i)
     iWLn=NeighVertex(3,iGam)
     WeightRW = 1.d0
-    call generate_xy(WRVertex(:,iGam),NewRW(:,i),dR,WeightRW,.false.)
+
+    call generate_r(D,WRVertex(iGam),NewRW(i),dR,WeightRW,.false.)
 
     if(flagW(iWLn)==1) then
       jGam=NeighLn(3-DirecVertex(iGam),iWLn)
       tau = (-1)**DirecVertex(iGam)*(TVertex(3, iGam)-TVertex(3, jGam))
       WeightW(i)=weight_wline(StatusLn(iWLn),IsDeltaLn(iWLn),&
-          & NewRW(:,i)-WRVertex(:,jGam),tau,TypeLn(iWLn))
+          & diff_r(D, NewRW(i),WRVertex(jGam)),tau,TypeLn(iWLn))
 
       Anew=Anew*WeightW(i)
       Aold=Aold*WeightLn(iWLn)
@@ -1852,8 +1854,8 @@ SUBROUTINE change_gline_space
       iWLn=NeighVertex(3,iGam)
 
       !------ update the site of elements -------------
-      GRVertex(:,iGam) = NewRG(:)
-      WRVertex(:,iGam) = NewRW(:,i)
+      GRVertex(iGam) = NewRG
+      WRVertex(iGam) = NewRW(i)
 
       !------ update the weight of elements -------------
       if(flagW(iWLn)==1) then
@@ -1872,7 +1874,7 @@ END SUBROUTINE
 !------------ change wline space: Pupdate(13) ------------
 SUBROUTINE change_wline_space
     implicit none
-    integer :: iGam, iWLn, jGam, rwi(2), rwj(2), dir,dr(2)
+    integer :: iGam, iWLn, jGam, rwi, rwj, dir,dr
     double precision :: Pacc,T1,T2,T3,T4,T5,T6,WeightR
     complex*16  ::  WiGam,WjGam, WW, Anew, Aold, sgn
 
@@ -1885,12 +1887,12 @@ SUBROUTINE change_wline_space
     jGam = NeighLn(2, iWLn)
 
     WeightR=1.0
-    call generate_xy(WRVertex(:, iGam),rwi,dr,WeightR,.true.)
+    call generate_r(D,WRVertex(iGam),rwi,dr,WeightR,.true.)
 
     if(IsDeltaLn(iWLn)==0) then
-      call generate_xy(WRVertex(:, jGam),rwj,dr,WeightR,.true.)
+      call generate_r(D,WRVertex(jGam),rwj,dr,WeightR,.true.)
     else
-      rwj(:)=rwi(:)
+      rwj=rwi
     endif
 
     !------- step3 : configuration check ------------------
@@ -1900,15 +1902,15 @@ SUBROUTINE change_wline_space
     T2=TVertex(2, iGam);
     T3=TVertex(3, iGam);
     WiGam = weight_vertex(StatusVertex(iGam),IsDeltaVertex(iGam), &
-      & GRVertex(:, iGam)-rwi(:), T3-T2, T1-T3, TypeVertex(iGam))
+      & diff_r(D,GRVertex(iGam),rwi), T3-T2, T1-T3, TypeVertex(iGam))
 
     T4=TVertex(1, jGam);
     T5=TVertex(2, jGam);
     T6=TVertex(3, jGam);
     WjGam = weight_vertex(StatusVertex(jGam),IsDeltaVertex(jGam), &
-      & GRVertex(:, jGam)-rwj(:), T6-T5, T4-T6, TypeVertex(jGam))
+      & diff_r(D,GRVertex(jGam),rwj), T6-T5, T4-T6, TypeVertex(jGam))
 
-    WW = weight_wline(StatusLn(iWLn),IsDeltaLn(iWLn),rwi(:)-rwj(:),T6-T3,TypeLn(iWLn))
+    WW = weight_wline(StatusLn(iWLn),IsDeltaLn(iWLn),diff_r(D,rwi,rwj),T6-T3,TypeLn(iWLn))
 
     Anew = WiGam*WjGam*WW
     Aold = WeightLn(iWLn)*WeightVertex(iGam)*WeightVertex(jGam)
@@ -1925,8 +1927,8 @@ SUBROUTINE change_wline_space
       Phase = Phase *sgn
 
       !------ update the site of elements --------------
-      WRVertex(:, iGam) = rwi(:)
-      WRVertex(:, jGam) = rwj(:)
+      WRVertex(iGam) = rwi
+      WRVertex(jGam) = rwj
 
       !------ update the weight of elements ------------
       WeightLn(iWLn) = WW
@@ -1978,10 +1980,10 @@ SUBROUTINE change_Gamma_type
   tau1 = TVertex(3, iGam)-TVertex(2, iGam)
   tau2 = TVertex(1, iGam)-TVertex(3, iGam)
   WGam = weight_vertex(StatusVertex(iGam), IsDeltaVertex(iGam), &
-    & GRVertex(:, iGam)-WRVertex(:, iGam), tau1, tau2, typGam)
+    & diff_r(D, GRVertex(iGam),WRVertex(iGam)), tau1, tau2, typGam)
 
   tau = TVertex(3, NeighLn(2, iWLn))-TVertex(3, NeighLn(1, iWLn))
-  WW  = weight_wline(StatusLn(iWLn), IsDeltaLn(iWLn), WRVertex(:, iGam)-WRVertex(:, jGam), &
+  WW  = weight_wline(StatusLn(iWLn), IsDeltaLn(iWLn), diff_r(D,WRVertex(iGam),WRVertex(jGam)), &
     & tau, typW) 
 
   Anew = WW *WGam
@@ -2077,19 +2079,18 @@ SUBROUTINE move_measuring_index
 
   !------- step4 : weight calculation -------------------
  !dx = xg-xw;  dy = yg-yw; dtau1 = tau3-tau2; dtau2 = tau1-tau3
-!COMPLEX*16 FUNCTION weight_vertex(stat, isdelta, dr0, dtau1, dtau2, typ)
   tau1 = TVertex(3, iGam)-TVertex(2, iGam)
   tau2 = TVertex(1, iGam)-TVertex(3, iGam)
 !   if(abs(tau1)>1e-8 .or. abs(tau2)>1e-8) then
 !     print *," I am a Bug1!"
 !     stop
 !   endif
-  WiGam = weight_vertex(statiGam, IsDeltaVertex(iGam), GRVertex(:, iGam)-WRVertex(:, iGam), &
+  WiGam = weight_vertex(statiGam, IsDeltaVertex(iGam), diff_r(D,GRVertex(iGam),WRVertex(iGam)), &
     & tau1, tau2, TypeVertex(iGam))
 
   tau = TVertex(3, NeighLn(2, iW)) - TVertex(3, NeighLn(1, iW))
-  WiW = weight_wline(statiW, IsDeltaLn(iW), WRVertex(:, NeighLn(2, iW))-WRVertex(:, NeighLn(1,iW)),&
-    &  tau, TypeLn(iW))
+  WiW = weight_wline(statiW, IsDeltaLn(iW), diff_r(D,WRVertex(NeighLn(2, iW)), &
+    & WRVertex(NeighLn(1,iW))), tau, TypeLn(iW))
 
   tau = TVertex(2, NeighLn(2, iGin)) - TVertex(1, NeighLn(1, iGin))
   WiGin = weight_gline(statiGin, tau, TypeLn(iGin))
@@ -2103,11 +2104,11 @@ SUBROUTINE move_measuring_index
 !     print *," I am a Bug2!"
 !     stop
 !   endif
-  WjGam = weight_vertex(statjGam, IsDeltaVertex(jGam), GRVertex(:, jGam)-WRVertex(:, jGam),  &
+  WjGam = weight_vertex(statjGam, IsDeltaVertex(jGam), diff_r(D,GRVertex(jGam),WRVertex(jGam)),  &
     & tau1, tau2, TypeVertex(jGam))
 
   tau = TVertex(3, NeighLn(2, jW)) - TVertex(3, NeighLn(1, jW))
-  WjW = weight_wline(statjW, IsDeltaLn(jW), WRVertex(:, NeighLn(2, jW))-WRVertex(:, NeighLn(1,jW)),&
+  WjW = weight_wline(statjW, IsDeltaLn(jW), diff_r(D,WRVertex(NeighLn(2, jW)),WRVertex(NeighLn(1,jW))),&
     &  tau, TypeLn(jW))
 
   tau = TVertex(2, NeighLn(2, jGin)) - TVertex(1, NeighLn(1, jGin))
@@ -2229,8 +2230,8 @@ SUBROUTINE change_Gamma_time
     tau2 = 0
   endif
 
-  WGam = weight_vertex(StatusVertex(iGam),IsDeltaVertex(iGam),GRVertex(:,iGam) &
-    & -WRVertex(:,iGam), tau1, tau2, TypeVertex(iGam))
+  WGam = weight_vertex(StatusVertex(iGam),IsDeltaVertex(iGam),diff_r(D,GRVertex(iGam) &
+    & ,WRVertex(iGam)), tau1, tau2, TypeVertex(iGam))
 
   if(isdelta==0) then
     if(dir==1 .or. dir==2) then
@@ -2241,7 +2242,7 @@ SUBROUTINE change_Gamma_time
       dirGam = DirecVertex(iGam)
       jGam = NeighLn(3-dirGam, iLn)
       tau = (-1)**dirGam*(newtau -TVertex(3, jGam))
-      WLn = weight_wline(StatusLn(iLn),IsDeltaLn(iLn), WRVertex(:, iGam)-WRVertex(:, jGam), &
+      WLn = weight_wline(StatusLn(iLn),IsDeltaLn(iLn), diff_r(D, WRVertex(iGam),WRVertex(jGam)), &
         & tau, TypeLn(iLn))
     endif
     Anew = WGam*WLn
@@ -2262,7 +2263,7 @@ SUBROUTINE change_Gamma_time
     dirGam = DirecVertex(iGam)
     jGam = NeighLn(3-dirGam, iLn3)
     tau = (-1)**dirGam*(newtau -TVertex(3, jGam))
-    WLn3 = weight_wline(StatusLn(iLn3),IsDeltaLn(iLn3), WRVertex(:, iGam)-WRVertex(:, jGam), &
+    WLn3 = weight_wline(StatusLn(iLn3),IsDeltaLn(iLn3), diff_r(D, WRVertex(iGam),WRVertex(jGam)), &
       & tau, TypeLn(iLn3))
 
     Anew = WGam *WLn1 *WLn2 *WLn3
@@ -2347,18 +2348,18 @@ SUBROUTINE change_wline_isdelta
   
   !------- step4 : weight calculation -------------------
   if(backforth==0) then
-    WW = weight_wline(StatusLn(iWLn), 1, WRVertex(:, jGam)-WRVertex(:, iGam), &
+    WW = weight_wline(StatusLn(iWLn), 1, diff_r(D, WRVertex(jGam),WRVertex(iGam)), &
       & 0.d0, TypeLn(iWLn)) 
   else
     dtau = t3jGam - t3iGam
-    WW = weight_wline(StatusLn(iWLn), 0, WRVertex(:, jGam)-WRVertex(:, iGam), &
+    WW = weight_wline(StatusLn(iWLn), 0, diff_r(D, WRVertex(jGam),WRVertex(iGam)), &
       & dtau, TypeLn(iWLn)) 
   endif
 
   tau1 = t3jGam-t2jGam
   tau2 = t1jGam-t3jGam
-  WjGam = weight_vertex(StatusVertex(jGam), IsDeltaVertex(jGam), GRVertex(:, jGam)-WRVertex(:, jGam), &
-    & tau1, tau2, TypeVertex(jGam))
+  WjGam = weight_vertex(StatusVertex(jGam), IsDeltaVertex(jGam), diff_r(D, GRVertex(jGam), &
+    & WRVertex(jGam)), tau1, tau2, TypeVertex(jGam))
 
   dtau = t2jGam-TVertex(1, NeighLn(1, jGin))
   WjGin = weight_gline(StatusLn(jGin), dtau, TypeLn(jGin)) 
@@ -2445,7 +2446,7 @@ SUBROUTINE change_gamma_isdelta
   !------- step4 : weight calculation -------------------
   tau1 = t3iGam-t2iGam
   tau2 = t1iGam-t3iGam
-  WiGam = weight_vertex(StatusVertex(iGam), 1-backforth, GRVertex(:, iGam)-WRVertex(:, iGam), &
+  WiGam = weight_vertex(StatusVertex(iGam), 1-backforth, diff_r(D, GRVertex(iGam),WRVertex(iGam)), &
     & tau1, tau2, TypeVertex(iGam))
 
   dtau = t2iGam-TVertex(1, NeighLn(1, iGin))
@@ -2554,8 +2555,8 @@ SUBROUTINE measure
   integer :: ibasis, ibin
   integer :: spg, spw
   integer :: ityp, nloop
-  integer :: MeaGin, MeaGout, MeaW, rg(2), rw(2), dir, typ
-  integer :: dr(2), dt1, dt2
+  integer :: MeaGin, MeaGout, MeaW, rg, rw, dir, typ
+  integer :: dr, dt1, dt2
   integer :: dx, dy
   integer :: ikey, sumt, sumd
   double precision  :: factorM
@@ -2616,11 +2617,9 @@ SUBROUTINE measure
     endif
 
     !----- find the space and time variables for Gamma -------
-    rg = GRVertex(:, MeasureGam)
-    rw = WRVertex(:, NeighLn(3-dir, MeaW))
-    call diff_r(rg-rw, dr)
-    dx = dr(1)
-    dy = dr(2)
+    rg = GRVertex(MeasureGam)
+    rw = WRVertex(NeighLn(3-dir, MeaW))
+    dr = diff_r(D, rg, rw)
 
     tau1 = TVertex(1, NeighLn(1, MeaGout))
     tau2 = TVertex(2, NeighLn(2, MeaGin))
@@ -2641,7 +2640,7 @@ SUBROUTINE measure
 
     dt1 = Floor(dtau1*MxT/Beta)
     dt2 = Floor(dtau2*MxT/Beta)
-    factorM = factorM *CoefOfSymmetry(dx, dy)* CoefOfWeight(Order) *abs(WeightVertex(MeasureGam))
+    factorM = factorM *CoefOfSymmetry(dr)* CoefOfWeight(Order) *abs(WeightVertex(MeasureGam))
 
     !================= accumulation ===================================
     if(Order==0 .and. IsDeltaVertex(NeighLn(3-dir, MeaW))==1) then
@@ -2650,9 +2649,9 @@ SUBROUTINE measure
 
     !============ save the diagonal Gamma ================================
     if(dt1==dt2 .and. ityp==1) then
-      GamMC(Order, dx, dy, dt1) = GamMC(Order, dx, dy, dt1) + (Phase/factorM)
-      ReGamSqMC(Order, dx, dy, dt1) = ReGamSqMC(Order, dx, dy, dt1) + (Real(Phase/factorM))**2.d0
-      ImGamSqMC(Order, dx, dy, dt1) = ImGamSqMC(Order, dx, dy, dt1) + (dimag(Phase/factorM))**2.d0
+      GamMC(Order, dr,  dt1) = GamMC(Order, dr, dt1) + (Phase/factorM)
+      ReGamSqMC(Order, dr, dt1) = ReGamSqMC(Order, dr, dt1) + (Real(Phase/factorM))**2.d0
+      ImGamSqMC(Order, dr, dt1) = ImGamSqMC(Order, dr, dt1) + (dimag(Phase/factorM))**2.d0
     endif
 
     !============ save Gamma in the fitting coeffecients =====================================
@@ -2670,18 +2669,12 @@ SUBROUTINE measure
         wbasis = (Beta/dble(MxT))**2.d0*weight_basis_Gam(CoefGam &
           & (0:BasisOrderGam,0:BasisOrderGam, ibasis,ibin), dt1*Beta/MxT, dt2*Beta/MxT)
 
-        !if(flag) then
-        !else 
-          !GamBasis(Order, ityp, dx, dy, ibin, ibasis) = GamBasis(Order, ityp, dx, dy, ibin, &
-            !& ibasis) + (dcmplx(real(Phase), -dimag(Phase))/factorM)*wbasis
-        !endif
-
-        GamBasis(Order, ityp, dx, dy, ibin, ibasis) = GamBasis(Order, ityp, dx, dy, ibin, &
+        GamBasis(Order, ityp, dr, ibin, ibasis) = GamBasis(Order, ityp, dr, ibin, &
           & ibasis) + (Phase/factorM)*wbasis
 
-        ReGamSqBasis(Order, ityp, dx, dy, ibin, ibasis) = ReGamSqBasis(Order, ityp, dx, dy, ibin, &
+        ReGamSqBasis(Order, ityp, dr, ibin, ibasis) = ReGamSqBasis(Order, ityp, dr, ibin, &
           & ibasis) + (real(Phase)/factorM)**2.d0*wbasis
-        ImGamSqBasis(Order, ityp, dx, dy, ibin, ibasis) = ImGamSqBasis(Order, ityp, dx, dy, ibin, &
+        ImGamSqBasis(Order, ityp, dr, ibin, ibasis) = ImGamSqBasis(Order, ityp, dr, ibin, &
           & ibasis) + (dimag(Phase)/factorM)**2.d0*wbasis
       enddo
     else 
@@ -2689,11 +2682,11 @@ SUBROUTINE measure
         wbasis = (Beta/dble(MxT))*weight_basis(CoefGam(0:BasisOrder,0, &
           & ibasis,ibin), dt1*Beta/MxT)
 
-        GamBasis(Order, ityp, dx, dy, ibin, ibasis) = GamBasis(Order, ityp, dx, dy, ibin, &
+        GamBasis(Order, ityp, dr, ibin, ibasis) = GamBasis(Order, ityp, dr, ibin, &
           & ibasis) + (Phase/factorM)*wbasis
-        ReGamSqBasis(Order, ityp, dx, dy, ibin, ibasis) = ReGamSqBasis(Order, ityp, dx, dy, ibin, &
+        ReGamSqBasis(Order, ityp, dr, ibin, ibasis) = ReGamSqBasis(Order, ityp, dr, ibin, &
           & ibasis) + (real(Phase)/factorM)**2.d0*wbasis
-        ImGamSqBasis(Order, ityp, dx, dy, ibin, ibasis) = ImGamSqBasis(Order, ityp, dx, dy, ibin, &
+        ImGamSqBasis(Order, ityp, dr, ibin, ibasis) = ImGamSqBasis(Order, ityp, dr, ibin, &
           & ibasis) + (dimag(Phase)/factorM)**2.d0*wbasis
       enddo
     endif
@@ -2703,7 +2696,7 @@ SUBROUTINE measure
     !print *, Order, Quan(Order), Norm(Order)
 
     !==============  Error renormalization =========================
-    if(Order==1 .and. ityp==1 .and. dx==0 .and. dy==0) then
+    if(Order==1 .and. ityp==1 .and. dr==0) then
       if(dt1==0 .and. dt2==0) then
         Norm(MCOrder+1) = Norm(MCOrder+1)+1.d0
         Quan(MCOrder+1) = Quan(MCOrder+1) + real(Phase)/factorM

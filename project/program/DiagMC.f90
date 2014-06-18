@@ -16,8 +16,7 @@ PROGRAM MAIN
   endif
   open(unit=11, file=trim(infile), action='read')
     read(11,*) ID
-    read(11,*) L(1)
-    read(11,*) L(2)
+    read(11,*) L(1:D)
     read(11,*) Jcp
     read(11,*) Beta
     read(11,*) MCOrder
@@ -69,9 +68,15 @@ PROGRAM MAIN
   Mu(2)  = 1.d0
 
   !================== space variables ==================================
-  Vol = L(1)*L(2)
-  dL(1) = Floor(L(1)/2.d0)
-  dL(2) = Floor(L(2)/2.d0)
+  Vol = 1.d0
+  do i = 1, D
+    dVol(i) = Vol
+    Vol = Vol *L(i)
+    dL(i) = Floor(L(i)/2.d0)
+  enddo
+  do i = D+1, 3
+    dVol(i) = Vol
+  enddo
 
   logL(:)=dlog(L(:)*1.d0)
   SpatialWeight(:,:)=0.d0
@@ -102,22 +107,22 @@ PROGRAM MAIN
   Error(:)=0.d0
   QuanName(:)="Undefined"
 
-  allocate(W(NTypeW, 0:L(1)-1, 0:L(2)-1, 0:MxT-1))
-  allocate(Gam(NTypeGam, 0:L(1)-1, 0:L(2)-1, 0:MxT-1, 0:MxT-1))
+  allocate(W(NTypeW, 0:Vol-1, 0:MxT-1))
+  allocate(Gam(NTypeGam, 0:Vol-1, 0:MxT-1, 0:MxT-1))
 
-  allocate(W0PF(0:L(1)-1, 0:L(2)-1, 0:MxT-1))
-  allocate(Gam0PF(0:L(1)-1, 0:L(2)-1, 0:MxT-1, 0:MxT-1))
-  allocate(Polar(0:L(1)-1, 0:L(2)-1, 0:MxT-1))
-  allocate(Denom(0:L(1)-1, 0:L(2)-1, 0:MxT-1))
-  allocate(Chi(0:L(1)-1, 0:L(2)-1, 0:MxT-1))
+  allocate(W0PF(0:Vol-1, 0:MxT-1))
+  allocate(Gam0PF(0:Vol-1, 0:MxT-1, 0:MxT-1))
+  allocate(Polar(0:Vol-1, 0:MxT-1))
+  allocate(Denom(0:Vol-1, 0:MxT-1))
+  allocate(Chi(0:Vol-1, 0:MxT-1))
 
-  allocate(GamMC(0:MCOrder, 0:L(1)-1, 0:L(2)-1, 0:MxT-1))
-  allocate(ReGamSqMC(0:MCOrder, 0:L(1)-1, 0:L(2)-1, 0:MxT-1))
-  allocate(ImGamSqMC(0:MCOrder, 0:L(1)-1, 0:L(2)-1, 0:MxT-1))
+  allocate(GamMC(0:MCOrder, 0:Vol-1, 0:MxT-1))
+  allocate(ReGamSqMC(0:MCOrder, 0:Vol-1, 0:MxT-1))
+  allocate(ImGamSqMC(0:MCOrder, 0:Vol-1, 0:MxT-1))
 
-  allocate(GamBasis(0:MCOrder,1:NTypeGam/2, 0:L(1)-1, 0:L(2)-1, 1:NbinGam, 1:NBasisGam))
-  allocate(ReGamSqBasis(0:MCOrder,1:NTypeGam/2, 0:L(1)-1, 0:L(2)-1, 1:NbinGam, 1:NBasisGam))
-  allocate(ImGamSqBasis(0:MCOrder,1:NTypeGam/2, 0:L(1)-1, 0:L(2)-1, 1:NbinGam, 1:NBasisGam))
+  allocate(GamBasis(0:MCOrder,1:NTypeGam/2, 0:Vol-1, 1:NbinGam, 1:NBasisGam))
+  allocate(ReGamSqBasis(0:MCOrder,1:NTypeGam/2, 0:Vol-1, 1:NbinGam, 1:NBasisGam))
+  allocate(ImGamSqBasis(0:MCOrder,1:NTypeGam/2, 0:Vol-1, 1:NbinGam, 1:NBasisGam))
 
   MaxStat=1024
   allocate(ObsRecord(1:MaxStat,0:NObs-1))
@@ -158,19 +163,20 @@ PROGRAM MAIN
 
 CONTAINS
 
-INCLUDE "basic_function.f90"
 INCLUDE "self_consistent.f90"
-INCLUDE "monte_carlo.f90"
-INCLUDE "check_conf.f90"
+INCLUDE "sc_functions.f90"
+INCLUDE "sc_read_write.f90"
 INCLUDE "analytic_integration.f90"
-INCLUDE "read_write_data.f90"
 INCLUDE "fitting.f90"
-INCLUDE "test.f90"
 
-SUBROUTINE read_from_infile
-  implicit none
-  return
-END SUBROUTINE
+INCLUDE "monte_carlo.f90"
+INCLUDE "mc_functions.f90"
+INCLUDE "mc_read_write.f90"
+
+INCLUDE "model_dependent.f90"
+
+INCLUDE "check_conf.f90"
+
 
 subroutine numerical_integeration
   implicit none
@@ -211,7 +217,6 @@ SUBROUTINE self_consistent
   integer :: iloop
   logical :: flag
 
-  !call output_Quantities
   !------- read the G, W, and Gamma  -------------------
   if(IsLoad==.false.) then
 
@@ -221,6 +226,7 @@ SUBROUTINE self_consistent
     call transfer_Chi_r(-1)
     call transfer_Chi_t(-1)
     call transfer_Sigma_t(-1)
+
     call output_Quantities
 
     call write_GWGamma
@@ -267,9 +273,11 @@ LOGICAL FUNCTION self_consistent_GW(err)
   call plus_minus_W0(1)
   call plus_minus_Gam0(1)
 
+  call output_Quantities
+
   !!------ calculate G, W in momentum domain --------------
   WOld = (10.d0, 0.d0)
-  WNow = weight_W(1, (/0, 0/), 0)
+  WNow = weight_W(1, 0, 0)
   self_consistent_GW = .true.
 
   iloop = 0
@@ -287,7 +295,7 @@ LOGICAL FUNCTION self_consistent_GW(err)
     call calculate_G
     call calculate_W
 
-    WNow = weight_W(1, (/0, 0/), 0)
+    WNow = weight_W(1, 0, 0)
 
     call LogFile%QuickLog("G-W loop:"//str(iloop)//str(real(WOld))//str(real(WNOw)))
   enddo
@@ -355,13 +363,13 @@ SUBROUTINE monte_carlo
     GamOrder(:) = 0.d0
     GamWormOrder(:) = 0.d0
 
-    GamMC(:,:,:,:) = (0.d0, 0.d0)
-    ReGamSqMC(:,:,:,:) = 0.d0
-    ImGamSqMC(:,:,:,:) = 0.d0
+    GamMC(:,:,:) = (0.d0, 0.d0)
+    ReGamSqMC(:,:,:) = 0.d0
+    ImGamSqMC(:,:,:) = 0.d0
 
-    GamBasis(:,:,:,:,:,:) = (0.d0, 0.d0)
-    ReGamSqBasis(:,:,:,:,:,:) = 0.d0
-    ImGamSqBasis(:,:,:,:,:,:) = 0.d0
+    GamBasis(:,:,:,:,:) = (0.d0, 0.d0)
+    ReGamSqBasis(:,:,:,:,:) = 0.d0
+    ImGamSqBasis(:,:,:,:,:) = 0.d0
 
     GamNorm = (0.d0, 0.d0)
     TestData(:)=0.d0
@@ -441,6 +449,37 @@ SUBROUTINE update_flag
   endif
   return
 END SUBROUTINE update_flag
+
+SUBROUTINE test_subroutine
+    implicit none
+    integer :: ir, i, it1, it2
+    integer :: isamp
+
+    !========  test drawing subroutine =====================
+    !call initialize_markov
+    !call print_config
+
+    !======== analytic_integration =========================
+    !call read_GWGamma
+    !call calculate_Gam1
+    !call output_Gam1
+
+    !======== check the value in Gamma matrix ==============
+    call read_GWGamma
+    do it2 = 0, MxT-1
+      do it1 = 0, MxT-1
+        do ir = 0, Vol-1
+          do i = 1, NtypeGam
+            if(abs(Gam(i,ir,it1,it2))>=1.d3) then
+              print *, i, ir, it1, it2, Gam(i,ir,it1,it2)
+            endif
+          enddo
+        enddo
+      enddo
+    enddo
+
+    return
+END SUBROUTINE test_subroutine
 
 END PROGRAM MAIN
 

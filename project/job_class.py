@@ -116,6 +116,19 @@ class JobConsistLoop(Job):
         input_str += self.key_to_string("ReadFile")
         return input_str
 
+class JobIntegration(Job):
+    '''job subclass for numerical integration jobs'''
+    def __init__(self, para):
+        Job.__init__(self, para)
+        self.keep_cpu_busy = True
+        self.para["Type: NI"] = 3
+        self.name = "NI"
+
+    def to_string(self, pid=0):
+        input_str = Job.to_string(self, pid)
+        input_str += self.key_to_string("Type: NI")
+        return input_str
+
 class JobOutputLoop(Job):
     '''job subclass for output loop jobs'''
     def __init__(self, para):
@@ -130,17 +143,17 @@ class JobOutputLoop(Job):
         input_str += self.key_to_string("ReadFile")
         return input_str
 
-class JobIntegration(Job):
-    '''job subclass for numerical integration jobs'''
+class JobDebug(Job):
+    '''job subclass for debug jobs'''
     def __init__(self, para):
         Job.__init__(self, para)
-        self.keep_cpu_busy = True
-        self.para["Type: NI"] = 3
-        self.name = "NI"
+        self.keep_cpu_busy = False
+        self.para["Type: BG"] = 5
+        self.name = "BG"
 
     def to_string(self, pid=0):
         input_str = Job.to_string(self, pid)
-        input_str += self.key_to_string("Type: NI")
+        input_str += self.key_to_string("Type: BG")
         return input_str
 
 if __name__ == "__main__":
