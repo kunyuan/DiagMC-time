@@ -194,8 +194,8 @@ MODULE vrbls_mc
                                                    
 
   !----------- data structure for vertexes -------------------------------------
-  integer, dimension(2, MxNVertex) :: GRVertex      ! gline sites for Gamma
-  integer, dimension(2, MxNVertex) :: WRVertex      ! wline sites for Gamma
+  integer, dimension(MxNVertex) :: GRVertex      ! gline sites for Gamma
+  integer, dimension(MxNVertex) :: WRVertex      ! wline sites for Gamma
   double precision, dimension(3, MxNVertex) :: TVertex! times for Gamma
   !  1: outgoing G, 2: ingoing G, 3: W attached
   integer, dimension(MxNVertex) :: DirecVertex              ! Gamma is 1: left, 2: right

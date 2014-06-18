@@ -132,16 +132,14 @@ END FUNCTION weight_gline
 !-------- the weight of a wline -------------------------
 
 ! dx = x2-x1;  dy = y2- y1; tau = tau2-tau1
-COMPLEX*16 FUNCTION weight_wline(stat, isdelta, dr0, tau, typ)
+COMPLEX*16 FUNCTION weight_wline(stat, isdelta, dr, tau, typ)
   implicit none
   integer :: stat, isdelta, dx, dy, typ
-  integer :: dr0(2)
-  integer :: dr(2)
+  integer :: dr
   double precision :: tau
   integer :: t
 
   t = Floor(tau*MxT/Beta)
-  call diff_r(dr0, dr)
 
   if(stat == 0) then
     if(isdelta==0) weight_wline = weight_W(typ, dr, t)
@@ -163,25 +161,10 @@ COMPLEX*16 FUNCTION weight_wline(stat, isdelta, dr0, tau, typ)
   endif
 
   !---------------------- test1: fake function ----------------------------
-  !if(stat >= 0 .and. stat<=3) then
-    !if(isdelta==0 .and. dr(1)==0 .and. dr(2)==0) then
-      !weight_wline = weight_meas_W(dr, t)
-    !else 
-      !weight_wline = (0.d0, 0.d0)
-    !endif
-
-    !!if(isdelta==0) weight_wline = weight_meas_W(dr, t)
-    !!if(isdelta==1) weight_wline = weight_meas_W(dr, 0)
-  !else
-      !call LogFile%WriteStamp('e')
-      !call LogFile%WriteLine("The number of update: "+str(iupdate))
-      !call LogFile%WriteLine("line status error!"+str(stat))
-      !stop
-  !endif
 
   !---------------------- test2: uniform function ----------------------------
   !if(stat >= 0 .and. stat<=3) then
-    !if(isdelta==0 .and. dr(1)==0 .and. dr(2)==0) then
+    !if(isdelta==0 .and. dr==0 ) then
       !weight_wline = weight_meas_W(dr, t)
     !else 
       !weight_wline = (0.d0, 0.d0)
@@ -201,17 +184,15 @@ END FUNCTION weight_wline
 !-------- the weight of a vertex ------------------------
  !dx = xg-xw;  dy = yg-yw; dtau1 = tau3-tau2; dtau2 = tau1-tau3
 
-COMPLEX*16 FUNCTION weight_vertex(stat, isdelta, dr0, dtau1, dtau2, typ)
+COMPLEX*16 FUNCTION weight_vertex(stat, isdelta, dr, dtau1, dtau2, typ)
   implicit none
-  integer :: stat, dr(2), t1, t2, typ, isdelta
-  integer :: dr0(2), flag
+  integer :: stat, dr, t1, t2, typ, isdelta
+  integer :: flag
   double precision :: weight
   double precision :: dtau1, dtau2
 
   t1 = Floor(dtau1*MxT/Beta)
   t2 = Floor(dtau2*MxT/Beta)
-
-  call diff_r(dr0, dr)
 
   if(stat==0) then
     if(IS_BOLD) then
@@ -260,7 +241,7 @@ COMPLEX*16 FUNCTION weight_vertex(stat, isdelta, dr0, dtau1, dtau2, typ)
     !if(isdelta==1) weight_vertex = weight_meas_Gam0(typ, dr)
     !if(isdelta==0) then
       !weight_vertex = (0.d0, 0.d0)
-      !if(dr(1)==0 .and. dr(2)==0) then
+      !if(dr==0 ) then
         !if(typ==1 .or. typ==2 .or. typ==5 .or. typ==6) then
           !if(mod(flag, 2)==0) the
             !weight_vertex = dcmplx(dtau1**2.d0+dtau2**2.d0+1.d0, 0.d0)
@@ -310,7 +291,7 @@ END FUNCTION weight_vertex
 !--------- worm weight function  ---------
 DOUBLE PRECISION FUNCTION weight_worm(drg, drw, dtau)
   implicit none
-  integer, intent(in)  :: drg(2), drw(2)
+  integer, intent(in)  :: drg, drw
   double precision, intent(in) :: dtau
 
   weight_worm = 1.d0
@@ -332,27 +313,17 @@ END FUNCTION weight_meas_G
 
 complex*16 FUNCTION weight_meas_W(dr, t1)
   implicit none
-  integer, intent(in)  :: dr(2)
+  integer, intent(in)  :: dr
   integer, intent(in) :: t1
 
   weight_meas_W = (1.d0, 0.d0)
   return
 END FUNCTION weight_meas_W
 
-!complex*16 FUNCTION weight_meas_Gam(ityp, dr, t1, t2)
-  !implicit none
-  !integer, intent(in)  :: dr(2), ityp, t1, t2
-
-  !weight_meas_Gam = (0.d0, 0.d0)
-  !if(dr(1)==0 .and. dr(2)==0) then
-    !weight_meas_Gam = (1.d0, 0.d0)
-  !endif
-  !return
-!END FUNCTION weight_meas_Gam
 
 complex*16 FUNCTION weight_meas_Gam0(ityp, dr)
   implicit none
-  integer, intent(in)  :: dr(2), ityp
+  integer, intent(in)  :: dr, ityp
 
   !----------------------------------------------------------------------------
   !                       (out)
@@ -371,7 +342,7 @@ complex*16 FUNCTION weight_meas_Gam0(ityp, dr)
   !----------------------------------------------------------------------------
 
   weight_meas_Gam0 = (0.d0, 0.d0)
-  if(dr(1)==0 .and. dr(2)==0) then
+  if(dr==0) then
     if(ityp==1 .or. ityp==2 .or. ityp==5 .or. ityp==6) then
       weight_meas_Gam0 = (1.d0, 0.d0)
     endif
@@ -402,7 +373,7 @@ SUBROUTINE update_WeightCurrent
   do ikey = 1, NWLn
     i = WLnKey2Value(ikey)
     Gam1 = NeighLn(1,i);       Gam2 = NeighLn(2,i)
-    wln = weight_wline(StatusLn(i),IsDeltaLn(i), WRVertex(:, Gam1)-WRVertex(:, Gam2), &
+    wln = weight_wline(StatusLn(i),IsDeltaLn(i), diff_r(D, WRVertex(Gam1),WRVertex(Gam2)), &
       &  TVertex(3, Gam2)-TVertex(3,Gam1), TypeLn(i))
     WeightLn(i) = wln
     weight = weight *wln
@@ -413,7 +384,7 @@ SUBROUTINE update_WeightCurrent
     i = VertexKey2Value(ikey)
     tau1 = TVertex(3, i)-TVertex(2, i)
     tau2 = TVertex(1, i)-TVertex(3, i)
-    wgam = weight_vertex(StatusVertex(i), IsDeltaVertex(i), GRVertex(:, i)-WRVertex(:, i), &
+    wgam = weight_vertex(StatusVertex(i), IsDeltaVertex(i), diff_r(D,GRVertex(i),WRVertex(i)), &
       & tau1, tau2, TypeVertex(i))
     WeightVertex(i) = wgam
     weight = weight *wgam
@@ -450,48 +421,38 @@ DOUBLE PRECISION FUNCTION prob_tau(tau)
 END FUNCTION prob_tau
 
 !---------- int x y -------------------------
-SUBROUTINE generate_xy(CurrentR,NewR,dR,Weight,Flag)
-!Please make sure Weight is already initialized before calling!
-!Flag=.true.: generate new X,Y and new dX,dY
-!Flag=.false.: generate new X,Y according to input dX,dY
-  implicit none
-  logical :: Flag
-  integer :: NewR(2),CurrentR(2),dR(2),i
-  double precision :: Weight,rand
-  !dR: CurrentR --> NewR;   dR': CurrentR <-- NewR
-  !CurrentR==NewR, dR=0, dR'=0
-  !CurrentR>NewR, dR=NewR-CurrentR, dR'=CurrentR-NewR+L
-  !CurrentR<NewR, dR=NewR-CurrentR+L, dR'=CurrentR-NewR
+!SUBROUTINE generate_xy(CurrentR,NewR,dR,Weight,Flag)
+!!Please make sure Weight is already initialized before calling!
+!!Flag=.true.: generate new X,Y and new dX,dY
+!!Flag=.false.: generate new X,Y according to input dX,dY
+  !implicit none
+  !logical :: Flag
+  !integer :: NewR(2),CurrentR(2),dR(2),i
+  !double precision :: Weight,rand
+  !!dR: CurrentR --> NewR;   dR': CurrentR <-- NewR
+  !!CurrentR==NewR, dR=0, dR'=0
+  !!CurrentR>NewR, dR=NewR-CurrentR, dR'=CurrentR-NewR+L
+  !!CurrentR<NewR, dR=NewR-CurrentR+L, dR'=CurrentR-NewR
 
-  do i=1,2
-    if(Flag) then
-      rand=rn()
-      dR(i)=0.5d0*dexp(rand*logL(i))
-      IF(rn()>0.5d0) dR(i)=L(i)-1-dR(i)
-    endif
-    if(dR(i)/=0) then
-      Weight=Weight*SpatialWeight(i,dR(i))
-      Weight=Weight/SpatialWeight(i,L(i)-dR(i))
-    endif
+  !do i=1,2
+    !if(Flag) then
+      !rand=rn()
+      !dR(i)=0.5d0*dexp(rand*logL(i))
+      !IF(rn()>0.5d0) dR(i)=L(i)-1-dR(i)
+    !endif
+    !if(dR(i)/=0) then
+      !Weight=Weight*SpatialWeight(i,dR(i))
+      !Weight=Weight/SpatialWeight(i,L(i)-dR(i))
+    !endif
 
-    NewR(i) = CurrentR(i) + dR(i)
-    if(NewR(i)>=L(i)) then
-      NewR(i) = NewR(i) - L(i)
-    endif
-  enddo
-  return
-END SUBROUTINE generate_xy
+    !NewR(i) = CurrentR(i) + dR(i)
+    !if(NewR(i)>=L(i)) then
+      !NewR(i) = NewR(i) - L(i)
+    !endif
+  !enddo
+  !return
+!END SUBROUTINE generate_xy
 
-SUBROUTINE diff_r(dr0, dr)
-  implicit none
-  integer, intent(in) :: dr0(2)
-  integer, intent(out) :: dr(2)
-  integer :: i
-  do i = 1, 2
-    dr(i) = dr0(i)
-    if(dr(i)<0)     dr(i) = L(i)+ dr(i)
-  enddo
-END SUBROUTINE diff_r
 
 !!---------- int k -------------------------
 INTEGER FUNCTION generate_k()
@@ -1091,10 +1052,10 @@ END SUBROUTINE undo_insert_line
 
 
 !------------- insert a gamma to the link -------------------
-SUBROUTINE insert_gamma(newgamma, isdelta, gx, gy, wx, wy, t1, t2, t3, dir, typ, stat, weigh)
+SUBROUTINE insert_gamma(newgamma, isdelta, gr, wr, t1, t2, t3, dir, typ, stat, weigh)
   implicit none
   integer, intent(out) :: newgamma
-  integer, intent(in) :: gx, gy, wx, wy, isdelta, dir, typ, stat
+  integer, intent(in) :: gr, wr, isdelta, dir, typ, stat
   complex*16, intent(in) :: weigh
   double precision, intent(in) :: t1, t2, t3
 
@@ -1117,10 +1078,8 @@ SUBROUTINE insert_gamma(newgamma, isdelta, gx, gy, wx, wy, t1, t2, t3, dir, typ,
   VertexValue2Key(newgamma) = NVertex
 
   IsDeltaVertex(newgamma) = isdelta
-  GRVertex(1, newgamma) = gx
-  GRVertex(2, newgamma) = gy
-  WRVertex(1, newgamma) = wx
-  WRVertex(2, newgamma) = wy
+  GRVertex(newgamma) = gr
+  WRVertex(newgamma) = wr
   TVertex(1, newgamma) = t1
   TVertex(2, newgamma) = t2
   TVertex(3, newgamma) = t3
@@ -1271,7 +1230,7 @@ END SUBROUTINE undo_delete_gamma
 !============   initialize diagrams =================================
 SUBROUTINE first_order_diagram
   implicit none
-  integer :: i, dr0(2)
+  integer :: i, dr0
   double precision :: ratio
   complex*16 :: Anew
 
@@ -1377,8 +1336,8 @@ SUBROUTINE first_order_diagram
   !IsDeltaVertex(1) = 1
 
   ! the site variables of Gamma 1, 2, 3 and 4
-  GRVertex(1, 1:4) = 0;            GRVertex(2, 1:4) = 0
-  WRVertex(1, 1:4) = 0;            WRVertex(2, 1:4) = 0
+  GRVertex(1:4) = 0
+  WRVertex(1:4) = 0
 
   ! the time variables of Gamma 1, 2, 3 and 4
   TVertex(1, 1)=0.d0; TVertex(2, 1)=0.d0; TVertex(3, 1)=0.d0
@@ -1402,7 +1361,7 @@ SUBROUTINE first_order_diagram
   WeightLn(4) = weight_gline(StatusLn(4),TVertex(2,NeighLn(2,4))-TVertex(1,NeighLn(1,4)),TypeLn(4))
   WeightLn(5) = weight_gline(StatusLn(5),TVertex(2,NeighLn(2,5))-TVertex(1,NeighLn(1,5)),TypeLn(5))
 
-  dr0(:) = 0
+  dr0 = 0
   WeightLn(3) = weight_wline(StatusLn(3),IsDeltaLn(3),dr0,TVertex(3,NeighLn(2,3))-TVertex(3,NeighLn(1,3)),TypeLn(3))
   WeightLn(6) = weight_wline(StatusLn(6),IsDeltaLn(6),dr0,TVertex(3,NeighLn(2,6))-TVertex(3,NeighLn(1,6)),TypeLn(6))
 
@@ -1428,7 +1387,7 @@ end SUBROUTINE first_order_diagram
 
 SUBROUTINE first_order_diagram_with_bubble
   implicit none
-  integer :: i, dr0(2)
+  integer :: i, dr0
   double precision :: ratio
   complex*16 :: Anew
 
@@ -1528,8 +1487,8 @@ SUBROUTINE first_order_diagram_with_bubble
   IsDeltaVertex(1:4) = 1
 
   ! the site variables of Gamma 1, 2, 3 and 4
-  GRVertex(1, 1:4) = 0;            GRVertex(2, 1:4) = 0
-  WRVertex(1, 1:4) = 0;            WRVertex(2, 1:4) = 0
+  GRVertex(1:4) = 0
+  WRVertex(1:4) = 0
 
   ! the time variables of Gamma 1, 2, 3 and 4
   TVertex(1, 1)=0.d0; TVertex(2, 1)=0.d0; TVertex(3, 1)=0.d0
@@ -1553,7 +1512,7 @@ SUBROUTINE first_order_diagram_with_bubble
   WeightLn(4) = weight_gline(StatusLn(4),TVertex(2,NeighLn(2,4))-TVertex(1,NeighLn(1,4)),TypeLn(4))
   WeightLn(5) = weight_gline(StatusLn(5),TVertex(2,NeighLn(2,5))-TVertex(1,NeighLn(1,5)),TypeLn(5))
 
-  dr0(:) = 0
+  dr0 = 0
   WeightLn(3) = weight_wline(StatusLn(3),IsDeltaLn(3),dr0,TVertex(3,NeighLn(2,3))-TVertex(3,NeighLn(1,3)),TypeLn(3))
   WeightLn(6) = weight_wline(StatusLn(6),IsDeltaLn(6),dr0,TVertex(3,NeighLn(2,6))-TVertex(3,NeighLn(1,6)),TypeLn(6))
 
@@ -1579,7 +1538,7 @@ end SUBROUTINE first_order_diagram_with_bubble
 
 SUBROUTINE second_order_diagram
   implicit none
-  integer :: i, dr0(2)
+  integer :: i, dr0
   double precision :: ratio
   complex*16 :: Anew
 
@@ -1692,8 +1651,8 @@ SUBROUTINE second_order_diagram
   IsDeltaVertex(1:6) = 1
 
   ! the site variables of Gamma 1, 2, 3 and 4
-  GRVertex(1, 1:6) = 0;            GRVertex(2, 1:6) = 0
-  WRVertex(1, 1:6) = 0;            WRVertex(2, 1:6) = 0
+  GRVertex(1:6) = 0
+  WRVertex(1:6) = 0
 
   ! the time variables of Gamma 1, 2, 3 and 4
   TVertex(1, 1)=0.d0;  TVertex(2, 1)=0.d0;  TVertex(3, 1)=0.d0
@@ -1724,7 +1683,7 @@ SUBROUTINE second_order_diagram
   WeightLn(7) = weight_gline(StatusLn(7),TVertex(2,NeighLn(2,7))-TVertex(1,NeighLn(1,7)),TypeLn(7))
   WeightLn(8) = weight_gline(StatusLn(8),TVertex(2,NeighLn(2,8))-TVertex(1,NeighLn(1,8)),TypeLn(8))
 
-  dr0(:) = 0
+  dr0 = 0
   WeightLn(3) = weight_wline(StatusLn(3),IsDeltaLn(3),dr0,TVertex(3,NeighLn(2,3))-TVertex(3,NeighLn(1,3)),TypeLn(3))
   WeightLn(6) = weight_wline(StatusLn(6),IsDeltaLn(6),dr0,TVertex(3,NeighLn(2,6))-TVertex(3,NeighLn(1,6)),TypeLn(6))
   WeightLn(9) = weight_wline(StatusLn(9),IsDeltaLn(9),dr0,TVertex(3,NeighLn(2,9))-TVertex(3,NeighLn(1,9)),TypeLn(9))
