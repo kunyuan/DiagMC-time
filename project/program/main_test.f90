@@ -172,8 +172,8 @@ INCLUDE "analytic_integration.f90"
 INCLUDE "fitting.f90"
 
 !INCLUDE "monte_carlo.f90"
-!INCLUDE "mc_functions.f90"
-!INCLUDE "mc_read_write.f90"
+INCLUDE "mc_functions.f90"
+INCLUDE "mc_read_write.f90"
 !INCLUDE "check_conf.f90"
 
 
@@ -232,31 +232,31 @@ SUBROUTINE self_consistent
 
     call write_GWGamma
     !!!======================================================================
-  !else if(IsLoad) then
+  else if(IsLoad) then
 
-    !call LogFile%QuickLog("Reading G,W, and Gamma...")
-    !call read_GWGamma
+    call LogFile%QuickLog("Reading G,W, and Gamma...")
+    call read_GWGamma
 
 
-    !call LogFile%QuickLog("Reading MC data...")
-    !call read_monte_carlo_data
+    call LogFile%QuickLog("Reading MC data...")
+    call read_monte_carlo_data
 
-    !call LogFile%QuickLog("Reading Done!...")
+    call LogFile%QuickLog("Reading Done!...")
 
-    !!!-------- update the Gamma matrix with MC data -------
-    !call Gam_mc2matrix_mc
+    !!-------- update the Gamma matrix with MC data -------
+    call Gam_mc2matrix_mc
 
-    !flag = self_consistent_GW(1.d-8)
+    flag = self_consistent_GW(1.d-8)
 
-    !call calculate_Chi
-    !call transfer_Chi_r(-1)
-    !call transfer_Chi_t(-1)
-    !call transfer_Sigma_t(-1)
+    call calculate_Chi
+    call transfer_Chi_r(-1)
+    call transfer_Chi_t(-1)
+    call transfer_Sigma_t(-1)
 
-    !call output_Quantities
+    call output_Quantities
 
-    !call update_flag
-    !call write_GWGamma
+    call update_flag
+    call write_GWGamma
   endif
   return
 END SUBROUTINE self_consistent
