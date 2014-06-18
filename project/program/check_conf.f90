@@ -271,39 +271,21 @@ SUBROUTINE check_site
 
   do ikey = 1, NVertex
     i = VertexKey2Value(ikey)
-    if(GRVertex(1, i)<0 .or. GRVertex(1, i)>L(1)-1) then
+    if(GRVertex(i)<0 .or. GRVertex(i)>Vol-1) then
       call LogFile%WriteStamp('e')
       call LogFile%WriteLine("Oops, check_site found a bug!")
       call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+",imc"+str(imc))
-      call LogFile%WriteLine("GX is wrong!")
-      call LogFile%WriteLine("gamma's number"+str(i)+",GX"+str(GRVertex(1, i)))
+      call LogFile%WriteLine("GR is wrong!")
+      call LogFile%WriteLine("gamma's number"+str(i)+",GR"+str(GRVertex(i)))
       call print_config
       stop
     endif
-    if(GRVertex(2, i)<0 .or. GRVertex(2, i)>L(2)-1) then
+    if(WRVertex(i)<0 .or. WRVertex(i)>Vol-1) then
       call LogFile%WriteStamp('e')
       call LogFile%WriteLine("Oops, check_site found a bug!")
       call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+",imc"+str(imc))
-      call LogFile%WriteLine("GY is wrong!")
-      call LogFile%WriteLine("gamma's number"+str(i)+",GY"+str(GRVertex(2, i)))
-      call print_config
-      stop
-    endif
-    if(WRVertex(1, i)<0 .or. WRVertex(1, i)>L(1)-1) then
-      call LogFile%WriteStamp('e')
-      call LogFile%WriteLine("Oops, check_site found a bug!")
-      call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+",imc"+str(imc))
-      call LogFile%WriteLine("GY is wrong!")
-      call LogFile%WriteLine("gamma's number"+str(i)+",WX"+str(WRVertex(1, i)))
-      call print_config
-      stop
-    endif
-    if(WRVertex(2, i)<0 .or. WRVertex(2, i)>L(2)-1) then
-      call LogFile%WriteStamp('e')
-      call LogFile%WriteLine("Oops, check_site found a bug!")
-      call LogFile%WriteLine("IsWormPresent"+str(IsWormPresent)+",imc"+str(imc))
-      call LogFile%WriteLine("GY is wrong!")
-      call LogFile%WriteLine("gamma's number"+str(i)+",WY"+str(WRVertex(2, i)))
+      call LogFile%WriteLine("WR is wrong!")
+      call LogFile%WriteLine("gamma's number"+str(i)+",WR"+str(WRVertex(i)))
       call print_config
       stop
     endif
@@ -553,7 +535,7 @@ SUBROUTINE check_weight
   do ikey = 1, NWLn
     i = WLnKey2Value(ikey)
     Gam1 = NeighLn(1,i);       Gam2 = NeighLn(2,i)
-    wln(ikey) = weight_wline(StatusLn(i),IsDeltaLn(i), WRVertex(:, Gam1)-WRVertex(:, Gam2), &
+    wln(ikey) = weight_wline(StatusLn(i),IsDeltaLn(i), diff_r(D, WRVertex(Gam1),WRVertex(Gam2)), &
       & TVertex(3, Gam2)-TVertex(3,Gam1), TypeLn(i))
     weight = weight *wln(ikey)
   enddo
@@ -562,12 +544,11 @@ SUBROUTINE check_weight
     i = VertexKey2Value(ikey)
     tau1 = TVertex(3, i)-TVertex(2, i)
     tau2 = TVertex(1, i)-TVertex(3, i)
-    gam(ikey) = weight_vertex(StatusVertex(i), IsDeltaVertex(i), GRVertex(:, i)-WRVertex(:, i), &
+    gam(ikey) = weight_vertex(StatusVertex(i), IsDeltaVertex(i), diff_r(D,GRVertex(i),WRVertex(i)), &
       & tau1, tau2, TypeVertex(i))
     weight = weight *gam(ikey)
   enddo
 
-  !weight = weight*(1.d0/Beta)**Order *SignFermiLoop
   weight = weight *(-1.d0)**Order*SignFermiLoop
 
   if(abs(real(Phase*WeightCurrent-weight))>1.d-6.or.abs(dimag(Phase*WeightCurrent-weight))>1.d-6) then
