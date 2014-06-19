@@ -3,13 +3,15 @@ import numpy as np
 import matplotlib.pyplot as plt
 import read_data
 
-L = 8
+L = 4
 Lx = np.arange(0, L)
 Ly = np.arange(0, L)
+Lz = np.arange(0, L)
 r=[]
 for x in Lx:
     for y in Ly:
-        r.append(np.sqrt(x**2.0+y**2.0))
+        for z in Lz:
+            r.append(np.sqrt(x**2.0+y**2.0+z**2.0))
 
 Order = np.arange(1, 7)
 x = 0.0
@@ -20,8 +22,8 @@ Quans=["Chi"]
 
 Files=[]
 
-Files.append(read_data.read_array("../../project/0.90_quantities.dat", Quans))
-Files.append(read_data.read_array("../../../L8_0.90_2_bare/0.90_quantities.dat", Quans))
+Files.append(read_data.read_array("../../project/0.50_quantities.dat", Quans))
+#Files.append(read_data.read_array("../../../L8_0.90_2_bare/0.90_quantities.dat", Quans))
 
 #Files.append(read_data.read_array("../../data/cmp_L_dependence/L8_0.90_1_quantities.dat", Quans))
 #Files.append(read_data.read_array("../../data/cmp_L_dependence/L8_0.90_2_quantities.dat", Quans))
