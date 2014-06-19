@@ -273,8 +273,6 @@ LOGICAL FUNCTION self_consistent_GW(err)
   call plus_minus_W0(1)
   call plus_minus_Gam0(1)
 
-  call output_Quantities
-
   !!------ calculate G, W in momentum domain --------------
   WOld = (10.d0, 0.d0)
   WNow = weight_W(1, 0, 0)
@@ -286,6 +284,8 @@ LOGICAL FUNCTION self_consistent_GW(err)
   call calculate_W
 
   do while(abs(real(WNow)-real(WOld))>err) 
+    if(iloop>=200)  exit
+
     WOld = WNow
     iloop = iloop + 1
 

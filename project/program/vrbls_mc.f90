@@ -22,8 +22,8 @@ MODULE vrbls_mc
   integer, parameter          :: Mxint = 2147483647
   integer, parameter          :: Mnint =-2147483647
 
-  integer, parameter :: D = 2                       ! 2-dimensional system
-  integer, parameter,dimension(D) :: MxL =(/32,32/)   ! the largest system
+  integer, parameter :: D = 3                       ! 2-dimensional system
+  integer, parameter,dimension(D) :: MxL =(/16,16,16/)   ! the largest system
   integer, parameter :: MxVol = MxL(1)**D           ! the maximum system volume
   integer, parameter :: MxT   =   64                ! the maximum number of time segments
   integer, parameter :: MxK   = 1000000             ! the maximum momentum

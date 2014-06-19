@@ -1432,7 +1432,7 @@ SUBROUTINE add_interaction
 
   call insert_line(GIA, -1, kIA, 1, TypeLn(GIC), statIA, WGIA)
   call insert_line(GMB, -1, kMB, 1, TypeLn(GMD), statMB, WGMB)
-  call insert_line(WAB,  isdelta,q, 2,       typAB,      0, WWAB) 
+  call insert_line(WAB,  isdelta,q, 2,    typAB,      0, WWAB) 
   
   !------------ update the topology -----------------------------
   NeighLn(3-dir, GIC) = GamA;        NeighLn(3-dir, GMD) = GamB

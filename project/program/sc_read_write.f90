@@ -7,6 +7,9 @@ SUBROUTINE read_GWGamma
   implicit none
   integer :: isite, ityp, it1, it2, ios
   logical :: alive
+  complex*16, allocatable :: Gtmp(:,:)
+  complex*16, allocatable :: Wtmp(:,:,:)
+  complex*16, allocatable :: Gamtmp(:,:,:,:)
 
   inquire(file=trim(title_loop)//"_G_file.dat",exist=alive)
   if(.not. alive) then
@@ -24,20 +27,24 @@ SUBROUTINE read_GWGamma
     stop -1
   endif
 
+  allocate(Gtmp(1:NtypeG, 0:MxT-1))
+  allocate(Wtmp(1:NtypeW, 0:Vol-1, 0:MxT-1))
+  allocate(Gamtmp(1:NtypeGam, 0:Vol-1, 0:MxT-1, 0:MxT-1))
+
   open(100, status="old", file=trim(title_loop)//"_G_file.dat")
   open(101, status="old", file=trim(title_loop)//"_W_file.dat")
   open(102, status="old", file=trim(title_loop)//"_Gamma_file.dat")
 
   do it1 = 0, MxT-1
     do ityp = 1, NTypeG
-      read(100, *,iostat=ios) G(ityp, it1)
+      read(100, *,iostat=ios) Gtmp(ityp, it1)
     enddo
   enddo
 
   do it1 = 0, MxT-1
     do isite = 0, Vol-1
       do ityp = 1, NTypeW
-        read(101, *,iostat=ios) W(ityp, isite, it1)
+        read(101, *,iostat=ios) Wtmp(ityp, isite, it1)
       enddo
     enddo
   enddo
@@ -46,7 +53,7 @@ SUBROUTINE read_GWGamma
     do it1 = 0, MxT-1
       do isite = 0, Vol-1
         do ityp = 1, NTypeGam
-          read(102, *,iostat=ios) Gam(ityp, isite, it1, it2)
+          read(102, *,iostat=ios) Gamtmp(ityp, isite, it1, it2)
         enddo
       enddo
     enddo
@@ -56,6 +63,9 @@ SUBROUTINE read_GWGamma
     if(ios/=0) then
       call LogFile%QuickLog("Failed to read G,W or Gamma information!",'e')
     else 
+      G = Gtmp;         deallocate(Gtmp)
+      W = Wtmp;         deallocate(Wtmp)
+      Gam = Gamtmp;     deallocate(Gamtmp)
       call update_WeightCurrent
       mc_version = file_version
     endif
@@ -158,8 +168,7 @@ SUBROUTINE output_Quantities
     write(104, *) "#tau1:", MxT
     write(104, *) "#Beta", Beta, "L", L(1), "Order", MCOrder
     do it1 = 0, MxT-1
-      write(104, *) real(SUM(GamMC(iorder,:,it1))/Vol)*normal, dimag(SUM(GamMC(iorder, &
-        & :,it1))/Vol)*normal
+      write(104, *) real(GamMC(iorder,0,it1))*normal, dimag(GamMC(iorder,0,it1))*normal
     enddo
     write(104, *)
   enddo
@@ -219,7 +228,7 @@ SUBROUTINE output_Quantities
   do isite = 0, Vol-1
     write(104, *) ratio*real(SUM(Chi(isite, :))),ratio*dimag(SUM(Chi(isite, :)))
   enddo
-
+  
   write(104, *) "##################################Sigma"
   write(104, *) "#tau:", MxT
   write(104, *) "#Beta", Beta, "L", L(1), "Order", MCOrder
@@ -243,6 +252,16 @@ SUBROUTINE output_Quantities
       write(104, *) real(Denom(ip, iomega)),dimag(Denom(ip, iomega))
     enddo
   enddo
+
+  call transfer_Chi_r(1)
+  write(104, *) "##################################ChiK"
+  write(104, *) "#k:", Vol
+  write(104, *) "#Beta", Beta, "L", L(1), "Order", MCOrder
+  ratio = 1.d0/dble(MxT)
+  do isite = 0, Vol-1
+    write(104, *) ratio*real(SUM(Chi(isite, :))),ratio*dimag(SUM(Chi(isite, :)))
+  enddo
+  call transfer_Chi_r(-1)
 
   close(104)
 END SUBROUTINE output_Quantities
