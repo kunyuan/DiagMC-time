@@ -23,8 +23,9 @@ PROGRAM Main
     do i = 0, tmpOrder
       stChi = stChi + 3.d0*a(i)*beta**i
     enddo
-    print *, "Order: ", tmpOrder, "Staggered Susceptibility: ", stChi
+    print *, Order, ": ", stChi
   enddo
+  print *, "final: ", stChi
 
 
 END PROGRAM

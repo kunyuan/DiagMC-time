@@ -13,7 +13,7 @@ for x in Lx:
         for z in Lz:
             r.append(np.sqrt(x**2.0+y**2.0+z**2.0))
 
-Order = np.arange(1, 7)
+#Order = np.arange(1, 7)
 x = 0.0
 
 N = 64.0
@@ -23,22 +23,6 @@ Quans=["Chi"]
 Files=[]
 
 Files.append(read_data.read_array("../../project/0.50_quantities.dat", Quans))
-#Files.append(read_data.read_array("../../../L8_0.90_2_bare/0.90_quantities.dat", Quans))
-
-#Files.append(read_data.read_array("../../data/cmp_L_dependence/L8_0.90_1_quantities.dat", Quans))
-#Files.append(read_data.read_array("../../data/cmp_L_dependence/L8_0.90_2_quantities.dat", Quans))
-#Files.append(read_data.read_array("../../data/cmp_L_dependence/L8_0.90_3_quantities.dat", Quans))
-#Files.append(read_data.read_array("../../data/cmp_L_dependence/L8_0.90_4_quantities.dat", Quans))
-#Files.append(read_data.read_array("../../data/cmp_L_dependence/L8_0.90_5_quantities.dat", Quans))
-#Files.append(read_data.read_array("../../data/cmp_L_dependence/L8_0.90_6_quantities.dat", Quans))
-
-#Files.append(read_data.read_array("../../data/cmp_L_dependence/L4_0.90_1_quantities.dat", Quans))
-#Files.append(read_data.read_array("../../data/cmp_L_dependence/L4_0.90_2_quantities.dat", Quans))
-#Files.append(read_data.read_array("../../data/cmp_L_dependence/L4_0.90_3_quantities.dat", Quans))
-#Files.append(read_data.read_array("../../data/cmp_L_dependence/L4_0.90_4_quantities.dat", Quans))
-#Files.append(read_data.read_array("../../data/cmp_L_dependence/L4_0.90_5_quantities.dat", Quans))
-#Files.append(read_data.read_array("../../data/cmp_L_dependence/L4_0.90_6_quantities.dat", Quans))
-
 
 fig = plt.figure()
 ax = plt.subplot(111)
@@ -107,7 +91,6 @@ ax.legend()
 plt.xlabel("dr")
 plt.ylabel("Chi(dr)")
 
-#plt.savefig("Chi_dr_L4.pdf")
-plt.savefig("Chi_dr_L8.pdf")
+plt.savefig("Beta0.5_L4_Chi_dr.pdf")
 #plt.savefig("Chi_0_0.pdf")
 plt.show()

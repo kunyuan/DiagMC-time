@@ -11,7 +11,7 @@ com_dict={
     "L" :   [4,4,4],
     "Jcp" :  1.0,
     "Beta" :  0.50,
-    "Order" :  1,
+    "Order" :  2,
     }
 
 readfile="{0:4.2f}_{1}_coll".format(com_dict["Beta"],com_dict["Order"])
@@ -24,9 +24,9 @@ mc_dict={
     "__IsCluster" : False,
     "__AutoRun" : True,
     "IsLoad" : False,
-    "Reweight" : [1.0],
+    "Reweight" : [1.0, 2.0],
     "ReadFile" : "null",
-    "Sample" : 10000000,
+    "Sample" : 5000000,
     "Sweep" : 10,
     "Toss" : 10000,
     "Worm/Norm" : 0.5 

@@ -24,7 +24,7 @@ Quan1D=["GammaDiag1"]
 Quan=Quan2D+Quan1D
 
 DiagGamma=[]
-DiagGamma.append(read_data.read_array("../../data/3D/cmp_highT/bare_L4_0.50_1_quantities.dat", Quan))
+DiagGamma.append(read_data.read_array("../../project/0.50_quantities.dat", Quan))
 
 
 
@@ -44,5 +44,5 @@ ax.legend()
 plt.xlabel("tau")
 plt.ylabel("diag{Gamma}")
 
-plt.savefig("0.90_diag_Gamma.pdf")
+plt.savefig("Beta0.5_diag_Gamma.pdf")
 plt.show()
