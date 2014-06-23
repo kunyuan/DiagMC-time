@@ -35,23 +35,23 @@ Program main
   !enddo
 
   !============ test example for 3D ================
-  do i = 0, L-1
-    do j = 0, L-1
-      do k = 0, L-1
-        mt = (/i, j, k/)
-        site = get_site_from_matrix(D, mt)
-        mt_new = get_matrix_from_site(D, site)
-        if(mt_new(1)/=i .or. mt_new(2)/=j .or. mt_new(3)/=k) then
-          print *, '3d transfer error: get_matrix_from_site'
-        endif
-      enddo
-    enddo
-  enddo
+  !do i = 0, L-1
+    !do j = 0, L-1
+      !do k = 0, L-1
+        !mt = (/i, j, k/)
+        !site = get_site_from_matrix(D, mt)
+        !mt_new = get_matrix_from_site(D, site)
+        !if(mt_new(1)/=i .or. mt_new(2)/=j .or. mt_new(3)/=k) then
+          !print *, '3d transfer error: get_matrix_from_site'
+        !endif
+      !enddo
+    !enddo
+  !enddo
 
-  do i = 0, L**3-1
-    mt = get_matrix_from_site(D, i)
-    print *, i, ': ', mt(1), mt(2), mt(3)
-  enddo
+  !do i = 0, L**3-1
+    !mt = get_matrix_from_site(D, i)
+    !print *, i, ': ', mt(1), mt(2), mt(3)
+  !enddo
 
 CONTAINS
   integer function get_site_from_matrix(dims, matrix)
@@ -80,5 +80,7 @@ CONTAINS
     enddo
     return
   END FUNCTION get_matrix_from_site
+
+
 
 END PROGRAM
