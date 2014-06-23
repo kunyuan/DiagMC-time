@@ -2620,6 +2620,11 @@ SUBROUTINE measure
     rg = GRVertex(MeasureGam)
     rw = WRVertex(NeighLn(3-dir, MeaW))
     dr = diff_r(D, rg, rw)
+    if(dr/=0)  then
+      call LogFile%QuickLog("Found a nonzero in dr/=0!", 'e')
+      call print_config
+      stop
+    endif
 
     tau1 = TVertex(1, NeighLn(1, MeaGout))
     tau2 = TVertex(2, NeighLn(2, MeaGin))

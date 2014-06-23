@@ -21,7 +21,7 @@ PROGRAM Main
   do tmpOrder = 0, Order
     stChi = 0.d0
     do i = 0, tmpOrder
-      stChi = stChi + a(i)*beta**i
+      stChi = stChi + 3.d0*a(i)*beta**i
     enddo
     print *, "Order: ", tmpOrder, "Staggered Susceptibility: ", stChi
   enddo
