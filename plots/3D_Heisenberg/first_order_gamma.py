@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 # -*- coding: utf-8 -*-
 # <nbformat>3.0</nbformat>
 import numpy as np
