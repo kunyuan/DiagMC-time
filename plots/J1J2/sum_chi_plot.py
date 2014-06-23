@@ -12,6 +12,9 @@ N = 64
 tau = np.arange(0, Beta, Beta/N)
 Order=np.arange(1, 6)
 
+fig = plt.figure()
+ax = plt.subplot(111)
+
 Quans=["SUMChi"]
 key = "SUMChi"
 
@@ -22,26 +25,40 @@ SUMChi.append(read_data.read_array("../../data/J1J2/L4_0.50_0.50_3_quantities.da
 SUMChi.append(read_data.read_array("../../data/J1J2/L4_0.50_0.50_4_quantities.dat", Quans))
 SUMChi.append(read_data.read_array("../../data/J1J2/L4_0.50_0.50_5_quantities.dat", Quans))
 
-fig = plt.figure()
-ax = plt.subplot(111)
+Order=np.arange(1, len(SUMChi)+1)
+ChiL4=[]
+for i in range(len(SUMChi)):
+    ChiL4.append(sum(SUMChi[i][key][0]).real/N)
 
-#ChiL4=[]
-#for i in range(len(SUMChi)):
-    #ChiL4.append(sum(SUMChi[i][key][0]).real/N)
-#ax.plot(1.0/Order, ChiL4, marker='o', label="L=4, beta=0.90")
+ax.plot(1.0/Order, ChiL4, marker='o', label="L=4, beta=0.50")
 
-for key in Quans:
-    for i in range(len(SUMChi)):
-        ax.plot(tau, SUMChi[i][key][0].real, marker='*', label='L=4 Order '+str(i+1))
+SUMChi=[]
+SUMChi.append(read_data.read_array("../../data/J1J2/L8_0.50_0.50_1_quantities.dat", Quans))
+SUMChi.append(read_data.read_array("../../data/J1J2/L8_0.50_0.50_2_quantities.dat", Quans))
+SUMChi.append(read_data.read_array("../../data/J1J2/L8_0.50_0.50_3_quantities.dat", Quans))
+SUMChi.append(read_data.read_array("../../data/J1J2/L8_0.50_0.50_4_quantities.dat", Quans))
+SUMChi.append(read_data.read_array("../../data/J1J2/L8_0.50_0.50_5_quantities.dat", Quans))
+#SUMChi.append(read_data.read_array("../../data/J1J2/L8_0.50_0.50_6_quantities.dat", Quans))
+
+Order=np.arange(1, len(SUMChi)+1)
+ChiL8=[]
+for i in range(len(SUMChi)):
+    ChiL8.append(sum(SUMChi[i][key][0]).real/N)
+
+ax.plot(1.0/Order, ChiL8, marker='*', label="L=8, beta=0.50")
+
+#for key in Quans:
+    #for i in range(len(SUMChi)):
+        #ax.plot(tau, SUMChi[i][key][0].real, marker='*', label='L=4 Order '+str(i+1))
 
 ax.legend()
 
-#plt.xlabel("1/N")
-#plt.ylabel("Chi")
-#plt.savefig("static_uniform_chi.pdf")
-
-plt.xlabel("tau")
+plt.xlabel("1/N")
 plt.ylabel("Chi")
-plt.savefig("chi_tau.pdf")
+plt.savefig("static_uniform_chi.pdf")
+
+#plt.xlabel("tau")
+#plt.ylabel("Chi")
+#plt.savefig("chi_tau.pdf")
 
 plt.show()

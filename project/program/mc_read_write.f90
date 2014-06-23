@@ -818,8 +818,8 @@ SUBROUTINE output_GamMC
         ipercenterr = ierr/abs(dimag(gam))
       endif
 
-      write(35, '(i3,2x,i3,E20.10E3,"+/-",f13.6,"%    +i",E20.10E3,"+/-",f13.6,"%")') it1, &
-        & real(gamn),rpercenterr, dimag(gamn), ipercenterr
+      write(35, '(i3,2x, E20.10E3,"+/-",f13.6,"%    +i",E20.10E3,"+/-",f13.6,"%")') it1, &
+        & real(gamn), rpercenterr, dimag(gamn), ipercenterr
     enddo
     write(35, *)
   enddo

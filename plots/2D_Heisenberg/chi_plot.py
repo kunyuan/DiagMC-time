@@ -3,13 +3,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 import read_data
 
-L = 8
+L = 4
 Lx = np.arange(0, L)
-Ly = np.arange(0, L)
-r=[]
-for x in Lx:
-    for y in Ly:
-        r.append(np.sqrt(x**2.0+y**2.0))
+#Ly = np.arange(0, L)
+#r=[]
+#for x in Lx:
+    #for y in Ly:
+        #r.append(np.sqrt(x**2.0+y**2.0))
 
 Order = np.arange(1, 7)
 x = 0.0
@@ -20,22 +20,19 @@ Quans=["Chi"]
 
 Files=[]
 
-Files.append(read_data.read_array("../../project/0.90_quantities.dat", Quans))
-Files.append(read_data.read_array("../../../L8_0.90_2_bare/0.90_quantities.dat", Quans))
+#Files.append(read_data.read_array("../../data/2D/cmp_L_dependence/L8_0.90_1_quantities.dat", Quans))
+#Files.append(read_data.read_array("../../data/2D/cmp_L_dependence/L8_0.90_2_quantities.dat", Quans))
+#Files.append(read_data.read_array("../../data/2D/cmp_L_dependence/L8_0.90_3_quantities.dat", Quans))
+#Files.append(read_data.read_array("../../data/2D/cmp_L_dependence/L8_0.90_4_quantities.dat", Quans))
+#Files.append(read_data.read_array("../../data/2D/cmp_L_dependence/L8_0.90_5_quantities.dat", Quans))
+#Files.append(read_data.read_array("../../data/2D/cmp_L_dependence/L8_0.90_6_quantities.dat", Quans))
 
-#Files.append(read_data.read_array("../../data/cmp_L_dependence/L8_0.90_1_quantities.dat", Quans))
-#Files.append(read_data.read_array("../../data/cmp_L_dependence/L8_0.90_2_quantities.dat", Quans))
-#Files.append(read_data.read_array("../../data/cmp_L_dependence/L8_0.90_3_quantities.dat", Quans))
-#Files.append(read_data.read_array("../../data/cmp_L_dependence/L8_0.90_4_quantities.dat", Quans))
-#Files.append(read_data.read_array("../../data/cmp_L_dependence/L8_0.90_5_quantities.dat", Quans))
-#Files.append(read_data.read_array("../../data/cmp_L_dependence/L8_0.90_6_quantities.dat", Quans))
-
-#Files.append(read_data.read_array("../../data/cmp_L_dependence/L4_0.90_1_quantities.dat", Quans))
-#Files.append(read_data.read_array("../../data/cmp_L_dependence/L4_0.90_2_quantities.dat", Quans))
-#Files.append(read_data.read_array("../../data/cmp_L_dependence/L4_0.90_3_quantities.dat", Quans))
-#Files.append(read_data.read_array("../../data/cmp_L_dependence/L4_0.90_4_quantities.dat", Quans))
-#Files.append(read_data.read_array("../../data/cmp_L_dependence/L4_0.90_5_quantities.dat", Quans))
-#Files.append(read_data.read_array("../../data/cmp_L_dependence/L4_0.90_6_quantities.dat", Quans))
+Files.append(read_data.read_array("../../data/2D/cmp_L_dependence/L4_0.90_1_quantities.dat", Quans))
+Files.append(read_data.read_array("../../data/2D/cmp_L_dependence/L4_0.90_2_quantities.dat", Quans))
+Files.append(read_data.read_array("../../data/2D/cmp_L_dependence/L4_0.90_3_quantities.dat", Quans))
+Files.append(read_data.read_array("../../data/2D/cmp_L_dependence/L4_0.90_4_quantities.dat", Quans))
+Files.append(read_data.read_array("../../data/2D/cmp_L_dependence/L4_0.90_5_quantities.dat", Quans))
+Files.append(read_data.read_array("../../data/2D/cmp_L_dependence/L4_0.90_6_quantities.dat", Quans))
 
 
 fig = plt.figure()
@@ -63,8 +60,6 @@ ax = plt.subplot(111)
     #ax.errorbar(0.002, Chi_8_pi, marker='*', yerr=0.0006, label="L=8, beta=0.90, Path Integral")
 #ax.set_xlim(0.0, 1.0)
 
-#ax.errorbar(1.00, Files[12]["Chi"][0][0][0].real, marker='*', label="L=8, beta=0.90, bold")
-
 ################ Beta=0.50 ##########################
 #Path=[]
 #Path.append(0.716597008080860) 
@@ -74,11 +69,11 @@ ax = plt.subplot(111)
 
 ############### Beta=0.90 ##########################
 
-#Path=[]
-#Path.append(0.645719404315138)
-#Path.append(-0.162600433543508)
-#Path.append(7.879834033016384E-002) 
-#Path.append(-0.162600433543508)
+Path=[]
+Path.append(0.645719404315138)
+Path.append(-0.162600433543508)
+Path.append(7.879834033016384E-002) 
+Path.append(-0.162600433543508)
 
 #Path=[]
 #Path.append(0.65090)
@@ -92,9 +87,9 @@ ax = plt.subplot(111)
 
 for key in Quans:
     for i in range(len(Files)):
-        ax.plot(r, Files[i][key][0].real, 'o', label=key+" Order"+str(i+1))
+        ax.plot(Lx, Files[i][key][0][0].real, 'o', label=key+" Order"+str(i+1))
 
-#ax.plot(Lx, Path, marker='*', label="Path")
+ax.plot(Lx, Path, marker='*', label="Path")
 
 ax.legend()
 
@@ -105,7 +100,7 @@ ax.legend()
 plt.xlabel("dr")
 plt.ylabel("Chi(dr)")
 
-#plt.savefig("Chi_dr_L4.pdf")
-plt.savefig("Chi_dr_L8.pdf")
-#plt.savefig("Chi_0_0.pdf")
+plt.savefig("Beta0.9_L4_Chi_dr.pdf")
+#plt.savefig("Beta0.9_L8_Chi_dr.pdf")
+#plt.savefig("Beta0.9_dr0_Chi_N.pdf")
 plt.show()

@@ -26,7 +26,7 @@ mc_dict={
     "IsLoad" : False,
     "Reweight" : [1.0],
     "ReadFile" : "null",
-    "Sample" : 5000000,
+    "Sample" : 10000000,
     "Sweep" : 10,
     "Toss" : 10000,
     "Worm/Norm" : 0.5 
