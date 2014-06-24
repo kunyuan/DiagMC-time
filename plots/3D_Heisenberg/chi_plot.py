@@ -22,7 +22,9 @@ Quans=["Chi"]
 
 Files=[]
 
-Files.append(read_data.read_array("../../project/0.50_quantities.dat", Quans))
+Files.append(read_data.read_array("../../data/3D/bare_L4_0.50_1_quantities.dat", Quans))
+Files.append(read_data.read_array("../../data/3D/bare_L4_0.50_2_quantities.dat", Quans))
+Files.append(read_data.read_array("../../data/3D/bare_L4_0.50_3_quantities.dat", Quans))
 
 fig = plt.figure()
 ax = plt.subplot(111)
