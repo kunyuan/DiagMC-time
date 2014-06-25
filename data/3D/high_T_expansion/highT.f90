@@ -23,9 +23,9 @@ PROGRAM Main
     do i = 0, tmpOrder
       stChi = stChi + 3.d0*a(i)*beta**i
     enddo
-    print *, Order, ": ", stChi
+    print *, tmpOrder, ": ", stChi
   enddo
-  print *, "final: ", stChi
+  print *, "final: ", stChi 
 
 
 END PROGRAM
