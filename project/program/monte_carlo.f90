@@ -281,23 +281,7 @@ SUBROUTINE markov(IsToss)
         mc_version = file_version
       endif
 
-      call LogFile%WriteStamp()
-      call LogFile%WriteLine("Reweighting order of diagrams...")
-
-      x = SUM(GamWormOrder(:))
-      CoefOfWeight(:)=TimeRatio(:)*CoefOfWeight(:)*x/(GamWormOrder(:)+50.d0)
-      CoefOfWeight(1:MCOrder) = CoefOfWeight(1:MCOrder)/CoefOfWeight(0)
-      CoefOfWeight(0) = 1.d0
-
-      call LogFile%WriteLine("Reweight Ratios:")
-
-      do i=0,MCOrder
-        call LogFile%WriteLine('Order'+str(i)+' :'+str(CoefOfWeight(i)))
-        call LogFile%WriteLine('     worm: '+str(GamWormOrder(i)))
-        call LogFile%WriteLine('     phycical: '+str(GamOrder(i)))
-      enddo
-
-      call LogFile%WriteLine("Reweighting is done!")
+      call recalculate_Reweighting
 
       if(iblck <= 10) then
         GamWormOrder=0.d0
@@ -326,6 +310,40 @@ SUBROUTINE markov(IsToss)
   enddo
 END SUBROUTINE markov
 
+SUBROUTINE recalculate_Reweighting
+  implicit none
+  integer :: i
+  double precision :: x
+  
+  call LogFile%WriteStamp()
+  call LogFile%WriteLine("Reweighting order of diagrams...")
+
+  !------ if the errorbar is too big, just don't reweight ----
+  do i = 0, MCOrder
+    if(Error(i)*Norm(i)/Quan(i)>MxError) then
+      call LogFile%WriteLine("Error bar too large! Order "+str(i)+" err: "+ &
+        & str(Error(i)*Norm(i)/Quan(i)))
+      call LogFile%WriteLine("Reweighting is done!")
+      return
+    endif
+  enddo
+
+  x = SUM(GamWormOrder(:))
+  CoefOfWeight(:)=TimeRatio(:)*CoefOfWeight(:)*x/(GamWormOrder(:)+50.d0)
+  CoefOfWeight(1:MCOrder) = CoefOfWeight(1:MCOrder)/CoefOfWeight(0)
+  CoefOfWeight(0) = 1.d0
+
+  call LogFile%WriteLine("Reweight Ratios:")
+
+  do i=0,MCOrder
+    call LogFile%WriteLine('Order'+str(i)+' :'+str(CoefOfWeight(i)))
+    call LogFile%WriteLine('     worm: '+str(GamWormOrder(i)))
+    call LogFile%WriteLine('     phycical: '+str(GamOrder(i)))
+  enddo
+
+  call LogFile%WriteLine("Reweighting is done!")
+  return
+END SUBROUTINE
 
 !====================================================================
 !============================== UPDATES =============================

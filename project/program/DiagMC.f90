@@ -202,7 +202,7 @@ SUBROUTINE just_output
   !!-------- update the Gamma matrix with MC data -------
   call Gam_mc2matrix_mc
 
-  flag = self_consistent_GW(1.d-8)
+  flag = self_consistent_GW(1.d-6)
 
   call calculate_Chi
   call transfer_Chi_r(-1)
@@ -220,7 +220,7 @@ SUBROUTINE self_consistent
   !------- read the G, W, and Gamma  -------------------
   if(IsLoad==.false.) then
 
-    flag = self_consistent_GW(1.d-8)
+    flag = self_consistent_GW(1.d-6)
 
     call calculate_Chi
     call transfer_Chi_r(-1)
@@ -245,7 +245,7 @@ SUBROUTINE self_consistent
     !!-------- update the Gamma matrix with MC data -------
     call Gam_mc2matrix_mc
 
-    flag = self_consistent_GW(1.d-8)
+    flag = self_consistent_GW(1.d-6)
 
     call calculate_Chi
     call transfer_Chi_r(-1)
@@ -284,7 +284,7 @@ LOGICAL FUNCTION self_consistent_GW(err)
   call calculate_W
 
   do while(abs(real(WNow)-real(WOld))>err) 
-    if(iloop>=200)  exit
+    !if(iloop>=100)  exit
 
     WOld = WNow
     iloop = iloop + 1
