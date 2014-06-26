@@ -279,9 +279,11 @@ SUBROUTINE markov(IsToss)
         call check_config
         call print_config
         mc_version = file_version
+
+        !!!!!!!! test 
+        call recalculate_Reweighting
       endif
 
-      call recalculate_Reweighting
 
       if(iblck <= 10) then
         GamWormOrder=0.d0
