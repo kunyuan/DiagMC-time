@@ -101,17 +101,25 @@ Complex*16 FUNCTION weight_W0(typ, site)
   integer, intent(in) :: site, typ
   double precision :: ratio
 
-  ratio = Jcp
-
   weight_W0 = (0.d0, 0.d0)
 
-  if(is_W0_nonzero(D, site)) then
+  if(is_W0_nonzero(D, site)==1) then
     if(typ ==1 .or. typ == 2) then
-      weight_W0 = dcmplx(0.25d0*ratio, 0.d0)
+      weight_W0 = dcmplx(0.25d0, 0.d0)
     else if(typ == 3 .or. typ == 4) then
-      weight_W0 = dcmplx(-0.25d0*ratio, 0.d0)
+      weight_W0 = dcmplx(-0.25d0, 0.d0)
     else if(typ == 5 .or. typ == 6) then
-      weight_W0 = dcmplx(0.5d0*ratio, 0.d0)
+      weight_W0 = dcmplx(0.5d0, 0.d0)
+    endif
+  endif
+
+  if(Is_J1J2 .and. is_W0_nonzero(D, site)==2) then
+    if(typ ==1 .or. typ == 2) then
+      weight_W0 = dcmplx(0.25d0*Jcp, 0.d0)
+    else if(typ == 3 .or. typ == 4) then
+      weight_W0 = dcmplx(-0.25d0*Jcp, 0.d0)
+    else if(typ == 5 .or. typ == 6) then
+      weight_W0 = dcmplx(0.5d0*Jcp, 0.d0)
     endif
   endif
 

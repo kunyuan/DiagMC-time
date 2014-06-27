@@ -13,7 +13,8 @@ END SUBROUTINE def_symmetry
 
 
 !!------------- definition of W0 function ----------------
-Logical Function is_W0_nonzero(dims, site)
+!!! return 0, 1, 2 (0: W0=0; 1: nearest neighbor; 2: next nearest neighbor)
+Integer Function is_W0_nonzero(dims, site)
   implicit none
   integer, intent(in) :: dims, site
   integer, allocatable :: cord(:)
@@ -22,42 +23,54 @@ Logical Function is_W0_nonzero(dims, site)
   allocate(cord(1:dims))
   cord = get_cord_from_site(D, site)
   
-  !========2-d Heisenberg ============
-  !dx = cord(1)
-  !dy = cord(2)
-  !is_W0_nonzero = .false.
-  !if(dx>=0  .and. dx<L(1) .and. dy>=0 .and. dy<L(2)) then
-    !if(dx>dL(1))     dx = L(1)-dx
-    !if(dy>dL(2))     dy = L(2)-dy
-    !cord = (/dx, dy/)
-  !else
-    !call logFile%QuickLog("Weight_W dx, dy bigger than system size!")
-    !stop
-  !endif
+  if(D==2) then
+    dx = cord(1)
+    dy = cord(2)
+    is_W0_nonzero = 0
+    if(dx>=0  .and. dx<L(1) .and. dy>=0 .and. dy<L(2)) then
+      if(dx>dL(1))     dx = L(1)-dx
+      if(dy>dL(2))     dy = L(2)-dy
+      cord = (/dx, dy/)
+    else
+      call logFile%QuickLog("Weight_W dx, dy bigger than system size!")
+      stop
+    endif
 
-  !if(cord(1)==1 .and. cord(2)==0) is_W0_nonzero = .true.
-  !if(cord(1)==0 .and. cord(2)==1) is_W0_nonzero = .true.
+    if(cord(1)==1 .and. cord(2)==0) is_W0_nonzero = 1
+    if(cord(1)==0 .and. cord(2)==1) is_W0_nonzero = 1
 
-  !========3-d Heisenberg ============
-  dx = cord(1)
-  dy = cord(2)
-  dz = cord(3)
-  is_W0_nonzero = .false.
+    if(Is_J1J2) then
+      if(cord(1)==1 .and. cord(2)==1) is_W0_nonzero = 2
+    endif
+  else if(D==3) then
 
-  if(dx>=0  .and. dx<L(1) .and. dy>=0 .and. dy<L(2) .and. dz>=0 .and. dz<L(3)) then
+    dx = cord(1)
+    dy = cord(2)
+    dz = cord(3)
+    is_W0_nonzero = 0
 
-    if(dx>dL(1))     dx = L(1)-dx
-    if(dy>dL(2))     dy = L(2)-dy
-    if(dz>dL(3))     dz = L(3)-dz
-    cord = (/dx, dy, dz/)
-  else
-    call logFile%QuickLog("Weight_W dx, dy, dz bigger than system size!")
-    stop
+    if(dx>=0  .and. dx<L(1) .and. dy>=0 .and. dy<L(2) .and. dz>=0 .and. dz<L(3)) then
+
+      if(dx>dL(1))     dx = L(1)-dx
+      if(dy>dL(2))     dy = L(2)-dy
+      if(dz>dL(3))     dz = L(3)-dz
+      cord = (/dx, dy, dz/)
+    else
+      call logFile%QuickLog("Weight_W dx, dy, dz bigger than system size!")
+      stop
+    endif
+
+    if(cord(1)==1 .and. cord(2)==0 .and. cord(3)==0) is_W0_nonzero = 1
+    if(cord(1)==0 .and. cord(2)==1 .and. cord(3)==0) is_W0_nonzero = 1
+    if(cord(1)==0 .and. cord(2)==0 .and. cord(3)==1) is_W0_nonzero = 1
+
+    if(Is_J1J2) then
+      !========3-d J1-J2 ============
+      if(cord(1)==1 .and. cord(2)==1 .and. cord(3)==0) is_W0_nonzero = 2
+      if(cord(1)==0 .and. cord(2)==1 .and. cord(3)==1) is_W0_nonzero = 2
+      if(cord(1)==1 .and. cord(2)==0 .and. cord(3)==1) is_W0_nonzero = 2
+    endif
   endif
-
-  if(cord(1)==1 .and. cord(2)==0 .and. cord(3)==0) is_W0_nonzero = .true.
-  if(cord(1)==0 .and. cord(2)==1 .and. cord(3)==0) is_W0_nonzero = .true.
-  if(cord(1)==0 .and. cord(2)==0 .and. cord(3)==1) is_W0_nonzero = .true.
   return
 END FUNCTION is_W0_nonzero
 
@@ -71,43 +84,47 @@ Logical Function is_Gam0_nonzero(dims, site)
   allocate(cord(1:dims))
   cord = get_cord_from_site(D, site)
 
-  !========2-d Heisenberg ============
-  !dx = cord(1)
-  !dy = cord(2)
-  !is_Gam0_nonzero = .false.
+  if(D==2) then
+    !========2-d ============
+    dx = cord(1)
+    dy = cord(2)
+    is_Gam0_nonzero = .false.
 
-  !if(dx>=0  .and. dx<L(1) .and. dy>=0 .and. dy<L(2)) then
+    if(dx>=0  .and. dx<L(1) .and. dy>=0 .and. dy<L(2)) then
 
-    !if(dx>dL(1))     dx = L(1)-dx
-    !if(dy>dL(2))     dy = L(2)-dy
-    !cord = (/dx, dy/)
-  !else
-    !call logFile%QuickLog("Weight_Gam dx, dy bigger than system size!")
-    !stop
-  !endif
-  !if(cord(1)==0 .and. cord(2)==0) then
-    !is_Gam0_nonzero = .true.
-  !endif
+      if(dx>dL(1))     dx = L(1)-dx
+      if(dy>dL(2))     dy = L(2)-dy
+      cord = (/dx, dy/)
+    else
+      call logFile%QuickLog("Weight_Gam dx, dy bigger than system size!")
+      stop
+    endif
+    if(cord(1)==0 .and. cord(2)==0) then
+      is_Gam0_nonzero = .true.
+    endif
 
-  !========3-d Heisenberg ============
-  dx = cord(1)
-  dy = cord(2)
-  dz = cord(3)
-  is_Gam0_nonzero = .false.
-
-  if(dx>=0  .and. dx<L(1) .and. dy>=0 .and. dy<L(2) .and. dz>=0 .and. dz<L(3)) then
-
-    if(dx>dL(1))     dx = L(1)-dx
-    if(dy>dL(2))     dy = L(2)-dy
-    if(dz>dL(3))     dz = L(3)-dz
-    cord = (/dx, dy, dz/)
   else
-    call logFile%QuickLog("Weight_Gam dx, dy, dz bigger than system size!")
-    stop
-  endif
 
-  if(cord(1)==0 .and. cord(2)==0 .and. cord(3)==0) then
-    is_Gam0_nonzero = .true.
+    !========3-d ============
+    dx = cord(1)
+    dy = cord(2)
+    dz = cord(3)
+    is_Gam0_nonzero = .false.
+
+    if(dx>=0  .and. dx<L(1) .and. dy>=0 .and. dy<L(2) .and. dz>=0 .and. dz<L(3)) then
+
+      if(dx>dL(1))     dx = L(1)-dx
+      if(dy>dL(2))     dy = L(2)-dy
+      if(dz>dL(3))     dz = L(3)-dz
+      cord = (/dx, dy, dz/)
+    else
+      call logFile%QuickLog("Weight_Gam dx, dy, dz bigger than system size!")
+      stop
+    endif
+
+    if(cord(1)==0 .and. cord(2)==0 .and. cord(3)==0) then
+      is_Gam0_nonzero = .true.
+    endif
   endif
 
   return
