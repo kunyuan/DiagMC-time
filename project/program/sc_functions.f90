@@ -51,6 +51,8 @@ SUBROUTINE decompose_matrix(Ntyp, Lx, Ly, Lz,Nleft, Mat1D, Mat)
   return
 END SUBROUTINE decompose_matrix
 
+
+
 !======= combine a matrix from D-dimensional matrix to 1-d matrix ==============
 SUBROUTINE combine_matrix(Ntyp, Lx, Ly, Lz, Nleft, Mat, Mat1D)
   implicit none
@@ -68,6 +70,8 @@ SUBROUTINE combine_matrix(Ntyp, Lx, Ly, Lz, Nleft, Mat, Mat1D)
   enddo
   return
 END SUBROUTINE combine_matrix
+
+
 
 
 !!======================== WEIGHT EXTRACTING =========================
