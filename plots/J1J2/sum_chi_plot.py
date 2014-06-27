@@ -36,9 +36,6 @@ SUMChi=[]
 SUMChi.append(read_data.read_array("../../data/J1J2/L8_0.50_0.50_1_quantities.dat", Quans))
 SUMChi.append(read_data.read_array("../../data/J1J2/L8_0.50_0.50_2_quantities.dat", Quans))
 SUMChi.append(read_data.read_array("../../data/J1J2/L8_0.50_0.50_3_quantities.dat", Quans))
-#SUMChi.append(read_data.read_array("../../data/J1J2/L8_0.50_0.50_4_quantities.dat", Quans))
-SUMChi.append(read_data.read_array("../../data/J1J2/L8_0.50_0.50_5_quantities.dat", Quans))
-SUMChi.append(read_data.read_array("../../data/J1J2/L8_0.50_0.50_6_quantities.dat", Quans))
 
 Order=np.arange(1, len(SUMChi)+1)
 ChiL8=[]
