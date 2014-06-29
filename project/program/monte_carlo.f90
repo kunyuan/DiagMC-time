@@ -280,7 +280,6 @@ SUBROUTINE markov(IsToss)
         call print_config
         mc_version = file_version
 
-        !!!!!!!! test 
         call recalculate_Reweighting
       endif
 

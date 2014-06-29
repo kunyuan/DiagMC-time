@@ -384,6 +384,7 @@ SUBROUTINE monte_carlo
 
     call read_monte_carlo_conf
     call LogFile%QuickLog("Read the previous MC conf Done!...")
+
     call read_monte_carlo_data
     call LogFile%QuickLog("Read the previous MC data Done!...")
 
