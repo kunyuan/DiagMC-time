@@ -26,9 +26,9 @@ Quan=Quan2D+Quan1D
 DiagGamma=[]
 #DiagGamma.append(read_data.read_array("../../data/3D/bare_L4_0.50_1_quantities.dat", Quan))
 #DiagGamma.append(read_data.read_array("../../data/3D/bare_L4_0.50_2_quantities.dat", Quan))
-#DiagGamma.append(read_data.read_array("../../data/3D/bare_L4_0.50_3_quantities.dat", Quan))
+DiagGamma.append(read_data.read_array("../../data/3D/bare_L8_0.70_5_quantities.dat", Quan))
 #DiagGamma.append(read_data.read_array("../../data/3D/bare_L8_0.50_4_quantities.dat", Quan))
-DiagGamma.append(read_data.read_array("../../data/3D/bare_L8_0.50_5_quantities.dat", Quan))
+#DiagGamma.append(read_data.read_array("../../data/3D/bare_L8_0.50_5_quantities.dat", Quan))
 #DiagGamma.append(read_data.read_array("../../data/3D/bare_L8_0.50_6_quantities.dat", Quan))
 #DiagGamma.append(read_data.read_array("../../data/3D/bare_L4_0.70_4_quantities.dat", Quan))
 #DiagGamma.append(read_data.read_array("../../data/3D/bare_L8_0.70_4_quantities.dat", Quan))

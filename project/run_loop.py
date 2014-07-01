@@ -24,6 +24,8 @@ def run_loop(infile):
     while True:
         i += 1
         logging.info("Loop "+str(i)+" running...")
+        os.system("rm read_list.dat")
+        os.system("cat readfile/*.dat >>read_list.dat")
         try:
             proc = subprocess.Popen(homedir+"/collapse_data.exe")
             exitcode = proc.wait()

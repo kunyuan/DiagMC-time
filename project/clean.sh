@@ -7,9 +7,13 @@ rm infile/*
 rm outfile/*
 rm logfile.log
 rm all_input.log
+rm readfile/*
 rm read_list.dat
 rm -r graph
 rm *.o
 rm *.dwarf
 rm loop_prof_*
 rm out*.txt
+
+rm loop.inp
+echo '0'>>loop.inp

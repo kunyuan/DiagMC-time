@@ -4,13 +4,45 @@
 !!------------- definition of the lattice and type symmetry ----------------
 SUBROUTINE def_symmetry
   implicit none
-  integer :: i, j, omega
+  integer :: dr, dt1, dt2
 
-  CoefOfSymmetry(:) = 2.d0   !typ 1,2; 3,4; 5,6
+  CoefOfSymmetry(:, :, :) = 2.d0   !typ 1,2; 3,4; 5,6
+  if(dr/=0 .or. dr/=get_site_from_cord(D,L(1:D)/2)) then
+    CoefOfSymmetry(dr, :, :) = CoefOfSymmetry(dr,:,:)*2.d0
+  endif
+  if(dt1/=0 .or. dt1/=MxT/2) then
+    CoefOfSymmetry(:, dt1, :) = CoefOfSymmetry(:,dt1,:)*2.d0
+  endif
+  if(dt2/=0 .or. dt2/=MxT/2) then
+    CoefOfSymmetry(:, :, dt2) = CoefOfSymmetry(:,:,dt2)*2.d0
+  endif
 
   return
 END SUBROUTINE def_symmetry
 
+Integer Function fold_r(dims, site)
+  implicit none 
+  integer, intent(in) :: dims, site
+  integer :: dr(1:dims)
+  integer :: drf(1:dims)
+  integer :: i
+
+  dr = get_cord_from_site(dims, site)
+  drf(1:dims) = dr(1:dims)
+  do i = 1, dims
+    if(dr(i)>L(i)/2) drf(i) = L(i)-dr(i)
+  enddo
+  fold_r = get_fold_site_from_cord(dims, drf)
+  return
+END FUNCTION fold_r
+
+Integer Function fold_tau(tau)
+  implicit none 
+  integer, intent(in) :: tau
+  fold_tau = tau
+  if(tau>MxT/2) fold_tau = MxT-tau
+  return
+END FUNCTION fold_tau
 
 !!------------- definition of W0 function ----------------
 !!! return 0, 1, 2 (0: W0=0; 1: nearest neighbor; 2: next nearest neighbor)

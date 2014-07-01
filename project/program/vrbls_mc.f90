@@ -59,8 +59,9 @@ MODULE vrbls_mc
 
   !======================== Input parameter ==============================
   integer          ::  L(3), Vol, dVol(3)         ! System size
-  double precision ::  logL(3)
   integer          ::  dL(3)
+  integer          ::  VolFold, dVolFold(3)       ! System size(fold into a smaller piece)
+  double precision ::  logL(3)
   double precision ::  Jcp                        ! interaction
   double precision ::  Mu(2)                      ! Chem. potential for spin down & up
   double precision ::  Beta                       ! inverse temperature
@@ -155,7 +156,7 @@ MODULE vrbls_mc
   double precision :: WeightCurrent            ! the current weight of the configuration
   double precision :: CoefOfWorm
   double precision :: CoefOfWeight(0:MxOrder)  ! the coeffecients for different orders and worm section
-  double precision :: CoefOfSymmetry(0:MxVol)
+  double precision :: CoefOfSymmetry(0:MxVol, 0:MxT-1, 0:MxT-1)
   double precision :: SpatialWeight(1:D,0:MxL(1))  ! 1, fox x direction 2, for y direction, ...
                                                  !!! attention: dx,dy=0~L!!!!
 

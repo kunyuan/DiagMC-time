@@ -1,4 +1,19 @@
 
+!!====== transfer to a D-dimensional coordinates from a 1-d array =============
+function get_cord_from_site(dims, site)
+  implicit none
+  integer, intent(in) :: dims, site
+  integer, dimension(dims) :: get_cord_from_site
+  integer :: i, tmp
+
+  tmp = site
+  do i = dims, 1, -1
+    get_cord_from_site(i) =  tmp/dVol(i)
+    tmp = tmp - get_cord_from_site(i)*dVol(i)
+  enddo
+  return
+END FUNCTION get_cord_from_site
+
 !!====== transfer a D-dimensional space into a 1-d array =============
 integer function get_site_from_cord(dims, cord)
   implicit none
@@ -15,19 +30,33 @@ END FUNCTION get_site_from_cord
 
 
 !!====== transfer to a D-dimensional coordinates from a 1-d array =============
-function get_cord_from_site(dims, site)
+function get_fold_cord_from_site(dims, site)
   implicit none
   integer, intent(in) :: dims, site
-  integer, dimension(dims) :: get_cord_from_site
+  integer, dimension(dims) :: get_fold_cord_from_site
   integer :: i, tmp
 
   tmp = site
   do i = dims, 1, -1
-    get_cord_from_site(i) =  tmp/dVol(i)
-    tmp = tmp - get_cord_from_site(i)*dVol(i)
+    get_fold_cord_from_site(i) =  tmp/dVolFold(i)
+    tmp = tmp - get_fold_cord_from_site(i)*dVolFold(i)
   enddo
   return
-END FUNCTION get_cord_from_site
+END FUNCTION get_fold_cord_from_site
+
+!!====== transfer a D-dimensional space into a 1-d array =============
+integer function get_fold_site_from_cord(dims, cord)
+  implicit none
+  integer :: dims
+  integer, dimension(dims) :: cord
+  integer :: i, j
+
+  get_fold_site_from_cord = 0
+  do i = 1, dims
+    get_fold_site_from_cord = get_fold_site_from_cord + cord(i)*dVolFold(i)
+  enddo
+  return
+END FUNCTION get_fold_site_from_cord
 
 !======= decompose a matrix from 1d array to D-dimensional matrix ==============
 SUBROUTINE decompose_matrix(Ntyp, Lx, Ly, Lz,Nleft, Mat1D, Mat)
