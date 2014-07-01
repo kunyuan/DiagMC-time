@@ -8,6 +8,7 @@ PROGRAM MAIN
   integer :: it, i, ISub,ID, ios
   logical :: IsLoad
   character(len=128) :: infile
+  logical :: FEXIST
 
   call get_command_argument(1,infile)
   if(len_trim(infile)==0) then
@@ -69,13 +70,20 @@ PROGRAM MAIN
 
   !================== space variables ==================================
   Vol = 1.d0
+  VolFold = 1.d0
+
   do i = 1, D
     dVol(i) = Vol
+    dVolFold(i) = VolFold
+
     Vol = Vol *L(i)
     dL(i) = Floor(L(i)/2.d0)
+    VolFold = VolFold *(dL(i)+1)
   enddo
+
   do i = D+1, 3
     dVol(i) = Vol
+    dVolFold(i) = VolFold
   enddo
 
   logL(:)=dlog(L(:)*1.d0)
@@ -116,13 +124,13 @@ PROGRAM MAIN
   allocate(Denom(0:Vol-1, 0:MxT-1))
   allocate(Chi(0:Vol-1, 0:MxT-1))
 
-  allocate(GamMC(0:MCOrder, 0:Vol-1, 0:MxT-1))
-  allocate(ReGamSqMC(0:MCOrder, 0:Vol-1, 0:MxT-1))
-  allocate(ImGamSqMC(0:MCOrder, 0:Vol-1, 0:MxT-1))
+  allocate(GamMC(0:MCOrder, 0:VolFold-1, 0:MxT/2))
+  allocate(ReGamSqMC(0:MCOrder, 0:VolFold-1, 0:MxT/2))
+  allocate(ImGamSqMC(0:MCOrder, 0:VolFold-1, 0:MxT/2))
 
-  allocate(GamBasis(0:MCOrder,1:NTypeGam/2, 0:Vol-1, 1:NbinGam, 1:NBasisGam))
-  allocate(ReGamSqBasis(0:MCOrder,1:NTypeGam/2, 0:Vol-1, 1:NbinGam, 1:NBasisGam))
-  allocate(ImGamSqBasis(0:MCOrder,1:NTypeGam/2, 0:Vol-1, 1:NbinGam, 1:NBasisGam))
+  allocate(GamBasis(0:MCOrder,1:NTypeGam/2, 0:VolFold-1, 1:NbinGam, 1:NBasisGam))
+  allocate(ReGamSqBasis(0:MCOrder,1:NTypeGam/2, 0:VolFold-1, 1:NbinGam, 1:NBasisGam))
+  allocate(ImGamSqBasis(0:MCOrder,1:NTypeGam/2, 0:VolFold-1, 1:NbinGam, 1:NBasisGam))
 
   MaxStat=1024
   allocate(ObsRecord(1:MaxStat,0:NObs-1))
@@ -146,12 +154,17 @@ PROGRAM MAIN
   if(ISub==1) then
     call self_consistent
   else if(ISub==2) then
-    ios=1
-    do while(ios/=0) 
-      open(10,access="append", iostat=ios, file="read_list.dat")
-      write(10, *) trim(adjustl(title_mc))//"_monte_carlo_data.bin.dat"
-      close(10)
-    enddo
+
+    INQUIRE(DIRECTORY="readfile",EXIST=FEXIST)
+    IF(.not.FEXIST) THEN
+      call system("mkdir readfile")
+    ENDIF
+
+    open(10,access="append", iostat=ios, file="readfile/"+trim(adjustl(title2))+".dat")
+    write(10, *) trim(adjustl(title_mc))//"_monte_carlo_data.bin.dat"
+    close(10)
+    if(ios/=0) call LogFile%QuickLog("readfile iostat nonzero!",'e')
+
     call monte_carlo
   else if(ISub==3) then
     call numerical_integeration
@@ -181,7 +194,7 @@ INCLUDE "check_conf.f90"
 subroutine numerical_integeration
   implicit none
   call LogFile%QuickLog("Reading G,W, and Gamma...")
-  call read_GWGamma
+  call read_GW
 
   call calculate_Gam1
 end subroutine
@@ -191,8 +204,7 @@ SUBROUTINE just_output
   logical :: flag
   call LogFile%QuickLog("Just output something!")
   call LogFile%QuickLog("Reading G,W, and Gamma...")
-  call read_GWGamma
-
+  call read_GW
 
   call LogFile%QuickLog("Reading MC data...")
   call read_monte_carlo_data
@@ -229,13 +241,12 @@ SUBROUTINE self_consistent
 
     call output_Quantities
 
-    call write_GWGamma
+    call write_GW
     !!!======================================================================
   else if(IsLoad) then
 
-    call LogFile%QuickLog("Reading G,W, and Gamma...")
-    call read_GWGamma
-
+    call LogFile%QuickLog("Reading old G,W...")
+    call read_GW
 
     call LogFile%QuickLog("Reading MC data...")
     call read_monte_carlo_data
@@ -248,6 +259,7 @@ SUBROUTINE self_consistent
     flag = self_consistent_GW(1.d-6)
 
     call calculate_Chi
+
     call transfer_Chi_r(-1)
     call transfer_Chi_t(-1)
     call transfer_Sigma_t(-1)
@@ -255,7 +267,7 @@ SUBROUTINE self_consistent
     call output_Quantities
 
     call update_flag
-    call write_GWGamma
+    call write_GW
   endif
   return
 END SUBROUTINE self_consistent
@@ -319,7 +331,7 @@ SUBROUTINE monte_carlo
   double precision :: WR, GamR
 
   call LogFile%QuickLog("Initializing monte carlo...")
-  call read_GWGamma
+  call read_GW
 
   call calculate_GamNormWeight
 
@@ -332,6 +344,8 @@ SUBROUTINE monte_carlo
   enddo
 
   if(IsLoad==.false.) then
+
+    call initialize_Gam
 
     call LogFile%QuickLog("Start Thermalization ...")
 
@@ -380,18 +394,12 @@ SUBROUTINE monte_carlo
   else if(IsLoad) then
 
     !------- read the configuration and MC data from previous simulation --
-    call LogFile%QuickLog("Reading the previous MC ...")
-
-    call read_monte_carlo_conf
-    call LogFile%QuickLog("Read the previous MC conf Done!...")
-
-    call read_monte_carlo_data
-    call LogFile%QuickLog("Read the previous MC data Done!...")
-
     call LogFile%QuickLog(str(mc_version)+', '+str(file_version))
     call LogFile%QuickLog("Updating G, W, and Gamma...")
 
-    call read_GWGamma
+    call read_Gamma 
+    call read_GW
+
     call output_Quantities
     call update_WeightCurrent
 
@@ -460,13 +468,10 @@ SUBROUTINE test_subroutine
     !call initialize_markov
     !call print_config
 
-    !======== analytic_integration =========================
-    !call read_GWGamma
-    !call calculate_Gam1
-    !call output_Gam1
-
     !======== check the value in Gamma matrix ==============
-    call read_GWGamma
+    call read_GW
+    call read_Gamma
+
     do it2 = 0, MxT-1
       do it1 = 0, MxT-1
         do ir = 0, Vol-1

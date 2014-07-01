@@ -281,7 +281,7 @@ END SUBROUTINE plus_minus_Gam0
  
 SUBROUTINE Gam_mc2matrix_mc
   implicit none
-  integer :: iorder, dr, ityp, iloop, it1, it2, typ
+  integer :: iorder, dr, ityp, iloop, it1, it2, typ, drr, itt1, itt2
   integer :: ibin, ibasis
   complex*16 :: cgam, normal
   logical :: flag(MxOrder)
@@ -301,7 +301,7 @@ SUBROUTINE Gam_mc2matrix_mc
   looporder: do iorder = 1, MCOrder
     totrerr = 0.d0
     totierr = 0.d0
-    do it1 = 0, MxT-1
+    do it1 = 0, MxT/2
       rgam = real(GamMC(iorder, 0, it1))/Z_normal
       rgam2 = ReGamSqMC(iorder, 0, it1)/Z_normal
 
@@ -343,13 +343,17 @@ SUBROUTINE Gam_mc2matrix_mc
 
 
     if(flag(iorder)) then
-      do it2 = 0, MxT-1
-        do it1 = 0, MxT-1
+      do itt2 = 0, MxT-1
+        do itt1 = 0, MxT-1
+          it1 = fold_tau(itt1)
+          it2 = fold_tau(itt2)
+
           tau1 = dble(it1)*Beta/dble(MxT)
           tau2 = dble(it2)*Beta/dble(MxT)
           ibin = get_bin_Gam(it1, it2)
 
-          do dr = 0, Vol-1
+          do drr = 0, Vol-1
+            dr = fold_r(D, drr)
             do ityp = 1, NTypeGam/2
               typ = 2*(ityp-1)+1
 

@@ -274,8 +274,7 @@ SUBROUTINE markov(IsToss)
         call LogFile%QuickLog(str(mc_version)+', '+str(file_version))
         call LogFile%QuickLog("Updating G, W, and Gamma...")
 
-        call read_GWGamma
-        call update_WeightCurrent
+        call read_GW
         call check_config
         call print_config
         mc_version = file_version
@@ -2635,10 +2634,10 @@ SUBROUTINE measure
       ityp = 3
     endif
 
-    !----- find the space and time variables for Gamma -------
+    !----- find the space and time variables for gamma -------
     rg = GRVertex(MeasureGam)
     rw = WRVertex(NeighLn(3-dir, MeaW))
-    dr = diff_r(D, rg, rw)
+    dr = fold_r(D, diff_r(D, rg, rw))
 
     tau1 = TVertex(1, NeighLn(1, MeaGout))
     tau2 = TVertex(2, NeighLn(2, MeaGin))
@@ -2657,30 +2656,40 @@ SUBROUTINE measure
       factorM = factorM * (-1.d0)
     endif
 
-    dt1 = Floor(dtau1*MxT/Beta)
-    dt2 = Floor(dtau2*MxT/Beta)
-    factorM = factorM *CoefOfSymmetry(dr)* CoefOfWeight(Order) *abs(WeightVertex(MeasureGam))
+    dt1 = fold_tau(Floor(dtau1*MxT/Beta))
+    dt2 = fold_tau(Floor(dtau2*MxT/Beta))
+
+    factorM = factorM * CoefOfWeight(Order) *abs(WeightVertex(MeasureGam))
+
+    !=============== The total contribution of each order ==========
+    Quan(Order) = Quan(Order) + real(Phase)/factorM
+    Norm(Order) = Norm(Order) + 1.d0
+    !================================================================
+
+    !==============  Error renormalization =========================
+    if(Order==1 .and. ityp==1 .and. dr==0) then
+      if(dt1==0 .and. dt2==0) then
+        Norm(MCOrder+1) = Norm(MCOrder+1) + 1.d0
+        Quan(MCOrder+1) = Quan(MCOrder+1) + real(Phase)/factorM
+      endif
+    endif
+    !================================================================
+
+    factorM = factorM *CoefOfSymmetry(dr, dt1, dt2)
 
     !================= accumulation ===================================
     if(Order==0 .and. IsDeltaVertex(NeighLn(3-dir, MeaW))==1) then
       GamNorm = GamNorm + Phase/CoefOfWeight(0)
     endif
 
-    !============ save the diagonal Gamma ================================
+    !============  the diagonal Gamma ================================
     if(dt1==dt2 .and. ityp==1) then
       GamMC(Order, dr,  dt1) = GamMC(Order, dr, dt1) + (Phase/factorM)
       ReGamSqMC(Order, dr, dt1) = ReGamSqMC(Order, dr, dt1) + (Real(Phase/factorM))**2.d0
       ImGamSqMC(Order, dr, dt1) = ImGamSqMC(Order, dr, dt1) + (dimag(Phase/factorM))**2.d0
     endif
 
-    !============ save Gamma in the fitting coeffecients =====================================
-    !flag = .false.
-    !if(dt1+dt2>MxT-1) then
-      !flag= .true.
-      !dt1 = MxT-1-dt1
-      !dt2 = MxT-1-dt2
-    !endif
-
+    !============  Gamma in the fitting coeffecients =====================================
     ibin = get_bin_Gam(dt1, dt2)
 
     if(IsBasis2D(ibin)) then
@@ -2709,19 +2718,6 @@ SUBROUTINE measure
           & ibasis) + (dimag(Phase)/factorM)**2.d0*wbasis
       enddo
     endif
-
-    Quan(Order) = Quan(Order) + real(Phase)/factorM
-    Norm(Order) = Norm(Order) + 1.d0
-    !print *, Order, Quan(Order), Norm(Order)
-
-    !==============  Error renormalization =========================
-    if(Order==1 .and. ityp==1 .and. dr==0) then
-      if(dt1==0 .and. dt2==0) then
-        Norm(MCOrder+1) = Norm(MCOrder+1)+1.d0
-        Quan(MCOrder+1) = Quan(MCOrder+1) + real(Phase)/factorM
-      endif
-    endif
-    !================================================================
 
     !===============  test variables =================================
     sumt = 0

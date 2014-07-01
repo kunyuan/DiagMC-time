@@ -3,13 +3,12 @@
 !!================================================================
 
 
-SUBROUTINE read_GWGamma
+SUBROUTINE read_GW
   implicit none
   integer :: isite, ityp, it1, it2, ios
   logical :: alive
   complex*16, allocatable :: Gtmp(:,:)
   complex*16, allocatable :: Wtmp(:,:,:)
-  complex*16, allocatable :: Gamtmp(:,:,:,:)
 
   inquire(file=trim(title_loop)//"_G_file.dat",exist=alive)
   if(.not. alive) then
@@ -21,19 +20,12 @@ SUBROUTINE read_GWGamma
     call LogFile%QuickLog("There is no W file yet!",'e')
     stop -1
   endif
-  inquire(file=trim(title_loop)//"_Gamma_file.dat",exist=alive)
-  if(.not. alive) then
-    call LogFile%QuickLog("There is no Gamma file yet!",'e')
-    stop -1
-  endif
 
   allocate(Gtmp(1:NtypeG, 0:MxT-1))
   allocate(Wtmp(1:NtypeW, 0:Vol-1, 0:MxT-1))
-  allocate(Gamtmp(1:NtypeGam, 0:Vol-1, 0:MxT-1, 0:MxT-1))
 
   open(100, status="old", file=trim(title_loop)//"_G_file.dat")
   open(101, status="old", file=trim(title_loop)//"_W_file.dat")
-  open(102, status="old", file=trim(title_loop)//"_Gamma_file.dat")
 
   do it1 = 0, MxT-1
     do ityp = 1, NTypeG
@@ -49,43 +41,31 @@ SUBROUTINE read_GWGamma
     enddo
   enddo
 
-  do it2 = 0, MxT-1
-    do it1 = 0, MxT-1
-      do isite = 0, Vol-1
-        do ityp = 1, NTypeGam
-          read(102, *,iostat=ios) Gamtmp(ityp, isite, it1, it2)
-        enddo
-      enddo
-    enddo
-  enddo
-
   if(ISub==2) then
     if(ios/=0) then
-      call LogFile%QuickLog("Failed to read G,W or Gamma information!",'e')
+      call LogFile%QuickLog("Failed to read G,W information!",'e')
     else 
       G = Gtmp;         deallocate(Gtmp)
       W = Wtmp;         deallocate(Wtmp)
-      Gam = Gamtmp;     deallocate(Gamtmp)
+      call read_Gamma
       call update_WeightCurrent
       mc_version = file_version
     endif
   else 
     if(ios/=0) then
-      call LogFile%QuickLog("Failed to read G,W or Gamma information!",'e')
+      call LogFile%QuickLog("Failed to read G,W information!",'e')
       close(100)
       close(101)
-      close(102)
       stop -1
     endif
   endif
 
   close(100)
   close(101)
-  close(102)
   return
-END SUBROUTINE read_GWGamma
+END SUBROUTINE read_GW
 
-SUBROUTINE write_GWGamma
+SUBROUTINE write_GW
   implicit none
   integer :: ix, iy, isite, ityp
   integer :: it1, it2
@@ -93,7 +73,6 @@ SUBROUTINE write_GWGamma
 
   open(100, status="replace", file=trim(title_loop)//"_G_file.dat")
   open(101, status="replace", file=trim(title_loop)//"_W_file.dat")
-  open(102, status="replace", file=trim(title_loop)//"_Gamma_file.dat")
 
   do it1 = 0, MxT-1
     do ityp = 1, NTypeG
@@ -109,21 +88,10 @@ SUBROUTINE write_GWGamma
     enddo
   enddo
 
-  do it2 = 0, MxT-1
-    do it1 = 0, MxT-1
-      do isite = 0, Vol-1
-        do ityp = 1, NTypeGam
-          write(102, *) Gam(ityp, isite, it1, it2)
-        enddo
-      enddo
-    enddo
-  enddo
-
   close(100)
   close(101)
-  close(102)
   return
-END SUBROUTINE write_GWGamma
+END SUBROUTINE write_GW
 
 
 
@@ -134,7 +102,7 @@ END SUBROUTINE write_GWGamma
 
 SUBROUTINE output_Quantities
   implicit none
-  integer :: ityp, it1, it2, iorder
+  integer :: ityp, it1, it2, iorder, itt1, itt2
   integer :: dr(D), dx, dy, it, isite, ip, iomega
   complex*16 :: gam1
   double precision :: normal, ratio
@@ -168,7 +136,7 @@ SUBROUTINE output_Quantities
     write(104, *) "#tau1:", MxT
     write(104, *) "#Beta", Beta, "L", L(1), "Order", MCOrder
     do it1 = 0, MxT-1
-      write(104, *) real(GamMC(iorder,0,it1))*normal, dimag(GamMC(iorder,0,it1))*normal
+      write(104, *) real(GamMC(iorder,0,fold_tau(it1)))*normal, dimag(GamMC(iorder,0,fold_tau(it1)))*normal
     enddo
     write(104, *)
   enddo
@@ -177,8 +145,10 @@ SUBROUTINE output_Quantities
     write(104, *) "##################################Gamma",trim(adjustl(str(iorder)))
     write(104, *) "#tau1:", MxT, ",tau2:", MxT
     write(104, *) "#Beta", Beta, "L", L(1), "Order", MCOrder
-    do it2 = 0, MxT-1
-      do it1 = 0, MxT-1
+    do itt2 = 0, MxT-1
+      do itt1 = 0, MxT-1
+        it1 = fold_tau(itt1)
+        it2 = fold_tau(itt2)
         ibin = get_bin_Gam(it1, it2)
 
         tau1 = dble(it1)*Beta/dble(MxT)

@@ -463,8 +463,8 @@ SUBROUTINE write_monte_carlo_data
   write(104) Beta, MCOrder, L(1:D)
   write(104) imc, GamNorm, GamNormWeight
   write(104) Z_normal, ratioerr
-  do it1 = 0, MxT-1
-    do ir = 0, Vol-1
+  do it1 = 0, MxT/2
+    do ir = 0, VolFold-1
       do iorder = 0, MCOrder
         write(104)  GamMC(iorder, ir, it1)
         write(104)  ReGamSqMC(iorder, ir, it1)
@@ -475,7 +475,7 @@ SUBROUTINE write_monte_carlo_data
 
   do ibasis = 1, NBasisGam
     do ibin = 1, NbinGam
-      do ir = 0, Vol-1
+      do ir = 0, VolFold-1
         do ityp = 1, NtypeGam/2
           do iorder = 0, MCOrder
             write(104) GamBasis(iorder, ityp, ir, ibin, ibasis)
@@ -510,8 +510,8 @@ SUBROUTINE read_monte_carlo_data
   read(105,iostat=ios) imc, GamNorm, GamNormWeight
   read(105,iostat=ios) Z_normal, ratioerr
 
-  do it1 = 0, MxT-1
-    do ir = 0, Vol-1
+  do it1 = 0, MxT/2
+    do ir = 0, VolFold-1
       do iorder = 0, MCOrder
         read(105,iostat=ios)  GamMC(iorder, ir, it1)
         read(105,iostat=ios)  ReGamSqMC(iorder,  ir, it1)
@@ -522,7 +522,7 @@ SUBROUTINE read_monte_carlo_data
 
   do ibasis = 1, NBasisGam
     do ibin = 1, NbinGam
-      do ir = 0, Vol-1
+      do ir = 0, VolFold-1
         do ityp = 1, NtypeGam/2
           do iorder = 0, MCOrder
             read(105) GamBasis(iorder, ityp, ir, ibin, ibasis)
@@ -540,6 +540,29 @@ SUBROUTINE read_monte_carlo_data
     stop -1
   endif
 END SUBROUTINE read_monte_carlo_data
+
+
+SUBROUTINE read_Gamma
+  implicit none
+  logical :: alive
+
+  inquire(file=trim(title)//"_monte_carlo_data.bin.dat",exist=alive)
+  if(.not. alive) then
+    call LogFile%QuickLog("There is no monte carlo binary data yet!")
+
+    call initialize_Gam
+    call LogFile%QuickLog("Initialize the Gamma Done!")
+  else
+    call read_monte_carlo_data
+    call LogFile%QuickLog("Read the previous MC data Done!...")
+
+    call Gam_mc2matrix_mc
+    call LogFile%QuickLog("Tabulate the MC data Done!...")
+  endif
+
+END SUBROUTINE read_Gamma
+
+
 
 SUBROUTINE write_monte_carlo_conf
   implicit none
