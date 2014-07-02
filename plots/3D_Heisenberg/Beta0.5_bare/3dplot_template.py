@@ -14,7 +14,7 @@ N = 64
 
 #Quans = ["Gamma2"]
 #Quans = ["Gamma"]
-GamInt, dim_name = read_data.read_array("../project/0.90_Gam1.dat")["Gamma"]
+GamInt, dim_name = read_data.read_array("../../../project/0.50_quantities.dat")["Gamma"]
 #GamMC, dim_name = read_data.read_array("./../../data/conservation/bare_0.90_4_quantities.dat")["Gamma2"]
 #GamMC, dim_name = read_data.read_array("./1_loop/0.90_quantities.dat")["Gamma"]
 #GamMC = read_data.read_array("../0.90_quantities.dat", Quans)

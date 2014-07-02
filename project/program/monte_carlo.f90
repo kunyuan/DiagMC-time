@@ -2574,7 +2574,7 @@ SUBROUTINE measure
   integer :: spg, spw
   integer :: ityp, nloop
   integer :: MeaGin, MeaGout, MeaW, rg, rw, dir, typ
-  integer :: dr, dt1, dt2
+  integer :: dr, dt1, dt2, dtp1, dtp2
   integer :: dx, dy
   integer :: ikey, sumt, sumd
   double precision  :: factorM
@@ -2656,8 +2656,8 @@ SUBROUTINE measure
       factorM = factorM * (-1.d0)
     endif
 
-    dt1 = fold_tau(Floor(dtau1*MxT/Beta))
-    dt2 = fold_tau(Floor(dtau2*MxT/Beta))
+    dt1 = Floor(dtau1*MxT/Beta)
+    dt2 = Floor(dtau2*MxT/Beta)
 
     factorM = factorM * CoefOfWeight(Order) *abs(WeightVertex(MeasureGam))
 
@@ -2682,41 +2682,12 @@ SUBROUTINE measure
       GamNorm = GamNorm + Phase/CoefOfWeight(0)
     endif
 
-    !============  the diagonal Gamma ================================
-    if(dt1==dt2 .and. ityp==1) then
-      GamMC(Order, dr,  dt1) = GamMC(Order, dr, dt1) + (Phase/factorM)
-      ReGamSqMC(Order, dr, dt1) = ReGamSqMC(Order, dr, dt1) + (Real(Phase/factorM))**2.d0
-      ImGamSqMC(Order, dr, dt1) = ImGamSqMC(Order, dr, dt1) + (dimag(Phase/factorM))**2.d0
-    endif
+    call accumulate_Gamma(ityp, dr, dt1, dt2, Phase, factorM, .false.)
 
-    !============  Gamma in the fitting coeffecients =====================================
-    ibin = get_bin_Gam(dt1, dt2)
-
-    if(IsBasis2D(ibin)) then
-      do ibasis = 1, NBasisGam
-        wbasis = (Beta/dble(MxT))**2.d0*weight_basis_Gam(CoefGam &
-          & (0:BasisOrderGam,0:BasisOrderGam, ibasis,ibin), dt1*Beta/MxT, dt2*Beta/MxT)
-
-        GamBasis(Order, ityp, dr, ibin, ibasis) = GamBasis(Order, ityp, dr, ibin, &
-          & ibasis) + (Phase/factorM)*wbasis
-
-        ReGamSqBasis(Order, ityp, dr, ibin, ibasis) = ReGamSqBasis(Order, ityp, dr, ibin, &
-          & ibasis) + (real(Phase)/factorM)**2.d0*wbasis
-        ImGamSqBasis(Order, ityp, dr, ibin, ibasis) = ImGamSqBasis(Order, ityp, dr, ibin, &
-          & ibasis) + (dimag(Phase)/factorM)**2.d0*wbasis
-      enddo
-    else 
-      do ibasis = 1, NBasis
-        wbasis = (Beta/dble(MxT))*weight_basis(CoefGam(0:BasisOrder,0, &
-          & ibasis,ibin), dt1*Beta/MxT)
-
-        GamBasis(Order, ityp, dr, ibin, ibasis) = GamBasis(Order, ityp, dr, ibin, &
-          & ibasis) + (Phase/factorM)*wbasis
-        ReGamSqBasis(Order, ityp, dr, ibin, ibasis) = ReGamSqBasis(Order, ityp, dr, ibin, &
-          & ibasis) + (real(Phase)/factorM)**2.d0*wbasis
-        ImGamSqBasis(Order, ityp, dr, ibin, ibasis) = ImGamSqBasis(Order, ityp, dr, ibin, &
-          & ibasis) + (dimag(Phase)/factorM)**2.d0*wbasis
-      enddo
+    if(dt1>0 .and. dt2>0) then
+      dtp1 = MxT-dt1
+      dtp2 = MxT-dt2
+      call accumulate_Gamma(ityp, dr, dtp1, dtp2, Phase, factorM, .true.)
     endif
 
     !===============  test variables =================================
@@ -2740,6 +2711,72 @@ SUBROUTINE measure
 
   endif
 END SUBROUTINE measure
+
+SUBROUTINE accumulate_Gamma(ityp, dr, dt1, dt2, Phase, factorM, flag)
+  implicit none
+  integer, intent(in) :: ityp, dr, dt1, dt2
+  complex*16, intent(in) :: Phase
+  double precision, intent(in) :: factorM
+  logical, intent(in) :: flag  !if need to flip the imaginary part
+  complex*16 :: wbasis
+  integer :: ibin, ibasis
+
+  !============  the diagonal Gamma ================================
+  if(dt1==dt2 .and. ityp==1) then
+    if(flag) then
+      GamMC(Order, dr,  dt1) = GamMC(Order, dr, dt1) + dcmplx(real(Phase/factorM),  &
+        & -dimag(Phase/factorM))
+    else
+      GamMC(Order, dr,  dt1) = GamMC(Order, dr, dt1) + dcmplx(real(Phase/factorM),  &
+        & dimag(Phase/factorM))
+    endif
+
+    ReGamSqMC(Order, dr, dt1) = ReGamSqMC(Order, dr, dt1) + (Real(Phase/factorM))**2.d0
+    ImGamSqMC(Order, dr, dt1) = ImGamSqMC(Order, dr, dt1) + (dimag(Phase/factorM))**2.d0
+  endif
+
+  !============  Gamma in the fitting coeffecients =====================================
+  ibin = get_bin_Gam(dt1, dt2)
+
+  if(IsBasis2D(ibin)) then
+    do ibasis = 1, NBasisGam
+      wbasis = (Beta/dble(MxT))**2.d0*weight_basis_Gam(CoefGam &
+        & (0:BasisOrderGam,0:BasisOrderGam, ibasis,ibin), dt1*Beta/MxT, dt2*Beta/MxT)
+
+      if(flag) then
+        GamBasis(Order, ityp, dr, ibin, ibasis) = GamBasis(Order, ityp, dr, ibin, &
+          & ibasis) + dcmplx(real(Phase/factorM), -dimag(Phase/factorM))*wbasis
+      else
+        GamBasis(Order, ityp, dr, ibin, ibasis) = GamBasis(Order, ityp, dr, ibin, &
+          & ibasis) + dcmplx(real(Phase/factorM), dimag(Phase/factorM))*wbasis
+      endif
+
+      ReGamSqBasis(Order, ityp, dr, ibin, ibasis) = ReGamSqBasis(Order, ityp, dr, ibin, &
+        & ibasis) + (real(Phase)/factorM)**2.d0*wbasis
+      ImGamSqBasis(Order, ityp, dr, ibin, ibasis) = ImGamSqBasis(Order, ityp, dr, ibin, &
+        & ibasis) + (dimag(Phase)/factorM)**2.d0*wbasis
+    enddo
+  else 
+    do ibasis = 1, NBasis
+      wbasis = (Beta/dble(MxT))*weight_basis(CoefGam(0:BasisOrder,0, &
+        & ibasis,ibin), dt1*Beta/MxT)
+
+      if(flag) then
+        GamBasis(Order, ityp, dr, ibin, ibasis) = GamBasis(Order, ityp, dr, ibin, &
+          & ibasis) + dcmplx(real(Phase/factorM), -dimag(Phase/factorM))*wbasis
+      else
+        GamBasis(Order, ityp, dr, ibin, ibasis) = GamBasis(Order, ityp, dr, ibin, &
+          & ibasis) + dcmplx(real(Phase/factorM), dimag(Phase/factorM))*wbasis
+      endif
+
+      ReGamSqBasis(Order, ityp, dr, ibin, ibasis) = ReGamSqBasis(Order, ityp, dr, ibin, &
+        & ibasis) + (real(Phase)/factorM)**2.d0*wbasis
+      ImGamSqBasis(Order, ityp, dr, ibin, ibasis) = ImGamSqBasis(Order, ityp, dr, ibin, &
+        & ibasis) + (dimag(Phase)/factorM)**2.d0*wbasis
+    enddo
+  endif
+END SUBROUTINE accumulate_Gamma
+
 
 !================   statistics =======================================
 

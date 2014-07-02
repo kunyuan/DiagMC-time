@@ -301,7 +301,7 @@ SUBROUTINE Gam_mc2matrix_mc
   looporder: do iorder = 1, MCOrder
     totrerr = 0.d0
     totierr = 0.d0
-    do it1 = 0, MxT/2
+    do it1 = 0, MxT-1
       rgam = real(GamMC(iorder, 0, it1))/Z_normal
       rgam2 = ReGamSqMC(iorder, 0, it1)/Z_normal
 
@@ -343,11 +343,8 @@ SUBROUTINE Gam_mc2matrix_mc
 
 
     if(flag(iorder)) then
-      do itt2 = 0, MxT-1
-        do itt1 = 0, MxT-1
-          it1 = fold_tau(itt1)
-          it2 = fold_tau(itt2)
-
+      do it2 = 0, MxT-1
+        do it1 = 0, MxT-1
           tau1 = dble(it1)*Beta/dble(MxT)
           tau2 = dble(it2)*Beta/dble(MxT)
           ibin = get_bin_Gam(it1, it2)
