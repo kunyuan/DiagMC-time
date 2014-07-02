@@ -102,6 +102,68 @@ END SUBROUTINE combine_matrix
 
 
 
+!!------------- definition of the lattice and type symmetry ----------------
+SUBROUTINE def_symmetry
+  implicit none
+  integer :: site, dt1, dt2, i
+  integer :: dr(1:D)
+
+  CoefOfSymmetry(:, :, :) = 2.d0   !typ 1,2; 3,4; 5,6
+  
+  do site = 0, Vol-1
+    dr = get_cord_from_site(D, site)
+    do i = 1, D
+      if(dr(i)/=0 .and. dr(i)/=L(i)/2) then
+        CoefOfSymmetry(site, :, :) = CoefOfSymmetry(site, :, :)*2.d0
+      endif
+    enddo
+  enddo
+
+  do dt1 = 1, MxT-1
+    do dt2 = 1, MxT-1
+      CoefOfSymmetry(:, dt1, dt2) = CoefOfSymmetry(:, dt1, dt2)*2.d0
+    enddo
+  enddo
+
+  return
+END SUBROUTINE def_symmetry
+
+Integer Function fold_r(dims, site)
+  implicit none 
+  integer, intent(in) :: dims, site
+  integer :: dr(1:dims)
+  integer :: drf(1:dims)
+  integer :: i
+
+  dr = get_cord_from_site(dims, site)
+  drf(1:dims) = dr(1:dims)
+  do i = 1, dims
+    if(dr(i)>L(i)/2) drf(i) = L(i)-dr(i)
+  enddo
+  fold_r = get_fold_site_from_cord(dims, drf)
+  return
+END FUNCTION fold_r
+
+
+Integer FUNCTION diff_r(dims, site1, site2)
+  implicit none
+  integer, intent(in) :: site1, site2
+  integer, intent(in) :: dims
+  integer :: r1(dims), r2(dims), dr(dims)
+
+  r1 = get_cord_from_site(dims, site1)
+  r2 = get_cord_from_site(dims, site2)
+
+  dr = r1 - r2
+
+  do i = 1, dims
+    if(dr(i)<0)  dr(i) = dr(i)+L(i)
+    if(dr(i)>dL(i))  dr(i) = L(i)-dr(i)
+  enddo
+
+  diff_r = get_site_from_cord(dims, dr)
+  return
+END FUNCTION diff_r
 
 !!======================== WEIGHT EXTRACTING =========================
 !! most basic interface to the matrix element

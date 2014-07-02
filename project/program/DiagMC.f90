@@ -124,9 +124,9 @@ PROGRAM MAIN
   allocate(Denom(0:Vol-1, 0:MxT-1))
   allocate(Chi(0:Vol-1, 0:MxT-1))
 
-  allocate(GamMC(0:MCOrder, 0:VolFold-1, 0:MxT/2))
-  allocate(ReGamSqMC(0:MCOrder, 0:VolFold-1, 0:MxT/2))
-  allocate(ImGamSqMC(0:MCOrder, 0:VolFold-1, 0:MxT/2))
+  allocate(GamMC(0:MCOrder, 0:VolFold-1, 0:MxT-1))
+  allocate(ReGamSqMC(0:MCOrder, 0:VolFold-1, 0:MxT-1))
+  allocate(ImGamSqMC(0:MCOrder, 0:VolFold-1, 0:MxT-1))
 
   allocate(GamBasis(0:MCOrder,1:NTypeGam/2, 0:VolFold-1, 1:NbinGam, 1:NBasisGam))
   allocate(ReGamSqBasis(0:MCOrder,1:NTypeGam/2, 0:VolFold-1, 1:NbinGam, 1:NBasisGam))

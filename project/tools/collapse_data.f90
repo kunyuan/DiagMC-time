@@ -76,13 +76,13 @@ PROGRAM MAIN
 
     title_mc = str(Beta,'(f4.2)')+'_'+str(MCOrder,'(i1)')+'_coll'
 
-    allocate(GamMC(0:MCOrder, 0:VolFold-1, 0:MxT/2))
-    allocate(ReGamSqMC(0:MCOrder, 0:VolFold-1, 0:MxT/2))
-    allocate(ImGamSqMC(0:MCOrder, 0:VolFold-1, 0:MxT/2))
+    allocate(GamMC(0:MCOrder, 0:VolFold-1, 0:MxT-1))
+    allocate(ReGamSqMC(0:MCOrder, 0:VolFold-1, 0:MxT-1))
+    allocate(ImGamSqMC(0:MCOrder, 0:VolFold-1, 0:MxT-1))
 
-    allocate(GamMCTmp(0:MCOrder, 0:VolFold-1, 0:MxT/2))
-    allocate(ReGamSqMCTmp(0:MCOrder, 0:VolFold-1, 0:MxT/2))
-    allocate(ImGamSqMCTmp(0:MCOrder, 0:VolFold-1, 0:MxT/2))
+    allocate(GamMCTmp(0:MCOrder, 0:VolFold-1, 0:MxT-1))
+    allocate(ReGamSqMCTmp(0:MCOrder, 0:VolFold-1, 0:MxT-1))
+    allocate(ImGamSqMCTmp(0:MCOrder, 0:VolFold-1, 0:MxT-1))
 
     allocate(GamBasis(0:MCOrder,1:NTypeGam/2, 0:VolFold-1, 1:NBinGam, 1:NBasisGam))
     allocate(ReGamSqBasis(0:MCOrder,1:NTypeGam/2, 0:VolFold-1, 1:NBinGam, 1:NBasisGam))
@@ -113,7 +113,7 @@ PROGRAM MAIN
         read(101) Beta, MCOrder, L(1:D)
         read(101,iostat=ios) imctmp, iGamNorm, iGamNormWeight
         read(101) Ztmp, ratioerr
-        do it1 = 0, MxT/2
+        do it1 = 0, MxT-1
           do ir = 0, VolFold-1
             do iorder = 0, MCOrder
               read(101,iostat=ios)  GamMCTmp(iorder, ir, it1)
@@ -179,7 +179,7 @@ PROGRAM MAIN
     write(104) Beta, MCOrder, L(1:D)
     write(104) imc, GamNorm, GamNormWeight
     write(104) Z_normal, ratioerr
-    do it1 = 0, MxT/2
+    do it1 = 0, MxT-1
       do ir = 0, VolFold-1
         do iorder = 0, MCOrder
           write(104)  GamMC(iorder,  ir, it1)
@@ -218,7 +218,7 @@ PROGRAM MAIN
     write(104, *) imc, GamNorm, GamNormWeight
     write(104, *) Z_normal, ratioerr
     
-    do it1 = 0, MxT/2
+    do it1 = 0, MxT-1
       it2 =  it1
       gam = GamMC(1, 0, it1)*GamNormWeight/GamNorm
       write(104, '(i3,E20.10E3,"    +i",E20.10E3)') it1, real(gam), dimag(gam)

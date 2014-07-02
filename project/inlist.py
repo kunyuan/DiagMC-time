@@ -8,10 +8,10 @@ TO_DO = []
 
 #common dictionary for all jobs
 com_dict={
-    "L" :   [8,8,8],
+    "L" :   [4,4,4],
     "Jcp" :  1.0,
-    "Beta" :  0.80,
-    "Order" :  4,
+    "Beta" :  0.50,
+    "Order" :  1,
     }
 
 readfile="{0:4.2f}_{1}_coll".format(com_dict["Beta"],com_dict["Order"])
@@ -24,7 +24,7 @@ mc_dict={
     "__IsCluster" : False,
     "__AutoRun" : True,
     "IsLoad" : False,
-    "Reweight" : [1.0, 0.5, 0.2, 0.1],
+    "Reweight" : [1.0],
     "ReadFile" : "null",
     "Sample" : 5000000,
     "Sweep" : 10,
@@ -37,7 +37,7 @@ TO_DO.append(job.JobMonteCarlo(mc_dict))
 # self consist loop job definition
 sc_dict={
     "__Execute" : ["python", "./run_loop.py"],
-    "__Duplicate" : 0,
+    "__Duplicate" : 1,
     "__IsCluster" : False,
     "__AutoRun" : True, 
     #"__AutoRun" : False, 

@@ -463,7 +463,7 @@ SUBROUTINE write_monte_carlo_data
   write(104) Beta, MCOrder, L(1:D)
   write(104) imc, GamNorm, GamNormWeight
   write(104) Z_normal, ratioerr
-  do it1 = 0, MxT/2
+  do it1 = 0, MxT-1
     do ir = 0, VolFold-1
       do iorder = 0, MCOrder
         write(104)  GamMC(iorder, ir, it1)
@@ -510,7 +510,7 @@ SUBROUTINE read_monte_carlo_data
   read(105,iostat=ios) imc, GamNorm, GamNormWeight
   read(105,iostat=ios) Z_normal, ratioerr
 
-  do it1 = 0, MxT/2
+  do it1 = 0, MxT-1
     do ir = 0, VolFold-1
       do iorder = 0, MCOrder
         read(105,iostat=ios)  GamMC(iorder, ir, it1)
