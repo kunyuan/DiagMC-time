@@ -70,20 +70,16 @@ PROGRAM MAIN
 
   !================== space variables ==================================
   Vol = 1.d0
-  VolFold = 1.d0
 
   do i = 1, D
     dVol(i) = Vol
-    dVolFold(i) = VolFold
 
     Vol = Vol *L(i)
     dL(i) = Floor(L(i)/2.d0)
-    VolFold = VolFold *(dL(i)+1)
   enddo
 
   do i = D+1, 3
     dVol(i) = Vol
-    dVolFold(i) = VolFold
   enddo
 
   logL(:)=dlog(L(:)*1.d0)
@@ -124,13 +120,13 @@ PROGRAM MAIN
   allocate(Denom(0:Vol-1, 0:MxT-1))
   allocate(Chi(0:Vol-1, 0:MxT-1))
 
-  allocate(GamMC(0:MCOrder, 0:VolFold-1, 0:MxT-1))
-  allocate(ReGamSqMC(0:MCOrder, 0:VolFold-1, 0:MxT-1))
-  allocate(ImGamSqMC(0:MCOrder, 0:VolFold-1, 0:MxT-1))
+  allocate(GamMC(0:MCOrder, 0:Vol-1, 0:MxT-1))
+  allocate(ReGamSqMC(0:MCOrder, 0:Vol-1, 0:MxT-1))
+  allocate(ImGamSqMC(0:MCOrder, 0:Vol-1, 0:MxT-1))
 
-  allocate(GamBasis(0:MCOrder,1:NTypeGam/2, 0:VolFold-1, 1:NbinGam, 1:NBasisGam))
-  allocate(ReGamSqBasis(0:MCOrder,1:NTypeGam/2, 0:VolFold-1, 1:NbinGam, 1:NBasisGam))
-  allocate(ImGamSqBasis(0:MCOrder,1:NTypeGam/2, 0:VolFold-1, 1:NbinGam, 1:NBasisGam))
+  allocate(GamBasis(0:MCOrder,1:NTypeGam/2, 0:Vol-1, 1:NbinGam, 1:NBasisGam))
+  allocate(ReGamSqBasis(0:MCOrder,1:NTypeGam/2, 0:Vol-1, 1:NbinGam, 1:NBasisGam))
+  allocate(ImGamSqBasis(0:MCOrder,1:NTypeGam/2, 0:Vol-1, 1:NbinGam, 1:NBasisGam))
 
   MaxStat=1024
   allocate(ObsRecord(1:MaxStat,0:NObs-1))
@@ -275,7 +271,7 @@ END SUBROUTINE self_consistent
 LOGICAL FUNCTION self_consistent_GW(err)
   implicit none
   double precision, intent(in) :: err
-  integer :: iloop
+  integer :: iloop, istag
   integer :: px, py
   complex*16 :: WOld, WNow
 
@@ -287,7 +283,8 @@ LOGICAL FUNCTION self_consistent_GW(err)
 
   !!------ calculate G, W in momentum domain --------------
   WOld = (10.d0, 0.d0)
-  WNow = weight_W(1, 0, 0)
+  istag = get_site_from_cord(D, L(1:D)/2)
+  WNow = weight_W(1, istag, 0)
   self_consistent_GW = .true.
 
   iloop = 0
@@ -296,7 +293,7 @@ LOGICAL FUNCTION self_consistent_GW(err)
   call calculate_W
 
   do while(abs(real(WNow)-real(WOld))>err) 
-    !if(iloop>=100)  exit
+    if(iloop>=20)  exit
 
     WOld = WNow
     iloop = iloop + 1
@@ -307,15 +304,13 @@ LOGICAL FUNCTION self_consistent_GW(err)
     call calculate_G
     call calculate_W
 
-    WNow = weight_W(1, 0, 0)
+    call calculate_Denom
+    call calculate_Chi
 
-    call LogFile%QuickLog("G-W loop:"//str(iloop)//str(real(WOld))//str(real(WNOw)))
+    WNow = weight_W(1, istag, 0)
+
+    call LogFile%QuickLog("G-W loop:"//str(iloop)//str(WNow/W0PF(istag, 0)))
   enddo
-  call calculate_Sigma
-  call calculate_Polar
-  call calculate_Denom
-  call calculate_Chi
-
   !!-------------------------------------------------------
   call plus_minus_W0(-1)
   call plus_minus_Gam0(-1)

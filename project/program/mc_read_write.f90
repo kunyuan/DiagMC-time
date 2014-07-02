@@ -449,7 +449,7 @@ END SUBROUTINE DRAW
 !!================================================================
 SUBROUTINE write_monte_carlo_data
   implicit none
-  integer :: iorder, itopo, ir, ityp, it1, it2
+  integer :: iorder, itopo, ir, irr, ityp, it1, it2
   double precision :: rgam2, rerr
   integer :: ibin, ibasis
   complex*16 :: gam1
@@ -464,7 +464,7 @@ SUBROUTINE write_monte_carlo_data
   write(104) imc, GamNorm, GamNormWeight
   write(104) Z_normal, ratioerr
   do it1 = 0, MxT-1
-    do ir = 0, VolFold-1
+    do ir = 0, Vol-1
       do iorder = 0, MCOrder
         write(104)  GamMC(iorder, ir, it1)
         write(104)  ReGamSqMC(iorder, ir, it1)
@@ -475,7 +475,7 @@ SUBROUTINE write_monte_carlo_data
 
   do ibasis = 1, NBasisGam
     do ibin = 1, NbinGam
-      do ir = 0, VolFold-1
+      do ir = 0, Vol-1
         do ityp = 1, NtypeGam/2
           do iorder = 0, MCOrder
             write(104) GamBasis(iorder, ityp, ir, ibin, ibasis)
@@ -511,7 +511,7 @@ SUBROUTINE read_monte_carlo_data
   read(105,iostat=ios) Z_normal, ratioerr
 
   do it1 = 0, MxT-1
-    do ir = 0, VolFold-1
+    do ir = 0, Vol-1
       do iorder = 0, MCOrder
         read(105,iostat=ios)  GamMC(iorder, ir, it1)
         read(105,iostat=ios)  ReGamSqMC(iorder,  ir, it1)
@@ -522,7 +522,7 @@ SUBROUTINE read_monte_carlo_data
 
   do ibasis = 1, NBasisGam
     do ibin = 1, NbinGam
-      do ir = 0, VolFold-1
+      do ir = 0, Vol-1
         do ityp = 1, NtypeGam/2
           do iorder = 0, MCOrder
             read(105) GamBasis(iorder, ityp, ir, ibin, ibasis)

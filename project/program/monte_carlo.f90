@@ -2578,11 +2578,11 @@ SUBROUTINE measure
   logical :: flag
 
   GamWormOrder(Order) = GamWormOrder(Order) + 1.d0
+
   !===========  Measure in worm space  ==========================
   if(IsWormPresent) then
     Z_worm=Z_worm+1.d0
   endif
-
 
   !=============================================================
   if(.not. IsWormPresent) then
@@ -2631,7 +2631,7 @@ SUBROUTINE measure
     !----- find the space and time variables for gamma -------
     rg = GRVertex(MeasureGam)
     rw = WRVertex(NeighLn(3-dir, MeaW))
-    dr = fold_r(D, diff_r(D, rg, rw))
+    dr = diff_r(D, rg, rw)
 
     tau1 = TVertex(1, NeighLn(1, MeaGout))
     tau2 = TVertex(2, NeighLn(2, MeaGin))
@@ -2678,11 +2678,9 @@ SUBROUTINE measure
 
     call accumulate_Gamma(ityp, dr, dt1, dt2, Phase, factorM, .false.)
 
-    if(dt1>0 .and. dt2>0) then
-      dtp1 = MxT-dt1
-      dtp2 = MxT-dt2
-      call accumulate_Gamma(ityp, dr, dtp1, dtp2, Phase, factorM, .true.)
-    endif
+    dtp1 = MxT-dt1
+    dtp2 = MxT-dt2
+    call accumulate_Gamma(ityp, dr, dtp1, dtp2, Phase, factorM, .true.)
 
     !===============  test variables =================================
     sumt = 0
@@ -2714,6 +2712,8 @@ SUBROUTINE accumulate_Gamma(ityp, dr, dt1, dt2, Phase, factorM, flag)
   logical, intent(in) :: flag  !if need to flip the imaginary part
   complex*16 :: wbasis
   integer :: ibin, ibasis
+
+  if(flag .and. (dt1==MxT .or. dt2==MxT))  return
 
   !============  the diagonal Gamma ================================
   if(dt1==dt2 .and. ityp==1) then

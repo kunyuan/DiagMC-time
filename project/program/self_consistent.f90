@@ -349,8 +349,7 @@ SUBROUTINE Gam_mc2matrix_mc
           tau2 = dble(it2)*Beta/dble(MxT)
           ibin = get_bin_Gam(it1, it2)
 
-          do drr = 0, Vol-1
-            dr = fold_r(D, drr)
+          do dr = 0, Vol-1
             do ityp = 1, NTypeGam/2
               typ = 2*(ityp-1)+1
 
