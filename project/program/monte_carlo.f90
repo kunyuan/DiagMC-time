@@ -167,13 +167,7 @@ SUBROUTINE markov(IsToss)
   endif
 
   !------- assign the config ratio for each order ------
-  TimeRatio(0) = 0.25d0
-  ratioleft = 1.d0 - TimeRatio(0)
-  do i = MCOrder, 1, -1
-    TimeRatio(i) = 0.5d0*(ratioleft)
-    ratioleft = ratioleft - TimeRatio(i)
-  enddo
-  TimeRatio(1) = TimeRatio(1) + ratioleft
+  TimeRatio(0:MCOrder) = 1.d0/(MCOrder+1.d0)
 
   call LogFile%QuickLog("Starting Markov...")
   call check_config
