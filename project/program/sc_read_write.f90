@@ -103,7 +103,7 @@ END SUBROUTINE write_GW
 SUBROUTINE output_Quantities
   implicit none
   integer :: ityp, it1, it2, iorder, itt1, itt2
-  integer :: dr(D), dx, dy, it, isite, ip, iomega
+  integer :: dr(D), dx, dy, it, isite, site, ip, iomega
   complex*16 :: gam1
   double precision :: normal, ratio
   integer :: ibin, ibasis
@@ -173,9 +173,9 @@ SUBROUTINE output_Quantities
 
   do iorder = 1, MCOrder
     write(104, *) "##################################GammaR",trim(adjustl(str(iorder)))
-    write(104, *) "#r:", VolFold
+    write(104, *) "#r:", Vol
     write(104, *) "#Beta", Beta, "L", L(1), "Order", MCOrder
-    do isite = 0, VolFold-1
+    do isite = 0, Vol-1
       it1 = MxT/2
       it2 = MxT/2 
       ibin = get_bin_Gam(it1, it2)
@@ -263,9 +263,19 @@ SUBROUTINE output_Quantities
   call transfer_Chi_r(-1)
 
   close(104)
+
+  call output_denominator
 END SUBROUTINE output_Quantities
 
+SUBROUTINE output_denominator
+  implicit none
+  integer :: ip
 
+  ip = get_site_from_cord(D, L(1:D)/2)
+  open(104, access='append', file=trim(title_loop)//"_denom.dat") 
+  write(104, *) real(Denom(ip, 0)),dimag(Denom(ip, 0))
+  close(104)
+END SUBROUTINE output_denominator
 
 SUBROUTINE output_Gam1
   implicit none
