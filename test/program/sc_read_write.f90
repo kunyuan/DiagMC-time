@@ -236,6 +236,13 @@ SUBROUTINE output_Quantities
     write(104, *) Vol*(MxT/Beta)**2.d0*real(Sigma(it)),  &
       & Vol*(MxT/Beta)**2.d0*dimag(Sigma(it))
   enddo
+  
+  write(104, *) "##################################Polar"
+  write(104, *) "#tau:", MxT
+  write(104, *) "#Beta", Beta, "L", L(1), "Order", MCOrder
+  do it = 0, MxT-1
+    write(104, *) real(Polar(0, it)),  dimag(Polar(0, it))
+  enddo
 
   write(104, *) "##################################SUMChi"
   write(104, *) "#tau:", MxT
