@@ -3,28 +3,32 @@ import numpy as np
 import matplotlib.pyplot as plt
 import read_data
 
-Beta = 0.70
+Beta = 0.80
 N = 64
 
 tau = np.arange(0, Beta, Beta/N)
 
-#Quan2D=["Gamma1","Gamma2","Gamma3","Gamma4","Gamma5"]
+Quan2D=["Gamma1","Gamma2","Gamma3","Gamma4","Gamma5"]
 #Quan2D=["Gamma1","Gamma2","Gamma3","Gamma4"]
-Quan2D=["Gamma1","Gamma2","Gamma3"]
+#Quan2D=["Gamma1","Gamma2","Gamma3"]
 #Quan2D=["Gamma1","Gamma2"]
 #Quan2D=["Gamma1"]
 #Quan2D=[]
 
-#Quan1D=["GammaDiag1","GammaDiag2","GammaDiag3","GammaDiag4","GammaDiag5"]
+Quan1D=["GammaDiag1","GammaDiag2","GammaDiag3","GammaDiag4","GammaDiag5"]
 #Quan1D=["GammaDiag1","GammaDiag2","GammaDiag3","GammaDiag4"]
-Quan1D=["GammaDiag1","GammaDiag2","GammaDiag3"]
+#Quan1D=["GammaDiag1","GammaDiag2","GammaDiag3"]
 #Quan1D=["GammaDiag1","GammaDiag2"]
 #Quan1D=["GammaDiag1"]
 #Quan1D=[]
 Quan=Quan2D+Quan1D
 
 DiagGamma=[]
-DiagGamma.append(read_data.read_array("../../../../project/0.80_quantities.dat", Quan))
+#DiagGamma.append(read_data.read_array("./bare_L8_0.80_1_quantities.dat", Quan))
+#DiagGamma.append(read_data.read_array("./bare_L8_0.80_2_quantities.dat", Quan))
+#DiagGamma.append(read_data.read_array("./bare_L8_0.80_3_quantities.dat", Quan))
+#DiagGamma.append(read_data.read_array("./bare_L8_0.80_4_quantities.dat", Quan))
+DiagGamma.append(read_data.read_array("./bare_L8_0.80_5_quantities.dat", Quan))
 
 
 fig = plt.figure()
