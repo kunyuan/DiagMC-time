@@ -1,5 +1,5 @@
 
-!!====== transfer to a D-dimensional coordinates from a 1-d array =============
+!!!====== transfer to a D-dimensional coordinates from a 1-d array =============
 function get_cord_from_site(dims, site)
   implicit none
   integer, intent(in) :: dims, site
@@ -14,7 +14,7 @@ function get_cord_from_site(dims, site)
   return
 END FUNCTION get_cord_from_site
 
-!!====== transfer a D-dimensional space into a 1-d array =============
+!!!====== transfer a D-dimensional space into a 1-d array =============
 integer function get_site_from_cord(dims, cord)
   implicit none
   integer :: dims
@@ -29,7 +29,7 @@ integer function get_site_from_cord(dims, cord)
 END FUNCTION get_site_from_cord
 
 
-!======= decompose a matrix from 1d array to D-dimensional matrix ==============
+!!======= decompose a matrix from 1d array to D-dimensional matrix ==============
 SUBROUTINE decompose_matrix(Ntyp, Lx, Ly, Lz,Nleft, Mat1D, Mat)
   implicit none
   integer, intent(in) :: Ntyp, Lx, Ly, Lz, Nleft
@@ -53,7 +53,7 @@ END SUBROUTINE decompose_matrix
 
 
 
-!======= combine a matrix from D-dimensional matrix to 1-d matrix ==============
+!!======= combine a matrix from D-dimensional matrix to 1-d matrix ==============
 SUBROUTINE combine_matrix(Ntyp, Lx, Ly, Lz, Nleft, Mat, Mat1D)
   implicit none
   integer, intent(in) :: Ntyp, Lx, Ly, Lz, Nleft
@@ -71,171 +71,6 @@ SUBROUTINE combine_matrix(Ntyp, Lx, Ly, Lz, Nleft, Mat, Mat1D)
   return
 END SUBROUTINE combine_matrix
 
-
-
-!!------------- definition of the lattice and type symmetry ----------------
-SUBROUTINE def_symmetry
-  implicit none
-  integer :: site, dt1, dt2, i
-  integer :: dr(1:D)
-
-  CoefOfSymmetry(:, :, :) = 2.d0   !typ 1,2; 3,4; 5,6
-  
-  do site = 0, Vol-1
-    dr = get_cord_from_site(D, site)
-    do i = 1, D
-      if(dr(i)/=0 .and. dr(i)/=L(i)/2) then
-        CoefOfSymmetry(site, :, :) = CoefOfSymmetry(site, :, :)*2.d0
-      endif
-    enddo
-  enddo
-
-  do dt1 = 1, MxT-1
-    do dt2 = 1, MxT-1
-      CoefOfSymmetry(:, dt1, dt2) = CoefOfSymmetry(:, dt1, dt2)*2.d0
-    enddo
-  enddo
-
-  return
-END SUBROUTINE def_symmetry
-
-
-Integer FUNCTION diff_r(dims, site1, site2)
-  implicit none
-  integer, intent(in) :: site1, site2
-  integer, intent(in) :: dims
-  integer :: r1(dims), r2(dims), dr(dims)
-
-  r1 = get_cord_from_site(dims, site1)
-  r2 = get_cord_from_site(dims, site2)
-
-  dr = r1 - r2
-
-  do i = 1, dims
-    if(dr(i)<0)  dr(i) = dr(i)+L(i)
-    if(dr(i)>dL(i))  dr(i) = L(i)-dr(i)
-  enddo
-
-  diff_r = get_site_from_cord(dims, dr)
-  return
-END FUNCTION diff_r
-
-!!======================== WEIGHT EXTRACTING =========================
-!! most basic interface to the matrix element
-
-!--------- weight for bare propagator ----------------
-Complex*16 FUNCTION weight_G0(typ, t)
-  implicit none
-  integer, intent(in)  :: typ, t  
-  double precision     :: tau
-  complex(kind=8)      :: muc  
-
-  muc = dcmplx(0.d0, Mu(1)*pi/(2.d0*Beta))
-  tau = (real(t)+0.5d0)*Beta/MxT
-  if(tau>=0) then
-    weight_G0 = cdexp(muc*tau)/(1.d0, 1.d0) 
-  else
-    weight_G0 = -cdexp(muc*(tau+Beta))/(1.d0, 1.d0) 
-  endif
-  return
-END FUNCTION weight_G0
-
-
-!!--------- calculate weight for bare interaction ----
-Complex*16 FUNCTION weight_W0(typ, site)
-  implicit none
-  integer, intent(in) :: site, typ
-  double precision :: ratio
-
-  weight_W0 = (0.d0, 0.d0)
-
-  if(is_W0_nonzero(D, site)==1) then
-    if(typ ==1 .or. typ == 2) then
-      weight_W0 = dcmplx(0.25d0, 0.d0)
-    else if(typ == 3 .or. typ == 4) then
-      weight_W0 = dcmplx(-0.25d0, 0.d0)
-    else if(typ == 5 .or. typ == 6) then
-      weight_W0 = dcmplx(0.5d0, 0.d0)
-    endif
-  endif
-
-  if(Is_J1J2 .and. is_W0_nonzero(D, site)==2) then
-    if(typ ==1 .or. typ == 2) then
-      weight_W0 = dcmplx(0.25d0*Jcp, 0.d0)
-    else if(typ == 3 .or. typ == 4) then
-      weight_W0 = dcmplx(-0.25d0*Jcp, 0.d0)
-    else if(typ == 5 .or. typ == 6) then
-      weight_W0 = dcmplx(0.5d0*Jcp, 0.d0)
-    endif
-  endif
-
-END FUNCTION weight_W0
-
-!!--------- calculate weight for bare Gamma ---------
-COMPLEX*16 FUNCTION weight_Gam0(typ, site)
-  implicit none
-  integer, intent(in)  :: site, typ
-  double precision :: ratio
-
-  weight_Gam0 = (0.d0, 0.d0)
-
-  if(is_Gam0_nonzero(D, site)) then
-    if(typ==1 .or. typ==2 .or. typ==5 .or. typ==6) then
-      weight_Gam0 = (1.d0, 0.d0)
-    endif
-  endif
-END FUNCTION weight_Gam0
-
-
-!!--------- extract weight for G ---------
-COMPLEX*16 FUNCTION weight_G(typ1, t1)
-  implicit none
-  integer, intent(in)  :: t1, typ1
-
-  if(t1>=0) then
-    weight_G = G(typ1, t1)
-  else
-    weight_G = -G(typ1, t1+MxT)
-  endif
-END FUNCTION weight_G
-
-!!--------- extract weight for W ---------
-COMPLEX*16 FUNCTION weight_W(typ1, site, t1)
-  implicit none
-  integer, intent(in)  :: site, t1, typ1
-  if(t1>=0) then
-    weight_W = W(typ1, site, t1)
-  else
-    weight_W = W(typ1, site, t1+MxT)
-  endif
-END FUNCTION weight_W
-
-!!--------- extract weight for Gamma ---------
-COMPLEX*16 FUNCTION weight_Gam(typ1, site, t1, t2)
-  implicit none
-  integer, intent(in)  :: site, t1, t2, typ1
-  double precision :: GaR
-
-  if(t1>=0 .and. t2>=0) then
-    weight_Gam = Gam(typ1, site, t1, t2)
-  else if(t1<0 .and. t2>=0) then
-    weight_Gam = -Gam(typ1, site, t1+MxT, t2)
-  else if(t1>=0 .and. t2<0) then
-    weight_Gam = -Gam(typ1, site, t1, t2+MxT)
-  else
-    weight_Gam = Gam(typ1, site, t1+MxT, t2+MxT)
-  endif
-END FUNCTION weight_Gam
-
-
-!======================= Complex Operations =============================
-COMPLEX*16 FUNCTION d_times_cd(nd, ncd)
-  implicit none 
-  double precision, intent(in) :: nd
-  complex*16, intent(in) :: ncd
-  d_times_cd = dcmplx(nd*real(ncd), nd*dimag(ncd))
-  return
-END FUNCTION d_times_cd
 
 
 
@@ -263,10 +98,10 @@ SUBROUTINE transfer_t(Backforth)
   call transfer_Gam_t(Backforth)
 END SUBROUTINE
 
+
 !================================================================================
 !============ transfer quantities in (r,k) domain ===========================
 !================================================================================
-
 SUBROUTINE transfer_W0_r(BackForth)
     implicit none
     integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
@@ -381,6 +216,9 @@ SUBROUTINE transfer_Chi_t(BackForth)
 END SUBROUTINE
 
 
+
+
+
 SUBROUTINE FFT_r(XR,Ntype,Nz,BackForth)
     implicit none
     integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
@@ -389,7 +227,7 @@ SUBROUTINE FFT_r(XR,Ntype,Nz,BackForth)
     complex*16 :: XR(Ntype,0:Vol-1,0:Nz-1)
     complex*16,allocatable :: XR3D(:,:,:,:,:)
     integer :: Power,Noma
-    integer :: ix, iy, iz, iother,it
+    integer :: i, ix, iy, iz, iother,it
     integer :: FL(3)
     double precision,allocatable ::   Real1(:), Im1(:)
     
@@ -471,6 +309,7 @@ SUBROUTINE FFT_r(XR,Ntype,Nz,BackForth)
     deallocate(XR3D)
 
 end SUBROUTINE FFT_r
+
 
 
 SUBROUTINE FFT_tau_single(XR,Ntype,Nz,IsAntiSym,BackForth)
