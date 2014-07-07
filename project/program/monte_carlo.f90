@@ -268,7 +268,15 @@ SUBROUTINE markov(IsToss)
         call LogFile%QuickLog(str(mc_version)+', '+str(file_version))
         call LogFile%QuickLog("Updating G, W, and Gamma...")
 
-        call read_GW
+        if(read_GW())  call LogFile%QuickLog("Read G, W done!")
+        call read_Gamma;  call LogFile%QuickLog("Read Gamma done!")
+
+        call LogFile%QuickLog("old Beta "+str(Beta))
+        call reset_Beta
+        call LogFile%QuickLog("new Beta "+str(Beta))
+
+        call update_WeightCurrent
+
         call check_config
         call print_config
         mc_version = file_version
@@ -336,6 +344,15 @@ SUBROUTINE recalculate_Reweighting
   enddo
 
   call LogFile%WriteLine("Reweighting is done!")
+  return
+END SUBROUTINE
+
+SUBROUTINE reset_Beta
+  implicit none
+  
+  if(Beta<BetaFinal) then
+    Beta = Beta + dBeta
+  endif
   return
 END SUBROUTINE
 

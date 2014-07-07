@@ -65,6 +65,7 @@ MODULE vrbls_mc
   double precision ::  Jcp                        ! interaction
   double precision ::  Mu(2)                      ! Chem. potential for spin down & up
   double precision ::  Beta                       ! inverse temperature
+  double precision ::  dBeta, BetaFinal           ! inverse temperature
   integer          ::  MCOrder                    ! the max order for Gamma in MC
   !=======================================================================
 

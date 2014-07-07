@@ -67,7 +67,7 @@ SUBROUTINE calculate_Gam1
   !Gam(5,0,0,:,:) = FGam(:, :)
   !Gam(6,0,0,:,:) = FGam(:, :)
 
-  call read_GW
+  if(read_GW())  call LogFile%QuickLog("Read G, W done!")
   call read_Gamma
 
   !================== bold gamma ===============================

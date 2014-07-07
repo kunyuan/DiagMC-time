@@ -108,7 +108,6 @@ SUBROUTINE calculate_Polar
           Gout = -1.d0*weight_G(1, omegaGout+MxT)
           Gam1 = -1.d0*weight_Gam(5, p, omegaGin, omegaGout+MxT)
         endif
-        !Polar(p, omega) = Polar(p, omega)+d_times_cd(ratio, Gin*Gout*Gam1)
         Polar(p, omega) = Polar(p, omega)+d_times_cd(ratio, cdexp(dcmplx(0.d0, -1.d0)* &
           & omegaGout*2.d0*Pi/MxT) *Gin*Gout*Gam1)
       enddo

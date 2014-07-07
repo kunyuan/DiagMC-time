@@ -37,7 +37,11 @@ PROGRAM MAIN
     endif
   close(11)
 
-  write(*,*) Beta, MCOrder
+  BetaFinal = 0.80d0
+  dBeta = 0.01d0
+
+  write(*,*) Beta, dBeta, BetaFinal, MCOrder
+
   write(title_loop, '(f5.2)') beta
   write(title1, '(i2)')  MCOrder
   write(title2,'(i4)') ID
@@ -190,7 +194,9 @@ INCLUDE "check_conf.f90"
 subroutine numerical_integeration
   implicit none
   call LogFile%QuickLog("Reading G,W, and Gamma...")
-  call read_GW
+  if(read_GW()) call LogFile%QuickLog("Read G, W done!")
+  call read_Gamma
+  call LogFile%QuickLog("Read Gamma done!")
 
   call calculate_Gam1
 end subroutine
@@ -200,7 +206,7 @@ SUBROUTINE just_output
   logical :: flag
   call LogFile%QuickLog("Just output something!")
   call LogFile%QuickLog("Reading G,W, and Gamma...")
-  call read_GW
+  if(read_GW()) call LogFile%QuickLog("Read G, W done!")
 
   call LogFile%QuickLog("Reading MC data...")
   call read_monte_carlo_data
@@ -248,7 +254,7 @@ SUBROUTINE self_consistent
   else if(IsLoad) then
 
     call LogFile%QuickLog("Reading old G,W...")
-    call read_GW
+    if(read_GW()) call LogFile%QuickLog("Read G, W done!")
 
     call LogFile%QuickLog("Reading MC data...")
     call read_monte_carlo_data
@@ -281,7 +287,7 @@ LOGICAL FUNCTION self_consistent_GW(err)
   double precision, intent(in) :: err
   integer :: iloop, istag
   integer :: px, py
-  complex*16 :: WOld, WNow
+  complex*16 :: WOld, WNow, denominator
 
   call transfer_r(1)
   call transfer_t(1)
@@ -290,35 +296,50 @@ LOGICAL FUNCTION self_consistent_GW(err)
   call plus_minus_Gam0(1)
 
   !!------ calculate G, W in momentum domain --------------
-  WOld = (10.d0, 0.d0)
   istag = get_site_from_cord(D, L(1:D)/2)
-  WNow = weight_W(1, istag, 0)
   self_consistent_GW = .true.
 
   iloop = 0
 
+  !WOld = (10.d0, 0.d0)
+  !WNow = weight_W(1, istag, 0)
+  !call calculate_Polar
+  !call calculate_W
+
+  !do while(abs(real(WNow)-real(WOld))>err) 
+    !if(iloop>=20)  exit
+
+    !WOld = WNow
+    !iloop = iloop + 1
+
+    !call calculate_Sigma
+    !call calculate_Polar
+
+    !call calculate_G
+    !call calculate_W
+
+    !call calculate_Denom
+    !call calculate_Chi
+
+    !!WNow = weight_W(1, istag, 0)
+    !call LogFile%QuickLog("G-W loop:"//str(iloop)//str(WNow/W0PF(istag, 0)))
+  !enddo
+
+  call calculate_Sigma
   call calculate_Polar
+
+  call calculate_G
   call calculate_W
 
-  do while(abs(real(WNow)-real(WOld))>err) 
-    if(iloop>=20)  exit
+  call calculate_Denom
+  call calculate_Chi
 
-    WOld = WNow
-    iloop = iloop + 1
-
-    call calculate_Sigma
-    call calculate_Polar
-
-    call calculate_G
-    call calculate_W
-
-    call calculate_Denom
-    call calculate_Chi
-
-    WNow = weight_W(1, istag, 0)
-
-    call LogFile%QuickLog("G-W loop:"//str(iloop)//str(WNow/W0PF(istag, 0)))
-  enddo
+  denominator = Denom(istag, 0)
+  if(real(denominator)<1.d-8)  then
+    self_consistent_GW = .false.
+    call LogFile%QuickLog("denominator touches zero! "+str(denominator), 'e')
+    stop -1
+  endif
   !!-------------------------------------------------------
   call plus_minus_W0(-1)
   call plus_minus_Gam0(-1)
@@ -334,7 +355,7 @@ SUBROUTINE monte_carlo
   double precision :: WR, GamR
 
   call LogFile%QuickLog("Initializing monte carlo...")
-  call read_GW
+  if(read_GW()) call LogFile%QuickLog("Read G, W done!")
 
   call calculate_GamNormWeight
 
@@ -401,7 +422,7 @@ SUBROUTINE monte_carlo
     call LogFile%QuickLog("Updating G, W, and Gamma...")
 
     call read_Gamma 
-    call read_GW
+    if(read_GW()) call LogFile%QuickLog("Read G, W done!")
 
     call output_Quantities
     call update_WeightCurrent
@@ -472,7 +493,7 @@ SUBROUTINE test_subroutine
     !call print_config
 
     !======== check the value in Gamma matrix ==============
-    call read_GW
+    if(read_GW()) call LogFile%QuickLog("Read G, W done!")
     call read_Gamma
 
     do it2 = 0, MxT-1
