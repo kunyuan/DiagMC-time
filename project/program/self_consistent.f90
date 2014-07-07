@@ -69,7 +69,7 @@ SUBROUTINE initialize_W0PF
   W0PF(:,:) = (0.d0, 0.d0)
   ratio = real(MxT)/Beta
   do site = 0, Vol-1
-    W0PF(site, :) = ratio *weight_W0(1, site)
+    W0PF(site, 0:MxT-1) = ratio *weight_W0(1, site)
   enddo
   call transfer_W0_r(1)
 END SUBROUTINE initialize_W0PF
@@ -80,8 +80,7 @@ SUBROUTINE initialize_Gam0PF
   double precision :: ratio
 
   ratio = (real(MxT)/Beta)**2.d0
-  Gam0PF(:,:,:) = (0.d0, 0.d0)
-  Gam0PF(:,:,:) = ratio*weight_Gam0(1, 0)
+  Gam0PF(0:Vol-1,0:MxT-1,0:MxT-1) = ratio*weight_Gam0(1, 0)
 END SUBROUTINE initialize_Gam0PF
  
 !!============== WEIGHT CALCULATING ==================================
@@ -109,7 +108,9 @@ SUBROUTINE calculate_Polar
           Gout = -1.d0*weight_G(1, omegaGout+MxT)
           Gam1 = -1.d0*weight_Gam(5, p, omegaGin, omegaGout+MxT)
         endif
-        Polar(p, omega) = Polar(p, omega)+d_times_cd(ratio, Gin*Gout*Gam1)
+        !Polar(p, omega) = Polar(p, omega)+d_times_cd(ratio, Gin*Gout*Gam1)
+        Polar(p, omega) = Polar(p, omega)+d_times_cd(ratio, cdexp(dcmplx(0.d0, -1.d0)* &
+          & omegaGout*2.d0*Pi/MxT) *Gin*Gout*Gam1)
       enddo
     enddo
   enddo

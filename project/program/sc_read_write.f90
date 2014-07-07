@@ -109,8 +109,8 @@ SUBROUTINE output_Quantities
   integer :: ibin, ibasis
   double precision :: tau1, tau2
 
-  !open(104, status='replace', file=trim(title_loop)//"_quantities.dat") 
-  open(104, access='append', file=trim(title_loop)//"_quantities.dat") 
+  open(104, status='replace', file=trim(title_loop)//"_quantities.dat") 
+  !open(104, access='append', file=trim(title_loop)//"_quantities.dat") 
 
   write(104, *) "##################################Gamma"
   write(104, *) "#tau1:", MxT, ",tau2:", MxT
@@ -211,6 +211,14 @@ SUBROUTINE output_Quantities
   enddo
   write(104, *)
 
+  write(104, *) "##################################G0"
+  write(104, *) "#tau:", MxT
+  write(104, *) "#Beta", Beta, "L", L(1), "Order", MCOrder
+  do it1 = 0, MxT-1
+    write(104, *)  real(G0F(it1)), dimag(G0F(it1))
+  enddo
+  write(104, *)
+
   write(104, *) "##################################W"
   write(104, *) "#r:", Vol, ",tau:", MxT
   write(104, *) "#Beta", Beta, "L", L(1), "Order", MCOrder
@@ -229,6 +237,13 @@ SUBROUTINE output_Quantities
     write(104, *) ratio*real(SUM(Chi(isite, :))),ratio*dimag(SUM(Chi(isite, :)))
   enddo
   
+  write(104, *) "##################################Polar"
+  write(104, *) "#tau:", MxT
+  write(104, *) "#Beta", Beta, "L", L(1), "Order", MCOrder
+  do it = 0, MxT-1
+    write(104, *) real(Polar(0, it)), dimag(Polar(0, it)) 
+  enddo
+
   write(104, *) "##################################Sigma"
   write(104, *) "#tau:", MxT
   write(104, *) "#Beta", Beta, "L", L(1), "Order", MCOrder
