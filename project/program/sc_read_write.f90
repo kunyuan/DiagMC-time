@@ -3,7 +3,7 @@
 !!================================================================
 
 
-SUBROUTINE read_GW
+Logical Function read_GW
   implicit none
   integer :: isite, ityp, it1, it2, ios
   logical :: alive
@@ -41,19 +41,21 @@ SUBROUTINE read_GW
     enddo
   enddo
 
+  read_GW = .true.
+
   if(ISub==2) then
     if(ios/=0) then
       call LogFile%QuickLog("Failed to read G,W information!",'e')
+      read_GW = .false.
     else 
       G = Gtmp;         deallocate(Gtmp)
       W = Wtmp;         deallocate(Wtmp)
-      call read_Gamma
-      call update_WeightCurrent
-      mc_version = file_version
+      read_GW = .true.
     endif
   else 
     if(ios/=0) then
       call LogFile%QuickLog("Failed to read G,W information!",'e')
+      read_GW = .false.
       close(100)
       close(101)
       stop -1
@@ -63,7 +65,7 @@ SUBROUTINE read_GW
   close(100)
   close(101)
   return
-END SUBROUTINE read_GW
+END Function read_GW
 
 SUBROUTINE write_GW
   implicit none
