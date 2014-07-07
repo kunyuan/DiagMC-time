@@ -131,7 +131,7 @@ Complex*16 FUNCTION weight_G0(typ, t)
   complex(kind=8)      :: muc  
 
   muc = dcmplx(0.d0, Mu(1)*pi/(2.d0*Beta))
-  tau = (real(t))*Beta/MxT
+  tau = (real(t)+0.5d0)*Beta/MxT
   if(tau>=0) then
     weight_G0 = cdexp(muc*tau)/(1.d0, 1.d0) 
   else
@@ -242,40 +242,7 @@ END FUNCTION d_times_cd
 !!=======================================================================
 !!======================= Fourier Transformation ========================
 !!=======================================================================
-!MODULE test
-    !implicit none
-    !integer,parameter :: L(1)=4,L(2)=4
-    !integer,parameter :: Omega=2
-    !integer,parameter :: NtypeW=7
-    !double precision :: WR(NtypeW,0:L(1)-1,0:L(2)-1,-Omega:Omega,-Omega:Omega)
-!end module
 
-!program main
-    !use test
-    !integer :: ix,iy
-    !print *, "Start"
-    !WR(:,:,:,:,:)=1
-    !WR(1,0,0,:,:)=3
-    !write(*,*) "Before"
-    !do iy=0,L(2)-1
-      !write(*,*) WR(1,:,iy,2,2)
-    !enddo
-    !call FFT(WR,NtypW,(2*Omega+1)**2,1)
-    !print *, "First FFT"
-    !do iy=0,L(2)-1
-      !write(*,*) WR(1,:,iy,2,2)
-    !enddo
-    !call FFT(WR,NtypW,(2*Omega+1)**2,-1)
-    !print *, "Second FFT"
-    !do iy=0,L(2)-1
-      !write(*,*) WR(1,:,iy,2,2)
-    !enddo
-
-!CONTAINS
-
-!================================================================================
-!============ transfer quantities in (r,k) domain ===========================
-!================================================================================
 SUBROUTINE transfer_r(Backforth)
   implicit none
   integer,intent(in) :: Backforth
@@ -284,6 +251,21 @@ SUBROUTINE transfer_r(Backforth)
   call transfer_Gam_r(Backforth)
   return
 END SUBROUTINE
+
+
+
+SUBROUTINE transfer_t(Backforth)
+  implicit none
+  integer,intent(in) :: Backforth
+
+  call transfer_G_t(Backforth)
+  call transfer_W_t(Backforth)
+  call transfer_Gam_t(Backforth)
+END SUBROUTINE
+
+!================================================================================
+!============ transfer quantities in (r,k) domain ===========================
+!================================================================================
 
 SUBROUTINE transfer_W0_r(BackForth)
     implicit none
@@ -318,31 +300,22 @@ SUBROUTINE transfer_Chi_r(BackForth)
     return
 END SUBROUTINE
 
-!SUBROUTINE transfer_Polar_r(BackForth)
-    !implicit none
-    !integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
-    !call FFT_r(Polar,1,MxT,BackForth)
-!END SUBROUTINE
+SUBROUTINE transfer_Polar_r(BackForth)
+    implicit none
+    integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
+    call FFT_r(Polar,1,MxT,BackForth)
+END SUBROUTINE
 
 !!================================================================================
 !!============ transfer quantities in (t,omega) domain ===========================
 !!================================================================================
-SUBROUTINE transfer_t(Backforth)
-  implicit none
-  integer,intent(in) :: Backforth
 
-  call transfer_G_t(Backforth)
-  call transfer_W_t(Backforth)
-  call transfer_Gam_t(Backforth)
-END SUBROUTINE
-
-
-
+!!!TODO: need to be update!!!!
 !========W0 and Gam0 are just constants in omega domain ====================
 SUBROUTINE transfer_W0_t(BackForth)
     implicit none
     integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
-    call FFT_tau_single(W0PF,1,Vol,BackForth)
+    call FFT_tau_single(W0PF,1,Vol,.false.,BackForth)
 END SUBROUTINE
 
 SUBROUTINE transfer_Gam0_t(BackForth)
@@ -350,7 +323,7 @@ SUBROUTINE transfer_Gam0_t(BackForth)
     integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
     integer :: it1, it2
 
-    call FFT_tau_double(Gam0PF,1,Vol,BackForth)
+    call FFT_tau_double(Gam0PF,1,Vol,.false.,BackForth)
 END SUBROUTINE
 !===========================================================================
 
@@ -358,189 +331,55 @@ SUBROUTINE transfer_G0(BackForth)
     implicit none
     integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
     integer :: it
-    if(BackForth/=-1) then
-      call FFT_shift_t_single(G0F,1,1,BackForth)
-      call FFT_tau_single(G0F,1,1,BackForth)
-      !call FFT_shift_omega_single(G0F,1,1,BackForth)
-    else
-      !call FFT_shift_omega_single(G0F,1,1,BackForth)
-      call FFT_tau_single(G0F,1,1,BackForth)
-      call FFT_shift_t_single(G0F,1,1,BackForth)
-    endif
+    call FFT_tau_single(G0F,1,1,.true.,BackForth)
 END SUBROUTINE
 
 SUBROUTINE transfer_GamOrder1_t(BackForth)
     implicit none
     integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
     integer ::it1, it2
-    if(BackForth/=-1) then
-      call FFT_shift_t_double(GamOrder1,NtypeGam,1,BackForth)
-      call FFT_tau_double(GamOrder1,NtypeGam,1,BackForth)
-      !call FFT_shift_omega_double(GamOrder1,NtypeGam,1,BackForth)
-    else 
-      !call FFT_shift_omega_double(GamOrder1,NtypeGam,1,BackForth)
-      call FFT_tau_double(GamOrder1,NtypeGam,1,BackForth)
-      call FFT_shift_t_double(GamOrder1,NtypeGam,1,BackForth)
-    endif
+    call FFT_tau_double(GamOrder1,NtypeGam,1,.true.,BackForth)
 END SUBROUTINE
-
 
 SUBROUTINE transfer_G_t(BackForth)
     implicit none
     integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
     integer            :: it
-    if(BackForth/=-1) then
-      call FFT_shift_t_single(G,NtypeG,1,BackForth)
-      call FFT_tau_single(G,NtypeG,1,BackForth)
-      !call FFT_shift_omega_single(G,NtypeG,1,BackForth)
-    else
-      !call FFT_shift_omega_single(G,NtypeG,1,BackForth)
-      call FFT_tau_single(G,NtypeG,1,BackForth)
-      call FFT_shift_t_single(G,NtypeG,1,BackForth)
-    endif
+    call FFT_tau_single(G,NtypeG,1,.true.,BackForth)
 END SUBROUTINE transfer_G_t
-
-SUBROUTINE transfer_W_t(BackForth)
-    implicit none
-    integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
-    call FFT_tau_single(W,NtypeW,Vol,BackForth)
-END SUBROUTINE transfer_W_t
-
 
 SUBROUTINE transfer_Gam_t(BackForth)
     implicit none
     integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
     integer :: it1, it2
-    if(BackForth/=-1) then
-      call FFT_shift_t_double(Gam,NtypeGam,Vol,BackForth)
-      call FFT_tau_double(Gam,NtypeGam,Vol,BackForth)
-      !call FFT_shift_omega_double(Gam,NtypeGam,Vol,BackForth)
-    else
-      !call FFT_shift_omega_double(Gam,NtypeGam,Vol,BackForth)
-      call FFT_tau_double(Gam,NtypeGam,Vol,BackForth)
-      call FFT_shift_t_double(Gam,NtypeGam,Vol,BackForth)
-    endif
-
-END SUBROUTINE
-
-SUBROUTINE transfer_Chi_t(BackForth)
-    implicit none
-    integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
-    call FFT_tau_single(Chi,1,Vol,BackForth)
+    call FFT_tau_double(Gam,NtypeGam,Vol,.true.,BackForth)
 END SUBROUTINE
 
 SUBROUTINE transfer_Sigma_t(BackForth)
     implicit none
     integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
     integer       :: it
-    if(BackForth/=-1) then
-      call FFT_shift_t_single(Sigma,1,1,BackForth)
-      call FFT_tau_single(Sigma,1,1,BackForth)
-      !call FFT_shift_omega_single(Sigma,1,1,BackForth)
-    else
-      !call FFT_shift_omega_single(Sigma,1,1,BackForth)
-      call FFT_tau_single(Sigma,1,1,BackForth)
-      call FFT_shift_t_single(Sigma,1,1,BackForth)
-    endif
+    call FFT_tau_single(Sigma,1,1,.true.,BackForth)
 END SUBROUTINE
 
-!SUBROUTINE transfer_Polar_t(BackForth)
-    !implicit none
-    !integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
-    !call FFT_tau_single(Polar,1,Vol,BackForth)
-!END SUBROUTINE
-
-
-
-
-
-
-SUBROUTINE FFT_shift_t_single(XR, Ntype, Nz, BackForth)
-    integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
-    integer,intent(in) :: Nz
-    integer,intent(in) :: Ntype
-    complex(kind=8)    :: XR(Ntype,0:Nz-1,0:MxT-1)
-    integer :: it
-
-    if(BackForth/=-1) then
-      do it = 0, MxT-1
-        XR(:,:,it) = XR(:,:,it)* cdexp(dcmplx(0.d0,-Pi*real(it)/real(MxT)))
-      enddo
-    else
-      do it = 0, MxT-1
-        XR(:,:,it) = XR(:,:,it)* cdexp(dcmplx(0.d0,Pi*real(it)/real(MxT)))
-      enddo
-    endif
-    return
-END SUBROUTINE FFT_shift_t_single
-
-!SUBROUTINE FFT_shift_omega_single(XR, Ntype, Nz, BackForth)
-    !integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
-    !integer,intent(in) :: Nz
-    !integer,intent(in) :: Ntype
-    !complex(kind=8)    :: XR(Ntype,0:Nz-1,0:MxT-1)
-    !integer :: it
-
-    !if(BackForth/=-1) then
-      !do it = 0, MxT-1
-        !XR(:,:,it) = XR(:,:,it)* cdexp(dcmplx(0.d0,-Pi*(it+0.5d0)/real(MxT)))
-      !enddo
-    !else
-      !do it = 0, MxT-1
-        !XR(:,:,it) = XR(:,:,it)* cdexp(dcmplx(0.d0,Pi*(it+0.5d0)/real(MxT)))
-      !enddo
-    !endif
-    !return
-!END SUBROUTINE FFT_shift_omega_single
-
-
-SUBROUTINE FFT_shift_t_double(XR, Ntype, Nz, BackForth)
+SUBROUTINE transfer_Polar_t(BackForth)
     implicit none
     integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
-    integer,intent(in) :: Nz
-    integer,intent(in) :: Ntype
-    complex(kind=8)    :: XR(Ntype,0:Nz-1,0:MxT-1,0:MxT-1)
-    integer :: it1, it2
+    call FFT_tau_single(Polar,1,Vol,.false.,BackForth)
+END SUBROUTINE
 
-    if(BackForth/=-1) then
-      do it2 = 0, MxT-1
-        do it1 = 0, MxT-1
-          XR(:,:,it1, it2) = XR(:,:,it1, it2)* cdexp(dcmplx(0.d0,-Pi*real(it1+it2)/real(MxT)))
-        enddo
-      enddo
-    else
-      do it2 = 0, MxT-1
-        do it1 = 0, MxT-1
-          XR(:,:,it1, it2) = XR(:,:,it1, it2)* cdexp(dcmplx(0.d0,Pi*real(it1+it2)/real(MxT)))
-        enddo
-      enddo
-    endif
-    return
-END SUBROUTINE FFT_shift_t_double
+SUBROUTINE transfer_W_t(BackForth)
+    implicit none
+    integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
+    call FFT_tau_single(W,NtypeW,Vol,.false.,BackForth)
+END SUBROUTINE transfer_W_t
 
-!SUBROUTINE FFT_shift_omega_double(XR, Ntype, Nz, BackForth)
-    !implicit none
-    !integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
-    !integer,intent(in) :: Nz
-    !integer,intent(in) :: Ntype
-    !complex(kind=8)    :: XR(Ntype,0:Nz-1,0:MxT-1,0:MxT-1)
-    !integer :: it1, it2
+SUBROUTINE transfer_Chi_t(BackForth)
+    implicit none
+    integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
+    call FFT_tau_single(Chi,1,Vol,.false.,BackForth)
+END SUBROUTINE
 
-    !if(BackForth/=-1) then
-      !do it2 = 0, MxT-1
-        !do it1 = 0, MxT-1
-          !XR(:,:,it1, it2) = XR(:,:,it1, it2)* cdexp(dcmplx(0.d0,-Pi*(it1+it2+1.d0)/real(MxT)))
-        !enddo
-      !enddo
-    !else
-      !do it2 = 0, MxT-1
-        !do it1 = 0, MxT-1
-          !XR(:,:,it1, it2) = XR(:,:,it1, it2)* cdexp(dcmplx(0.d0,Pi*(it1+it2+1.d0)/real(MxT)))
-        !enddo
-      !enddo
-    !endif
-    !return
-!END SUBROUTINE FFT_shift_omega_double
 
 SUBROUTINE FFT_r(XR,Ntype,Nz,BackForth)
     implicit none
@@ -634,9 +473,10 @@ SUBROUTINE FFT_r(XR,Ntype,Nz,BackForth)
 end SUBROUTINE FFT_r
 
 
-
-SUBROUTINE FFT_tau_single(XR,Ntype,Nz,BackForth)
+SUBROUTINE FFT_tau_single(XR,Ntype,Nz,IsAntiSym,BackForth)
     implicit none
+    logical,intent(in) :: IsAntiSym    !IsAntiSym=.true. antisymmetric function
+                                       !IsAntiSym=.false. symmetric function
     integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
     integer,intent(in) :: Nz
     integer,intent(in) :: Ntype
@@ -644,6 +484,22 @@ SUBROUTINE FFT_tau_single(XR,Ntype,Nz,BackForth)
     integer :: Power,Noma
     integer :: itau,iomega,iz,it
     double precision,allocatable ::   Real1(:), Im1(:)
+
+
+    if(BackForth/=-1) then
+      !multiply exp(-i*Pi*(n+1/2)/MxT) term to anti-symmetric tau function
+      if(IsAntiSym) then
+        do it = 0, MxT-1
+          XR(:,:,it) = XR(:,:,it)* cdexp(dcmplx(0.d0,-Pi*(real(it)+0.5d0)/real(MxT)))
+        enddo
+      endif
+    else
+      !shift tau with 1/2
+      !multiply  exp(i*Pi*m/MxT) term to omega function
+      !do it = 0, MxT-1
+        !XR(:,:,it) = XR(:,:,it)* cdexp(dcmplx(0.d0,Pi*real(it)/real(MxT)))
+      !enddo
+    endif
 
     !do FFT in tau 
     Power=log(MxT*1.d0)/log(2.d0)+1.d-14  
@@ -659,17 +515,54 @@ SUBROUTINE FFT_tau_single(XR,Ntype,Nz,BackForth)
     enddo
     deallocate(Real1,Im1)
 
+    if(BackForth/=-1) then
+      !shift tau with 1/2
+      !multiply  exp(-i*Pi*m/MxT) term to omega function
+      !do it = 0, MxT-1
+        !XR(:,:,it) = XR(:,:,it)* cdexp(dcmplx(0.d0,-Pi*real(it)/real(MxT)))
+      !enddo
+    else
+      !multiply exp(i*Pi*(n+1/2)/MxT) term to anti-symmetric tau function
+      if(IsAntiSym) then
+        do it = 0, MxT-1
+          XR(:,:,it) = XR(:,:,it)* cdexp(dcmplx(0.d0,Pi*(real(it)+0.5d0)/real(MxT)))
+        enddo
+      endif
+    endif
+
 end SUBROUTINE FFT_tau_single
     
-SUBROUTINE FFT_tau_double(XR,Ntype,Nz,BackForth)
+SUBROUTINE FFT_tau_double(XR,Ntype,Nz,IsAntiSym,BackForth)
     implicit none
+    logical,intent(in) :: IsAntiSym    !IsAntiSym=.true. antisymmetric function
+                                       !IsAntiSym=.false. symmetric function
     integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
     integer,intent(in) :: Nz
     integer,intent(in) :: Ntype
     complex(kind=8)    :: XR(Ntype,0:Nz-1,0:MxT-1,0:MxT-1)
     integer :: Power,Noma
-    integer :: itau1,itau2,iz,it
+    integer :: itau1,itau2,iz,it,it1,it2
     double precision,allocatable ::   Real1(:), Im1(:)
+
+
+    if(BackForth/=-1) then
+      !multiply exp(-i*Pi*(n1+1/2+n2+1/2)/MxT) term to anti-symmetric tau function
+      if(IsAntiSym) then
+        do it2 = 0, MxT-1
+          do it1 = 0, MxT-1
+            XR(:,:,it1, it2) = XR(:,:,it1, it2)* cdexp(dcmplx(0.d0,-Pi*real(it1+it2+1.d0)/real(MxT)))
+          enddo
+        enddo
+      endif
+    else
+      !shift tau with 1/2
+      !multiply  exp(i*Pi*(m1+m2)/MxT) term to omega function
+      !do it2 = 0, MxT-1
+        !do it1 = 0, MxT-1
+          !XR(:,:,it1, it2) = XR(:,:,it1, it2)* cdexp(dcmplx(0.d0,Pi*real(it1+it2)/real(MxT)))
+        !enddo
+      !enddo
+    endif
 
     !do FFT in tau1 direction
     Power=log(MxT*1.d0)/log(2.d0)+1.d-14  
@@ -703,6 +596,24 @@ SUBROUTINE FFT_tau_double(XR,Ntype,Nz,BackForth)
     enddo
     deallocate(Real1,Im1)
 
+    if(BackForth/=-1) then
+      !shift tau with 1/2
+      !multiply  exp(-i*Pi*(m1+m2)/MxT) term to omega function
+      !do it2 = 0, MxT-1
+        !do it1 = 0, MxT-1
+          !XR(:,:,it1, it2) = XR(:,:,it1, it2)* cdexp(dcmplx(0.d0,-Pi*real(it1+it2)/real(MxT)))
+        !enddo
+      !enddo
+    else
+      !multiply exp(i*Pi*(n1+1/2+n2+1/2)/MxT) term to anti-symmetric tau function
+      if(IsAntiSym) then
+        do it2 = 0, MxT-1
+          do it1 = 0, MxT-1
+            XR(:,:,it1, it2) = XR(:,:,it1, it2)* cdexp(dcmplx(0.d0,Pi*real(it1+it2+1.d0)/real(MxT)))
+          enddo
+        enddo
+      endif
+    endif
 end SUBROUTINE FFT_tau_double
     
 

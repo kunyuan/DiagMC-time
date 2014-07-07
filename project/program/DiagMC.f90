@@ -212,10 +212,13 @@ SUBROUTINE just_output
 
   flag = self_consistent_GW(1.d-6)
 
+  call transfer_Polar_r(-1)
+  call transfer_Polar_t(-1)
+  call transfer_Sigma_t(-1)
+
   call calculate_Chi
   call transfer_Chi_r(-1)
   call transfer_Chi_t(-1)
-  call transfer_Sigma_t(-1)
 
   call output_Quantities
 end SUBROUTINE just_output
@@ -230,10 +233,13 @@ SUBROUTINE self_consistent
 
     flag = self_consistent_GW(1.d-6)
 
+    call transfer_Polar_r(-1)
+    call transfer_Polar_t(-1)
+    call transfer_Sigma_t(-1)
+
     call calculate_Chi
     call transfer_Chi_r(-1)
     call transfer_Chi_t(-1)
-    call transfer_Sigma_t(-1)
 
     call output_Quantities
 
@@ -254,11 +260,13 @@ SUBROUTINE self_consistent
 
     flag = self_consistent_GW(1.d-6)
 
-    call calculate_Chi
+    call transfer_Polar_r(-1)
+    call transfer_Polar_t(-1)
+    call transfer_Sigma_t(-1)
 
+    call calculate_Chi
     call transfer_Chi_r(-1)
     call transfer_Chi_t(-1)
-    call transfer_Sigma_t(-1)
 
     call output_Quantities
 
@@ -292,17 +300,17 @@ LOGICAL FUNCTION self_consistent_GW(err)
   call calculate_Polar
   call calculate_W
 
-  !do while(abs(real(WNow)-real(WOld))>err) 
-    !if(iloop>=20)  exit
+  do while(abs(real(WNow)-real(WOld))>err) 
+    if(iloop>=20)  exit
 
     WOld = WNow
     iloop = iloop + 1
 
     call calculate_Sigma
-    !call calculate_Polar
+    call calculate_Polar
 
     call calculate_G
-    !call calculate_W
+    call calculate_W
 
     call calculate_Denom
     call calculate_Chi
@@ -310,7 +318,7 @@ LOGICAL FUNCTION self_consistent_GW(err)
     WNow = weight_W(1, istag, 0)
 
     call LogFile%QuickLog("G-W loop:"//str(iloop)//str(WNow/W0PF(istag, 0)))
-  !enddo
+  enddo
   !!-------------------------------------------------------
   call plus_minus_W0(-1)
   call plus_minus_Gam0(-1)
