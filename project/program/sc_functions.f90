@@ -487,7 +487,7 @@ SUBROUTINE FFT_tau_single(XR,Ntype,Nz,IsAntiSym,BackForth)
 
 
     if(BackForth/=-1) then
-      !multiply exp(-i*Pi*(n+1/2)/MxT) term to anti-symmetric function
+      !multiply exp(-i*Pi*(n+1/2)/MxT) term to anti-symmetric tau function
       if(IsAntiSym) then
         do it = 0, MxT-1
           XR(:,:,it) = XR(:,:,it)* cdexp(dcmplx(0.d0,-Pi*(real(it)+0.5d0)/real(MxT)))
@@ -496,9 +496,9 @@ SUBROUTINE FFT_tau_single(XR,Ntype,Nz,IsAntiSym,BackForth)
     else
       !shift tau with 1/2
       !multiply  exp(i*Pi*m/MxT) term to omega function
-      do it = 0, MxT-1
-        XR(:,:,it) = XR(:,:,it)* cdexp(dcmplx(0.d0,Pi*real(it)/real(MxT)))
-      enddo
+      !do it = 0, MxT-1
+        !XR(:,:,it) = XR(:,:,it)* cdexp(dcmplx(0.d0,Pi*real(it)/real(MxT)))
+      !enddo
     endif
 
     !do FFT in tau 
@@ -518,11 +518,11 @@ SUBROUTINE FFT_tau_single(XR,Ntype,Nz,IsAntiSym,BackForth)
     if(BackForth/=-1) then
       !shift tau with 1/2
       !multiply  exp(-i*Pi*m/MxT) term to omega function
-      do it = 0, MxT-1
-        XR(:,:,it) = XR(:,:,it)* cdexp(dcmplx(0.d0,-Pi*real(it)/real(MxT)))
-      enddo
+      !do it = 0, MxT-1
+        !XR(:,:,it) = XR(:,:,it)* cdexp(dcmplx(0.d0,-Pi*real(it)/real(MxT)))
+      !enddo
     else
-      !multiply exp(i*Pi*(n+1/2)/MxT) term to anti-symmetric function
+      !multiply exp(i*Pi*(n+1/2)/MxT) term to anti-symmetric tau function
       if(IsAntiSym) then
         do it = 0, MxT-1
           XR(:,:,it) = XR(:,:,it)* cdexp(dcmplx(0.d0,Pi*(real(it)+0.5d0)/real(MxT)))
@@ -546,7 +546,7 @@ SUBROUTINE FFT_tau_double(XR,Ntype,Nz,IsAntiSym,BackForth)
 
 
     if(BackForth/=-1) then
-      !multiply exp(-i*Pi*(n1+1/2+n2+1/2)/MxT) term to anti-symmetric function
+      !multiply exp(-i*Pi*(n1+1/2+n2+1/2)/MxT) term to anti-symmetric tau function
       if(IsAntiSym) then
         do it2 = 0, MxT-1
           do it1 = 0, MxT-1
@@ -557,11 +557,11 @@ SUBROUTINE FFT_tau_double(XR,Ntype,Nz,IsAntiSym,BackForth)
     else
       !shift tau with 1/2
       !multiply  exp(i*Pi*(m1+m2)/MxT) term to omega function
-      do it2 = 0, MxT-1
-        do it1 = 0, MxT-1
-          XR(:,:,it1, it2) = XR(:,:,it1, it2)* cdexp(dcmplx(0.d0,Pi*real(it1+it2)/real(MxT)))
-        enddo
-      enddo
+      !do it2 = 0, MxT-1
+        !do it1 = 0, MxT-1
+          !XR(:,:,it1, it2) = XR(:,:,it1, it2)* cdexp(dcmplx(0.d0,Pi*real(it1+it2)/real(MxT)))
+        !enddo
+      !enddo
     endif
 
     !do FFT in tau1 direction
@@ -599,13 +599,13 @@ SUBROUTINE FFT_tau_double(XR,Ntype,Nz,IsAntiSym,BackForth)
     if(BackForth/=-1) then
       !shift tau with 1/2
       !multiply  exp(-i*Pi*(m1+m2)/MxT) term to omega function
-      do it2 = 0, MxT-1
-        do it1 = 0, MxT-1
-          XR(:,:,it1, it2) = XR(:,:,it1, it2)* cdexp(dcmplx(0.d0,-Pi*real(it1+it2)/real(MxT)))
-        enddo
-      enddo
+      !do it2 = 0, MxT-1
+        !do it1 = 0, MxT-1
+          !XR(:,:,it1, it2) = XR(:,:,it1, it2)* cdexp(dcmplx(0.d0,-Pi*real(it1+it2)/real(MxT)))
+        !enddo
+      !enddo
     else
-      !multiply exp(i*Pi*(n1+1/2+n2+1/2)/MxT) term to anti-symmetric function
+      !multiply exp(i*Pi*(n1+1/2+n2+1/2)/MxT) term to anti-symmetric tau function
       if(IsAntiSym) then
         do it2 = 0, MxT-1
           do it1 = 0, MxT-1
