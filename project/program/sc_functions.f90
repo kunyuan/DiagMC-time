@@ -171,7 +171,7 @@ Complex*16 FUNCTION weight_W0(typ, site)
 
 END FUNCTION weight_W0
 
-!!--------- calculate weight for bare Gamma ---------
+!!--------- calculate weight for bare gamma ---------
 COMPLEX*16 FUNCTION weight_Gam0(typ, site)
   implicit none
   integer, intent(in)  :: site, typ
@@ -185,47 +185,6 @@ COMPLEX*16 FUNCTION weight_Gam0(typ, site)
     endif
   endif
 END FUNCTION weight_Gam0
-
-
-!!--------- extract weight for G ---------
-COMPLEX*16 FUNCTION weight_G(typ1, t1)
-  implicit none
-  integer, intent(in)  :: t1, typ1
-
-  if(t1>=0) then
-    weight_G = G(typ1, t1)
-  else
-    weight_G = -G(typ1, t1+MxT)
-  endif
-END FUNCTION weight_G
-
-!!--------- extract weight for W ---------
-COMPLEX*16 FUNCTION weight_W(typ1, site, t1)
-  implicit none
-  integer, intent(in)  :: site, t1, typ1
-  if(t1>=0) then
-    weight_W = W(typ1, site, t1)
-  else
-    weight_W = W(typ1, site, t1+MxT)
-  endif
-END FUNCTION weight_W
-
-!!--------- extract weight for Gamma ---------
-COMPLEX*16 FUNCTION weight_Gam(typ1, site, t1, t2)
-  implicit none
-  integer, intent(in)  :: site, t1, t2, typ1
-  double precision :: GaR
-
-  if(t1>=0 .and. t2>=0) then
-    weight_Gam = Gam(typ1, site, t1, t2)
-  else if(t1<0 .and. t2>=0) then
-    weight_Gam = -Gam(typ1, site, t1+MxT, t2)
-  else if(t1>=0 .and. t2<0) then
-    weight_Gam = -Gam(typ1, site, t1, t2+MxT)
-  else
-    weight_Gam = Gam(typ1, site, t1+MxT, t2+MxT)
-  endif
-END FUNCTION weight_Gam
 
 
 !======================= Complex Operations =============================

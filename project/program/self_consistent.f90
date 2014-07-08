@@ -100,13 +100,13 @@ SUBROUTINE calculate_Polar
       do p = 0, Vol-1
         omegaGout = omegaGin - omega
 
-        Gin = weight_G(1, omegaGin)
+        Gin = G(1, omegaGin)
         if(omegaGout>=0) then
-          Gout = weight_G(1, omegaGout)
-          Gam1 = weight_Gam(5, p, omegaGin, omegaGout)
+          Gout = G(1, omegaGout)
+          Gam1 = Gam(5, p, omegaGin, omegaGout)
         else
-          Gout = -1.d0*weight_G(1, omegaGout+MxT)
-          Gam1 = -1.d0*weight_Gam(5, p, omegaGin, omegaGout+MxT)
+          Gout = -1.d0*G(1, omegaGout+MxT)
+          Gam1 = -1.d0*Gam(5, p, omegaGin, omegaGout+MxT)
         endif
         Polar(p, omega) = Polar(p, omega)+d_times_cd(ratio, cdexp(dcmplx(0.d0, -1.d0)* &
           & omegaGout*2.d0*Pi/MxT) *Gin*Gout*Gam1)
@@ -132,13 +132,13 @@ SUBROUTINE calculate_Sigma
       do p = 0, Vol-1
         omegaW = omega-omegaG
 
-        G1 = weight_G(1, omegaG)
+        G1 = G(1, omegaG)
         if(omegaW>=0) then
-          W1 = weight_W(1, p, omegaW)
+          W1 = W(1, p, omegaW)
         else
-          W1 = weight_W(1, p, omegaW+MxT)
+          W1 = W(1, p, omegaW+MxT)
         endif
-        Gam1 = weight_Gam(5, p, omegaG, omega)
+        Gam1 = Gam(5, p, omegaG, omega)
         
         Sigma(omega) = Sigma(omega)+d_times_cd(ratio, G1*W1*Gam1)
       enddo

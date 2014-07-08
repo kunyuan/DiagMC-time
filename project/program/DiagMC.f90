@@ -216,7 +216,7 @@ SUBROUTINE just_output
   !!-------- update the Gamma matrix with MC data -------
   call Gam_mc2matrix_mc
 
-  flag = self_consistent_GW(1.d-6)
+  flag = self_consistent_GW(.false.)
 
   call transfer_Polar_r(-1)
   call transfer_Polar_t(-1)
@@ -237,7 +237,7 @@ SUBROUTINE self_consistent
   !------- read the G, W, and Gamma  -------------------
   if(IsLoad==.false.) then
 
-    flag = self_consistent_GW(1.d-6)
+    flag = self_consistent_GW(.true.)
 
     call transfer_Polar_r(-1)
     call transfer_Polar_t(-1)
@@ -264,7 +264,7 @@ SUBROUTINE self_consistent
     !!-------- update the Gamma matrix with MC data -------
     call Gam_mc2matrix_mc
 
-    flag = self_consistent_GW(1.d-6)
+    flag = self_consistent_GW(.false.)
 
     call transfer_Polar_r(-1)
     call transfer_Polar_t(-1)
@@ -282,16 +282,15 @@ SUBROUTINE self_consistent
   return
 END SUBROUTINE self_consistent
 
-LOGICAL FUNCTION self_consistent_GW(err)
+LOGICAL FUNCTION self_consistent_GW(isloop)
   implicit none
-  double precision, intent(in) :: err
+  logical, intent(in) :: isloop
   integer :: iloop, istag
   integer :: px, py
   complex*16 :: WOld, WNow, denominator
 
   call transfer_r(1)
   call transfer_t(1)
-
   call plus_minus_W0(1)
   call plus_minus_Gam0(1)
 
@@ -299,47 +298,57 @@ LOGICAL FUNCTION self_consistent_GW(err)
   istag = get_site_from_cord(D, L(1:D)/2)
   self_consistent_GW = .true.
 
-  iloop = 0
+  if(isloop) then
+    WOld = (10.d0, 0.d0)
+    WNow = W(1, istag, 0)
+    call calculate_Polar
+    call calculate_W
 
-  !WOld = (10.d0, 0.d0)
-  !WNow = weight_W(1, istag, 0)
-  !call calculate_Polar
-  !call calculate_W
+    do iloop = 1, 20
+      WOld = WNow
 
-  !do while(abs(real(WNow)-real(WOld))>err) 
-    !if(iloop>=20)  exit
+      call calculate_Sigma
+      call calculate_Polar
 
-    !WOld = WNow
-    !iloop = iloop + 1
+      call calculate_G
+      call calculate_W
 
-    !call calculate_Sigma
-    !call calculate_Polar
+      call calculate_Denom
+      call calculate_Chi
 
-    !call calculate_G
-    !call calculate_W
+      WNow = W(1, istag, 0)
+      call LogFile%QuickLog("G-W loop:"//str(iloop)//str(WNow/W0PF(istag, 0)))
 
-    !call calculate_Denom
-    !call calculate_Chi
+      denominator = Denom(istag, 0)
+      call LogFile%QuickLog("denominator: "+str(denominator), 'i')
 
-    !!WNow = weight_W(1, istag, 0)
-    !call LogFile%QuickLog("G-W loop:"//str(iloop)//str(WNow/W0PF(istag, 0)))
-  !enddo
+      if(real(denominator)<1.d-14)  then
+        self_consistent_GW = .false.
+        call LogFile%QuickLog("denominator touches zero! "+str(denominator), 'e')
+        stop -1
+      endif
+    enddo
 
-  call calculate_Sigma
-  call calculate_Polar
+  else
+    call calculate_Sigma
+    call calculate_Polar
 
-  call calculate_G
-  call calculate_W
+    call calculate_G
+    call calculate_W
 
-  call calculate_Denom
-  call calculate_Chi
+    call calculate_Denom
+    call calculate_Chi
 
-  denominator = Denom(istag, 0)
-  if(real(denominator)<1.d-8)  then
-    self_consistent_GW = .false.
-    call LogFile%QuickLog("denominator touches zero! "+str(denominator), 'e')
-    stop -1
+    denominator = Denom(istag, 0)
+    call LogFile%QuickLog("denominator: "+str(denominator), 'i')
+
+    if(real(denominator)<1.d-14)  then
+      self_consistent_GW = .false.
+      call LogFile%QuickLog("denominator touches zero! "+str(denominator), 'e')
+      stop -1
+    endif
   endif
+
   !!-------------------------------------------------------
   call plus_minus_W0(-1)
   call plus_minus_Gam0(-1)

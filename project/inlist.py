@@ -10,7 +10,7 @@ TO_DO = []
 com_dict={
     "L" :   [8,8,8],
     "Jcp" :  1.0,
-    "Beta" :  0.50,
+    "Beta" :  0.65,
     "Order" :  1,
     }
 

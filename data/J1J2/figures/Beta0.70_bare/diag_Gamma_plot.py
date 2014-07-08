@@ -24,6 +24,7 @@ Quan1D=["GammaDiag1","GammaDiag2","GammaDiag3","GammaDiag4"]
 Quan=Quan2D+Quan1D
 
 DiagGamma=[]
+#DiagGamma.append(read_data.read_array("./L16_0.70_5_bare_quantities.dat", Quan))
 DiagGamma.append(read_data.read_array("./L16_0.70_4_bare_quantities.dat", Quan))
 
 

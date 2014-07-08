@@ -2655,20 +2655,26 @@ SUBROUTINE measure
     tau3 = TVertex(3, NeighLn(3-dir, MeaW))
 
     factorM = 1.d0
+
     dtau1 = tau3-tau2
-    if(dtau1<0) then
+    if(dtau1<=1.d-14) then
+      if(abs(dtau1)<=1.d-14)  dtau1 = 0.d0
       dtau1 = dtau1 + Beta
       factorM = factorM * (-1.d0)
     endif
 
     dtau2 = tau1-tau3
-    if(dtau2<0) then
+    if(dtau2<=1.d-14) then
+      if(abs(dtau2)<=1.d-14)  dtau2 = 0.d0
       dtau2 = dtau2 + Beta
       factorM = factorM * (-1.d0)
     endif
 
-    dt1 = Floor(dtau1*MxT/Beta)
-    dt2 = Floor(dtau2*MxT/Beta)
+    dt1 = Floor(dtau1*MxT/Beta+0.5d0)
+    if(dt1==MxT)  dt1 = 0
+
+    dt2 = Floor(dtau2*MxT/Beta+0.5d0)
+    if(dt2==MxT)  dt2 = 0
 
     factorM = factorM * CoefOfWeight(Order) *abs(WeightVertex(MeasureGam))
 
