@@ -103,17 +103,17 @@ SUBROUTINE calculate_Gam1
           omegaout = omega2-omegaW
           if(omegaout<0)  omegaout = omegaout+MxT
 
-          Gin = weight_G(tg(ityp), omega3)
-          Gout = weight_G(tg(ityp), omegaout)
-          Gam2 = weight_Gam(tgam2(ityp), 0, omega3, omegaout)
+          Gin = G(tg(ityp), omega3)
+          Gout = G(tg(ityp), omegaout)
+          Gam2 = Gam(tgam2(ityp), 0, omega3, omegaout)
 
           do isite1 = 0, Vol-1
             do isite3 = 0, Vol-1
 
               isiteW = diff_r(D, isite1, isite3)
-              Gam1 = weight_Gam(tgam1(ityp), isite1, omega1, omega3)
-              Gam3 = weight_Gam(tgam3(ityp), isite3, omegaout, omega2)
-              iW = weight_W(tw(ityp), isiteW, omegaW)
+              Gam1 = Gam(tgam1(ityp), isite1, omega1, omega3)
+              Gam3 = Gam(tgam3(ityp), isite3, omegaout, omega2)
+              iW = W(tw(ityp), isiteW, omegaW)
 
               weight = Gin *Gout *iW *Gam1 *Gam2 *Gam3
               GamOrder1(1,omega1, omega2)=GamOrder1(1, omega1, omega2)+ratio*weight

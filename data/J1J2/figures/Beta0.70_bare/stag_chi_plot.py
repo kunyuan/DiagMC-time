@@ -25,6 +25,7 @@ Files.append(read_data.read_array("./L16_0.70_1_bare_quantities.dat", Quans))
 Files.append(read_data.read_array("./L16_0.70_2_bare_quantities.dat", Quans))
 Files.append(read_data.read_array("./L16_0.70_3_bare_quantities.dat", Quans))
 Files.append(read_data.read_array("./L16_0.70_4_bare_quantities.dat", Quans))
+Files.append(read_data.read_array("./L16_0.70_5_bare_quantities.dat", Quans))
 
 Order=np.arange(1, len(Files)+1)
 
