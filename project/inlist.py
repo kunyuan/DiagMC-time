@@ -26,9 +26,9 @@ mc_dict={
     "IsLoad" : False,
     "Reweight" : [1.0],
     "ReadFile" : "null",
-    "Sample" : 5000000,
-    "Sweep" : 10,
-    "Toss" : 10000,
+    "Sample" : 20000000,
+    "Sweep" : 20,
+    "Toss" : 50000,
     "Worm/Norm" : 0.5 
     }
 mc_dict.update(com_dict)

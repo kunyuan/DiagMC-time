@@ -37,10 +37,7 @@ PROGRAM MAIN
     endif
   close(11)
 
-  BetaFinal = 0.80d0
-  dBeta = 0.01d0
-
-  write(*,*) Beta, dBeta, BetaFinal, MCOrder
+  write(*,*) Beta, MCOrder
 
   write(title_loop, '(f5.2)') beta
   write(title1, '(i2)')  MCOrder
