@@ -349,8 +349,15 @@ END SUBROUTINE
 
 SUBROUTINE reset_Beta
   implicit none
+  integer :: IsChangeBeta
+
+  open(10, status='old', file="change_beta.inp")
+  read(10, *) IsChangeBeta
+  read(10, *) dBeta
+  read(10, *) BetaFinal
+  close(10)
   
-  if(Beta<BetaFinal) then
+  if(IsChangeBeta==1 .and. Beta<BetaFinal) then
     Beta = Beta + dBeta
   endif
   return
