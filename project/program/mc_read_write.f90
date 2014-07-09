@@ -809,7 +809,6 @@ SUBROUTINE output_GamMC
 
   ratioerr = 1.d0
 
-
   write(35, *) "============================================"
   write(35, *) "Beta", Beta, "L", L(1), "Order", MCOrder, "Seed",Seed
   write(35, *) imc, Z_normal, GamNormWeight, GamNorm, normal, ratioerr
