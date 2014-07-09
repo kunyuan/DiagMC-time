@@ -529,12 +529,17 @@ SUBROUTINE interpolation_Gam(tau1, tau2, Table, Val)
   ptau(2) = shift_tau(tau2)
 
   do i = 1, 2
-    ts(i) = Floor(ptau(i)*MxT/Beta)
-    tb(i) = ts(i) + 1
-    if(ts(i)<0 .or. ts(i)>=MxT) call LogFile%QuickLog("ts("+str(i)+") error!"+str(ts(i)),'e')
+    ts(i) = Floor((ptau(i)-0.5d0*Beta/MxT)*MxT/Beta)
+    if(ts(i)<0) then
+      ts(i) = 0
+    else if(ts(i)>=MxT) then
+      ts(i) = MxT-2
+    endif
 
-    taus(i) = real(ts(i))*Beta/MxT
-    taub(i) = real(tb(i))*Beta/MxT
+    tb(i) = ts(i) + 1
+
+    taus(i) = (real(ts(i))+0.5d0)*Beta/MxT
+    taub(i) = (real(tb(i))+0.5d0)*Beta/MxT
   enddo
 
   Val1 = interpolate(ptau(1), taus(1), Table(ts(1), ts(2)), taub(1), Table(tb(1), ts(2)))

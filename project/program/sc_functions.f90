@@ -90,8 +90,8 @@ SUBROUTINE def_symmetry
     enddo
   enddo
 
-  do dt1 = 1, MxT-1
-    do dt2 = 1, MxT-1
+  do dt1 = 0, MxT-1
+    do dt2 = 0, MxT-1
       CoefOfSymmetry(:, dt1, dt2) = CoefOfSymmetry(:, dt1, dt2)*2.d0
     enddo
   enddo

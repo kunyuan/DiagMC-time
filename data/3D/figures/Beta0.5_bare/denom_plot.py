@@ -10,15 +10,17 @@ tau = np.arange(0, Beta, Beta/N)
 Quans=["Denom"]
 
 Files=[]
-Files.append(read_data.read_array("./bare_L4_0.50_1_quantities.dat", Quans))
-Files.append(read_data.read_array("./bare_L4_0.50_2_quantities.dat", Quans))
-Files.append(read_data.read_array("./bare_L4_0.50_3_quantities.dat", Quans))
+Files.append(read_data.read_array("./bare_L8_0.50_1_quantities.dat", Quans))
+Files.append(read_data.read_array("./bare_L8_0.50_2_quantities.dat", Quans))
+Files.append(read_data.read_array("./bare_L8_0.50_3_quantities.dat", Quans))
+Files.append(read_data.read_array("./bare_L8_0.50_4_quantities.dat", Quans))
+Files.append(read_data.read_array("./bare_L8_0.50_5_quantities.dat", Quans))
 
 
 fig = plt.figure()
 ax = plt.subplot(111)
 
-L = 4
+L = 8
 stag = (L**2+L+1)*(L/2)
 
 

@@ -2663,25 +2663,15 @@ SUBROUTINE measure
 
     factorM = 1.d0
 
-    dtau1 = tau3-tau2
-    if(dtau1<=1.d-14) then
-      if(abs(dtau1)<=1.d-14)  dtau1 = 0.d0
-      dtau1 = dtau1 + Beta
-      factorM = factorM * (-1.d0)
-    endif
+    if(tau3-tau2<=1.d-14) factorM = factorM *(-1.d0)
+    if(tau1-tau3<=1.d-14) factorM = factorM *(-1.d0)
+    dtau1 = shift_tau(tau3-tau2)
+    dtau2 = shift_tau(tau1-tau3)
 
-    dtau2 = tau1-tau3
-    if(dtau2<=1.d-14) then
-      if(abs(dtau2)<=1.d-14)  dtau2 = 0.d0
-      dtau2 = dtau2 + Beta
-      factorM = factorM * (-1.d0)
-    endif
-
-    dt1 = Floor(dtau1*MxT/Beta+0.5d0)
-    if(dt1==MxT)  dt1 = 0
-
-    dt2 = Floor(dtau2*MxT/Beta+0.5d0)
-    if(dt2==MxT)  dt2 = 0
+    dt1 = Floor(dtau1*MxT/Beta)
+    if(dt1==MxT)  dt1 = MxT-1
+    dt2 = Floor(dtau2*MxT/Beta)
+    if(dt2==MxT)  dt2 = MxT-1 
 
     factorM = factorM * CoefOfWeight(Order) *abs(WeightVertex(MeasureGam))
 
@@ -2708,8 +2698,8 @@ SUBROUTINE measure
 
     call accumulate_Gamma(ityp, dr, dt1, dt2, Phase, factorM, .false.)
 
-    dtp1 = MxT-dt1
-    dtp2 = MxT-dt2
+    dtp1 = MxT-1-dt1
+    dtp2 = MxT-1-dt2
     call accumulate_Gamma(ityp, dr, dtp1, dtp2, Phase, factorM, .true.)
 
     !===============  test variables =================================
@@ -2742,8 +2732,6 @@ SUBROUTINE accumulate_Gamma(ityp, dr, dt1, dt2, Phase, factorM, flag)
   logical, intent(in) :: flag  !if need to flip the imaginary part
   complex*16 :: wbasis
   integer :: ibin, ibasis
-
-  if(flag .and. (dt1==MxT .or. dt2==MxT))  return
 
   !============  the diagonal Gamma ================================
   if(dt1==dt2 .and. ityp==1) then
