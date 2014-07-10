@@ -328,6 +328,12 @@ SUBROUTINE recalculate_Reweighting
       call LogFile%WriteLine("Reweighting is done!")
       return
     endif
+    if(GamOrder(i)<=10000.d0) then
+      call LogFile%WriteLine("The numbe of physical configs too small! Order "+str(i)+ &
+        & " Physical conf: "+str(GamOrder(i)))
+      call LogFile%WriteLine("Reweighting is done!")
+      return
+    endif
   enddo
 
   x = SUM(GamWormOrder(:))
