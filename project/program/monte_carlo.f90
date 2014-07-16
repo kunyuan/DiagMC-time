@@ -2759,7 +2759,8 @@ SUBROUTINE accumulate_Gamma(ityp, dr, dt1, dt2, Phase, factorM, flag)
   if(IsBasis2D(ibin)) then
     do ibasis = 1, NBasisGam
       wbasis = (Beta/dble(MxT))**2.d0*weight_basis_Gam(CoefGam &
-        & (0:BasisOrderGam,0:BasisOrderGam, ibasis,ibin), dt1*Beta/MxT, dt2*Beta/MxT)
+        & (0:BasisOrderGam,0:BasisOrderGam, ibasis,ibin), (real(dt1)+0.5d0)*Beta/MxT, &
+        & (real(dt2)+0.5d0)*Beta/MxT)
 
       if(flag) then
         GamBasis(Order, ityp, dr, ibin, ibasis) = GamBasis(Order, ityp, dr, ibin, &
@@ -2777,7 +2778,7 @@ SUBROUTINE accumulate_Gamma(ityp, dr, dt1, dt2, Phase, factorM, flag)
   else 
     do ibasis = 1, NBasis
       wbasis = (Beta/dble(MxT))*weight_basis(CoefGam(0:BasisOrder,0, &
-        & ibasis,ibin), dt1*Beta/MxT)
+        & ibasis,ibin), (real(dt1)+0.5d0)*Beta/MxT)
 
       if(flag) then
         GamBasis(Order, ityp, dr, ibin, ibasis) = GamBasis(Order, ityp, dr, ibin, &
