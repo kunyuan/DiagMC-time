@@ -431,7 +431,7 @@ DOUBLE PRECISION FUNCTION projector(tmin, tmax, Coef1, Coef2)
 
   projector  = 0.d0
   do t = tmin, tmax
-    tau = dble(t)*Beta/dble(MxT)
+    tau = (dble(t)+0.5d0)*Beta/dble(MxT)
     do j = 0, BasisOrder 
       do k = 0, BasisOrder
         projector = projector + Beta/dble(MxT)*Coef1(j)*Coef2(k)*tau**(dble(j+k))
@@ -467,7 +467,7 @@ SUBROUTINE test_basis(tmin, tmax, Coef)
   do i = 1, NBasis
     y = 0.d0
     do  t = tmin, tmax
-      tau = dble(t)*Beta/dble(MxT)
+      tau = (dble(t)+0.5d0)*Beta/dble(MxT)
       y = y + Beta/dble(MxT)*weight_basis(Coef(:, i), tau)**2.d0
     enddo
     if(dabs(y-1.d0)>1.d-8) then
@@ -535,8 +535,8 @@ DOUBLE PRECISION FUNCTION projector_Gam(t1min, t1max, t2min, t2max, Coef1, Coef2
   projector_Gam  = 0.d0
   do t1 = t1min, t1max
     do t2 = t2min(t1), t2max(t1)
-      tau1 = dble(t1)*Beta/dble(MxT)
-      tau2 = dble(t2)*Beta/dble(MxT)
+      tau1 = (dble(t1)+0.5d0)*Beta/dble(MxT)
+      tau2 = (dble(t2)+0.5d0)*Beta/dble(MxT)
       do it1 = 0, BasisOrderGam 
         do jt1 = 0, BasisOrderGam
           do it2 = 0, BasisOrderGam 
@@ -580,10 +580,9 @@ SUBROUTINE test_basis_Gam(t1min, t1max, t2min, t2max, Coef)
   do i = 1, NBasisGam
     y = 0.d0
     do  t1 = t1min, t1max
-      tau1 = dble(t1)*Beta/dble(MxT)
+      tau1 = (dble(t1)+0.5d0)*Beta/dble(MxT)
       do  t2 = t2min(t1), t2max(t1)
-        tau2 = dble(t2)*Beta/dble(MxT)
-
+        tau2 = (dble(t2)+0.5d0)*Beta/dble(MxT)
         y = y + (Beta/dble(MxT))**2.d0*weight_basis_Gam(Coef(:, :, i), tau1, tau2)**2.d0
       enddo
     enddo

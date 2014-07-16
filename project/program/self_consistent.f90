@@ -338,27 +338,10 @@ SUBROUTINE Gam_mc2matrix_mc
     if(flag(iorder)) then
       do it2 = 0, MxT-1
         do it1 = 0, MxT-1
-          tau1 = dble(it1)*Beta/dble(MxT)
-          tau2 = dble(it2)*Beta/dble(MxT)
-          ibin = get_bin_Gam(it1, it2)
-
           do dr = 0, Vol-1
             do ityp = 1, NTypeGam/2
               typ = 2*(ityp-1)+1
-
-              if(IsBasis2D(ibin)) then
-                do ibasis = 1, NBasisGam
-                  cgam = GamBasis(iorder,ityp,dr,ibin,ibasis)* weight_basis_Gam( &
-                    & CoefGam(0:BasisOrderGam,0:BasisOrderGam,ibasis,ibin), tau1, tau2)
-                  Gam(typ,dr,it1,it2) = Gam(typ,dr,it1,it2) + cgam*normal
-                enddo
-              else 
-                do ibasis = 1, NBasis
-                  cgam = GamBasis(iorder, ityp, dr, ibin, ibasis)* weight_basis( &
-                    & CoefGam(0:BasisOrder,0,ibasis,ibin), tau1)
-                  Gam(typ,dr,it1,it2) = Gam(typ,dr,it1,it2) + cgam*normal
-                enddo
-              endif
+              Gam(typ, dr, it1, it2) = normal *Gam_basis(it1, it2, GamBasis(iorder, ityp, dr, :,:))
             enddo
           enddo
         enddo
@@ -369,5 +352,35 @@ SUBROUTINE Gam_mc2matrix_mc
   Gam(2,:,:,:) = Gam(1,:,:,:)
   Gam(4,:,:,:) = Gam(3,:,:,:)
   Gam(6,:,:,:) = Gam(5,:,:,:)
-
 END SUBROUTINE Gam_mc2matrix_mc
+
+
+
+COMPLEX*16 FUNCTION Gam_basis(it1, it2, GammaBasis)
+  implicit none
+  integer, intent(in) :: it1, it2
+  complex*16, intent(in) :: GammaBasis(1:NbinGam, 1:NBasisGam)
+  double precision :: tau1, tau2
+  integer :: ibin, ibasis
+  complex*16 :: cgam
+
+  tau1 = (dble(it1)+0.5d0)*Beta/dble(MxT)
+  tau2 = (dble(it2)+0.5d0)*Beta/dble(MxT)
+  ibin = get_bin_Gam(it1, it2)
+
+  cgam = (0.d0, 0.d0)
+  if(IsBasis2D(ibin)) then
+    do ibasis = 1, NBasisGam
+      cgam = cgam + GammaBasis(ibin,ibasis)* weight_basis_Gam( &
+        & CoefGam(0:BasisOrderGam,0:BasisOrderGam,ibasis,ibin), tau1, tau2)
+    enddo
+  else 
+    do ibasis = 1, NBasis
+      cgam = cgam + GammaBasis(ibin, ibasis)* weight_basis( &
+        & CoefGam(0:BasisOrder,0,ibasis,ibin), tau1)
+    enddo
+  endif
+  Gam_basis = cgam
+  return
+END FUNCTION Gam_basis
+
