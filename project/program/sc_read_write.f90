@@ -41,8 +41,6 @@ Logical Function read_GW
     enddo
   enddo
 
-  read_GW = .true.
-
   if(ISub==2) then
     if(ios/=0) then
       call LogFile%QuickLog("Failed to read G,W information!",'e')
@@ -59,6 +57,10 @@ Logical Function read_GW
       close(100)
       close(101)
       stop -1
+    else
+      G = Gtmp;         deallocate(Gtmp)
+      W = Wtmp;         deallocate(Wtmp)
+      read_GW = .true.
     endif
   endif
 
@@ -89,9 +91,9 @@ SUBROUTINE write_GW
       enddo
     enddo
   enddo
-
   close(100)
   close(101)
+
   return
 END SUBROUTINE write_GW
 

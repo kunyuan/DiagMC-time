@@ -175,26 +175,19 @@ SUBROUTINE initialize_bins
   !============ Gamma with 3 bins ================================
   IsBasis2D(1) = .true.
   FromGamT1(1) = 0
-  ToGamT1(1) = MxT-2
-  do t1 = 0, MxT-2
+  ToGamT1(1) = MxT-1
+  do t1 = FromGamT1(1), ToGamT1(1)
     FromGamT2(t1, 1) = 0
-    ToGamT2(t1, 1)   = MxT-2-t1
+    ToGamT2(t1, 1)   = MxT-1-t1
   enddo
   
-  IsBasis2D(2) = .false.
-  FromGamT1(2) = 0
-  ToGamT1(2) = MxT-1
-  do t1 = 0, MxT-1
-    FromGamT2(t1, 2) = MxT-1-t1
-    ToGamT2(t1, 2)   = MxT-1-t1
-  enddo
 
-  IsBasis2D(3) = .true.
-  FromGamT1(3) = 1
-  ToGamT1(3) = MxT-1
-  do t1 = 1, MxT-1
-    FromGamT2(t1, 3) = MxT-t1
-    ToGamT2(t1, 3)   = MxT-1
+  IsBasis2D(2) = .true.
+  FromGamT1(2) = 1
+  ToGamT1(2) = MxT-1
+  do t1 = FromGamT1(2), ToGamT1(2)
+    FromGamT2(t1, 2) = MxT-t1
+    ToGamT2(t1, 2)   = MxT-1
   enddo
 
   !!=============== test the get_bin_Gam for 3 bins======================
@@ -300,9 +293,8 @@ END SUBROUTINE initialize_bins
 INTEGER FUNCTION get_bin_Gam(it1, it2)
   implicit none
   integer :: it1, it2
-  if(it1+it2<MxT-1)  get_bin_Gam = 1
-  if(it1+it2==MxT-1) get_bin_Gam = 2
-  if(it1+it2>MxT-1)  get_bin_Gam = 3
+  if(it1+it2<=MxT-1)  get_bin_Gam = 1
+  if(it1+it2>MxT-1)  get_bin_Gam = 2
   return
 END FUNCTION get_bin_Gam
 

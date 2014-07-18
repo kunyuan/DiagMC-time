@@ -364,23 +364,28 @@ COMPLEX*16 FUNCTION Gam_basis(it1, it2, GammaBasis)
   integer :: ibin, ibasis
   complex*16 :: cgam
 
-  tau1 = (dble(it1)+0.5d0)*Beta/dble(MxT)
-  tau2 = (dble(it2)+0.5d0)*Beta/dble(MxT)
   ibin = get_bin_Gam(it1, it2)
 
-  cgam = (0.d0, 0.d0)
-  if(IsBasis2D(ibin)) then
+  tau1 = (dble(it1)+0.5d0)*Beta/dble(MxT)
+  tau2 = (dble(it2)+0.5d0)*Beta/dble(MxT)
+
+  if(ibin==1) then
+    cgam = (0.d0, 0.d0)
     do ibasis = 1, NBasisGam
       cgam = cgam + GammaBasis(ibin,ibasis)* weight_basis_Gam( &
         & CoefGam(0:BasisOrderGam,0:BasisOrderGam,ibasis,ibin), tau1, tau2)
     enddo
-  else 
-    do ibasis = 1, NBasis
-      cgam = cgam + GammaBasis(ibin, ibasis)* weight_basis( &
-        & CoefGam(0:BasisOrder,0,ibasis,ibin), tau1)
+    Gam_basis = cgam
+  else if(ibin==2) then
+    tau1 = Beta - tau1
+    tau2 = Beta - tau2
+    cgam = (0.d0, 0.d0)
+    do ibasis = 1, NBasisGam
+      cgam = cgam + GammaBasis(1,ibasis)* weight_basis_Gam( &
+        & CoefGam(0:BasisOrderGam,0:BasisOrderGam,ibasis,1), tau1, tau2)
     enddo
+    Gam_basis = dcmplx(real(cgam), -dimag(cgam))
   endif
-  Gam_basis = cgam
   return
 END FUNCTION Gam_basis
 
