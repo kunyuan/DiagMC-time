@@ -2730,6 +2730,8 @@ SUBROUTINE measure
   endif
 END SUBROUTINE measure
 
+
+
 SUBROUTINE accumulate_Gamma(ityp, dr, dt1, dt2, Phase, factorM, flag)
   implicit none
   integer, intent(in) :: ityp, dr, dt1, dt2
@@ -2756,29 +2758,11 @@ SUBROUTINE accumulate_Gamma(ityp, dr, dt1, dt2, Phase, factorM, flag)
   !============  Gamma in the fitting coeffecients =====================================
   ibin = get_bin_Gam(dt1, dt2)
 
-  if(IsBasis2D(ibin)) then
+  if(ibin==1) then
     do ibasis = 1, NBasisGam
       wbasis = (Beta/dble(MxT))**2.d0*weight_basis_Gam(CoefGam &
         & (0:BasisOrderGam,0:BasisOrderGam, ibasis,ibin), (real(dt1)+0.5d0)*Beta/MxT, &
         & (real(dt2)+0.5d0)*Beta/MxT)
-
-      if(flag) then
-        GamBasis(Order, ityp, dr, ibin, ibasis) = GamBasis(Order, ityp, dr, ibin, &
-          & ibasis) + dcmplx(real(Phase/factorM), -dimag(Phase/factorM))*wbasis
-      else
-        GamBasis(Order, ityp, dr, ibin, ibasis) = GamBasis(Order, ityp, dr, ibin, &
-          & ibasis) + dcmplx(real(Phase/factorM), dimag(Phase/factorM))*wbasis
-      endif
-
-      ReGamSqBasis(Order, ityp, dr, ibin, ibasis) = ReGamSqBasis(Order, ityp, dr, ibin, &
-        & ibasis) + (real(Phase)/factorM)**2.d0*wbasis
-      ImGamSqBasis(Order, ityp, dr, ibin, ibasis) = ImGamSqBasis(Order, ityp, dr, ibin, &
-        & ibasis) + (dimag(Phase)/factorM)**2.d0*wbasis
-    enddo
-  else 
-    do ibasis = 1, NBasis
-      wbasis = (Beta/dble(MxT))*weight_basis(CoefGam(0:BasisOrder,0, &
-        & ibasis,ibin), (real(dt1)+0.5d0)*Beta/MxT)
 
       if(flag) then
         GamBasis(Order, ityp, dr, ibin, ibasis) = GamBasis(Order, ityp, dr, ibin, &

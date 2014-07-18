@@ -5,6 +5,7 @@ MODULE vrbls_mc
 
   logical, parameter  ::  IS_J1J2=.false.
   logical, parameter  ::  IS_BOLD=.false.
+
   !integer, parameter :: D = 2                            ! 2-dimensional system
   !integer, parameter,dimension(D) :: MxL =(/64,64/)      ! the largest system
   integer, parameter :: D = 3                             ! 3-dimensional system
@@ -141,7 +142,7 @@ MODULE vrbls_mc
   complex(kind=8) :: GamOrder1(NTypeGam, 0:MxT-1, 0:MxT-1) 
 
   !====================== MC Simulation ==================================
-  complex*16 :: GamNorm, GamNormWeight           ! the weight of the normalization diagram
+  complex*16 :: GamNorm, GamNormWeight         ! the weight of the normalization diagram
   complex*16, allocatable :: GamMC(:,:,:)      ! the measurement of Gamma in MC
   double precision, allocatable :: ReGamSqMC(:,:,:)   ! the measurement of Gamma in MC
   double precision, allocatable :: ImGamSqMC(:,:,:)   ! the measurement of Gamma in MC
@@ -256,7 +257,7 @@ MODULE vrbls_mc
 
 
   !================ Grand-Schmit Basis ===================================
-  integer, parameter :: BasisOrder=6
+  integer, parameter :: BasisOrder=4
   integer, parameter :: Nbasis=BasisOrder+1
 
   integer, parameter :: NbinG=1
@@ -273,7 +274,7 @@ MODULE vrbls_mc
   integer, parameter :: BasisOrderGam=3
   integer, parameter :: NbasisGam=(BasisOrderGam+1)**2
 
-  integer, parameter :: NbinGam=3
+  integer, parameter :: NbinGam=2
   integer, dimension(1:NbinGam) :: FromGamT1, ToGamT1
   integer, dimension(0:MxT-1, 1:NbinGam) :: FromGamT2, ToGamT2
   logical, dimension(1:NbinGam) :: IsBasis2D
