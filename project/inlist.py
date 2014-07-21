@@ -10,11 +10,13 @@ TO_DO = []
 com_dict={
     "L" :   [4,4],
     "Jcp" :  1.0,
-    "Beta" :  0.50,
+    "iniBeta" :  0.50,
+    "dBeta" :  0.05,
+    "finalBeta" :  0.80,
     "Order" :  1,
     }
 
-readfile="{0:4.2f}_{1}_coll".format(com_dict["Beta"],com_dict["Order"])
+readfile="{0:4.2f}_{1}_coll".format(com_dict["finalBeta"],com_dict["Order"])
 print readfile
 
 # monte carlo job defintion
@@ -26,9 +28,9 @@ mc_dict={
     "IsLoad" : False,
     "Reweight" : [1.0],
     "ReadFile" : "null",
-    "Sample" : 10000000,
+    "Sample" :  5000000,
     "Sweep" : 10,
-    "Toss" : 50000,
+    "Toss" : 10000,
     "Worm/Norm" : 0.5 
     }
 mc_dict.update(com_dict)

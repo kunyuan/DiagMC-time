@@ -460,7 +460,7 @@ SUBROUTINE write_monte_carlo_data
   open(104, status="replace", &
     & file=trim(title_mc)//"_monte_carlo_data.bin.dat",form="binary")
 
-  write(104) Beta, MCOrder, L(1:D)
+  write(104) finalBeta, Beta, MCOrder, L(1:D)
   write(104) imc, GamNorm, GamNormWeight
   write(104) Z_normal, ratioerr
   do it1 = 0, MxT-1
@@ -506,7 +506,7 @@ SUBROUTINE read_monte_carlo_data
   endif
 
   open(105, status="old", file=trim(title)//"_monte_carlo_data.bin.dat",form="binary")
-  read(105,iostat=ios) Beta, MCOrder, L(1:D)
+  read(105,iostat=ios) finalBeta, MCOrder, L(1:D)
   read(105,iostat=ios) imc, GamNorm, GamNormWeight
   read(105,iostat=ios) Z_normal, ratioerr
 
@@ -544,7 +544,7 @@ END SUBROUTINE read_monte_carlo_data
 
 SUBROUTINE read_Gamma
   implicit none
-  logical :: alive
+  logical :: alive, flag
 
   inquire(file=trim(title)//"_monte_carlo_data.bin.dat",exist=alive)
   if(.not. alive) then
@@ -556,7 +556,7 @@ SUBROUTINE read_Gamma
     call read_monte_carlo_data
     call LogFile%QuickLog("Read the previous MC data Done!...")
 
-    call Gam_mc2matrix_mc
+    call Gam_mc2matrix_mc(flag)
     call LogFile%QuickLog("Tabulate the MC data Done!...")
   endif
 

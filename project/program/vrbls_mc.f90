@@ -6,10 +6,10 @@ MODULE vrbls_mc
   logical, parameter  ::  IS_J1J2=.false.
   logical, parameter  ::  IS_BOLD=.false.
 
-  !integer, parameter :: D = 2                            ! 2-dimensional system
-  !integer, parameter,dimension(D) :: MxL =(/64,64/)      ! the largest system
-  integer, parameter :: D = 3                             ! 3-dimensional system
-  integer, parameter,dimension(D) :: MxL =(/16,16,16/)    ! the largest system
+  integer, parameter :: D = 2                            ! 2-dimensional system
+  integer, parameter,dimension(D) :: MxL =(/64,64/)      ! the largest system
+  !integer, parameter :: D = 3                             ! 3-dimensional system
+  !integer, parameter,dimension(D) :: MxL =(/16,16,16/)    ! the largest system
 
   !======================== code mode control ============================
   logical, parameter  ::  DEBUG=.true.          
@@ -33,7 +33,7 @@ MODULE vrbls_mc
   integer, parameter :: MxT   =   64                 ! the maximum number of time segments
   integer, parameter :: MxK   = 1000000              ! the maximum momentum
 
-  double precision, parameter :: MxError = 0.80d0    ! the maximum error for MC
+  double precision, parameter :: MxError = 0.50d0    ! the maximum error for MC
   integer, parameter          :: MxNblck = 1000000   ! the maximum memory blocks in MC simulations
 
   integer, parameter :: MxOrder =  10               ! the maximum order of the diagram
@@ -66,7 +66,7 @@ MODULE vrbls_mc
   double precision ::  Jcp                        ! interaction
   double precision ::  Mu(2)                      ! Chem. potential for spin down & up
   double precision ::  Beta                       ! inverse temperature
-  double precision ::  dBeta, BetaFinal           ! inverse temperature
+  double precision ::  iniBeta, dBeta, finalBeta  ! inverse temperature
   integer          ::  MCOrder                    ! the max order for Gamma in MC
   !=======================================================================
 

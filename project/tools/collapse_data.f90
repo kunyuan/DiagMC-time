@@ -11,6 +11,7 @@ PROGRAM MAIN
     integer, parameter :: Mxjobs = 200
     integer :: ibin, ibasis
     double precision :: imctmp, Ztmp
+    double precision :: targetBeta
     complex*16 :: iGam
     complex*16 :: iGamNorm, iGamNormWeight
     double precision :: iReGamSq
@@ -26,6 +27,10 @@ PROGRAM MAIN
     double precision, allocatable :: ReGamSqTmp(:,:,:,:,:)
     double precision, allocatable :: ImGamSqTmp(:,:,:,:,:)
     integer :: EffectiveSamp
+
+    open(10, status='old', file="beta.inp")
+    read(10, *) targetBeta
+    close(10)
 
     call LogFile%Initial("project.log","loop.collapse")
     call LogFile%QuickLog("Reading data files list from read_list.dat...")
@@ -50,7 +55,7 @@ PROGRAM MAIN
       inquire(file=title_file(i),exist=alive)
       if(alive) then
         open(101, status="old", file=title_file(i), form="binary")
-        read(101, iostat=ios) Beta, MCOrder, L(1:D)
+        read(101, iostat=ios) finalBeta, MCOrder, L(1:D)
         if(ios==0) then
           flag=.false.
           close(101)
@@ -72,7 +77,7 @@ PROGRAM MAIN
 
     call LogFile%QuickLog("Volume: "+str(Vol))
 
-    title_mc = str(Beta,'(f4.2)')+'_'+str(MCOrder,'(i1)')+'_coll'
+    title_mc = str(finalBeta,'(f4.2)')+'_'+str(MCOrder,'(i1)')+'_coll'
 
     allocate(GamMC(0:MCOrder, 0:Vol-1, 0:MxT-1))
     allocate(ReGamSqMC(0:MCOrder, 0:Vol-1, 0:MxT-1))
@@ -108,7 +113,7 @@ PROGRAM MAIN
       if(alive) then
         open(101, status="old", file=title_file(i), form="binary")
 
-        read(101) Beta, MCOrder, L(1:D)
+        read(101) finalBeta, Beta, MCOrder, L(1:D)
         read(101,iostat=ios) imctmp, iGamNorm, iGamNormWeight
         read(101) Ztmp, ratioerr
         do it1 = 0, MxT-1
@@ -136,7 +141,7 @@ PROGRAM MAIN
         enddo
         close(101)
       endif
-      if(ios==0) then
+      if(ios==0 .and. Beta==targetBeta) then
         EffectiveSamp=EffectiveSamp+1
         imc = imc + imctmp
         Z_normal = Z_normal+Ztmp
@@ -174,7 +179,7 @@ PROGRAM MAIN
     open(104, status="replace", &
       & file=trim(title_mc)//"_monte_carlo_data.bin.dat",form="binary")
 
-    write(104) Beta, MCOrder, L(1:D)
+    write(104) finalBeta, MCOrder, L(1:D)
     write(104) imc, GamNorm, GamNormWeight
     write(104) Z_normal, ratioerr
     do it1 = 0, MxT-1
@@ -199,10 +204,38 @@ PROGRAM MAIN
         enddo
       enddo
     enddo
-    !=========  write on the screen ========================================
-
-    
     close(104)
+
+    !=========  write on the screen ========================================
+    open(105, status="replace", &
+      & file=trim(title_mc)//"_monte_carlo_data.dat")
+
+    write(105, *) finalBeta, MCOrder, L(1:D)
+    write(105, *) imc, GamNorm, GamNormWeight
+    write(105, *) Z_normal, ratioerr
+    do it1 = 0, MxT-1
+      do ir = 0, Vol-1
+        do iorder = 0, MCOrder
+          write(105, *)  GamMC(iorder,  ir, it1)
+          write(105, *)  ReGamSqMC(iorder, ir, it1)
+          write(105, *)  ImGamSqMC(iorder, ir, it1)
+        enddo
+      enddo
+    enddo
+    do ibasis = 1, NBasisGam
+      do ibin = 1, NBinGam
+        do ir = 0, Vol-1
+          do ityp = 1, NtypeGam/2
+            do iorder = 0, MCOrder
+              write(105, *)  GamBasis(iorder,  ityp, ir, ibin, ibasis)
+              write(105, *)  ReGamSqBasis(iorder,  ityp, ir, ibin, ibasis)
+              write(105, *)  ImGamSqBasis(iorder,  ityp, ir, ibin, ibasis)
+            enddo
+          enddo
+        enddo
+      enddo
+    enddo
+    close(105)
   END SUBROUTINE write_monte_carlo_data
 
   SUBROUTINE write_GamMC
@@ -212,7 +245,7 @@ PROGRAM MAIN
 
     !=========== write into files =========================================
     open(104, status="replace", file=trim(title_mc)//"_GamMC.dat")
-    write(104, *) Beta, MCOrder, L(1:D)
+    write(104, *) finalBeta, MCOrder, L(1:D)
     write(104, *) imc, GamNorm, GamNormWeight
     write(104, *) Z_normal, ratioerr
     
