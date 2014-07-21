@@ -24,7 +24,8 @@ Quan1D=["GammaDiag1","GammaDiag2","GammaDiag3"]
 Quan=Quan2D+Quan1D
 
 DiagGamma=[]
-DiagGamma.append(read_data.read_array("bare_L4_0.50_3_quantities.dat", Quan))
+DiagGamma.append(read_data.read_array("bare_L8_0.65_3_quantities.dat", Quan))
+DiagGamma.append(read_data.read_array("bare_L8_0.65_0.80_3_quantities.dat", Quan))
 #DiagGamma.append(read_data.read_array("../../../../project/0.50_quantities.dat", Quan))
 
 
@@ -44,5 +45,5 @@ ax.legend()
 plt.xlabel("tau")
 plt.ylabel("diag{Gamma}")
 
-plt.savefig("Beta0.5_diag_Gamma.pdf")
+plt.savefig("Beta0.65_diag_Gamma.pdf")
 plt.show()

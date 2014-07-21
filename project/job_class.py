@@ -65,7 +65,9 @@ class Job:
         input_str = self.key_to_string("pid")
         input_str += self.key_to_string("L")
         input_str += self.key_to_string("Jcp")
-        input_str += self.key_to_string("Beta")
+        input_str += self.key_to_string("iniBeta")
+        input_str += self.key_to_string("dBeta")
+        input_str += self.key_to_string("finalBeta")
         input_str += self.key_to_string("Order")
         input_str += self.key_to_string("IsLoad")
         return input_str
@@ -96,7 +98,7 @@ class JobMonteCarlo(Job):
         input_str += self.key_to_string("Sweep")
         self.para["Seed"] = -int(random.random()*2**30)
         input_str += self.key_to_string("Seed")
-        self.para["ReadFile"]= "{0}_{1:4.2f}_{2}".format(pid, self.para["Beta"],self.para["Order"])
+        self.para["ReadFile"]= "{0}_{1:4.2f}_{2}".format(pid, self.para["finalBeta"],self.para["Order"])
         input_str += self.key_to_string("ReadFile")
         input_str += self.key_to_string("Worm/Norm")
         input_str += self.key_to_string("Reweight")
@@ -170,7 +172,9 @@ if __name__ == "__main__":
         "Lx" :  4,
         "Ly" :  4,
         "Jcp" :  1.0,
-        "Beta" :  0.9,
+        "iniBeta" :  0.5,
+        "dBeta" :  0.05,
+        "finalBeta" :  0.9,
         "Order" :  2,
         "Reweight" : [1,5],
         #"ReadFile" : "0.90_1_coll",
