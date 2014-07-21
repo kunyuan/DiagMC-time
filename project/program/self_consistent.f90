@@ -272,12 +272,13 @@ SUBROUTINE plus_minus_Gam0(Backforth)
 END SUBROUTINE plus_minus_Gam0
 
  
-SUBROUTINE Gam_mc2matrix_mc
+SUBROUTINE Gam_mc2matrix_mc(changeBeta)
   implicit none
   integer :: iorder, dr, ityp, iloop, it1, it2, typ, drr, itt1, itt2
   integer :: ibin, ibasis
   complex*16 :: cgam, normal
   logical :: flag(MxOrder)
+  logical, intent(out) :: changeBeta
   double precision :: totrerr, totierr, tau1, tau2
   double precision :: rgam, igam, rgam2, igam2, rerr, ierr, rpercenterr, ipercenterr
 
@@ -287,7 +288,7 @@ SUBROUTINE Gam_mc2matrix_mc
 
   call LogFile%QuickLog("(ErrorRatio):"+str(ratioerr))
 
-  flag(:) = .true.
+  flag(:) = .false.
 
   call LogFile%WriteStamp('i')
 
@@ -317,8 +318,8 @@ SUBROUTINE Gam_mc2matrix_mc
       rpercenterr = totrerr/rgam
     endif
 
-    if(rpercenterr>MxError) then
-      flag(iorder)=.false.
+    if(rpercenterr<=MxError) then
+      flag(iorder)=.true.
     endif
 
     igam = SUM(abs(dimag(GamMC(iorder, 0, :))))/Z_normal
@@ -328,8 +329,8 @@ SUBROUTINE Gam_mc2matrix_mc
       ipercenterr = totierr/igam
     endif
 
-    if(ipercenterr>MxError) then
-      flag(iorder)=.false.
+    if(ipercenterr<=MxError) then
+      flag(iorder)=.true.
     endif
 
     call LogFile%WriteLine("Order "+str(iorder)+" relative error: "+str(rpercenterr,'(f6.3)')+","+str(ipercenterr,'(f6.3)')+", accept: "+str(flag(iorder)))
@@ -346,13 +347,21 @@ SUBROUTINE Gam_mc2matrix_mc
           enddo
         enddo
       enddo
+    else 
+      exit looporder
     endif
   enddo looporder
 
   Gam(2,:,:,:) = Gam(1,:,:,:)
   Gam(4,:,:,:) = Gam(3,:,:,:)
   Gam(6,:,:,:) = Gam(5,:,:,:)
+
+  changeBeta = .false.
+  if((MCOrder<3 .and. flag(MCOrder)) .or.(MCOrder>=3 .and. flag(3))) then
+    changeBeta = .true.
+  endif
 END SUBROUTINE Gam_mc2matrix_mc
+
 
 
 

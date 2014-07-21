@@ -271,11 +271,18 @@ SUBROUTINE markov(IsToss)
         if(read_GW())  call LogFile%QuickLog("Read G, W done!")
         call read_Gamma;  call LogFile%QuickLog("Read Gamma done!")
 
+        
+        call LogFile%QuickLog("Updating Beta...")
         call LogFile%QuickLog("old Beta "+str(Beta))
-        call reset_Beta
+        open(10, status='old', file='beta.inp')
+        read(10, *) Beta
+        close(10)
         call LogFile%QuickLog("new Beta "+str(Beta))
+        call LogFile%QuickLog("Reading Beta done!")
 
+        call calculate_GamNormWeight
         call update_WeightCurrent
+        call calculate_basis_GWGam
 
         call check_config
         call print_config
@@ -350,22 +357,6 @@ SUBROUTINE recalculate_Reweighting
   enddo
 
   call LogFile%WriteLine("Reweighting is done!")
-  return
-END SUBROUTINE
-
-SUBROUTINE reset_Beta
-  implicit none
-  integer :: IsChangeBeta
-
-  open(10, status='old', file="change_beta.inp")
-  read(10, *) IsChangeBeta
-  read(10, *) dBeta
-  read(10, *) BetaFinal
-  close(10)
-  
-  if(IsChangeBeta==1 .and. Beta<BetaFinal) then
-    Beta = Beta + dBeta
-  endif
   return
 END SUBROUTINE
 
@@ -2771,12 +2762,18 @@ SUBROUTINE accumulate_Gamma(ityp, dr, dt1, dt2, Phase, factorM, flag)
         GamBasis(Order, ityp, dr, ibin, ibasis) = GamBasis(Order, ityp, dr, ibin, &
           & ibasis) + dcmplx(real(Phase/factorM), dimag(Phase/factorM))*wbasis
       endif
+      if(GamBasis(Order, ityp, dr, ibin, ibasis)/=GamBasis(Order, ityp, dr, ibin, ibasis)) then
+        call LogFile%QuickLog("NaN appears in MC!"+str(Phase/factorM))
+        call LogFile%QuickLog("NaN appears in MC!"+str(wbasis))
+        stop -1
+      endif
 
       ReGamSqBasis(Order, ityp, dr, ibin, ibasis) = ReGamSqBasis(Order, ityp, dr, ibin, &
         & ibasis) + (real(Phase)/factorM)**2.d0*wbasis
       ImGamSqBasis(Order, ityp, dr, ibin, ibasis) = ImGamSqBasis(Order, ityp, dr, ibin, &
         & ibasis) + (dimag(Phase)/factorM)**2.d0*wbasis
     enddo
+
   endif
 END SUBROUTINE accumulate_Gamma
 

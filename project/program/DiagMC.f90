@@ -19,7 +19,9 @@ PROGRAM MAIN
     read(11,*) ID
     read(11,*) L(1:D)
     read(11,*) Jcp
-    read(11,*) Beta
+    read(11,*) iniBeta
+    read(11,*) dBeta
+    read(11,*) finalBeta
     read(11,*) MCOrder
     read(11,*) IsLoad
     read(11,*) ISub
@@ -37,9 +39,9 @@ PROGRAM MAIN
     endif
   close(11)
 
-  write(*,*) Beta, MCOrder
+  write(*,*) iniBeta, dBeta, finalBeta, MCOrder
 
-  write(title_loop, '(f5.2)') beta
+  write(title_loop, '(f5.2)') finalBeta
   write(title1, '(i2)')  MCOrder
   write(title2,'(i4)') ID
 
@@ -137,16 +139,11 @@ PROGRAM MAIN
   call set_time_elapse
   call set_RNG
 
-  !=========== initialization of basis =======================
-  call initialize_polynomials
-  call initialize_bins
-  call calculate_basis_GWGam
-
-  call initialize_self_consistent
   call def_symmetry
 
   call LogFile%QuickLog("Initialization Done!...")
   !!=====================================================================
+
 
   if(ISub==1) then
     call self_consistent
@@ -192,8 +189,21 @@ subroutine numerical_integeration
   implicit none
   call LogFile%QuickLog("Reading G,W, and Gamma...")
   if(read_GW()) call LogFile%QuickLog("Read G, W done!")
+
   call read_Gamma
   call LogFile%QuickLog("Read Gamma done!")
+
+  !================ read Beta from beta.inp ======================
+  open(10, status='old', file="beta.inp")
+  read(10, *) Beta
+  close(10)
+
+  call initialize_self_consistent
+  !=========== initialization of basis =======================
+  call initialize_polynomials
+  call initialize_bins
+  call calculate_basis_GWGam
+
 
   call calculate_Gam1
 end subroutine
@@ -201,6 +211,17 @@ end subroutine
 SUBROUTINE just_output
   implicit none
   logical :: flag
+
+  !================ read Beta from beta.inp ======================
+  open(10, status='old', file="beta.inp")
+  read(10, *) Beta
+  close(10)
+  call initialize_self_consistent
+  !=========== initialization of basis =======================
+  call initialize_polynomials
+  call initialize_bins
+  call calculate_basis_GWGam
+
   call LogFile%QuickLog("Just output something!")
   call LogFile%QuickLog("Reading G,W, and Gamma...")
   if(read_GW()) call LogFile%QuickLog("Read G, W done!")
@@ -210,8 +231,9 @@ SUBROUTINE just_output
 
   call LogFile%QuickLog("Reading Done!...")
 
+
   !!-------- update the Gamma matrix with MC data -------
-  call Gam_mc2matrix_mc
+  call Gam_mc2matrix_mc(flag)
 
   flag = self_consistent_GW(.false.)
 
@@ -229,10 +251,17 @@ end SUBROUTINE just_output
 SUBROUTINE self_consistent
   implicit none
   integer :: iloop
-  logical :: flag
+  logical :: flag, changeBeta
 
   !------- read the G, W, and Gamma  -------------------
   if(IsLoad==.false.) then
+
+    Beta = iniBeta
+    call initialize_self_consistent
+    !=========== initialization of basis =======================
+    call initialize_polynomials
+    call initialize_bins
+    call calculate_basis_GWGam
 
     flag = self_consistent_GW(.true.)
 
@@ -250,6 +279,17 @@ SUBROUTINE self_consistent
     !!!======================================================================
   else if(IsLoad) then
 
+    !================ read Beta from beta.inp ======================
+    open(10, status='old', file="beta.inp")
+    read(10, *) Beta
+    close(10)
+
+    call initialize_self_consistent
+    !=========== initialization of basis =======================
+    call initialize_polynomials
+    call initialize_bins
+    call calculate_basis_GWGam
+
     call LogFile%QuickLog("Reading old G,W...")
     if(read_GW()) call LogFile%QuickLog("Read G, W done!")
 
@@ -259,7 +299,7 @@ SUBROUTINE self_consistent
     call LogFile%QuickLog("Reading Done!...")
 
     !!-------- update the Gamma matrix with MC data -------
-    call Gam_mc2matrix_mc
+    call Gam_mc2matrix_mc(changeBeta)
 
     flag = self_consistent_GW(.false.)
 
@@ -273,7 +313,7 @@ SUBROUTINE self_consistent
 
     call output_Quantities
 
-    call update_flag
+    call update_flag(changeBeta)
     call write_GW
   endif
   return
@@ -360,14 +400,6 @@ SUBROUTINE monte_carlo
   integer :: i, mc_version
   double precision :: WR, GamR
 
-  call LogFile%QuickLog("Initializing monte carlo...")
-  if(read_GW()) call LogFile%QuickLog("Read G, W done!")
-
-  call calculate_GamNormWeight
-
-  call initialize_markov
-
-  call LogFile%QuickLog("Initializing monte carlo done!")
 
   do i= 0, MCOrder
     QuanName(i) = "(Order "+str(i)+"Gamma)"
@@ -375,7 +407,23 @@ SUBROUTINE monte_carlo
 
   if(IsLoad==.false.) then
 
+    Beta = iniBeta
+
+    call initialize_self_consistent
     call initialize_Gam
+
+    !=========== initialization of basis =======================
+    call initialize_polynomials
+    call initialize_bins
+    call calculate_basis_GWGam
+
+    call LogFile%QuickLog("Initializing monte carlo...")
+    call calculate_GamNormWeight
+
+    if(read_GW()) call LogFile%QuickLog("Read G, W done!")
+
+    call initialize_markov
+    call LogFile%QuickLog("Initializing monte carlo done!")
 
     call LogFile%QuickLog("Start Thermalization ...")
 
@@ -392,7 +440,6 @@ SUBROUTINE monte_carlo
     call time_elapse
     t_simu = t_elap
     call LogFile%QuickLog('Thermalization time: '//trim(str(t_simu,'(f12.2)'))//'s')
-    
 
     !!================ MC SIMULATION FOR GAMMA =============================
     imc = 0.d0
@@ -423,6 +470,21 @@ SUBROUTINE monte_carlo
 
   else if(IsLoad) then
 
+    !================ read Beta from beta.inp ======================
+    open(10, status='old', file="beta.inp")
+    read(10, *) Beta
+    close(10)
+    call initialize_self_consistent
+    !=========== initialization of basis =======================
+    call initialize_polynomials
+    call initialize_bins
+    call calculate_basis_GWGam
+
+    call LogFile%QuickLog("Initializing monte carlo...")
+    call calculate_GamNormWeight
+    call initialize_markov
+    call LogFile%QuickLog("Initializing monte carlo done!")
+
     !------- read the configuration and MC data from previous simulation --
     call LogFile%QuickLog(str(mc_version)+', '+str(file_version))
     call LogFile%QuickLog("Updating G, W, and Gamma...")
@@ -431,6 +493,7 @@ SUBROUTINE monte_carlo
     if(read_GW()) call LogFile%QuickLog("Read G, W done!")
 
     call output_Quantities
+
     call update_WeightCurrent
 
     call check_config
@@ -465,9 +528,27 @@ SUBROUTINE read_flag
 END SUBROUTINE read_flag
 
 
-SUBROUTINE update_flag
+SUBROUTINE update_flag(changeBeta)
   implicit none
   integer :: ios 
+  logical, intent(in) :: changeBeta
+
+  if(changeBeta) then
+    call LogFile%QuickLog("Changing Beta:")
+    call LogFile%QuickLog("old Beta:"+str(Beta))
+    open(10, status='replace', file='beta.inp')
+    if(Beta+dBeta<=finalBeta) then
+      write(10, *) Beta+dBeta
+      call LogFile%QuickLog("change to new Beta:"+str(Beta+dBeta))
+    else if(Beta==finalBeta) then
+      write(10, *) Beta
+      call LogFile%QuickLog("already the target Beta!"+str(Beta))
+    else
+      call LogFile%QuickLog("error! Beta:"+str(Beta)+", dBeta: "+str(dBeta), 'e')
+      stop -1
+    endif
+    close(10)
+  endif
 
   open(11, status="old", iostat=ios, file="loop.inp")
   read(11, *) file_version

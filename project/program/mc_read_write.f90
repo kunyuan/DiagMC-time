@@ -460,7 +460,7 @@ SUBROUTINE write_monte_carlo_data
   open(104, status="replace", &
     & file=trim(title_mc)//"_monte_carlo_data.bin.dat",form="binary")
 
-  write(104) Beta, MCOrder, L(1:D)
+  write(104) finalBeta, Beta, MCOrder, L(1:D)
   write(104) imc, GamNorm, GamNormWeight
   write(104) Z_normal, ratioerr
   do it1 = 0, MxT-1
@@ -497,7 +497,10 @@ SUBROUTINE read_monte_carlo_data
   implicit none
   integer :: iorder, ir, ityp, it1, it2, itopo,ios
   integer :: ibin, ibasis
+  integer :: iL(1:D)
+  double precision :: fBeta
   logical :: alive
+  
 
   inquire(file=trim(title)//"_monte_carlo_data.bin.dat",exist=alive)
   if(.not. alive) then
@@ -506,7 +509,7 @@ SUBROUTINE read_monte_carlo_data
   endif
 
   open(105, status="old", file=trim(title)//"_monte_carlo_data.bin.dat",form="binary")
-  read(105,iostat=ios) Beta, MCOrder, L(1:D)
+  read(105,iostat=ios) fBeta, iorder, iL(1:D)
   read(105,iostat=ios) imc, GamNorm, GamNormWeight
   read(105,iostat=ios) Z_normal, ratioerr
 
@@ -544,7 +547,7 @@ END SUBROUTINE read_monte_carlo_data
 
 SUBROUTINE read_Gamma
   implicit none
-  logical :: alive
+  logical :: alive, changeBeta
 
   inquire(file=trim(title)//"_monte_carlo_data.bin.dat",exist=alive)
   if(.not. alive) then
@@ -553,11 +556,16 @@ SUBROUTINE read_Gamma
     call initialize_Gam
     call LogFile%QuickLog("Initialize the Gamma Done!")
   else
-    call read_monte_carlo_data
-    call LogFile%QuickLog("Read the previous MC data Done!...")
 
-    call Gam_mc2matrix_mc
+    call LogFile%QuickLog("Reading MC data...")
+    call read_monte_carlo_data
+
+    call LogFile%QuickLog("Reading Done!...")
+
+    !!-------- update the Gamma matrix with MC data -------
+    call Gam_mc2matrix_mc(changeBeta)
     call LogFile%QuickLog("Tabulate the MC data Done!...")
+
   endif
 
 END SUBROUTINE read_Gamma

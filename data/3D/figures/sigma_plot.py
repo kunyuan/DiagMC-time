@@ -13,8 +13,8 @@ tau = np.arange(0, Beta, Beta/N)
 target=["Sigma"]
 
 BoldSigma=[]
-BoldSigma.append(read_data.read_array("../../../../project/0.50_quantities.dat",target))
-BoldSigma.append(read_data.read_array("../../../../old_program/0.50_quantities.dat",target))
+BoldSigma.append(read_data.read_array("bare_L8_0.65_3_quantities.dat",target))
+BoldSigma.append(read_data.read_array("bare_L8_0.65_0.80_3_quantities.dat",target))
 
 fig = plt.figure()
 ax = plt.subplot(111)
@@ -28,5 +28,5 @@ ax.legend()
 plt.xlabel("tau")
 plt.ylabel("Sigma")
 
-plt.savefig("Beta0.5_L4_Sigma.pdf")
+plt.savefig("Beta0.65_L8_Sigma.pdf")
 plt.show()

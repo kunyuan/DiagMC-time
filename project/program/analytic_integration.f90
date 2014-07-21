@@ -13,6 +13,7 @@ SUBROUTINE calculate_GamNormWeight
   complex*16 :: Gam0
 
   GamNormWeight = (0.d0, 0.d0)
+
   !--------- bare Gamma --------------------
   do ityp = 1, 6
     Gam0 = weight_Gam0(ityp, 0)
