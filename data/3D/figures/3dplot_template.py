@@ -6,52 +6,29 @@ from matplotlib.ticker import LinearLocator, FormatStrFormatter
 import matplotlib.pyplot as plt
 import read_data
 
-#is2d = True
-is2d = False
-
-Beta = 0.90
+Beta = 0.65
 N = 64
 
-#Quans = ["Gamma2"]
-#Quans = ["Gamma"]
-GamInt, dim_name = read_data.read_array("../../../project/0.50_quantities.dat")["Gamma"]
-#GamMC, dim_name = read_data.read_array("./../../data/conservation/bare_0.90_4_quantities.dat")["Gamma2"]
-#GamMC, dim_name = read_data.read_array("./1_loop/0.90_quantities.dat")["Gamma"]
-#GamMC = read_data.read_array("../0.90_quantities.dat", Quans)
+#GamInt, dim_name = read_data.read_array("../../../project/0.50_quantities.dat")["Gamma"]
+GamMC, dim_name = read_data.read_array("bare_L8_0.65_3_quantities.dat")["Gamma"]
 
-if is2d is True:
-    tau = np.arange(0, Beta, Beta/N)
-    fig = plt.figure()
-    #plt.plot(tau, GamMC.diagonal().real, 'r', 
-    plt.plot(tau, GamInt.diagonal().real, 'b')
-    plt.xlabel(dim_name[0])
-    plt.ylabel("diag{Gamma}")
+X = np.arange(0, Beta, Beta/N)
+Y = np.arange(0, Beta, Beta/N)
+X, Y = np.meshgrid(X, Y)
 
-    # plt.savefig("0.90_Gamma.pdf")
-    plt.show()
+fig = plt.figure()
+ax = fig.gca(projection='3d')
 
-else:
-    X = np.arange(0, Beta, Beta/N)
-    Y = np.arange(0, Beta, Beta/N)
-    X, Y = np.meshgrid(X, Y)
+surf = ax.plot_surface(X, Y, GamMC.real, rstride=1, cstride=1, cmap=cm.coolwarm,
+    linewidth=0, antialiased=False)
 
-    fig = plt.figure()
-    ax = fig.gca(projection='3d')
+ax.set_xlabel(dim_name[0])
+ax.set_ylabel(dim_name[1])
+ax.set_zlabel("Gamma")
 
-    #for key in Quans:
-    surf = ax.plot_surface(X, Y, GamInt.real, rstride=1, cstride=1, cmap=cm.coolwarm,
-        linewidth=0, antialiased=False)
-        #surf = ax.plot_surface(X, Y, GamMC[key][0].imag, rstride=1, cstride=1, cmap=cm.coolwarm,
-            #linewidth=0, antialiased=False)
-    # ax.set_zlim(-1.01, 1.01)
+ax.zaxis.set_major_locator(LinearLocator(10))
+ax.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
 
-    ax.set_xlabel(dim_name[0])
-    ax.set_ylabel(dim_name[1])
-    ax.set_zlabel("Gamma")
+fig.colorbar(surf, shrink=Beta, aspect=5)
 
-    ax.zaxis.set_major_locator(LinearLocator(10))
-    ax.zaxis.set_major_formatter(FormatStrFormatter('%.02f'))
-
-    fig.colorbar(surf, shrink=Beta, aspect=5)
-
-    plt.show()
+plt.show()
