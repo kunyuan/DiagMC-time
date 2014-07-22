@@ -342,7 +342,7 @@ SUBROUTINE Gam_mc2matrix_mc(changeBeta)
           do dr = 0, Vol-1
             do ityp = 1, NTypeGam/2
               typ = 2*(ityp-1)+1
-              Gam(typ, dr, it1, it2) = normal *Gam_basis(it1, it2, GamBasis(iorder, ityp, dr, :,:))
+              Gam(typ, dr, it1, it2) = Gam(typ, dr, it1, it2) + normal *Gam_basis(it1, it2, GamBasis(iorder, ityp, dr, :,:))
             enddo
           enddo
         enddo
