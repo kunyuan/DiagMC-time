@@ -1,4 +1,5 @@
-rm *.bin.dat
+rm *_?_monte_carlo_conf.bin.dat
+rm *_?_monte_carlo_data.bin.dat
 rm *_test.dat
 rm *MC.dat
 rm *.conf

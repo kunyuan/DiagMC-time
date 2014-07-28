@@ -274,23 +274,23 @@ END SUBROUTINE plus_minus_Gam0
  
 SUBROUTINE Gam_mc2matrix_mc(changeBeta)
   implicit none
+  logical, intent(out) :: changeBeta
   integer :: iorder, dr, ityp, iloop, it1, it2, typ, drr, itt1, itt2
   integer :: ibin, ibasis
   complex*16 :: cgam, normal
   logical :: flag(MxOrder)
-  logical, intent(out) :: changeBeta
   double precision :: totrerr, totierr, tau1, tau2
   double precision :: rgam, igam, rgam2, igam2, rerr, ierr, rpercenterr, ipercenterr
 
   call initialize_Gam
-
-  normal = GamNormWeight/GamNorm
 
   call LogFile%QuickLog("(ErrorRatio):"+str(ratioerr))
 
   flag(:) = .false.
 
   call LogFile%WriteStamp('i')
+
+  normal = GamNormWeight / GamNorm
 
   looporder: do iorder = 1, MCOrder
     totrerr = 0.d0
@@ -370,7 +370,7 @@ COMPLEX*16 FUNCTION Gam_basis(it1, it2, GammaBasis)
   integer, intent(in) :: it1, it2
   complex*16, intent(in) :: GammaBasis(1:NbinGam, 1:NBasisGam)
   double precision :: tau1, tau2
-  integer :: ibin, ibasis
+  integer :: ibin, ibasis, jt1, jt2
   complex*16 :: cgam
 
   ibin = get_bin_Gam(it1, it2)
@@ -382,16 +382,16 @@ COMPLEX*16 FUNCTION Gam_basis(it1, it2, GammaBasis)
     cgam = (0.d0, 0.d0)
     do ibasis = 1, NBasisGam
       cgam = cgam + GammaBasis(ibin,ibasis)* weight_basis_Gam( &
-        & CoefGam(0:BasisOrderGam,0:BasisOrderGam,ibasis,ibin), tau1, tau2)
+        & CoefGam(0:BasisOrderGam,0:BasisOrderGam,ibasis,ibin), it1, it2)
     enddo
     Gam_basis = cgam
   else if(ibin==2) then
-    tau1 = Beta - tau1
-    tau2 = Beta - tau2
+    jt1 = MxT-1-it1
+    jt2 = MxT-1-it2
     cgam = (0.d0, 0.d0)
     do ibasis = 1, NBasisGam
       cgam = cgam + GammaBasis(1,ibasis)* weight_basis_Gam( &
-        & CoefGam(0:BasisOrderGam,0:BasisOrderGam,ibasis,1), tau1, tau2)
+        & CoefGam(0:BasisOrderGam,0:BasisOrderGam,ibasis,1), jt1, jt2)
     enddo
     Gam_basis = dcmplx(real(cgam), -dimag(cgam))
   endif

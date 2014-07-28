@@ -98,7 +98,6 @@ class JobMonteCarlo(Job):
         input_str += self.key_to_string("Sweep")
         self.para["Seed"] = -int(random.random()*2**30)
         input_str += self.key_to_string("Seed")
-        self.para["ReadFile"]= "{0}_{1:4.2f}_{2}".format(pid, self.para["finalBeta"],self.para["Order"])
         input_str += self.key_to_string("ReadFile")
         input_str += self.key_to_string("Worm/Norm")
         input_str += self.key_to_string("Reweight")
