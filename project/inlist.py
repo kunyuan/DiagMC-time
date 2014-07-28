@@ -10,7 +10,7 @@ TO_DO = []
 com_dict={
     "L" :   [4,4],
     "Jcp" :  1.0,
-    "iniBeta" :  0.50,
+    "iniBeta" :  0.70,
     "dBeta" :  0.05,
     "finalBeta" :  0.80,
     "Order" :  1,
@@ -22,7 +22,7 @@ print readfile
 # monte carlo job defintion
 mc_dict={
     "__Execute" : "./gamma3.exe",
-    "__Duplicate" : 3,
+    "__Duplicate" : 4,
     "__IsCluster" : False,
     "__AutoRun" : True,
     "IsLoad" : False,

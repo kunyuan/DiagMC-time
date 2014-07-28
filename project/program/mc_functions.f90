@@ -899,6 +899,94 @@ END SUBROUTINE undo_delete_gamma
 !!=======================================================================
 !!=======================================================================
 
+!------------- definition of the probabilities ----------------
+SUBROUTINE def_prob
+  implicit none
+  integer  :: j, k
+  double precision :: Cupdate, CPresent, CAbsent
+
+  !-------- probability for updates --------
+  do k = 1, Nupdate
+    Fupdate(k) = 0.d0
+    do j = 1, k
+      Fupdate(k)=Fupdate(k)+Pupdate(j)
+    enddo
+  enddo
+
+  Cupdate = Fupdate(Nupdate)
+  do k = 1, Nupdate
+    Pupdate(k) = Pupdate(k)/Cupdate
+    Fupdate(k) = Fupdate(k)/Cupdate
+  enddo
+  return
+END SUBROUTINE def_prob
+
+SUBROUTINE def_spatial_weight
+  implicit none
+  double precision :: tt
+  integer :: ix,iy,i
+
+  ! initializing logscale sampling of space
+  ! for seeding rx coordinate displacement do this
+  !     x=rndm(); rx=0.5d0*dexp(x*logL); ix=rx
+  !     IF(rndm()>0.5d0) ix=L(1)-1-ix
+  ! this gives you displacement ix in the affine basis called with probability
+  ! SpatialWeight(i,ix)
+
+  do i=1,D
+    ix=0;
+    SpatialWeight(i,ix)=dlog(2.d0)/(2.d0*logL(i))
+    SpatialWeight(i,L(i)-1-ix)=SpatialWeight(i,ix)
+    do ix=1,L(i)/2-1
+      tt=ix*1.d0;
+      SpatialWeight(i,ix)=dlog((tt+1.d0)/tt)/(2.d0*logL(i)) 
+      SpatialWeight(i,L(i)-1-ix)=SpatialWeight(i,ix)
+    enddo
+    tt=0.0
+    do ix=0,L(i)-1
+      tt=tt+SpatialWeight(i,ix)
+    enddo 
+    do ix=0,L(i)-1
+      SpatialWeight(i,ix)=SpatialWeight(i,ix)/tt
+    enddo 
+  enddo
+
+END SUBROUTINE def_spatial_weight
+
+
+SUBROUTINE def_spin
+  implicit none
+
+  TypeGam2W(:,:) = 0
+  TypeSp2Gam(:,:,:,:) = 0
+
+  !-- calculate the type of W according to the neighbor vertexes --
+  !---- TypeGam2W(Type(Gamleft), Type(Gamright)) = Type(W)
+  TypeGam2W(1,1) = 1;      TypeGam2W(1,4) = 1
+  TypeGam2W(1,2) = 3;      TypeGam2W(1,3) = 3
+
+  TypeGam2W(3,1) = 4;      TypeGam2W(3,4) = 4
+  TypeGam2W(3,2) = 2;      TypeGam2W(3,3) = 2
+
+  TypeGam2W(2,1) = 4;      TypeGam2W(2,4) = 4
+  TypeGam2W(2,2) = 2;      TypeGam2W(2,3) = 2
+
+  TypeGam2W(4,1) = 1;      TypeGam2W(4,4) = 1
+  TypeGam2W(4,2) = 3;      TypeGam2W(4,3) = 3
+
+
+  TypeGam2W(5,6) = 5;      TypeGam2W(6,5) = 6
+
+  !-- calculate the type of Gam according to the neighbor G, W --
+  !---- TypeSp2Gam(Type(Gin), Type(Gout), Type(Gamin), Type(Gamout)) = Type(Gam)
+  TypeSp2Gam(1,1,1,1) = 1
+  TypeSp2Gam(2,2,2,2) = 2
+  TypeSp2Gam(1,1,2,2) = 3
+  TypeSp2Gam(2,2,1,1) = 4
+  TypeSp2Gam(1,2,1,2) = 5
+  TypeSp2Gam(2,1,2,1) = 6
+
+END SUBROUTINE def_spin
 
 !============   initialize diagrams =================================
 SUBROUTINE first_order_diagram

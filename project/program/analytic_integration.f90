@@ -67,10 +67,6 @@ SUBROUTINE calculate_Gam1
   !Gam(4,0,0,:,:) = FGam(:, :)
   !Gam(5,0,0,:,:) = FGam(:, :)
   !Gam(6,0,0,:,:) = FGam(:, :)
-
-  if(read_GW())  call LogFile%QuickLog("Read G, W done!")
-  call read_Gamma
-
   !================== bold gamma ===============================
 
   call transfer_G_t(1)
@@ -158,10 +154,6 @@ SUBROUTINE calculate_Gam1
         !GamOrder1(1,t1,t2) = -1.d0* weight
     !enddo
   !enddo
-
-
-  call output_Gam1
-
 END SUBROUTINE calculate_Gam1
 !====================================================================
 

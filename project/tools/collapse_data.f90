@@ -28,7 +28,7 @@ PROGRAM MAIN
     double precision, allocatable :: ImGamSqTmp(:,:,:,:,:)
     integer :: EffectiveSamp
 
-    open(10, status='old', file="beta.inp")
+    open(10, status='old', file="input.inp")
     read(10, *) targetBeta
     close(10)
 
@@ -179,7 +179,7 @@ PROGRAM MAIN
     open(104, status="replace", &
       & file=trim(title_mc)//"_monte_carlo_data.bin.dat",form="binary")
 
-    write(104) finalBeta, MCOrder, L(1:D)
+    write(104) finalBeta, Beta, MCOrder, L(1:D)
     write(104) imc, GamNorm, GamNormWeight
     write(104) Z_normal, ratioerr
     do it1 = 0, MxT-1
@@ -210,7 +210,7 @@ PROGRAM MAIN
     open(105, status="replace", &
       & file=trim(title_mc)//"_monte_carlo_data.dat")
 
-    write(105, *) finalBeta, MCOrder, L(1:D)
+    write(105, *) finalBeta, Beta, MCOrder, L(1:D)
     write(105, *) imc, GamNorm, GamNormWeight
     write(105, *) Z_normal, ratioerr
     do it1 = 0, MxT-1

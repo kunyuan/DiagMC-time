@@ -8,36 +8,7 @@ SUBROUTINE initialize_markov
 
 
     call LogFile%QuickLog("Initializing the configuration...")
-
-
-    !--------------- initialize variables ---------------
-    GLnKey2Value(:) = 0
-    WLnKey2Value(:) = 0
-    VertexKey2Value(:) = 0
-
-    StatusLn(:) = -1
-    StatusVertex(:)= -1
-
-    WeightLn(:) = 1.d0
-    WeightVertex(:) = 1.d0
-
-    Hash4G(:) = 0
-    Hash4W(:) = 0
-
-    do i = 1, MxNLn
-      NextLn(i) = i+1
-      if(i==MxNLn)  NextLn(i) = -1
-    enddo
-
-    do i = 1, MxNVertex
-      NextVertex(i) = i+1
-      if(i==MxNVertex)  NextVertex(i) = -1
-    enddo
-
-    call def_prob
-    call def_spatial_weight
-    call def_spin
-    call def_diagram
+    call first_order_diagram
 
     call LogFile%QuickLog("Initialization Done!")
     call LogFile%QuickLog("Weight of Initialization Diagram: "//trim(str(WeightCurrent)))
@@ -45,103 +16,8 @@ SUBROUTINE initialize_markov
     return
 end SUBROUTINE initialize_markov
 
-!------------- definition of the probabilities ----------------
-SUBROUTINE def_prob
-  implicit none
-  integer  :: j, k
-  double precision :: Cupdate, CPresent, CAbsent
-
-  !-------- probability for updates --------
-  do k = 1, Nupdate
-    Fupdate(k) = 0.d0
-    do j = 1, k
-      Fupdate(k)=Fupdate(k)+Pupdate(j)
-    enddo
-  enddo
-
-  Cupdate = Fupdate(Nupdate)
-  do k = 1, Nupdate
-    Pupdate(k) = Pupdate(k)/Cupdate
-    Fupdate(k) = Fupdate(k)/Cupdate
-  enddo
-  return
-END SUBROUTINE def_prob
-
-SUBROUTINE def_spatial_weight
-  implicit none
-  double precision :: tt
-  integer :: ix,iy,i
-
-  ! initializing logscale sampling of space
-  ! for seeding rx coordinate displacement do this
-  !     x=rndm(); rx=0.5d0*dexp(x*logL); ix=rx
-  !     IF(rndm()>0.5d0) ix=L(1)-1-ix
-  ! this gives you displacement ix in the affine basis called with probability
-  ! SpatialWeight(i,ix)
-
-  do i=1,D
-    ix=0;
-    SpatialWeight(i,ix)=dlog(2.d0)/(2.d0*logL(i))
-    SpatialWeight(i,L(i)-1-ix)=SpatialWeight(i,ix)
-    do ix=1,L(i)/2-1
-      tt=ix*1.d0;
-      SpatialWeight(i,ix)=dlog((tt+1.d0)/tt)/(2.d0*logL(i)) 
-      SpatialWeight(i,L(i)-1-ix)=SpatialWeight(i,ix)
-    enddo
-    tt=0.0
-    do ix=0,L(i)-1
-      tt=tt+SpatialWeight(i,ix)
-    enddo 
-    do ix=0,L(i)-1
-      SpatialWeight(i,ix)=SpatialWeight(i,ix)/tt
-    enddo 
-  enddo
-
-END SUBROUTINE def_spatial_weight
-
-
-SUBROUTINE def_spin
-  implicit none
-
-  TypeGam2W(:,:) = 0
-  TypeSp2Gam(:,:,:,:) = 0
-
-  !-- calculate the type of W according to the neighbor vertexes --
-  !---- TypeGam2W(Type(Gamleft), Type(Gamright)) = Type(W)
-  TypeGam2W(1,1) = 1;      TypeGam2W(1,4) = 1
-  TypeGam2W(1,2) = 3;      TypeGam2W(1,3) = 3
-
-  TypeGam2W(3,1) = 4;      TypeGam2W(3,4) = 4
-  TypeGam2W(3,2) = 2;      TypeGam2W(3,3) = 2
-
-  TypeGam2W(2,1) = 4;      TypeGam2W(2,4) = 4
-  TypeGam2W(2,2) = 2;      TypeGam2W(2,3) = 2
-
-  TypeGam2W(4,1) = 1;      TypeGam2W(4,4) = 1
-  TypeGam2W(4,2) = 3;      TypeGam2W(4,3) = 3
-
-
-  TypeGam2W(5,6) = 5;      TypeGam2W(6,5) = 6
-
-  !-- calculate the type of Gam according to the neighbor G, W --
-  !---- TypeSp2Gam(Type(Gin), Type(Gout), Type(Gamin), Type(Gamout)) = Type(Gam)
-  TypeSp2Gam(1,1,1,1) = 1
-  TypeSp2Gam(2,2,2,2) = 2
-  TypeSp2Gam(1,1,2,2) = 3
-  TypeSp2Gam(2,2,1,1) = 4
-  TypeSp2Gam(1,2,1,2) = 5
-  TypeSp2Gam(2,1,2,1) = 6
-
-END SUBROUTINE def_spin
-
-!------------- definition of the config of diagram ----------------
-SUBROUTINE def_diagram
-  implicit none
-  call first_order_diagram
-  return
-END SUBROUTINE def_diagram
-
 !=======================================================================
+
 !=======================================================================
 !=======================================================================
 
@@ -155,8 +31,8 @@ END SUBROUTINE def_diagram
 SUBROUTINE markov(IsToss)
   implicit none
   integer :: istep,isamp,i,MaxSamp,iblck
-  double precision :: nr,x, ratioleft
-  logical :: IsToss
+  double precision :: nr,x, ratioleft, mcBeta, xphy
+  logical :: IsToss, ifchange
 
   iblck=0
   mc_version = 0
@@ -167,7 +43,7 @@ SUBROUTINE markov(IsToss)
   endif
 
   !------- assign the config ratio for each order ------
-  TimeRatio(0:MCOrder) = 1.d0/(MCOrder+1.d0)
+  TimeRatio(0:MxOrder) = 1.d0
 
   call LogFile%QuickLog("Starting Markov...")
   call check_config
@@ -256,41 +132,34 @@ SUBROUTINE markov(IsToss)
       call check_config
 
       call statistics
-      call output_GamMC
 
       call print_status
       call print_config
 
+      call LogFile%QuickLog("current Beta "+str(Beta))
       call LogFile%QuickLog("Check if there is a new G,W data...")
-      call read_flag
+      call read_input(.false.)
 
       if(mc_version/=file_version) then
+        call LogFile%QuickLog("new Beta "+str(Beta))
+
+        call update_T_dependent
+
         call LogFile%QuickLog(str(mc_version)+', '+str(file_version))
         call LogFile%QuickLog("Updating G, W, and Gamma...")
 
         if(read_GW())  call LogFile%QuickLog("Read G, W done!")
-        call read_Gamma;  call LogFile%QuickLog("Read Gamma done!")
 
-        
-        call LogFile%QuickLog("Updating Beta...")
-        call LogFile%QuickLog("old Beta "+str(Beta))
-        open(10, status='old', file='beta.inp')
-        read(10, *) Beta
-        close(10)
-        call LogFile%QuickLog("new Beta "+str(Beta))
-        call LogFile%QuickLog("Reading Beta done!")
+        !call read_Gamma(ifchange, mcBeta)
+        !call LogFile%QuickLog("Read Gamma done!")
 
-        call calculate_GamNormWeight
         call update_WeightCurrent
-        call calculate_basis_GWGam
+        call recalculate_Reweighting
 
         call check_config
         call print_config
         mc_version = file_version
-
-        call recalculate_Reweighting
       endif
-
 
       if(iblck <= 10) then
         GamWormOrder=0.d0
@@ -322,10 +191,13 @@ END SUBROUTINE markov
 SUBROUTINE recalculate_Reweighting
   implicit none
   integer :: i
-  double precision :: x
+  double precision :: x, xphy
   
   call LogFile%WriteStamp()
   call LogFile%WriteLine("Reweighting order of diagrams...")
+
+  x = SUM(GamWormOrder(0:MCOrder))
+  xphy =  SUM(GamOrder(0:MCOrder))
 
   !------ if the errorbar is too big, just don't reweight ----
   do i = 0, MCOrder
@@ -343,12 +215,18 @@ SUBROUTINE recalculate_Reweighting
     endif
   enddo
 
-  x = SUM(GamWormOrder(:))
-  CoefOfWeight(:)=TimeRatio(:)*CoefOfWeight(:)*x/(GamWormOrder(:)+50.d0)
+  CoefOfWeight(1:MCOrder) = TimeRatio(1:MCOrder)*CoefOfWeight(1:MCOrder)*x &
+    & /(GamWormOrder(1:MCOrder)+50.d0)
   CoefOfWeight(1:MCOrder) = CoefOfWeight(1:MCOrder)/CoefOfWeight(0)
   CoefOfWeight(0) = 1.d0
 
+  CoefOfWorm = CoefOfWorm *xphy/(x-xphy)
+
   call LogFile%WriteLine("Reweight Ratios:")
+
+  call LogFile%WriteLine('Worm/Phy :'+str(CoefOfWorm))
+  call LogFile%WriteLine('     worm: '+str(x-xphy))
+  call LogFile%WriteLine('     phy: '+str(xphy))
 
   do i=0,MCOrder
     call LogFile%WriteLine('Order'+str(i)+' :'+str(CoefOfWeight(i)))
@@ -359,6 +237,7 @@ SUBROUTINE recalculate_Reweighting
   call LogFile%WriteLine("Reweighting is done!")
   return
 END SUBROUTINE
+
 
 !====================================================================
 !============================== UPDATES =============================
@@ -2751,9 +2630,8 @@ SUBROUTINE accumulate_Gamma(ityp, dr, dt1, dt2, Phase, factorM, flag)
 
   if(ibin==1) then
     do ibasis = 1, NBasisGam
-      wbasis = (Beta/dble(MxT))**2.d0*weight_basis_Gam(CoefGam &
-        & (0:BasisOrderGam,0:BasisOrderGam, ibasis,ibin), (real(dt1)+0.5d0)*Beta/MxT, &
-        & (real(dt2)+0.5d0)*Beta/MxT)
+      wbasis = (1.d0/dble(MxT))**2.d0*weight_basis_Gam(CoefGam &
+        & (0:BasisOrderGam,0:BasisOrderGam, ibasis,ibin), dt1, dt2)
 
       if(flag) then
         GamBasis(Order, ityp, dr, ibin, ibasis) = GamBasis(Order, ityp, dr, ibin, &

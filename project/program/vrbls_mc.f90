@@ -20,6 +20,7 @@ MODULE vrbls_mc
   logical, parameter  ::  CHECK_G=.true.
   logical, parameter  ::  CHECK_W=.true.
   logical, parameter  ::  CHECK_GAM=IS_BOLD
+
   !======================== Parameters ====================================
   double precision, parameter :: Pi    = 3.14159265358979323846d0
   double precision, parameter :: Pi2   = 6.2831853071795865d0
@@ -52,6 +53,9 @@ MODULE vrbls_mc
   character*128 :: logstr
   character*128 :: title_loop_log
 
+  logical :: IsLoad
+  character(len=128) :: infile
+
   integer:: file_version
   integer:: mc_version
 
@@ -66,8 +70,10 @@ MODULE vrbls_mc
   double precision ::  Jcp                        ! interaction
   double precision ::  Mu(2)                      ! Chem. potential for spin down & up
   double precision ::  Beta                       ! inverse temperature
-  double precision ::  iniBeta, dBeta, finalBeta  ! inverse temperature
   integer          ::  MCOrder                    ! the max order for Gamma in MC
+  double precision ::  iniBeta, dBeta, finalBeta  ! inverse temperature
+  integer          ::  iniL(3)
+  integer          ::  iniMCOrder                    ! the max order for Gamma in MC
   !=======================================================================
 
 

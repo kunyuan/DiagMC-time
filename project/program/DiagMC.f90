@@ -5,160 +5,52 @@ PROGRAM MAIN
   USE logging_module
   USE vrbls_mc
   implicit none
-  integer :: it, i, ISub,ID, ios
-  logical :: IsLoad
-  character(len=128) :: infile
-  logical :: FEXIST
+  integer :: it, i, isub,ID, ios
 
   call get_command_argument(1,infile)
   if(len_trim(infile)==0) then
     call LogFile%QuickLog("No input file is specified!",'e')
     stop
   endif
-  open(unit=11, file=trim(infile), action='read')
-    read(11,*) ID
-    read(11,*) L(1:D)
-    read(11,*) Jcp
-    read(11,*) iniBeta
-    read(11,*) dBeta
-    read(11,*) finalBeta
-    read(11,*) MCOrder
-    read(11,*) IsLoad
-    read(11,*) ISub
-    if(ISub==2) then
-      read(11,*) Ntoss
-      read(11,*) Nsamp
-      read(11,*) Nstep
-      read(11,*) Seed
-      read(11,*) title
-      read(11,*) CoefOfWorm
-      CoefOfWeight(0) = 1.d0
-      read(11,*) CoefOfWeight(1:MCOrder)
-    elseif(ISub==1 .or. ISub==4) then
-      read(11,*) title
-    endif
-  close(11)
 
-  write(*,*) iniBeta, dBeta, finalBeta, MCOrder
+  call read_infile(id, isub)
 
-  write(title_loop, '(f5.2)') finalBeta
+  MCOrder = iniMCOrder
+  print *, iniBeta, dBeta, finalBeta, MCOrder, isub
+
+  !============ assign all the titles ============================
+  write(title_loop, '(f5.2)') finalBeta  !the title for G,W files
   write(title1, '(i2)')  MCOrder
   write(title2,'(i4)') ID
 
-  title1 = trim(adjustl(title_loop))//'_'//trim(adjustl(title1))
-  title_mc = trim(adjustl(title2))//'_'//trim(adjustl(title1))
+  ! the title for different MC jobs
+  title_mc = trim(adjustl(title2))//'_'//trim(adjustl(title_loop))//'_'//trim(adjustl(title1))  
 
-  if(ISub==1) then
+  if(isub==1) then
     call LogFile%Initial("project.log","loop")
     call LogTerm%Initial('*','loop')
-  else if(ISub==2) then
+  else if(isub==2) then
     call LogFile%Initial(trim(title_mc)//".log","job."//trim(adjustl(title2)))
     call LogTerm%Initial('*',"job."//trim(adjustl(title2)))
-  else if(ISub==3) then
+  else if(isub==3) then
     call LogFile%Initial("project.log","integral")
     call LogTerm%Initial('*','integral')
-  else if(ISub==4) then
+  else if(isub==4) then
     call LogFile%Initial("project.log","output")
     call LogTerm%Initial('*','output')
-  else if(ISub==5) then
+  else if(isub==5) then
     call LogFile%Initial('*','test')
     call LogTerm%Initial('*','test')
   endif
 
-  call LogFile%QuickLog("Initializing basic properties...")
+  call init_basic
 
-  !!================= INITIALIZATION =======================================
-  Mu(1)  = 1.d0
-  Mu(2)  = 1.d0
+  call LogFile%QuickLog("initialize basic properties done!")
 
-  !================== space variables ==================================
-  Vol = 1.d0
-
-  do i = 1, D
-    dVol(i) = Vol
-
-    Vol = Vol *L(i)
-    dL(i) = Floor(L(i)/2.d0)
-  enddo
-
-  do i = D+1, 3
-    dVol(i) = Vol
-  enddo
-
-  logL(:)=dlog(L(:)*1.d0)
-  SpatialWeight(:,:)=0.d0
-
-  !================ updates frequency   ================================
-  Pupdate( :)  = 0.d0
-  Pupdate( 1)  = 1.d0      ! create_worm_along_wline
-  Pupdate( 2)  = 1.d0      ! delete_worm_along_wline
-  Pupdate( 5)  = 1.d0      ! move_worm_along_wline
-  Pupdate( 6)  = 1.d0      ! move_worm_along_gline
-  Pupdate( 7)  = 1.d0      ! add_interaction
-  Pupdate( 8)  = 1.d0      ! remove_interaction
-  Pupdate(11)  = 1.d0      ! reconnect
-  Pupdate(12)  = 1.d0      ! change_gline_space
-  Pupdate(13)  = 1.d0      ! change_wline_space
-  Pupdate(14)  = 1.d0      ! change_Gamma_type
-  Pupdate(15)  = 1.d0      ! move_measuring_index
-  Pupdate(16)  = 1.d0      ! change_Gamma_time
-  Pupdate(17)  = 1.d0      ! change_wline_isdelta
-  Pupdate(18)  = 1.d0      ! change_gamma_isdelta
-
-  !===============  Test variables ==================================
-  TestData(:)=0.d0
-  !===================================================================
-  !==============   Statistics ======================================
-  Quan(:)=0.d0
-  Norm(:)=0.d0
-  Error(:)=0.d0
-  QuanName(:)="Undefined"
-
-  allocate(W(NTypeW, 0:Vol-1, 0:MxT-1))
-  allocate(Gam(NTypeGam, 0:Vol-1, 0:MxT-1, 0:MxT-1))
-
-  allocate(W0PF(0:Vol-1, 0:MxT-1))
-  allocate(Gam0PF(0:Vol-1, 0:MxT-1, 0:MxT-1))
-  allocate(Polar(0:Vol-1, 0:MxT-1))
-  allocate(Denom(0:Vol-1, 0:MxT-1))
-  allocate(Chi(0:Vol-1, 0:MxT-1))
-
-  allocate(GamMC(0:MCOrder, 0:Vol-1, 0:MxT-1))
-  allocate(ReGamSqMC(0:MCOrder, 0:Vol-1, 0:MxT-1))
-  allocate(ImGamSqMC(0:MCOrder, 0:Vol-1, 0:MxT-1))
-
-  allocate(GamBasis(0:MCOrder,1:NTypeGam/2, 0:Vol-1, 1:NbinGam, 1:NBasisGam))
-  allocate(ReGamSqBasis(0:MCOrder,1:NTypeGam/2, 0:Vol-1, 1:NbinGam, 1:NBasisGam))
-  allocate(ImGamSqBasis(0:MCOrder,1:NTypeGam/2, 0:Vol-1, 1:NbinGam, 1:NBasisGam))
-
-  MaxStat=1024
-  allocate(ObsRecord(1:MaxStat,0:NObs-1))
-
-  call LogFile%QuickLog("Initializing time and RNG...")
-
-  call set_time_elapse
-  call set_RNG
-
-  call def_symmetry
-
-  call LogFile%QuickLog("Initialization Done!...")
   !!=====================================================================
-
-
   if(ISub==1) then
     call self_consistent
   else if(ISub==2) then
-
-    INQUIRE(DIRECTORY="readfile",EXIST=FEXIST)
-    IF(.not.FEXIST) THEN
-      call system("mkdir readfile")
-    ENDIF
-
-    open(10,access="append", iostat=ios, file="readfile/"+trim(adjustl(title2))+".dat")
-    write(10, *) trim(adjustl(title_mc))//"_monte_carlo_data.bin.dat"
-    close(10)
-    if(ios/=0) call LogFile%QuickLog("readfile iostat nonzero!",'e')
-
     call monte_carlo
   else if(ISub==3) then
     call numerical_integeration
@@ -170,151 +62,103 @@ PROGRAM MAIN
 
 CONTAINS
 
-INCLUDE "self_consistent.f90"
-INCLUDE "sc_functions.f90"
-INCLUDE "sc_read_write.f90"
 INCLUDE "analytic_integration.f90"
 INCLUDE "fitting.f90"
 
+INCLUDE "self_consistent.f90"
 INCLUDE "monte_carlo.f90"
+
+INCLUDE "sc_functions.f90"
 INCLUDE "mc_functions.f90"
-INCLUDE "mc_read_write.f90"
 
 INCLUDE "model_dependent.f90"
+INCLUDE "read_write.f90"
 
 INCLUDE "check_conf.f90"
 
 
 subroutine numerical_integeration
   implicit none
+  logical :: ifchange
+  double precision :: mcBeta
+
+  call read_input(.true.)
+  call update_T_dependent
+
   call LogFile%QuickLog("Reading G,W, and Gamma...")
   if(read_GW()) call LogFile%QuickLog("Read G, W done!")
-
-  call read_Gamma
+  call read_Gamma(ifchange, mcBeta)
   call LogFile%QuickLog("Read Gamma done!")
 
-  !================ read Beta from beta.inp ======================
-  open(10, status='old', file="beta.inp")
-  read(10, *) Beta
-  close(10)
-
-  call initialize_self_consistent
-  !=========== initialization of basis =======================
-  call initialize_polynomials
-  call initialize_bins
-  call calculate_basis_GWGam
-
-
   call calculate_Gam1
+  call output_Gam1
+  return
 end subroutine
 
 SUBROUTINE just_output
   implicit none
-  logical :: flag
+  logical :: flag, ifchange
+  double precision :: mcBeta
 
-  !================ read Beta from beta.inp ======================
-  open(10, status='old', file="beta.inp")
-  read(10, *) Beta
-  close(10)
-  call initialize_self_consistent
-  !=========== initialization of basis =======================
-  call initialize_polynomials
-  call initialize_bins
-  call calculate_basis_GWGam
+  call LogFile%QuickLog("Just output something!") 
+  call read_input(.true.)
+  call update_T_dependent
 
-  call LogFile%QuickLog("Just output something!")
   call LogFile%QuickLog("Reading G,W, and Gamma...")
   if(read_GW()) call LogFile%QuickLog("Read G, W done!")
-
-  call LogFile%QuickLog("Reading MC data...")
-  call read_monte_carlo_data
-
-  call LogFile%QuickLog("Reading Done!...")
-
-
-  !!-------- update the Gamma matrix with MC data -------
-  call Gam_mc2matrix_mc(flag)
+  call read_Gamma(ifchange, mcBeta)
+  call LogFile%QuickLog("Read Gamma done!")
 
   flag = self_consistent_GW(.false.)
-
-  call transfer_Polar_r(-1)
-  call transfer_Polar_t(-1)
-  call transfer_Sigma_t(-1)
-
-  call calculate_Chi
-  call transfer_Chi_r(-1)
-  call transfer_Chi_t(-1)
 
   call output_Quantities
 end SUBROUTINE just_output
 
 SUBROUTINE self_consistent
   implicit none
-  integer :: iloop
-  logical :: flag, changeBeta
+  logical :: flag, ifchange
+  double precision :: mcBeta
 
   !------- read the G, W, and Gamma  -------------------
   if(IsLoad==.false.) then
 
     Beta = iniBeta
-    call initialize_self_consistent
-    !=========== initialization of basis =======================
-    call initialize_polynomials
-    call initialize_bins
-    call calculate_basis_GWGam
+    MCOrder = iniMCOrder
+    file_version = 0 
+
+    call update_T_dependent
 
     flag = self_consistent_GW(.true.)
 
-    call transfer_Polar_r(-1)
-    call transfer_Polar_t(-1)
-    call transfer_Sigma_t(-1)
-
-    call calculate_Chi
-    call transfer_Chi_r(-1)
-    call transfer_Chi_t(-1)
-
     call output_Quantities
 
     call write_GW
+    call write_Gamma0
+    call write_input(.false., .true.)
+
     !!!======================================================================
   else if(IsLoad) then
 
-    !================ read Beta from beta.inp ======================
-    open(10, status='old', file="beta.inp")
-    read(10, *) Beta
-    close(10)
+    call read_input(.true.)
 
-    call initialize_self_consistent
-    !=========== initialization of basis =======================
-    call initialize_polynomials
-    call initialize_bins
-    call calculate_basis_GWGam
+    call update_T_dependent
 
-    call LogFile%QuickLog("Reading old G,W...")
+    call LogFile%QuickLog("Reading old G, W, Gamma...")
     if(read_GW()) call LogFile%QuickLog("Read G, W done!")
+    call read_Gamma(ifchange, mcBeta)
 
-    call LogFile%QuickLog("Reading MC data...")
-    call read_monte_carlo_data
-
-    call LogFile%QuickLog("Reading Done!...")
-
-    !!-------- update the Gamma matrix with MC data -------
-    call Gam_mc2matrix_mc(changeBeta)
+    if(abs(mcBeta-Beta)>1.d-5)  then
+      call LogFile%QuickLog("Beta for Gamma is not the same with beta in input file!",'e')
+      stop -1
+    endif
+    call LogFile%QuickLog("Reading Gamma done!")
 
     flag = self_consistent_GW(.false.)
 
-    call transfer_Polar_r(-1)
-    call transfer_Polar_t(-1)
-    call transfer_Sigma_t(-1)
-
-    call calculate_Chi
-    call transfer_Chi_r(-1)
-    call transfer_Chi_t(-1)
-
     call output_Quantities
 
-    call update_flag(changeBeta)
     call write_GW
+    call write_input(ifchange, .false.)
   endif
   return
 END SUBROUTINE self_consistent
@@ -392,39 +236,39 @@ LOGICAL FUNCTION self_consistent_GW(isloop)
 
   call transfer_r(-1)
   call transfer_t(-1)
+
+  call transfer_Polar_r(-1)
+  call transfer_Polar_t(-1)
+  call transfer_Sigma_t(-1)
+
+  call calculate_Chi
+  call transfer_Chi_r(-1)
+  call transfer_Chi_t(-1)
   return
 END FUNCTION self_consistent_GW
 
 SUBROUTINE monte_carlo
   implicit none
   integer :: i, mc_version
-  double precision :: WR, GamR
+  logical :: ifchange
+  double precision :: WR, GamR, mcBeta
 
+  call write_readlist
 
-  do i= 0, MCOrder
-    QuanName(i) = "(Order "+str(i)+"Gamma)"
-  enddo
+  !===== read the starting beta and L and MCOrder ================
+  call read_input(.true.)
+  mc_version = file_version
+
+  call update_T_dependent !initialize all the properties dependent with Beta
+  call LogFile%QuickLog("updating T dependent properties done!")
+
+  if(read_GW()) call LogFile%QuickLog("Read G, W done!")
+  !call read_Gamma(ifchange, mcBeta)
+  !call LogFile%QuickLog("Read Gamma done!")
 
   if(IsLoad==.false.) then
 
-    Beta = iniBeta
-
-    call initialize_self_consistent
-    call initialize_Gam
-
-    !=========== initialization of basis =======================
-    call initialize_polynomials
-    call initialize_bins
-    call calculate_basis_GWGam
-
-    call LogFile%QuickLog("Initializing monte carlo...")
-    call calculate_GamNormWeight
-
-    if(read_GW()) call LogFile%QuickLog("Read G, W done!")
-
-    call initialize_markov
-    call LogFile%QuickLog("Initializing monte carlo done!")
-
+    !==============THERMOLIZATION=====================================
     call LogFile%QuickLog("Start Thermalization ...")
 
     ProbCall(:,:) = 0.d0
@@ -433,19 +277,24 @@ SUBROUTINE monte_carlo
     BalenceCheck(:,:,:)=0.d0
 
     !-------- throw away some configurations to thermalize -----------
+    call initialize_markov
+    call update_WeightCurrent
+    call check_config
+
     call markov(.true.)
 
     call LogFile%QuickLog("Thermalization done!")
-
     call time_elapse
     t_simu = t_elap
     call LogFile%QuickLog('Thermalization time: '//trim(str(t_simu,'(f12.2)'))//'s')
+    !=================================================================
 
     !!================ MC SIMULATION FOR GAMMA =============================
     imc = 0.d0
-    Z_normal=0.0
-    Z_worm=0.0
+    Z_normal=0.d0
+    Z_worm=0.d0
     StatNum=0
+    GamNorm = (0.d0, 0.d0)
 
     ProbCall(:,:) = 0.d0
     ProbProp(:,:) = 0.d0
@@ -462,46 +311,16 @@ SUBROUTINE monte_carlo
     ReGamSqBasis(:,:,:,:,:) = 0.d0
     ImGamSqBasis(:,:,:,:,:) = 0.d0
 
-    GamNorm = (0.d0, 0.d0)
     TestData(:)=0.d0
 
-    call read_flag
-    mc_version = file_version
+  else
 
-  else if(IsLoad) then
-
-    !================ read Beta from beta.inp ======================
-    open(10, status='old', file="beta.inp")
-    read(10, *) Beta
-    close(10)
-    call initialize_self_consistent
-    !=========== initialization of basis =======================
-    call initialize_polynomials
-    call initialize_bins
-    call calculate_basis_GWGam
-
-    call LogFile%QuickLog("Initializing monte carlo...")
-    call calculate_GamNormWeight
     call initialize_markov
-    call LogFile%QuickLog("Initializing monte carlo done!")
-
-    !------- read the configuration and MC data from previous simulation --
-    call LogFile%QuickLog(str(mc_version)+', '+str(file_version))
-    call LogFile%QuickLog("Updating G, W, and Gamma...")
-
-    call read_Gamma 
-    if(read_GW()) call LogFile%QuickLog("Read G, W done!")
-
-    call output_Quantities
-
     call update_WeightCurrent
-
     call check_config
-    call print_config
   endif
 
   call LogFile%QuickLog("Running MC Simulations...")
-
   call markov(.false.)
 
   call time_elapse
@@ -511,91 +330,172 @@ SUBROUTINE monte_carlo
   return
 END SUBROUTINE monte_carlo
 
-SUBROUTINE read_flag
+SUBROUTINE init_space
   implicit none
-  integer :: ios
+  integer :: i
 
-  open(11, status="old", iostat=ios, file="loop.inp")
-  read(11, *) file_version
-  close(11)
+  !================== space variables ==================================
+  Vol = 1.d0
 
-  if(ios/=0) then
-    call LogFile%QuickLog(str(ios)+"Fail to read the loop number, continue to MC!")
-    return
-  endif
+  do i = 1, D
+    dVol(i) = Vol
+
+    Vol = Vol *L(i)
+    dL(i) = Floor(L(i)/2.d0)
+  enddo
+
+  do i = D+1, 3
+    dVol(i) = Vol
+  enddo
+
+  logL(:)=dlog(L(:)*1.d0)
+  SpatialWeight(:,:)=0.d0
+
+  call def_symmetry
 
   return
-END SUBROUTINE read_flag
+END SUBROUTINE init_space
 
-
-SUBROUTINE update_flag(changeBeta)
+SUBROUTINE init_matrix
   implicit none
-  integer :: ios 
-  logical, intent(in) :: changeBeta
 
-  if(changeBeta) then
-    call LogFile%QuickLog("Changing Beta:")
-    call LogFile%QuickLog("old Beta:"+str(Beta))
-    open(10, status='replace', file='beta.inp')
-    if(Beta+dBeta<=finalBeta) then
-      write(10, *) Beta+dBeta
-      call LogFile%QuickLog("change to new Beta:"+str(Beta+dBeta))
-    else if(Beta==finalBeta) then
-      write(10, *) Beta
-      call LogFile%QuickLog("already the target Beta!"+str(Beta))
-    else
-      call LogFile%QuickLog("error! Beta:"+str(Beta)+", dBeta: "+str(dBeta), 'e')
-      stop -1
-    endif
-    close(10)
-  endif
+  allocate(W(NTypeW, 0:Vol-1, 0:MxT-1))
+  allocate(Gam(NTypeGam, 0:Vol-1, 0:MxT-1, 0:MxT-1))
 
-  open(11, status="old", iostat=ios, file="loop.inp")
-  read(11, *) file_version
-  close(11)
+  allocate(W0PF(0:Vol-1, 0:MxT-1))
+  allocate(Gam0PF(0:Vol-1, 0:MxT-1, 0:MxT-1))
+  allocate(Polar(0:Vol-1, 0:MxT-1))
+  allocate(Denom(0:Vol-1, 0:MxT-1))
+  allocate(Chi(0:Vol-1, 0:MxT-1))
 
-  if(ios/=0) then
-    call LogFile%QuickLog(str(ios)+"Fail to read the loop number in loop.inp!")
-    return
-  endif
+  allocate(GamMC(0:MCOrder, 0:Vol-1, 0:MxT-1))
+  allocate(ReGamSqMC(0:MCOrder, 0:Vol-1, 0:MxT-1))
+  allocate(ImGamSqMC(0:MCOrder, 0:Vol-1, 0:MxT-1))
 
-  open(12, status="replace", iostat=ios, file="loop.inp")
-  write(12, *) file_version+1
-  close(12)
+  allocate(GamBasis(0:MCOrder,1:NTypeGam/2, 0:Vol-1, 1:NbinGam, 1:NBasisGam))
+  allocate(ReGamSqBasis(0:MCOrder,1:NTypeGam/2, 0:Vol-1, 1:NbinGam, 1:NBasisGam))
+  allocate(ImGamSqBasis(0:MCOrder,1:NTypeGam/2, 0:Vol-1, 1:NbinGam, 1:NBasisGam))
+END SUBROUTINE init_matrix
 
-  if(ios/=0) then
-    call LogFile%QuickLog(str(ios)+"Fail to write the loop number to loop.inp!")
-    return
-  endif
+
+SUBROUTINE init_basic
+  implicit none
+
+  call LogFile%QuickLog("Initializing basic properties...")
+
+  !!================= INITIALIZATION =======================================
+  Mu(1)  = 1.d0
+  Mu(2)  = 1.d0
+
+  !!================ init basis properties ==============================
+  call initialize_polynomials
+  call initialize_bins
+  call calculate_basis_GWGam
+
+  !================ updates frequency   ================================
+  Pupdate( :)  = 0.d0
+  Pupdate( 1)  = 1.d0      ! create_worm_along_wline
+  Pupdate( 2)  = 1.d0      ! delete_worm_along_wline
+  Pupdate( 5)  = 1.d0      ! move_worm_along_wline
+  Pupdate( 6)  = 1.d0      ! move_worm_along_gline
+  Pupdate( 7)  = 1.d0      ! add_interaction
+  Pupdate( 8)  = 1.d0      ! remove_interaction
+  Pupdate(11)  = 1.d0      ! reconnect
+  Pupdate(12)  = 1.d0      ! change_gline_space
+  Pupdate(13)  = 1.d0      ! change_wline_space
+  Pupdate(14)  = 1.d0      ! change_Gamma_type
+  Pupdate(15)  = 1.d0      ! move_measuring_index
+  Pupdate(16)  = 1.d0      ! change_Gamma_time
+  Pupdate(17)  = 1.d0      ! change_wline_isdelta
+  Pupdate(18)  = 1.d0      ! change_gamma_isdelta
+  !===================================================================
+
+  !===============  Test variables ==================================
+  TestData(:)=0.d0
+  !===================================================================
+
+  !==============  Statistics for MC  ===============================
+  Quan(:)=0.d0
+  Norm(:)=0.d0
+  Error(:)=0.d0
+  QuanName(:)="Undefined"
+
+  do i= 0, MCOrder
+    QuanName(i) = "(Order "+str(i)+"Gamma)"
+  enddo
+
+  MaxStat=1024
+  allocate(ObsRecord(1:MaxStat,0:NObs-1))
+
+  !--------------- initialize topology variables for MC ---------------
+  GLnKey2Value(:) = 0
+  WLnKey2Value(:) = 0
+  VertexKey2Value(:) = 0
+
+  StatusLn(:) = -1
+  StatusVertex(:)= -1
+
+  WeightLn(:) = 1.d0
+  WeightVertex(:) = 1.d0
+
+  Hash4G(:) = 0
+  Hash4W(:) = 0
+
+  do i = 1, MxNLn
+    NextLn(i) = i+1
+    if(i==MxNLn)  NextLn(i) = -1
+  enddo
+
+  do i = 1, MxNVertex
+    NextVertex(i) = i+1
+    if(i==MxNVertex)  NextVertex(i) = -1
+  enddo
+
+  call def_prob
+  call def_spin
+  !=================================================================
+
+  call init_space
+  call init_matrix
+
+  call def_spatial_weight
+
+  call set_time_elapse
+  call set_RNG
+
+  call LogFile%QuickLog("Initialization Done!...")
   return
-END SUBROUTINE update_flag
+END SUBROUTINE init_basic
+
+SUBROUTINE update_T_dependent
+  implicit none
+
+  call initialize_self_consistent
+  call initialize_Gam
+
+  call calculate_GamNormWeight !dependent with beta
+  return
+END SUBROUTINE update_T_dependent
 
 SUBROUTINE test_subroutine
-    implicit none
-    integer :: ir, i, it1, it2
-    integer :: isamp
+  implicit none
+  integer :: ir, i, it1, it2
+  integer :: isamp
+  logical :: ifchange
+  double precision :: mcBeta
 
-    !========  test drawing subroutine =====================
-    !call initialize_markov
-    !call print_config
+  call read_input(.true.)
+  call update_T_dependent
 
-    !======== check the value in Gamma matrix ==============
-    if(read_GW()) call LogFile%QuickLog("Read G, W done!")
-    call read_Gamma
+  call LogFile%QuickLog("Reading G,W, and Gamma...")
+  if(read_GW()) call LogFile%QuickLog("Read G, W done!")
 
-    do it2 = 0, MxT-1
-      do it1 = 0, MxT-1
-        do ir = 0, Vol-1
-          do i = 1, NtypeGam
-            if(abs(Gam(i,ir,it1,it2))>=1.d3) then
-              print *, i, ir, it1, it2, Gam(i,ir,it1,it2)
-            endif
-          enddo
-        enddo
-      enddo
-    enddo
+  call read_Gamma(ifchange, mcBeta)
+  call LogFile%QuickLog("Read Gamma done!")
 
-    return
+  call output_Quantities
+
+  return
 END SUBROUTINE test_subroutine
 
 END PROGRAM MAIN
