@@ -23,7 +23,7 @@ PROGRAM MAIN
     double precision, allocatable :: ReGamSqMCTmp(:,:,:)
     double precision, allocatable :: ImGamSqMCTmp(:,:,:)
 
-    complex*16, allocatable :: GamBasisTmp(:,:,:,:,:)
+    complex*16, allocatable :: GamMCBasisTmp(:,:,:,:,:)
     double precision, allocatable :: ReGamSqTmp(:,:,:,:,:)
     double precision, allocatable :: ImGamSqTmp(:,:,:,:,:)
     integer :: EffectiveSamp
@@ -87,11 +87,11 @@ PROGRAM MAIN
     allocate(ReGamSqMCTmp(0:MCOrder, 0:Vol-1, 0:MxT-1))
     allocate(ImGamSqMCTmp(0:MCOrder, 0:Vol-1, 0:MxT-1))
 
-    allocate(GamBasis(0:MCOrder,1:NTypeGam/2, 0:Vol-1, 1:NBinGam, 1:NBasisGam))
+    allocate(GamMCBasis(0:MCOrder,1:NTypeGam/2, 0:Vol-1, 1:NBinGam, 1:NBasisGam))
     allocate(ReGamSqBasis(0:MCOrder,1:NTypeGam/2, 0:Vol-1, 1:NBinGam, 1:NBasisGam))
     allocate(ImGamSqBasis(0:MCOrder,1:NTypeGam/2, 0:Vol-1, 1:NBinGam, 1:NBasisGam))
 
-    allocate(GamBasisTmp(0:MCOrder,1:NTypeGam/2, 0:Vol-1, 1:NBinGam, 1:NBasisGam))
+    allocate(GamMCBasisTmp(0:MCOrder,1:NTypeGam/2, 0:Vol-1, 1:NBinGam, 1:NBasisGam))
     allocate(ReGamSqTmp(0:MCOrder,1:NTypeGam/2, 0:Vol-1, 1:NBinGam, 1:NBasisGam))
     allocate(ImGamSqTmp(0:MCOrder,1:NTypeGam/2, 0:Vol-1, 1:NBinGam, 1:NBasisGam))
 
@@ -103,7 +103,7 @@ PROGRAM MAIN
     GamMC(:,:,:) = 0.d0
     ReGamSqMC(:,:,:) = 0.d0
     ImGamSqMC(:,:,:) = 0.d0
-    GamBasis(:,:,:,:,:) = 0.d0
+    GamMCBasis(:,:,:,:,:) = 0.d0
     ReGamSqBasis(:,:,:,:,:) = 0.d0
     ImGamSqBasis(:,:,:,:,:) = 0.d0
 
@@ -131,7 +131,7 @@ PROGRAM MAIN
             do ir = 0, Vol-1
               do ityp = 1, NtypeGam/2
                 do iorder = 0, MCOrder
-                  read(101,iostat=ios)  GamBasisTmp(iorder, ityp, ir, ibin, ibasis)
+                  read(101,iostat=ios)  GamMCBasisTmp(iorder, ityp, ir, ibin, ibasis)
                   read(101,iostat=ios)  ReGamSqTmp(iorder, ityp, ir, ibin, ibasis)
                   read(101,iostat=ios)  ImGamSqTmp(iorder, ityp, ir, ibin, ibasis)
                 enddo
@@ -151,7 +151,7 @@ PROGRAM MAIN
         GamMC=GamMC+GamMCTmp
         ReGamSqMC=ReGamSqMC+ReGamSqMCTmp
         ImGamSqMC=ImGamSqMC+ImGamSqMCTmp
-        GamBasis = GamBasis+GamBasisTmp
+        GamMCBasis = GamMCBasis+GamMCBasisTmp
         ReGamSqBasis = ReGamSqBasis+ReGamSqTmp
         ImGamSqBasis = ImGamSqBasis+ImGamSqTmp
       endif
@@ -196,7 +196,7 @@ PROGRAM MAIN
         do ir = 0, Vol-1
           do ityp = 1, NtypeGam/2
             do iorder = 0, MCOrder
-              write(104)  GamBasis(iorder,  ityp, ir, ibin, ibasis)
+              write(104)  GamMCBasis(iorder,  ityp, ir, ibin, ibasis)
               write(104)  ReGamSqBasis(iorder,  ityp, ir, ibin, ibasis)
               write(104)  ImGamSqBasis(iorder,  ityp, ir, ibin, ibasis)
             enddo
@@ -207,35 +207,35 @@ PROGRAM MAIN
     close(104)
 
     !=========  write on the screen ========================================
-    open(105, status="replace", &
-      & file=trim(title_mc)//"_monte_carlo_data.dat")
+    !open(105, status="replace", &
+      !& file=trim(title_mc)//"_monte_carlo_data.dat")
 
-    write(105, *) finalBeta, Beta, MCOrder, L(1:D)
-    write(105, *) imc, GamNorm, GamNormWeight
-    write(105, *) Z_normal, ratioerr
-    do it1 = 0, MxT-1
-      do ir = 0, Vol-1
-        do iorder = 0, MCOrder
-          write(105, *)  GamMC(iorder,  ir, it1)
-          write(105, *)  ReGamSqMC(iorder, ir, it1)
-          write(105, *)  ImGamSqMC(iorder, ir, it1)
-        enddo
-      enddo
-    enddo
-    do ibasis = 1, NBasisGam
-      do ibin = 1, NBinGam
-        do ir = 0, Vol-1
-          do ityp = 1, NtypeGam/2
-            do iorder = 0, MCOrder
-              write(105, *)  GamBasis(iorder,  ityp, ir, ibin, ibasis)
-              write(105, *)  ReGamSqBasis(iorder,  ityp, ir, ibin, ibasis)
-              write(105, *)  ImGamSqBasis(iorder,  ityp, ir, ibin, ibasis)
-            enddo
-          enddo
-        enddo
-      enddo
-    enddo
-    close(105)
+    !write(105, *) finalBeta, Beta, MCOrder, L(1:D)
+    !write(105, *) imc, GamNorm, GamNormWeight
+    !write(105, *) Z_normal, ratioerr
+    !do it1 = 0, MxT-1
+      !do ir = 0, Vol-1
+        !do iorder = 0, MCOrder
+          !write(105, *)  GamMC(iorder,  ir, it1)
+          !write(105, *)  ReGamSqMC(iorder, ir, it1)
+          !write(105, *)  ImGamSqMC(iorder, ir, it1)
+        !enddo
+      !enddo
+    !enddo
+    !do ibasis = 1, NBasisGam
+      !do ibin = 1, NBinGam
+        !do ir = 0, Vol-1
+          !do ityp = 1, NtypeGam/2
+            !do iorder = 0, MCOrder
+              !write(105, *)  GamMCBasis(iorder,  ityp, ir, ibin, ibasis)
+              !write(105, *)  ReGamSqBasis(iorder,  ityp, ir, ibin, ibasis)
+              !write(105, *)  ImGamSqBasis(iorder,  ityp, ir, ibin, ibasis)
+            !enddo
+          !enddo
+        !enddo
+      !enddo
+    !enddo
+    !close(105)
   END SUBROUTINE write_monte_carlo_data
 
   SUBROUTINE write_GamMC

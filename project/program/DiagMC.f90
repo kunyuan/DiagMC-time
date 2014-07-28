@@ -85,10 +85,7 @@ subroutine numerical_integeration
   call read_input(.true.)
   call update_T_dependent
 
-  call LogFile%QuickLog("Reading G,W, and Gamma...")
-  if(read_GW()) call LogFile%QuickLog("Read G, W done!")
-  call read_Gamma(ifchange, mcBeta)
-  call LogFile%QuickLog("Read Gamma done!")
+  call read_GWGamma
 
   call calculate_Gam1
   call output_Gam1
@@ -104,10 +101,7 @@ SUBROUTINE just_output
   call read_input(.true.)
   call update_T_dependent
 
-  call LogFile%QuickLog("Reading G,W, and Gamma...")
-  if(read_GW()) call LogFile%QuickLog("Read G, W done!")
-  call read_Gamma(ifchange, mcBeta)
-  call LogFile%QuickLog("Read Gamma done!")
+  call read_GWGamma
 
   flag = self_consistent_GW(.false.)
 
@@ -132,8 +126,7 @@ SUBROUTINE self_consistent
 
     call output_Quantities
 
-    call write_GW
-    call write_Gamma0
+    call write_GWGamma
     call write_input(.false., .true.)
 
     !!!======================================================================
@@ -143,10 +136,10 @@ SUBROUTINE self_consistent
 
     call update_T_dependent
 
-    call LogFile%QuickLog("Reading old G, W, Gamma...")
+    call LogFile%QuickLog("Reading G, W...")
     if(read_GW()) call LogFile%QuickLog("Read G, W done!")
-    call read_Gamma(ifchange, mcBeta)
 
+    call read_Gamma_MC(ifchange, mcBeta)
     if(abs(mcBeta-Beta)>1.d-5)  then
       call LogFile%QuickLog("Beta for Gamma is not the same with beta in input file!",'e')
       stop -1
@@ -157,7 +150,7 @@ SUBROUTINE self_consistent
 
     call output_Quantities
 
-    call write_GW
+    call write_GWGamma
     call write_input(ifchange, .false.)
   endif
   return
@@ -262,9 +255,7 @@ SUBROUTINE monte_carlo
   call update_T_dependent !initialize all the properties dependent with Beta
   call LogFile%QuickLog("updating T dependent properties done!")
 
-  if(read_GW()) call LogFile%QuickLog("Read G, W done!")
-  !call read_Gamma(ifchange, mcBeta)
-  !call LogFile%QuickLog("Read Gamma done!")
+  call read_GWGamma
 
   if(IsLoad==.false.) then
 
@@ -307,13 +298,18 @@ SUBROUTINE monte_carlo
     ReGamSqMC(:,:,:) = 0.d0
     ImGamSqMC(:,:,:) = 0.d0
 
-    GamBasis(:,:,:,:,:) = (0.d0, 0.d0)
+    GamMCBasis(:,:,:,:,:) = (0.d0, 0.d0)
     ReGamSqBasis(:,:,:,:,:) = 0.d0
     ImGamSqBasis(:,:,:,:,:) = 0.d0
 
     TestData(:)=0.d0
 
   else
+    call read_monte_carlo_data(mcBeta)
+    if(abs(mcBeta-Beta)>1.d-5)  then
+      call LogFile%QuickLog("Beta for Gamma is not the same with beta in input file!",'e')
+      stop -1
+    endif
 
     call initialize_markov
     call update_WeightCurrent
@@ -361,6 +357,7 @@ SUBROUTINE init_matrix
 
   allocate(W(NTypeW, 0:Vol-1, 0:MxT-1))
   allocate(Gam(NTypeGam, 0:Vol-1, 0:MxT-1, 0:MxT-1))
+  allocate(GamBasis(NTypeGam, 0:Vol-1, 1:NbinGam, 1:NBasisGam))
 
   allocate(W0PF(0:Vol-1, 0:MxT-1))
   allocate(Gam0PF(0:Vol-1, 0:MxT-1, 0:MxT-1))
@@ -372,7 +369,7 @@ SUBROUTINE init_matrix
   allocate(ReGamSqMC(0:MCOrder, 0:Vol-1, 0:MxT-1))
   allocate(ImGamSqMC(0:MCOrder, 0:Vol-1, 0:MxT-1))
 
-  allocate(GamBasis(0:MCOrder,1:NTypeGam/2, 0:Vol-1, 1:NbinGam, 1:NBasisGam))
+  allocate(GamMCBasis(0:MCOrder,1:NTypeGam/2, 0:Vol-1, 1:NbinGam, 1:NBasisGam))
   allocate(ReGamSqBasis(0:MCOrder,1:NTypeGam/2, 0:Vol-1, 1:NbinGam, 1:NBasisGam))
   allocate(ImGamSqBasis(0:MCOrder,1:NTypeGam/2, 0:Vol-1, 1:NbinGam, 1:NBasisGam))
 END SUBROUTINE init_matrix
@@ -472,6 +469,7 @@ SUBROUTINE update_T_dependent
 
   call initialize_self_consistent
   call initialize_Gam
+  GamBasis = (0.d0, 0.d0)
 
   call calculate_GamNormWeight !dependent with beta
   return
@@ -487,11 +485,7 @@ SUBROUTINE test_subroutine
   call read_input(.true.)
   call update_T_dependent
 
-  call LogFile%QuickLog("Reading G,W, and Gamma...")
-  if(read_GW()) call LogFile%QuickLog("Read G, W done!")
-
-  call read_Gamma(ifchange, mcBeta)
-  call LogFile%QuickLog("Read Gamma done!")
+  call read_GWGamma
 
   call output_Quantities
 

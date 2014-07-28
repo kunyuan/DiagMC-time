@@ -42,7 +42,6 @@ sc_dict={
     "__Duplicate" : 1,
     "__IsCluster" : False,
     "__AutoRun" : True, 
-    #"__AutoRun" : False, 
     "IsLoad" : True,
     "ReadFile" : readfile,
     }
