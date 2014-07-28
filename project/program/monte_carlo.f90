@@ -148,10 +148,7 @@ SUBROUTINE markov(IsToss)
         call LogFile%QuickLog(str(mc_version)+', '+str(file_version))
         call LogFile%QuickLog("Updating G, W, and Gamma...")
 
-        if(read_GW())  call LogFile%QuickLog("Read G, W done!")
-
-        !call read_Gamma(ifchange, mcBeta)
-        !call LogFile%QuickLog("Read Gamma done!")
+        call read_GWGamma
 
         call update_WeightCurrent
         call recalculate_Reweighting
@@ -2634,13 +2631,13 @@ SUBROUTINE accumulate_Gamma(ityp, dr, dt1, dt2, Phase, factorM, flag)
         & (0:BasisOrderGam,0:BasisOrderGam, ibasis,ibin), dt1, dt2)
 
       if(flag) then
-        GamBasis(Order, ityp, dr, ibin, ibasis) = GamBasis(Order, ityp, dr, ibin, &
+        GamMCBasis(Order, ityp, dr, ibin, ibasis) = GamMCBasis(Order, ityp, dr, ibin, &
           & ibasis) + dcmplx(real(Phase/factorM), -dimag(Phase/factorM))*wbasis
       else
-        GamBasis(Order, ityp, dr, ibin, ibasis) = GamBasis(Order, ityp, dr, ibin, &
+        GamMCBasis(Order, ityp, dr, ibin, ibasis) = GamMCBasis(Order, ityp, dr, ibin, &
           & ibasis) + dcmplx(real(Phase/factorM), dimag(Phase/factorM))*wbasis
       endif
-      if(GamBasis(Order, ityp, dr, ibin, ibasis)/=GamBasis(Order, ityp, dr, ibin, ibasis)) then
+      if(GamMCBasis(Order, ityp, dr, ibin, ibasis)/=GamMCBasis(Order, ityp, dr, ibin, ibasis)) then
         call LogFile%QuickLog("NaN appears in MC!"+str(Phase/factorM))
         call LogFile%QuickLog("NaN appears in MC!"+str(wbasis))
         stop -1

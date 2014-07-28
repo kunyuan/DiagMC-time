@@ -282,15 +282,15 @@ SUBROUTINE Gam_mc2matrix_mc(changeBeta)
   double precision :: totrerr, totierr, tau1, tau2
   double precision :: rgam, igam, rgam2, igam2, rerr, ierr, rpercenterr, ipercenterr
 
-  call initialize_Gam
-
   call LogFile%QuickLog("(ErrorRatio):"+str(ratioerr))
 
   flag(:) = .false.
 
   call LogFile%WriteStamp('i')
 
-  normal = GamNormWeight / GamNorm
+  normal = GamNormWeight/GamNorm
+
+  GamBasis = (0.d0, 0.d0)
 
   looporder: do iorder = 1, MCOrder
     totrerr = 0.d0
@@ -337,33 +337,48 @@ SUBROUTINE Gam_mc2matrix_mc(changeBeta)
 
 
     if(flag(iorder)) then
-      do it2 = 0, MxT-1
-        do it1 = 0, MxT-1
-          do dr = 0, Vol-1
-            do ityp = 1, NTypeGam/2
-              typ = 2*(ityp-1) + 1
-              Gam(typ, dr, it1, it2) = Gam(typ, dr, it1, it2) + normal*Gam_basis(it1, it2, GamBasis(iorder, ityp, dr, :,:))
-            enddo
-          enddo
-        enddo
+      do ityp = 1, NTypeGam/2
+        typ = 2*(ityp-1) + 1
+        GamBasis(typ, :, :, :) = GamBasis(typ,:,:,:) + normal*GamMCBasis(iorder, ityp, :, :, :)
       enddo
     else 
       exit looporder
     endif
   enddo looporder
 
-  Gam(2,:,:,:) = Gam(1,:,:,:)
-  Gam(4,:,:,:) = Gam(3,:,:,:)
-  Gam(6,:,:,:) = Gam(5,:,:,:)
+  GamBasis(2,:,:,:) = GamBasis(1,:,:,:)
+  GamBasis(4,:,:,:) = GamBasis(3,:,:,:)
+  GamBasis(6,:,:,:) = GamBasis(5,:,:,:)
 
   changeBeta = .false.
   if((MCOrder<3 .and. flag(MCOrder)) .or.(MCOrder>=3 .and. flag(3))) then
     changeBeta = .true.
   endif
+
+  call Gam_basis2matrix
+
 END SUBROUTINE Gam_mc2matrix_mc
 
 
 
+SUBROUTINE Gam_basis2matrix
+  implicit none
+  integer :: ityp, ir, it1, it2
+
+  call initialize_Gam
+
+  do it2 = 0, MxT-1
+    do it1 = 0, MxT-1
+      do ir = 0, Vol-1
+        do ityp = 1, NtypeGam
+          Gam(ityp, ir, it1, it2) = Gam(ityp, ir, it1, it2) +  &
+            & Gam_basis(it1, it2, GamBasis(ityp, ir, :,:))
+        enddo
+      enddo
+    enddo
+  enddo
+  return
+END SUBROUTINE Gam_basis2matrix
 
 COMPLEX*16 FUNCTION Gam_basis(it1, it2, GammaBasis)
   implicit none

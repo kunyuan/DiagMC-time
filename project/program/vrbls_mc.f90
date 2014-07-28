@@ -135,6 +135,7 @@ MODULE vrbls_mc
 
   complex(kind=8), allocatable :: W(:,:,:)
   complex(kind=8), allocatable :: Gam(:,:,:,:)
+  complex(kind=8), allocatable :: GamBasis(:,:,:,:)
 
   complex(kind=8), allocatable :: W0PF(:,:)
   complex(kind=8), allocatable :: Gam0PF(:,:,:)
@@ -153,7 +154,7 @@ MODULE vrbls_mc
   double precision, allocatable :: ReGamSqMC(:,:,:)   ! the measurement of Gamma in MC
   double precision, allocatable :: ImGamSqMC(:,:,:)   ! the measurement of Gamma in MC
 
-  complex*16, allocatable :: GamBasis(:,:,:,:,:)      ! the measurement of Gamma in MC
+  complex*16, allocatable :: GamMCBasis(:,:,:,:,:)      ! the measurement of Gamma in MC
   double precision, allocatable :: ReGamSqBasis(:,:,:,:,:)   ! the measurement of Gamma in MC
   double precision, allocatable :: ImGamSqBasis(:,:,:,:,:)   ! the measurement of Gamma in MC
 

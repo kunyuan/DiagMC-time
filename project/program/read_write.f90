@@ -139,6 +139,14 @@ END SUBROUTINE write_readlist
 !!================= READ/WRITE CONFIGURATIONS ====================
 !!================================================================
 
+SUBROUTINE read_GWGamma
+  implicit none
+
+  call LogFile%QuickLog("Reading G, W, Gamma...")
+  if(read_GW()) call LogFile%QuickLog("Read G, W done!")
+  if(read_Gamma()) call LogFile%QuickLog("Read Gamma done!")
+  return
+END SUBROUTINE read_GWGamma
 
 Logical Function read_GW
   implicit none
@@ -206,14 +214,74 @@ Logical Function read_GW
   return
 END Function read_GW
 
-SUBROUTINE write_GW
+LOGICAL FUNCTION read_Gamma
+  implicit none
+  integer :: isite, ityp, it1, it2, ios, ibin, ibasis
+  logical :: alive
+  complex*16, allocatable :: GamBasistmp(:,:,:,:)
+
+  inquire(file=trim(title_loop)//"_Gam_file.dat",exist=alive)
+  if(.not. alive) then
+    call LogFile%QuickLog("There is no Gam file yet!",'e')
+    stop -1
+  endif
+
+  allocate(GamBasistmp(1:NtypeGam, 0:Vol-1, 1:NbinGam, 1:NbasisGam))
+
+  open(102, status="old", file=trim(title_loop)//"_Gam_file.dat")
+
+  do ibasis = 1, NBasisGam
+    do ibin = 1, NbinGam
+      do isite = 0, Vol-1
+        do ityp = 1, NTypeGam
+          read(102, *,iostat=ios) GamBasistmp(ityp, isite, ibin, ibasis)
+        enddo
+      enddo
+    enddo
+  enddo
+
+  if(ISub==2) then
+    if(ios/=0) then
+      call LogFile%QuickLog("Failed to read Gam information!",'e')
+      read_Gamma = .false.
+      deallocate(GamBasistmp)
+    else 
+      GamBasis = GamBasistmp;         deallocate(GamBasistmp)
+      read_Gamma = .true.
+    endif
+  else 
+    if(ios/=0) then
+      call LogFile%QuickLog("Failed to read Gam information!",'e')
+      read_Gamma = .false.
+      close(102)
+      stop -1
+    else
+      GamBasis = GamBasistmp;         deallocate(GamBasistmp)
+      read_Gamma = .true.
+    endif
+  endif
+  close(102)
+
+  if(read_Gamma) then
+    call Gam_basis2matrix
+  endif
+
+  return
+END FUNCTION read_Gamma
+
+
+
+SUBROUTINE write_GWGamma
   implicit none
   integer :: ix, iy, isite, ityp
   integer :: it1, it2
+  integer :: ibasis, ibin
   character*26 ich
+
 
   open(100, status="replace", file=trim(title_loop)//"_G_file.dat")
   open(101, status="replace", file=trim(title_loop)//"_W_file.dat")
+  open(102, status="replace", file=trim(title_loop)//"_Gam_file.dat")
 
   do it1 = 0, MxT-1
     do ityp = 1, NTypeG
@@ -228,123 +296,40 @@ SUBROUTINE write_GW
       enddo
     enddo
   enddo
-  close(100)
-  close(101)
-
-  return
-END SUBROUTINE write_GW
-
-
-SUBROUTINE read_Gamma(changeBeta, mcBeta)
-  implicit none
-  logical :: alive
-  logical, intent(out) :: changeBeta
-  double precision, intent(out) :: mcBeta
-  complex*16 :: normal
-
-  inquire(file=trim(title)//"_monte_carlo_data.bin.dat",exist=alive)
-  if(.not. alive) then
-    call LogFile%QuickLog("There is no monte carlo binary data yet!")
-
-    call initialize_Gam
-    call LogFile%QuickLog("Initialize the Gamma Done!")
-  else
-    call LogFile%QuickLog("Reading MC data...")
-  
-    call read_monte_carlo_data(mcBeta)
-    call LogFile%QuickLog("Reading Done!...")
-
-    call Gam_mc2matrix_mc(changeBeta)
-
-    !!!!TODO
-    !call read_Gamma_basis
-    
-    !looporder: do iorder = 1, MCOrder
-      !if(flag(iorder)) then
-        !do it2 = 0, MxT-1
-          !do it1 = 0, MxT-1
-            !do dr = 0, Vol-1
-              !do ityp = 1, NTypeGam/2
-                !typ = 2*(ityp-1) + 1
-                !Gam(typ, dr, it1, it2) = Gam(typ, dr, it1, it2) + normal*Gam_basis(it1, it2, GamBasis(iorder, ityp, dr, :,:))
-              !enddo
-            !enddo
-          !enddo
-        !enddo
-      !else 
-        !exit looporder
-      !endif
-    !enddo looporder
-
-    !Gam(2,:,:,:) = Gam(1,:,:,:)
-    !Gam(4,:,:,:) = Gam(3,:,:,:)
-    !Gam(6,:,:,:) = Gam(5,:,:,:)
-
-    !changeBeta = .false.
-    !if((MCOrder<3 .and. flag(MCOrder)) .or.(MCOrder>=3 .and. flag(3))) then
-      !changeBeta = .true.
-    !endif
-
-
-  endif
-
-END SUBROUTINE read_Gamma
-
-
-
-SUBROUTINE write_Gamma0
-  implicit none
-  integer :: iorder, itopo, ir, irr, ityp, it1, it2
-  double precision :: rgam2, rerr
-  integer :: ibin, ibasis
-  complex*16 :: gam1
-
-  imc = 0.d0
-  Z_normal=0.d0
-  GamNorm = (0.d0, 0.d0)
-  ratioerr = 1.d0
-
-  GamMC(:,:,:) = (0.d0, 0.d0)
-  ReGamSqMC(:,:,:) = 0.d0
-  ImGamSqMC(:,:,:) = 0.d0
-
-  GamBasis(:,:,:,:,:) = (0.d0, 0.d0)
-  ReGamSqBasis(:,:,:,:,:) = 0.d0
-  ImGamSqBasis(:,:,:,:,:) = 0.d0
-
-  !=========== write into files =========================================
-  open(104, status="replace", &
-    & file=trim(title)//"_monte_carlo_data.bin.dat",form="binary")
-
-  write(104) finalBeta, Beta, MCOrder, L(1:D)
-  write(104) imc, GamNorm, GamNormWeight
-  write(104) Z_normal, ratioerr
-  do it1 = 0, MxT-1
-    do ir = 0, Vol-1
-      do iorder = 0, MCOrder
-        write(104)  GamMC(iorder, ir, it1)
-        write(104)  ReGamSqMC(iorder, ir, it1)
-        write(104)  ImGamSqMC(iorder, ir, it1)
-      enddo
-    enddo
-  enddo
 
   do ibasis = 1, NBasisGam
     do ibin = 1, NbinGam
-      do ir = 0, Vol-1
-        do ityp = 1, NtypeGam/2
-          do iorder = 0, MCOrder
-            write(104) GamBasis(iorder, ityp, ir, ibin, ibasis)
-            write(104) ReGamSqBasis(iorder, ityp, ir, ibin, ibasis)
-            write(104) ImGamSqBasis(iorder, ityp, ir, ibin, ibasis)
-          enddo
+      do isite = 0, Vol-1
+        do ityp = 1, NTypeGam
+          write(102, *) GamBasis(ityp, isite, ibin, ibasis)
         enddo
       enddo
     enddo
   enddo
-  
-  close(104)
-END SUBROUTINE write_Gamma0
+
+
+  close(100)
+  close(101)
+  close(102)
+  return
+END SUBROUTINE write_GWGamma
+
+
+
+
+SUBROUTINE read_Gamma_MC(changeBeta, mcBeta)
+  IMPLICIT none
+  double precision, intent(out) :: mcBeta
+  logical, intent(out) :: changeBeta
+
+  call LogFile%QuickLog("read monte carlo data from collapse")
+  call read_monte_carlo_data(mcBeta)
+  call LogFile%QuickLog("get the new Gamma function...")
+  call Gam_mc2matrix_mc(changeBeta)
+  call LogFile%QuickLog("read_Gamma_MC done!")
+  return
+END SUBROUTINE
+
 
 !!================================================================
 !!================= READ/WRITE CONFIGURATIONS ====================
@@ -380,7 +365,7 @@ SUBROUTINE write_monte_carlo_data
       do ir = 0, Vol-1
         do ityp = 1, NtypeGam/2
           do iorder = 0, MCOrder
-            write(104) GamBasis(iorder, ityp, ir, ibin, ibasis)
+            write(104) GamMCBasis(iorder, ityp, ir, ibin, ibasis)
             write(104) ReGamSqBasis(iorder, ityp, ir, ibin, ibasis)
             write(104) ImGamSqBasis(iorder, ityp, ir, ibin, ibasis)
           enddo
@@ -390,10 +375,6 @@ SUBROUTINE write_monte_carlo_data
   enddo
   
   close(104)
-
-  normal = GamNormWeight/GamNorm
-
-  call output_GamMC(normal)
 
 END SUBROUTINE write_monte_carlo_data
 
@@ -436,7 +417,7 @@ SUBROUTINE read_monte_carlo_data(mcBeta)
       do ir = 0, Vol-1
         do ityp = 1, NtypeGam/2
           do iorder = 0, MCOrder
-            read(105) GamBasis(iorder, ityp, ir, ibin, ibasis)
+            read(105) GamMCBasis(iorder, ityp, ir, ibin, ibasis)
             read(105) ReGamSqBasis(iorder, ityp, ir, ibin, ibasis)
             read(105) ImGamSqBasis(iorder, ityp, ir, ibin, ibasis)
           enddo
@@ -489,6 +470,42 @@ SUBROUTINE output_Quantities
   enddo
   write(104, *)
 
+  normal = GamNormWeight/GamNorm
+  do iorder = 1, MCOrder
+    write(104, *) "##################################GammaDiag",trim(adjustl(str(iorder)))
+    write(104, *) "#tau1:", MxT
+    write(104, *) "#Beta", Beta, "L", L(1), "Order", MCOrder
+    do it1 = 0, MxT-1
+      write(104, *) real(GamMC(iorder,0,it1)*normal), dimag(GamMC(iorder,0,it1)*normal)
+    enddo
+    write(104, *)
+  enddo
+
+  do iorder = 1, MCOrder
+    write(104, *) "##################################Gamma",trim(adjustl(str(iorder)))
+    write(104, *) "#tau1:", MxT, ",tau2:", MxT
+    write(104, *) "#Beta", Beta, "L", L(1), "Order", MCOrder
+    do it2 = 0, MxT-1
+      do it1 = 0, MxT-1
+        gam1 = Gam_basis(it1, it2, GamMCBasis(iorder, 1, 0, :, :))
+        write(104, *) real(gam1*normal), dimag(gam1*normal)
+      enddo
+    enddo
+    write(104, *)
+  enddo
+
+  do iorder = 1, MCOrder
+    write(104, *) "##################################GammaR",trim(adjustl(str(iorder)))
+    write(104, *) "#r:", Vol
+    write(104, *) "#Beta", Beta, "L", L(1), "Order", MCOrder
+    do isite = 0, Vol-1
+      it1 = MxT/2
+      it2 = MxT/2 
+      gam1 = Gam_basis(it1, it2, GamMCBasis(iorder, 1, isite, :, :))
+      write(104, *) real(gam1*normal), dimag(gam1*normal)
+    enddo
+    write(104, *)
+  enddo
 
   write(104, *) "##################################G"
   write(104, *) "#tau:", MxT
@@ -637,53 +654,6 @@ END SUBROUTINE output_Gam1
 !!================================================================
 !!========== PRINT OUT THE DATA FILES ============================
 !!================================================================
-
-SUBROUTINE output_GamMC(normal)
-  implicit none
-  complex*16, intent(in) :: normal
-  integer :: iorder, it1, it2, isite
-  complex*16 :: gam1 
-
-  open(104, status="replace", file=trim(title_loop)//"_Gam_MC.dat") 
-
-  do iorder = 1, MCOrder
-    write(104, *) "##################################GammaDiag",trim(adjustl(str(iorder)))
-    write(104, *) "#tau1:", MxT
-    write(104, *) "#Beta", Beta, "L", L(1), "Order", MCOrder
-    do it1 = 0, MxT-1
-      write(104, *) real(GamMC(iorder,0,it1)*normal), dimag(GamMC(iorder,0,it1)*normal)
-    enddo
-    write(104, *)
-  enddo
-
-  do iorder = 1, MCOrder
-    write(104, *) "##################################Gamma",trim(adjustl(str(iorder)))
-    write(104, *) "#tau1:", MxT, ",tau2:", MxT
-    write(104, *) "#Beta", Beta, "L", L(1), "Order", MCOrder
-    do it2 = 0, MxT-1
-      do it1 = 0, MxT-1
-        gam1 = Gam_basis(it1, it2, GamBasis(iorder, 1, 0, :, :))
-        write(104, *) real(gam1*normal), dimag(gam1*normal)
-      enddo
-    enddo
-    write(104, *)
-  enddo
-
-  do iorder = 1, MCOrder
-    write(104, *) "##################################GammaR",trim(adjustl(str(iorder)))
-    write(104, *) "#r:", Vol
-    write(104, *) "#Beta", Beta, "L", L(1), "Order", MCOrder
-    do isite = 0, Vol-1
-      it1 = MxT/2
-      it2 = MxT/2 
-      gam1 = Gam_basis(it1, it2, GamBasis(iorder, 1, isite, :, :))
-      write(104, *) real(gam1*normal), dimag(gam1*normal)
-    enddo
-    write(104, *)
-  enddo
-
-  close(104)
-END SUBROUTINE output_GamMC
 
 SUBROUTINE output_test
   implicit none
