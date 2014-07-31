@@ -6,10 +6,10 @@ MODULE vrbls_mc
   logical, parameter  ::  IS_J1J2=.false.
   logical, parameter  ::  IS_BOLD=.false.
 
-  integer, parameter :: D = 2                            ! 2-dimensional system
-  integer, parameter,dimension(D) :: MxL =(/64,64/)      ! the largest system
-  !integer, parameter :: D = 3                             ! 3-dimensional system
-  !integer, parameter,dimension(D) :: MxL =(/16,16,16/)    ! the largest system
+  !integer, parameter :: D = 2                            ! 2-dimensional system
+  !integer, parameter,dimension(D) :: MxL =(/64,64/)      ! the largest system
+  integer, parameter :: D = 3                             ! 3-dimensional system
+  integer, parameter,dimension(D) :: MxL =(/16,16,16/)    ! the largest system
 
   !======================== code mode control ============================
   logical, parameter  ::  DEBUG=.true.          
