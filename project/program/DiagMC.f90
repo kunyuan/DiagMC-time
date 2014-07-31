@@ -234,7 +234,6 @@ LOGICAL FUNCTION self_consistent_GW(isloop)
   call transfer_Polar_t(-1)
   call transfer_Sigma_t(-1)
 
-  call calculate_Chi
   call transfer_Chi_r(-1)
   call transfer_Chi_t(-1)
   return
