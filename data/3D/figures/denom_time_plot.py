@@ -12,7 +12,7 @@ for Order in range(3, 6):
     for i in range(0, len(data)-1):
         real.append(data[i][0])
 
-    ax.plot(range(0, len(real)), real, marker='o', label="L=8, Beta=(0.65,0.05,0.80), Order="+str(Order))
+    ax.plot(range(0, len(real)), real, marker='o', label="L=8, Beta=0.80, Order="+str(Order))
 
 ax.legend()
 

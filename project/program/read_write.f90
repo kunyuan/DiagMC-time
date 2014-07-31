@@ -581,6 +581,14 @@ SUBROUTINE output_Quantities
   do isite = 0, Vol-1
     write(104, *) ratio*real(SUM(Chi(isite, :))),ratio*dimag(SUM(Chi(isite, :)))
   enddo
+
+  write(104, *) "##################################ChiKt0"
+  write(104, *) "#k:", Vol
+  write(104, *) "#Beta", Beta, "L", L(1), "Order", MCOrder
+  do isite = 0, Vol-1
+    write(104, *) real(Chi(isite, 0)), dimag(Chi(isite, 0))
+  enddo
+
   call transfer_Chi_r(-1)
 
   close(104)

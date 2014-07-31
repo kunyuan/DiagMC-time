@@ -103,7 +103,7 @@ SUBROUTINE just_output
 
   call read_GWGamma
 
-  flag = self_consistent_GW(.false.)
+  flag = self_consistent_GW(.true.)
 
   call output_Quantities
 end SUBROUTINE just_output
@@ -195,6 +195,8 @@ LOGICAL FUNCTION self_consistent_GW(isloop)
 
       denominator = Denom(istag, 0)
       call LogFile%QuickLog("denominator: "+str(denominator), 'i')
+      !!!for test
+      call output_denominator
 
       if(real(denominator)<1.d-14)  then
         self_consistent_GW = .false.
