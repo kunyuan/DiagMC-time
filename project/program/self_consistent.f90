@@ -275,7 +275,7 @@ END SUBROUTINE plus_minus_Gam0
 SUBROUTINE Gam_mc2matrix_mc(changeBeta)
   implicit none
   logical, intent(out) :: changeBeta
-  integer :: iorder, dr, ityp, iloop, it1, it2, typ, drr, itt1, itt2
+  integer :: iorder, ir, dr, ityp, iloop, it1, it2, typ, drr, itt1, itt2
   integer :: ibin, ibasis
   complex*16 :: cgam, normal
   logical :: flag(MxOrder)
@@ -339,7 +339,10 @@ SUBROUTINE Gam_mc2matrix_mc(changeBeta)
     if(flag(iorder)) then
       do ityp = 1, NTypeGam/2
         typ = 2*(ityp-1) + 1
-        GamBasis(typ, :, :, :) = GamBasis(typ,:,:,:) + normal*GamMCBasis(iorder, ityp, :, :, :)
+        do dr = 0, Vol-1
+          ir = diff_r(D, dr, 0)
+          GamBasis(typ,dr,:,:) = GamBasis(typ,dr,:,:) + normal*GamMCBasis(iorder,ityp,ir,:,:)
+        enddo
       enddo
     else 
       exit looporder

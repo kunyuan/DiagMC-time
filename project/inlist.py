@@ -8,12 +8,12 @@ TO_DO = []
 
 #common dictionary for all jobs
 com_dict={
-    "L" :   [8,8,8],
+    "L" :   [4,4],
     "Jcp" :  1.0,
-    "iniBeta" :  0.80,
+    "iniBeta" :  0.50,
     "dBeta" :  0.00,
-    "finalBeta" :  0.80,
-    "Order" :  1,
+    "finalBeta" :  0.50,
+    "Order" :  2,
     }
 
 readfile="{0:4.2f}_{1}_coll".format(com_dict["finalBeta"],com_dict["Order"])
@@ -22,11 +22,11 @@ print readfile
 # monte carlo job defintion
 mc_dict={
     "__Execute" : "./gamma3.exe",
-    "__Duplicate" : 0,
+    "__Duplicate" : 3,
     "__IsCluster" : False,
     "__AutoRun" : True,
     "IsLoad" : False,
-    "Reweight" : [1.0],
+    "Reweight" : [1.0, 0.5],
     "ReadFile" : readfile,
     "Sample" :  5000000,
     "Sweep" : 10,
@@ -39,7 +39,7 @@ TO_DO.append(job.JobMonteCarlo(mc_dict))
 # self consist loop job definition
 sc_dict={
     "__Execute" : ["python", "./run_loop.py"],
-    "__Duplicate" : 0,
+    "__Duplicate" : 1,
     "__IsCluster" : False,
     "__AutoRun" : True, 
     "IsLoad" : True,
