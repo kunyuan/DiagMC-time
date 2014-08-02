@@ -101,9 +101,17 @@ SUBROUTINE just_output
   call read_input(.true.)
   call update_T_dependent
 
-  call read_GWGamma
+  call LogFile%QuickLog("Reading G, W...")
+  if(read_GW()) call LogFile%QuickLog("Read G, W done!")
 
-  flag = self_consistent_GW(.true.)
+  call read_Gamma_MC(ifchange, mcBeta)
+  if(abs(mcBeta-Beta)>1.d-5)  then
+    call LogFile%QuickLog("Beta for Gamma is not the same with beta in input file!",'e')
+    stop -1
+  endif
+  call LogFile%QuickLog("Reading Gamma done!")
+
+  flag = self_consistent_GW(.false.)
 
   call output_Quantities
 end SUBROUTINE just_output
@@ -195,8 +203,9 @@ LOGICAL FUNCTION self_consistent_GW(isloop)
 
       denominator = Denom(istag, 0)
       call LogFile%QuickLog("denominator: "+str(denominator), 'i')
-      !!!for test
-      call output_denominator
+
+      !!for test
+      !call output_denominator
 
       if(real(denominator)<1.d-14)  then
         self_consistent_GW = .false.

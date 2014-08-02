@@ -449,6 +449,7 @@ SUBROUTINE output_Quantities
   integer :: ibin, ibasis
   double precision :: tau1, tau2
 
+  !open(104, access='append', file=trim(title_loop)//"_quantities.dat") 
   open(104, status='replace', file=trim(title_loop)//"_quantities.dat") 
 
   write(104, *) "##################################Gamma"
