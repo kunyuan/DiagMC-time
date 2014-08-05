@@ -86,12 +86,9 @@ SUBROUTINE write_input(changeBeta, iffirst)
       if(Beta+dBeta<=finalBeta) then
         write(10, *) Beta+dBeta
         call LogFile%QuickLog("change to new Beta:"+str(Beta+dBeta))
-      else if(Beta==finalBeta) then
+      else if(Beta>=finalBeta) then
         write(10, *) Beta
         call LogFile%QuickLog("already the target Beta!"+str(Beta))
-      else
-        call LogFile%QuickLog("error! Beta:"+str(Beta)+", dBeta: "+str(dBeta), 'e')
-        stop -1
       endif
     else 
       write(10, *) Beta
