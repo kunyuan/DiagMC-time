@@ -148,10 +148,10 @@ SUBROUTINE self_consistent
     if(read_GW()) call LogFile%QuickLog("Read G, W done!")
 
     call read_Gamma_MC(ifchange, mcBeta)
-    if(abs(mcBeta-Beta)>1.d-5)  then
-      call LogFile%QuickLog("Beta for Gamma is not the same with beta in input file!",'e')
-      stop -1
-    endif
+    !if(abs(mcBeta-Beta)>1.d-5)  then
+      !call LogFile%QuickLog("Beta for Gamma is not the same with beta in input file!",'e')
+      !stop -1
+    !endif
     call LogFile%QuickLog("Reading Gamma done!")
 
     flag = self_consistent_GW(.false.)
@@ -326,7 +326,6 @@ SUBROUTINE monte_carlo
     call check_config
   endif
 
-  LoopTimes = 1.d0
   call LogFile%QuickLog("Running MC Simulations...")
   call markov(.false.)
 

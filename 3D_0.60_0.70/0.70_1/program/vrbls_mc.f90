@@ -34,7 +34,7 @@ MODULE vrbls_mc
   integer, parameter :: MxT   =  128                 ! the maximum number of time segments
   integer, parameter :: MxK   = 1000000              ! the maximum momentum
 
-  double precision, parameter :: MxError = 0.50d0    ! the maximum error for MC
+  double precision, parameter :: MxError = 0.70d0    ! the maximum error for MC
   integer, parameter          :: MxNblck = 1000000   ! the maximum memory blocks in MC simulations
 
   integer, parameter :: MxOrder =  10               ! the maximum order of the diagram
@@ -58,7 +58,6 @@ MODULE vrbls_mc
 
   integer:: file_version
   integer:: mc_version
-  double precision :: LoopTimes
 
   type(logging) :: LogFile
   type(logging) :: LogTerm

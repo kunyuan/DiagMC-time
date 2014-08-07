@@ -396,7 +396,7 @@ SUBROUTINE read_monte_carlo_data(mcBeta)
 
   open(105, status="old", file=trim(title)//"_monte_carlo_data.bin.dat",form="binary")
   read(105,iostat=ios) fBeta, mcBeta, iorder, iL(1:D)
-  read(105,iostat=ios) imc, GamNorm, oldGamNormWeight
+  read(105,iostat=ios) imc, GamNorm, GamNormWeight
   read(105,iostat=ios) Z_normal, ratioerr
 
   do it1 = 0, MxT-1

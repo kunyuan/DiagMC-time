@@ -5,11 +5,10 @@ MODULE vrbls_mc
 
   logical, parameter  ::  IS_J1J2=.false.
   logical, parameter  ::  IS_BOLD=.false.
-
-  !integer, parameter :: D = 2                            ! 2-dimensional system
-  !integer, parameter,dimension(D) :: MxL =(/64,64/)      ! the largest system
-  integer, parameter :: D = 3                             ! 3-dimensional system
-  integer, parameter,dimension(D) :: MxL =(/16,16,16/)    ! the largest system
+  integer, parameter :: D = 2                            ! 2-dimensional system
+  integer, parameter,dimension(D) :: MxL =(/64,64/)      ! the largest system
+  !integer, parameter :: D = 3                             ! 3-dimensional system
+  !integer, parameter,dimension(D) :: MxL =(/16,16,16/)    ! the largest system
 
   !======================== code mode control ============================
   logical, parameter  ::  DEBUG=.true.          
@@ -20,7 +19,6 @@ MODULE vrbls_mc
   logical, parameter  ::  CHECK_G=.true.
   logical, parameter  ::  CHECK_W=.true.
   logical, parameter  ::  CHECK_GAM=IS_BOLD
-
   !======================== Parameters ====================================
   double precision, parameter :: Pi    = 3.14159265358979323846d0
   double precision, parameter :: Pi2   = 6.2831853071795865d0
@@ -31,10 +29,10 @@ MODULE vrbls_mc
   integer, parameter          :: Mnint =-2147483647
 
   integer, parameter :: MxVol = MxL(1)**D            ! the maximum system volume
-  integer, parameter :: MxT   =  128                 ! the maximum number of time segments
+  integer, parameter :: MxT   =   64                 ! the maximum number of time segments
   integer, parameter :: MxK   = 1000000              ! the maximum momentum
 
-  double precision, parameter :: MxError = 0.50d0    ! the maximum error for MC
+  double precision, parameter :: MxError = 0.80d0    ! the maximum error for MC
   integer, parameter          :: MxNblck = 1000000   ! the maximum memory blocks in MC simulations
 
   integer, parameter :: MxOrder =  10               ! the maximum order of the diagram
@@ -53,12 +51,8 @@ MODULE vrbls_mc
   character*128 :: logstr
   character*128 :: title_loop_log
 
-  logical :: IsLoad
-  character(len=128) :: infile
-
   integer:: file_version
   integer:: mc_version
-  double precision :: LoopTimes
 
   type(logging) :: LogFile
   type(logging) :: LogTerm
@@ -71,10 +65,8 @@ MODULE vrbls_mc
   double precision ::  Jcp                        ! interaction
   double precision ::  Mu(2)                      ! Chem. potential for spin down & up
   double precision ::  Beta                       ! inverse temperature
+  double precision ::  dBeta, BetaFinal           ! inverse temperature
   integer          ::  MCOrder                    ! the max order for Gamma in MC
-  double precision ::  iniBeta, dBeta, finalBeta  ! inverse temperature
-  integer          ::  iniL(3)
-  integer          ::  iniMCOrder                    ! the max order for Gamma in MC
   !=======================================================================
 
 
@@ -136,7 +128,6 @@ MODULE vrbls_mc
 
   complex(kind=8), allocatable :: W(:,:,:)
   complex(kind=8), allocatable :: Gam(:,:,:,:)
-  complex(kind=8), allocatable :: GamBasis(:,:,:,:)
 
   complex(kind=8), allocatable :: W0PF(:,:)
   complex(kind=8), allocatable :: Gam0PF(:,:,:)
@@ -150,12 +141,12 @@ MODULE vrbls_mc
   complex(kind=8) :: GamOrder1(NTypeGam, 0:MxT-1, 0:MxT-1) 
 
   !====================== MC Simulation ==================================
-  complex*16 :: GamNorm, GamNormWeight         ! the weight of the normalization diagram
+  complex*16 :: GamNorm, GamNormWeight           ! the weight of the normalization diagram
   complex*16, allocatable :: GamMC(:,:,:)      ! the measurement of Gamma in MC
   double precision, allocatable :: ReGamSqMC(:,:,:)   ! the measurement of Gamma in MC
   double precision, allocatable :: ImGamSqMC(:,:,:)   ! the measurement of Gamma in MC
 
-  complex*16, allocatable :: GamMCBasis(:,:,:,:,:)      ! the measurement of Gamma in MC
+  complex*16, allocatable :: GamBasis(:,:,:,:,:)      ! the measurement of Gamma in MC
   double precision, allocatable :: ReGamSqBasis(:,:,:,:,:)   ! the measurement of Gamma in MC
   double precision, allocatable :: ImGamSqBasis(:,:,:,:,:)   ! the measurement of Gamma in MC
 
@@ -282,7 +273,7 @@ MODULE vrbls_mc
   integer, parameter :: BasisOrderGam=3
   integer, parameter :: NbasisGam=(BasisOrderGam+1)**2
 
-  integer, parameter :: NbinGam=2
+  integer, parameter :: NbinGam=1
   integer, dimension(1:NbinGam) :: FromGamT1, ToGamT1
   integer, dimension(0:MxT-1, 1:NbinGam) :: FromGamT2, ToGamT2
   logical, dimension(1:NbinGam) :: IsBasis2D
