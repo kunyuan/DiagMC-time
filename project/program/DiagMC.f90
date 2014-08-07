@@ -326,6 +326,7 @@ SUBROUTINE monte_carlo
     call check_config
   endif
 
+  LoopTimes = 1.d0
   call LogFile%QuickLog("Running MC Simulations...")
   call markov(.false.)
 

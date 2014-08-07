@@ -1,0 +1,3 @@
+ifort main.f90 -o main.exe
+rm *.dat
+./main.exe

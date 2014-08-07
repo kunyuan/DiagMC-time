@@ -152,7 +152,7 @@ SUBROUTINE markov(IsToss)
 
         call update_WeightCurrent
         call recalculate_Reweighting
-        !call forget_accumulation
+        call forget_accumulation
 
         call check_config
         call print_config
@@ -237,25 +237,27 @@ SUBROUTINE recalculate_Reweighting
 END SUBROUTINE recalculate_Reweighting
 
 
-!!!!TODO
-!SUBROUTINE forget_accumulation
-  !implicit none
-  !integer :: ityp, it1, it2, ir
-  !double precision :: forgetratio
+SUBROUTINE forget_accumulation
+  implicit none
+  double precision :: forgetratio
 
-  !imc
-  !GamNorm
-  !Z_normal
+  forgetratio = 1.d0-(1.d0/LoopTimes)*(dexp(-LoopTimes/10.d0))
 
-  !GamMC
-  !ReGamSqMC
-  !ImGamSqMC
+  imc = forgetratio *imc
+  GamNorm = forgetratio *GamNorm
+  Z_normal = forgetratio *Z_normal
 
-  !GamMCBasis
-  !ReGamSqBasis
-  !ImGamSqBasis
-  !return
-!END SUBROUTINE
+  GamMC = forgetratio *GamMC
+  ReGamSqMC = forgetratio**2.d0 * ReGamSqMC
+  ImGamSqMC = forgetratio**2.d0 * ImGamSqMC
+
+  GamMCBasis = forgetratio * GamMCBasis
+  ReGamSqBasis = forgetratio**2.d0 * ReGamSqBasis
+  ImGamSqBasis = forgetratio**2.d0 * ImGamSqBasis
+
+  LoopTimes = LoopTimes + 1.d0
+  return
+END SUBROUTINE forget_accumulation
 
 
 !====================================================================

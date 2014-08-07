@@ -58,6 +58,7 @@ MODULE vrbls_mc
 
   integer:: file_version
   integer:: mc_version
+  double precision :: LoopTimes
 
   type(logging) :: LogFile
   type(logging) :: LogTerm
