@@ -170,9 +170,7 @@ Logical Function read_GW
   open(101, status="old", file=trim(title_loop)//"_W_file.dat")
 
   do it1 = 0, MxT-1
-    do ityp = 1, NTypeG
-      read(100, *,iostat=ios) Gtmp(1, it1)
-    enddo
+    read(100, *,iostat=ios) Gtmp(1, it1)
   enddo
 
   do it1 = 0, MxT-1
