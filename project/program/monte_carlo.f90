@@ -152,6 +152,7 @@ SUBROUTINE markov(IsToss)
 
         call update_WeightCurrent
         call recalculate_Reweighting
+        !call forget_accumulation
 
         call check_config
         call print_config
@@ -233,7 +234,28 @@ SUBROUTINE recalculate_Reweighting
 
   call LogFile%WriteLine("Reweighting is done!")
   return
-END SUBROUTINE
+END SUBROUTINE recalculate_Reweighting
+
+
+!!!!TODO
+!SUBROUTINE forget_accumulation
+  !implicit none
+  !integer :: ityp, it1, it2, ir
+  !double precision :: forgetratio
+
+  !imc
+  !GamNorm
+  !Z_normal
+
+  !GamMC
+  !ReGamSqMC
+  !ImGamSqMC
+
+  !GamMCBasis
+  !ReGamSqBasis
+  !ImGamSqBasis
+  !return
+!END SUBROUTINE
 
 
 !====================================================================
