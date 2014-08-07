@@ -127,7 +127,7 @@ SUBROUTINE markov(IsToss)
     if(IsToss .and. iblck==1) return
 
     !========================== REWEIGHTING =========================
-    if(mod(iblck, 10)==0) then
+    if(mod(iblck, NBLCKCHECK)==0) then
 
       call check_config
 
@@ -166,7 +166,7 @@ SUBROUTINE markov(IsToss)
     endif
     !================================================================
 
-    if(mod(iblck,30)==0) then
+    if(mod(iblck,NBLCKWRITE)==0) then
 
       call check_config
 

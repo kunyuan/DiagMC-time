@@ -6,10 +6,10 @@ MODULE vrbls_mc
   logical, parameter  ::  IS_J1J2=.false.
   logical, parameter  ::  IS_BOLD=.false.
 
-  !integer, parameter :: D = 2                            ! 2-dimensional system
-  !integer, parameter,dimension(D) :: MxL =(/64,64/)      ! the largest system
-  integer, parameter :: D = 3                             ! 3-dimensional system
-  integer, parameter,dimension(D) :: MxL =(/16,16,16/)    ! the largest system
+  integer, parameter :: D = 2                            ! 2-dimensional system
+  integer, parameter,dimension(D) :: MxL =(/64,64/)      ! the largest system
+  !integer, parameter :: D = 3                             ! 3-dimensional system
+  !integer, parameter,dimension(D) :: MxL =(/16,16,16/)    ! the largest system
 
   !======================== code mode control ============================
   logical, parameter  ::  DEBUG=.true.          
@@ -29,6 +29,11 @@ MODULE vrbls_mc
   double precision, parameter :: macheps = epsilon(0d0)
   integer, parameter          :: Mxint = 2147483647
   integer, parameter          :: Mnint =-2147483647
+
+  integer, parameter :: NLOOP = 5
+  integer, parameter :: ININLOOP = 20
+  integer, parameter :: NBLCKCHECK = 2
+  integer, parameter :: NBLCKWRITE = 5
 
   integer, parameter :: MxVol = MxL(1)**D            ! the maximum system volume
   integer, parameter :: MxT   =  128                 ! the maximum number of time segments

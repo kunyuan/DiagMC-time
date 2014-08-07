@@ -111,7 +111,7 @@ SUBROUTINE just_output
   !endif
   call LogFile%QuickLog("Reading Gamma done!")
 
-  flag = self_consistent_GW(.false.)
+  flag = self_consistent_GW(NLOOP)
 
   call output_Quantities
 end SUBROUTINE just_output
@@ -130,7 +130,7 @@ SUBROUTINE self_consistent
 
     call update_T_dependent
 
-    flag = self_consistent_GW(.true.)
+    flag = self_consistent_GW(ININLOOP)
 
     call output_Quantities
 
@@ -154,7 +154,7 @@ SUBROUTINE self_consistent
     !endif
     call LogFile%QuickLog("Reading Gamma done!")
 
-    flag = self_consistent_GW(.false.)
+    flag = self_consistent_GW(NLOOP)
 
     call output_Quantities
 
@@ -164,10 +164,10 @@ SUBROUTINE self_consistent
   return
 END SUBROUTINE self_consistent
 
-LOGICAL FUNCTION self_consistent_GW(isloop)
+LOGICAL FUNCTION self_consistent_GW(iloop)
   implicit none
-  logical, intent(in) :: isloop
-  integer :: iloop, istag
+  integer, intent(in) :: iloop
+  integer :: i, istag
   integer :: px, py
   complex*16 :: WOld, WNow, denominator
 
@@ -180,41 +180,14 @@ LOGICAL FUNCTION self_consistent_GW(isloop)
   istag = get_site_from_cord(D, L(1:D)/2)
   self_consistent_GW = .true.
 
-  if(isloop) then
-    WOld = (10.d0, 0.d0)
-    WNow = W(1, istag, 0)
-    call calculate_Polar
-    call calculate_W
+  WOld = (10.d0, 0.d0)
+  WNow = W(1, istag, 0)
+  call calculate_Polar
+  call calculate_W
 
-    do iloop = 1, 20
-      WOld = WNow
+  do i = 1, iloop
+    WOld = WNow
 
-      call calculate_Sigma
-      call calculate_Polar
-
-      call calculate_G
-      call calculate_W
-
-      call calculate_Denom
-      call calculate_Chi
-
-      WNow = W(1, istag, 0)
-      call LogFile%QuickLog("G-W loop:"//str(iloop)//str(WNow/W0PF(istag, 0)))
-
-      denominator = Denom(istag, 0)
-      call LogFile%QuickLog("denominator: "+str(denominator), 'i')
-
-      !!for test
-      !call output_denominator
-
-      if(real(denominator)<1.d-14)  then
-        self_consistent_GW = .false.
-        call LogFile%QuickLog("denominator touches zero! "+str(denominator), 'e')
-        stop -1
-      endif
-    enddo
-
-  else
     call calculate_Sigma
     call calculate_Polar
 
@@ -224,15 +197,22 @@ LOGICAL FUNCTION self_consistent_GW(isloop)
     call calculate_Denom
     call calculate_Chi
 
+    WNow = W(1, istag, 0)
+    call LogFile%QuickLog("G-W loop:"//str(i)//str(WNow/W0PF(istag, 0)))
+
     denominator = Denom(istag, 0)
     call LogFile%QuickLog("denominator: "+str(denominator), 'i')
+
+    !!for test
+    !call output_denominator
 
     if(real(denominator)<1.d-14)  then
       self_consistent_GW = .false.
       call LogFile%QuickLog("denominator touches zero! "+str(denominator), 'e')
       stop -1
     endif
-  endif
+  enddo
+
 
   !!-------------------------------------------------------
   call plus_minus_W0(-1)
