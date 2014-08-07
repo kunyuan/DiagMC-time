@@ -105,10 +105,10 @@ SUBROUTINE just_output
   if(read_GW()) call LogFile%QuickLog("Read G, W done!")
 
   call read_Gamma_MC(ifchange, mcBeta)
-  if(abs(mcBeta-Beta)>1.d-5)  then
-    call LogFile%QuickLog("Beta for Gamma is not the same with beta in input file!",'e')
-    stop -1
-  endif
+  !if(abs(mcBeta-Beta)>1.d-5)  then
+    !call LogFile%QuickLog("Beta for Gamma is not the same with beta in input file!",'e')
+    !stop -1
+  !endif
   call LogFile%QuickLog("Reading Gamma done!")
 
   flag = self_consistent_GW(.false.)
@@ -148,10 +148,10 @@ SUBROUTINE self_consistent
     if(read_GW()) call LogFile%QuickLog("Read G, W done!")
 
     call read_Gamma_MC(ifchange, mcBeta)
-    if(abs(mcBeta-Beta)>1.d-5)  then
-      call LogFile%QuickLog("Beta for Gamma is not the same with beta in input file!",'e')
-      stop -1
-    endif
+    !if(abs(mcBeta-Beta)>1.d-5)  then
+      !call LogFile%QuickLog("Beta for Gamma is not the same with beta in input file!",'e')
+      !stop -1
+    !endif
     call LogFile%QuickLog("Reading Gamma done!")
 
     flag = self_consistent_GW(.false.)
@@ -316,10 +316,10 @@ SUBROUTINE monte_carlo
 
   else
     call read_monte_carlo_data(mcBeta)
-    if(abs(mcBeta-Beta)>1.d-5)  then
-      call LogFile%QuickLog("Beta for Gamma is not the same with beta in input file!",'e')
-      stop -1
-    endif
+    !if(abs(mcBeta-Beta)>1.d-5)  then
+      !call LogFile%QuickLog("Beta for Gamma is not the same with beta in input file!",'e')
+      !stop -1
+    !endif
 
     call initialize_markov
     call update_WeightCurrent
