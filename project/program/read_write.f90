@@ -171,39 +171,37 @@ Logical Function read_GW
 
   do it1 = 0, MxT-1
     do ityp = 1, NTypeG
-      read(100, *,iostat=ios) Gtmp(ityp, it1)
+      read(100, *,iostat=ios) Gtmp(1, it1)
     enddo
   enddo
 
   do it1 = 0, MxT-1
     do isite = 0, Vol-1
-      do ityp = 1, NTypeW
-        read(101, *,iostat=ios) Wtmp(ityp, isite, it1)
-      enddo
+      read(101, *,iostat=ios) Wtmp(1, isite, it1)
+      read(101, *,iostat=ios) Wtmp(3, isite, it1)
+      read(101, *,iostat=ios) Wtmp(5, isite, it1)
     enddo
   enddo
 
-  if(ISub==2) then
-    if(ios/=0) then
+  if(ios/=0) then
+    if(ISub==2) then
       call LogFile%QuickLog("Failed to read G,W information!",'e')
       read_GW = .false.
-    else 
-      G = Gtmp;         deallocate(Gtmp)
-      W = Wtmp;         deallocate(Wtmp)
-      read_GW = .true.
-    endif
-  else 
-    if(ios/=0) then
+    else
       call LogFile%QuickLog("Failed to read G,W information!",'e')
       read_GW = .false.
       close(100)
       close(101)
       stop -1
-    else
-      G = Gtmp;         deallocate(Gtmp)
-      W = Wtmp;         deallocate(Wtmp)
-      read_GW = .true.
     endif
+  else
+    Gtmp(2,:)=Gtmp(1,:)
+    G = Gtmp;         deallocate(Gtmp)
+    Wtmp(2,:,:)=Wtmp(1,:,:)
+    Wtmp(4,:,:)=Wtmp(3,:,:)
+    Wtmp(6,:,:)=Wtmp(5,:,:)
+    W = Wtmp;         deallocate(Wtmp)
+    read_GW = .true.
   endif
 
   close(100)
@@ -230,32 +228,31 @@ LOGICAL FUNCTION read_Gamma
   do ibasis = 1, NBasisGam
     do ibin = 1, NbinGam
       do isite = 0, Vol-1
-        do ityp = 1, NTypeGam
-          read(102, *,iostat=ios) GamBasistmp(ityp, isite, ibin, ibasis)
-        enddo
+        read(102, *,iostat=ios) GamBasistmp(1, isite, ibin, ibasis)
+        read(102, *,iostat=ios) GamBasistmp(3, isite, ibin, ibasis)
+        read(102, *,iostat=ios) GamBasistmp(5, isite, ibin, ibasis)
       enddo
     enddo
   enddo
 
-  if(ISub==2) then
-    if(ios/=0) then
+  if(ios/=0) then
+    if(ISub==2) then
       call LogFile%QuickLog("Failed to read Gam information!",'e')
       read_Gamma = .false.
       deallocate(GamBasistmp)
-    else 
-      GamBasis = GamBasistmp;         deallocate(GamBasistmp)
-      read_Gamma = .true.
-    endif
-  else 
-    if(ios/=0) then
+    else
       call LogFile%QuickLog("Failed to read Gam information!",'e')
       read_Gamma = .false.
       close(102)
       stop -1
-    else
-      GamBasis = GamBasistmp;         deallocate(GamBasistmp)
-      read_Gamma = .true.
     endif
+  else
+    GamBasistmp(2,:,:,:)=GamBasistmp(1,:,:,:)
+    GamBasistmp(4,:,:,:)=GamBasistmp(3,:,:,:)
+    GamBasistmp(6,:,:,:)=GamBasistmp(5,:,:,:)
+    GamBasis = GamBasistmp;    
+    deallocate(GamBasistmp)
+    read_Gamma = .true.
   endif
   close(102)
 
@@ -265,8 +262,6 @@ LOGICAL FUNCTION read_Gamma
 
   return
 END FUNCTION read_Gamma
-
-
 
 SUBROUTINE write_GWGamma
   implicit none
@@ -281,25 +276,23 @@ SUBROUTINE write_GWGamma
   open(102, status="replace", file=trim(title_loop)//"_Gam_file.dat")
 
   do it1 = 0, MxT-1
-    do ityp = 1, NTypeG
-      write(100, *) G(ityp, it1)
-    enddo
+    write(100, *) G(1, it1)
   enddo
 
   do it1 = 0, MxT-1
     do isite = 0, Vol-1
-      do ityp = 1, NTypeW
-        write(101, *) W(ityp, isite, it1)
-      enddo
+      write(101, *) W(1, isite, it1)
+      write(101, *) W(3, isite, it1)
+      write(101, *) W(5, isite, it1)
     enddo
   enddo
 
   do ibasis = 1, NBasisGam
     do ibin = 1, NbinGam
       do isite = 0, Vol-1
-        do ityp = 1, NTypeGam
-          write(102, *) GamBasis(ityp, isite, ibin, ibasis)
-        enddo
+        write(102, *) GamBasis(1, isite, ibin, ibasis)
+        write(102, *) GamBasis(3, isite, ibin, ibasis)
+        write(102, *) GamBasis(5, isite, ibin, ibasis)
       enddo
     enddo
   enddo
