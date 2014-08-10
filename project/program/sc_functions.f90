@@ -197,6 +197,24 @@ COMPLEX*16 FUNCTION d_times_cd(nd, ncd)
 END FUNCTION d_times_cd
 
 
+!================ find the lowest denominator in brillouin zone ===========
+COMPLEX*16 FUNCTION find_lowest_in_bz(Matrix, klow)
+  implicit none
+  complex*16, intent(in) :: Matrix(0:Vol-1)
+  integer, intent(out) :: klow(1:D)
+  integer :: ik
+  find_lowest_in_bz = Matrix(0)
+  do  ik = 0, Vol-1
+    if(real(Matrix(ik))-real(find_lowest_in_bz)<-1.d-12) then
+      find_lowest_in_bz = Matrix(ik)
+      klow = get_cord_from_site(D, ik)
+    endif
+  enddo
+  return 
+END FUNCTION find_lowest_in_bz
+
+
+
 
 !!=======================================================================
 !!======================= Fourier Transformation ========================
