@@ -182,13 +182,13 @@ LOGICAL FUNCTION self_consistent_GW(iloop)
   istag = get_site_from_cord(D, L(1:D)/2)
   self_consistent_GW = .true.
 
-  WOld = (10.d0, 0.d0)
-  WNow = W(1, istag, 0)
+  !WOld = (10.d0, 0.d0)
+  !WNow = W(1, istag, 0)
   call calculate_Polar
   call calculate_W
 
   do i = 1, iloop
-    WOld = WNow
+    !WOld = WNow
 
     call calculate_Sigma
     call calculate_Polar
@@ -199,11 +199,13 @@ LOGICAL FUNCTION self_consistent_GW(iloop)
     call calculate_Denom
     call calculate_Chi
 
-    WNow = W(1, istag, 0)
-    call LogFile%QuickLog("G-W loop:"//str(i)//str(WNow/W0PF(istag, 0)))
+    !WNow = W(1, istag, 0)
+    !call LogFile%QuickLog("G-W loop:"//str(i)//str(WNow/W0PF(istag, 0)))
+
 
     denominator = find_lowest_in_bz(Denom(:, 0), klow)
     call LogFile%WriteStamp()
+    call LogFile%QuickLog("G-W loop:"//str(i))
     call LogFile%WriteLine("denominator: "+str(denominator))
     call LogFile%WriteLine("at "+str(klow(1))+","+str(klow(2))+","+str(klow(3)))
 
