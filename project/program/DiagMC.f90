@@ -168,8 +168,10 @@ LOGICAL FUNCTION self_consistent_GW(iloop)
   implicit none
   integer, intent(in) :: iloop
   integer :: i, istag
-  integer :: px, py
+  integer :: px, py, klow(1:3)
   complex*16 :: WOld, WNow, denominator
+
+  klow = 0
 
   call transfer_r(1)
   call transfer_t(1)
@@ -200,8 +202,10 @@ LOGICAL FUNCTION self_consistent_GW(iloop)
     WNow = W(1, istag, 0)
     call LogFile%QuickLog("G-W loop:"//str(i)//str(WNow/W0PF(istag, 0)))
 
-    denominator = Denom(istag, 0)
-    call LogFile%QuickLog("denominator: "+str(denominator), 'i')
+    denominator = find_lowest_in_bz(Denom(:, 0), klow)
+    call LogFile%WriteStamp()
+    call LogFile%WriteLine("denominator: "+str(denominator))
+    call LogFile%WriteLine("at "+str(klow(1))+","+str(klow(2))+","+str(klow(3)))
 
     !!for test
     !call output_denominator

@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import read_data
 
-Beta = 1.10
+Beta = 0.70
 N = 128
 
 tau = np.arange(0, Beta, Beta/N)
@@ -25,10 +25,10 @@ Quan1D=["GammaDiag1","GammaDiag2","GammaDiag3","GammaDiag4","GammaDiag5"]
 Quan=Quan2D+Quan1D
 
 DiagGamma=[]
-#DiagGamma.append(read_data.read_array("bare_L8_0.80_5_quantities.dat", Quan))
-#DiagGamma.append(read_data.read_array("bare_L8_0.50_5_quantities.dat", Quan))
-DiagGamma.append(read_data.read_array("2D_L8_1.10_5_quantities.dat", Quan))
-
+#DiagGamma.append(read_data.read_array("N1_L8_0.70_5_quantities.dat", Quan))
+#DiagGamma.append(read_data.read_array("N5_L8_0.70_5_quantities.dat", Quan))
+#DiagGamma.append(read_data.read_array("N20_L8_0.70_5_quantities.dat", Quan))
+DiagGamma.append(read_data.read_array("bare_L8_0.70_5_quantities.dat", Quan))
 
 fig = plt.figure()
 ax = plt.subplot(111)
