@@ -32,7 +32,7 @@ SUBROUTINE read_infile(id, isub)
       CoefOfWeight(0) = 1.d0
       read(11,*) CoefOfWeight(1:iniMCOrder)
 
-    elseif(ISub==1 .or. ISub==4) then
+    elseif(ISub==1 .or. ISub==4 .or. ISub==5) then
       !for GW and output, only the title of Gamma file are needed
       read(11,*) title
     endif
@@ -301,9 +301,6 @@ SUBROUTINE write_GWGamma
   close(102)
   return
 END SUBROUTINE write_GWGamma
-
-
-
 
 SUBROUTINE read_Gamma_MC(changeBeta, mcBeta)
   IMPLICIT none
@@ -584,6 +581,35 @@ SUBROUTINE output_Quantities
 
   call output_denominator
 END SUBROUTINE output_Quantities
+
+SUBROUTINE output_Sigma(iorder)
+  implicit none
+  integer, intent(in) :: iorder
+  integer :: it, it1, it2
+
+  open(104, access='append', file=trim(title_loop)//"_quantities.dat") 
+
+  write(104, *) "##################################Sigma",trim(adjustl(str(iorder)))
+  write(104, *) "#tau:", MxT
+  write(104, *) "#Beta", Beta, "L", L(1), "Order", MCOrder
+  do it = 0, MxT-1
+    write(104, *) Vol*(MxT/Beta)**2.d0*real(Sigma(it)),  &
+      & Vol*(MxT/Beta)**2.d0*dimag(Sigma(it))
+  enddo
+  write(104, *)
+
+  write(104, *) "##################################Gamma",trim(adjustl(str(iorder)))
+  write(104, *) "#tau1:", MxT, ",tau2:", MxT
+  write(104, *) "#Beta", Beta, "L", L(1), "Order", MCOrder
+  do it2 = 0, MxT-1
+    do it1 = 0, MxT-1
+      write(104, *)  real(Gam(1, 0, it1, it2)), dimag(Gam(1, 0, it1, it2))
+    enddo
+  enddo
+  write(104, *)
+
+  close(104)
+END SUBROUTINE output_Sigma
 
 SUBROUTINE output_denominator
   implicit none

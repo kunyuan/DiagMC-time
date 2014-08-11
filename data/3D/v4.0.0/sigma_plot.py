@@ -9,21 +9,18 @@ import matplotlib.pyplot as plt
 Beta = 0.70
 N =128
 
-tau1 = np.arange(0, Beta/2, Beta/N)
-tau2 = np.arange(Beta/2, Beta, Beta/N)
-target=["Sigma"]
+tau = np.arange(0, Beta, Beta/N)
+target=["Sigma1", "Sigma2","Sigma3","Sigma4","Sigma5"]
 
 BoldSigma=[]
-BoldSigma.append(read_data.read_array("bare_L8_0.70_5_quantities.dat",target))
+BoldSigma.append(read_data.read_array("L8_0.70_5_Sigma_quantities.dat",target))
 
 fig = plt.figure()
 ax = plt.subplot(111)
 
 for i in range(len(BoldSigma)):
     for key in target:
-        #ax.plot(tau, BoldSigma[i][key][0].real, label="{0}, Order{1}".format(key, i+1))
-        ax.plot(tau1, -1.0*BoldSigma[i][key][0][0:N/2].imag, label="{0}, Order{1}".format(key, i+1))
-        ax.plot(tau2, BoldSigma[i][key][0][N/2:N].imag, label="{0}, Order{1}".format(key, i+1))
+        ax.plot(tau, BoldSigma[i][key][0].real, label="{0}".format(key))
 
 ax.legend()
 

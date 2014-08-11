@@ -8,12 +8,12 @@ TO_DO = []
 
 #common dictionary for all jobs
 com_dict={
-    "L" :   [4,4],
+    "L" :   [8,8,8],
     "Jcp" :  1.0,
-    "iniBeta" :  0.50,
+    "iniBeta" :  0.70,
     "dBeta" :  0.00,
-    "finalBeta" :  0.50,
-    "Order" :  2,
+    "finalBeta" :  0.70,
+    "Order" :  5,
     }
 
 readfile="{0:4.2f}_{1}_coll".format(com_dict["finalBeta"],com_dict["Order"])
@@ -26,7 +26,7 @@ mc_dict={
     "__IsCluster" : False,
     "__AutoRun" : True,
     "IsLoad" : False,
-    "Reweight" : [1.0, 0.5],
+    "Reweight" : [1.0, 0.5,0.25,0.25,0.25],
     "ReadFile" : readfile,
     "Sample" :  5000000,
     "Sweep" : 10,
@@ -39,7 +39,7 @@ TO_DO.append(job.JobMonteCarlo(mc_dict))
 # self consist loop job definition
 sc_dict={
     "__Execute" : ["python", "./run_loop.py"],
-    "__Duplicate" : 0,
+    "__Duplicate" : 1,
     "__IsCluster" : False,
     "__AutoRun" : True, 
     "IsLoad" : True,
@@ -51,7 +51,7 @@ TO_DO.append(job.JobConsistLoop(sc_dict))
 # self consist loop job to initialize the simulation
 sc_ini_dict={
     "__Execute" : ["python", "./run_loop.py"],
-    "__Duplicate" : 1,
+    "__Duplicate" : 0,
     "__IsCluster" : False,
     "__AutoRun" : False, 
     "IsLoad" : False,
@@ -84,6 +84,19 @@ ni_dict={
     }
 ni_dict.update(com_dict)
 TO_DO.append(job.JobIntegration(ni_dict))
+
+
+# output order job definition
+oo_dict={
+    "__Execute" : ["./gamma3.exe"],
+    "__Duplicate" : 1,
+    "__IsCluster" : False,
+    "__AutoRun" : False,
+    "IsLoad" : True,
+    "ReadFile" : readfile,
+    }
+oo_dict.update(com_dict)
+TO_DO.append(job.JobOutputOrder(oo_dict))
 
 # debug job definition
 bg_dict={

@@ -39,6 +39,9 @@ PROGRAM MAIN
     call LogFile%Initial("project.log","output")
     call LogTerm%Initial('*','output')
   else if(isub==5) then
+    call LogFile%Initial("project.log","output")
+    call LogTerm%Initial('*','outputOrder')
+  else if(isub==6) then
     call LogFile%Initial('*','test')
     call LogTerm%Initial('*','test')
   endif
@@ -57,6 +60,8 @@ PROGRAM MAIN
   else if(ISub==4) then
     call just_output
   else if(ISub==5) then
+    call output_SigmaOrder
+  else if(ISub==6) then
     call test_subroutine
   endif
 
@@ -96,6 +101,27 @@ SUBROUTINE just_output
   implicit none
   logical :: flag, ifchange
   double precision :: mcBeta
+  integer :: iorder
+
+  call LogFile%QuickLog("Just output something!") 
+  call read_input(.true.)
+  call update_T_dependent
+
+  call LogFile%QuickLog("Reading G, W...")
+  if(read_GW()) call LogFile%QuickLog("Read G, W done!")
+  call read_Gamma_MC(ifchange, mcBeta)
+
+  flag = self_consistent_GW(NLOOP)
+
+  call output_Quantities
+end SUBROUTINE just_output
+
+SUBROUTINE output_SigmaOrder
+  implicit none
+  logical :: flag, ifchange
+  double precision :: mcBeta
+  logical :: changeBeta
+  integer :: iorder
 
   call LogFile%QuickLog("Just output something!") 
   call read_input(.true.)
@@ -104,17 +130,28 @@ SUBROUTINE just_output
   call LogFile%QuickLog("Reading G, W...")
   if(read_GW()) call LogFile%QuickLog("Read G, W done!")
 
-  call read_Gamma_MC(ifchange, mcBeta)
-  !if(abs(mcBeta-Beta)>1.d-5)  then
-    !call LogFile%QuickLog("Beta for Gamma is not the same with beta in input file!",'e')
-    !stop -1
-  !endif
-  call LogFile%QuickLog("Reading Gamma done!")
+  call LogFile%QuickLog("read monte carlo data from collapse")
+  call read_monte_carlo_data(mcBeta)
 
-  flag = self_consistent_GW(NLOOP)
+  do iorder=1,MCOrder
+    call LogFile%QuickLog("get the new Gamma function...")
+    call Gam_mc2matrix_mc_by_order(iorder)
+    call LogFile%QuickLog("Reading order"+str(iorder)+" Gamma done!")
 
-  call output_Quantities
-end SUBROUTINE just_output
+    call transfer_r(1)
+    call transfer_t(1)
+    call plus_minus_W0(1)
+
+    call calculate_Sigma
+
+    call plus_minus_W0(-1)
+    call transfer_r(-1)
+    call transfer_t(-1)
+
+    call transfer_Sigma_t(-1)
+    call output_Sigma(iorder)
+  enddo
+END SUBROUTINE output_SigmaOrder
 
 SUBROUTINE self_consistent
   implicit none
