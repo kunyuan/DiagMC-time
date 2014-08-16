@@ -60,7 +60,7 @@ PROGRAM MAIN
   else if(ISub==4) then
     call just_output
   else if(ISub==5) then
-    call output_SigmaOrder
+    call output_Order
   else if(ISub==6) then
     call test_subroutine
   endif
@@ -116,7 +116,7 @@ SUBROUTINE just_output
   call output_Quantities
 end SUBROUTINE just_output
 
-SUBROUTINE output_SigmaOrder
+SUBROUTINE output_Order
   implicit none
   logical :: flag, ifchange
   double precision :: mcBeta
@@ -147,11 +147,31 @@ SUBROUTINE output_SigmaOrder
     call plus_minus_W0(-1)
     call transfer_r(-1)
     call transfer_t(-1)
-
     call transfer_Sigma_t(-1)
-    call output_Sigma(iorder)
+
+    call LogFile%QuickLog("get the new Gamma function...")
+    call Gam_mc2matrix_mc_up2order(iorder)
+    call logfile%quicklog("reading order"+str(iorder)+" gamma done!")
+
+    call transfer_r(1)
+    call transfer_t(1)
+    call plus_minus_W0(1)
+    call plus_minus_Gam0(1)
+
+    call calculate_Polar
+    call calculate_Denom
+    call calculate_Chi
+
+    call plus_minus_Gam0(-1)
+    call plus_minus_W0(-1)
+    call transfer_r(-1)
+    call transfer_t(-1)
+
+    call transfer_Chi_r(-1)
+    call transfer_Chi_t(-1)
+    call output_Quantities_Order(iorder)
   enddo
-END SUBROUTINE output_SigmaOrder
+END SUBROUTINE output_Order
 
 SUBROUTINE self_consistent
   implicit none

@@ -365,12 +365,8 @@ END SUBROUTINE Gam_mc2matrix_mc
 SUBROUTINE Gam_mc2matrix_mc_by_order(iorder)
   implicit none
   integer, intent(in) :: iorder
-  integer :: ir, dr, ityp, iloop, it1, it2, typ, drr, itt1, itt2
-  integer :: ibin, ibasis
-  complex*16 :: cgam, normal
-  logical :: flag(MxOrder)
-  double precision :: totrerr, totierr, tau1, tau2
-  double precision :: rgam, igam, rgam2, igam2, rerr, ierr, rpercenterr, ipercenterr
+  integer :: ir, dr, ityp, typ
+  complex*16 :: normal
 
   normal = GamNormWeight/GamNorm
 
@@ -390,6 +386,33 @@ SUBROUTINE Gam_mc2matrix_mc_by_order(iorder)
 
   call Gam_basis2matrix
 END SUBROUTINE Gam_mc2matrix_mc_by_order
+
+SUBROUTINE Gam_mc2matrix_mc_up2order(iorder)
+  implicit none
+  integer, intent(in) :: iorder
+  integer :: ir, dr, ityp, typ, i
+  complex*16 :: normal
+
+  normal = GamNormWeight/GamNorm
+
+  GamBasis = (0.d0, 0.d0)
+
+  do ityp = 1, NTypeGam/2
+    typ = 2*(ityp-1) + 1
+    do dr = 0, Vol-1
+      ir = diff_r(D, dr, 0)
+      do i = 1, iorder
+        GamBasis(typ,dr,:,:) = GamBasis(typ,dr,:,:) + normal*GamMCBasis(i,ityp,ir,:,:)
+      enddo
+    enddo
+  enddo
+
+  GamBasis(2,:,:,:) = GamBasis(1,:,:,:)
+  GamBasis(4,:,:,:) = GamBasis(3,:,:,:)
+  GamBasis(6,:,:,:) = GamBasis(5,:,:,:)
+
+  call Gam_basis2matrix
+END SUBROUTINE Gam_mc2matrix_mc_up2order
 
 SUBROUTINE Gam_basis2matrix
   implicit none

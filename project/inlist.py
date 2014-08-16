@@ -41,7 +41,7 @@ sc_dict={
     "__Execute" : ["python", "./run_loop.py"],
     "__Duplicate" : 1,
     "__IsCluster" : False,
-    "__AutoRun" : True, 
+    "__AutoRun" : False, 
     "IsLoad" : True,
     "ReadFile" : readfile,
     }
@@ -89,7 +89,7 @@ TO_DO.append(job.JobIntegration(ni_dict))
 # output order job definition
 oo_dict={
     "__Execute" : ["./gamma3.exe"],
-    "__Duplicate" : 1,
+    "__Duplicate" : 0,
     "__IsCluster" : False,
     "__AutoRun" : False,
     "IsLoad" : True,

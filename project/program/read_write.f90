@@ -519,13 +519,11 @@ SUBROUTINE output_Quantities
   enddo
   write(104, *)
 
-  write(104, *) "##################################Chi"
+  write(104, *) "##################################Chi0t"
   write(104, *) "#r:", Vol
   write(104, *) "#Beta", Beta, "L", L(1), "Order", MCOrder
-
-  ratio = 1.d0/dble(MxT)
   do isite = 0, Vol-1
-    write(104, *) ratio*real(SUM(Chi(isite, :))),ratio*dimag(SUM(Chi(isite, :)))
+    write(104, *) real(Chi(isite, 0)), dimag(Chi(isite, 0))
   enddo
   
   write(104, *) "##################################Polar"
@@ -568,7 +566,7 @@ SUBROUTINE output_Quantities
     write(104, *) ratio*real(SUM(Chi(isite, :))),ratio*dimag(SUM(Chi(isite, :)))
   enddo
 
-  write(104, *) "##################################ChiKt0"
+  write(104, *) "##################################ChiK0t"
   write(104, *) "#k:", Vol
   write(104, *) "#Beta", Beta, "L", L(1), "Order", MCOrder
   do isite = 0, Vol-1
@@ -582,12 +580,13 @@ SUBROUTINE output_Quantities
   call output_denominator
 END SUBROUTINE output_Quantities
 
-SUBROUTINE output_Sigma(iorder)
+SUBROUTINE output_Quantities_Order(iorder)
   implicit none
   integer, intent(in) :: iorder
-  integer :: it, it1, it2
+  integer :: it, it1, it2, isite
+  double precision :: ratio
 
-  open(104, access='append', file=trim(title_loop)//"_quantities.dat") 
+  open(104, access='append', file=trim(title_loop)//"_order_quantities.dat") 
 
   write(104, *) "##################################Sigma",trim(adjustl(str(iorder)))
   write(104, *) "#tau:", MxT
@@ -598,18 +597,34 @@ SUBROUTINE output_Sigma(iorder)
   enddo
   write(104, *)
 
-  write(104, *) "##################################Gamma",trim(adjustl(str(iorder)))
-  write(104, *) "#tau1:", MxT, ",tau2:", MxT
+  write(104, *) "##################################Chi",trim(adjustl(str(iorder)))
+  write(104, *) "#r:", Vol
   write(104, *) "#Beta", Beta, "L", L(1), "Order", MCOrder
-  do it2 = 0, MxT-1
-    do it1 = 0, MxT-1
-      write(104, *)  real(Gam(1, 0, it1, it2)), dimag(Gam(1, 0, it1, it2))
-    enddo
+  ratio = 1.d0/dble(MxT)
+  do isite = 0, Vol-1
+    write(104, *) ratio*real(SUM(Chi(isite, :))),ratio*dimag(SUM(Chi(isite, :)))
   enddo
   write(104, *)
 
+  call transfer_Chi_r(1)
+  write(104, *) "##################################ChiK",trim(adjustl(str(iorder)))
+  write(104, *) "#k:", Vol
+  write(104, *) "#Beta", Beta, "L", L(1), "Order", MCOrder
+  ratio = 1.d0/dble(MxT)
+  do isite = 0, Vol-1
+    write(104, *) ratio*real(SUM(Chi(isite, :))),ratio*dimag(SUM(Chi(isite, :)))
+  enddo
+
+  write(104, *) "##################################ChiK0t",trim(adjustl(str(iorder)))
+  write(104, *) "#k:", Vol
+  write(104, *) "#Beta", Beta, "L", L(1), "Order", MCOrder
+  do isite = 0, Vol-1
+    write(104, *) real(Chi(isite, 0)), dimag(Chi(isite, 0))
+  enddo
+
+  call transfer_Chi_r(-1)
   close(104)
-END SUBROUTINE output_Sigma
+END SUBROUTINE output_Quantities_Order
 
 SUBROUTINE output_denominator
   implicit none
