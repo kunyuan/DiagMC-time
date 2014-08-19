@@ -7,7 +7,7 @@ def get_r(x,y,z,L):
     r = z*L**2+y*L+x
     return r
 
-N = 64.0
+N = 128.0
 
 Quans=["ChiK"]
 key="ChiK"
@@ -21,12 +21,21 @@ Lx = np.arange(0, L/2)
 Ly = np.arange(0, L/2)
 Lz = np.arange(0, L/2)
 
+Order =5
+
+Beta=[]
+Beta.append(0.5)
+Beta.append(0.6)
+Beta.append(0.7)
+
 Files=[]
-Files.append(read_data.read_array("bare_L8_0.80_3_quantities.dat", Quans))
-Files.append(read_data.read_array("bare_L8_0.80_4_quantities.dat", Quans))
-Files.append(read_data.read_array("bare_L8_0.80_5_quantities.dat", Quans))
+Files.append(read_data.read_array("L8_0.50_"+str(Order)+"/0.50_quantities.dat", Quans))
+Files.append(read_data.read_array("L8_0.60_"+str(Order)+"/0.60_quantities.dat", Quans))
+Files.append(read_data.read_array("L8_0.70_"+str(Order)+"/0.70_quantities.dat", Quans))
+
 
 for i in range(len(Files)):
+
 #######Gamma-X
     path = []
     realChiK = []
@@ -88,8 +97,7 @@ for i in range(len(Files)):
 
     ax.text(ipath, -0.2500, r"$X$")
 
-    ax.plot(path, realChiK, marker='o', label=r"$\Gamma-X-M-\Gamma-R-X$ Order "+str(i+3))
-
+    ax.plot(path, realChiK, marker='o', label=r"$\Gamma-X-M-\Gamma-R-X$ Beta "+str(Beta[i]))
 
 #######M-R
     path = []
@@ -103,15 +111,22 @@ for i in range(len(Files)):
         r = get_r(L/2,L/2,z,L)
         realChiK.append(Files[i][key][0][r].real)
         imagChiK.append(Files[i][key][0][r].imag)
+
+    ipath = ipath + 1
+    path.append(ipath)
+    r = get_r(L/2,L/2,L/2,L)
+    realChiK.append(Files[i][key][0][r].real)
+    imagChiK.append(Files[i][key][0][r].imag)
+
     ax.text(ipath, -0.2500, r"$R$")
-    ax.plot(path, realChiK, marker='*', label=r"$M-R$ Order "+str(i+3))
+    ax.plot(path, realChiK, marker='*', label=r"$M-R$ "+str(Beta[i]))
 
 
 ax.legend()
 
 plt.ylabel("Chi(k)")
 
-plt.savefig("Beta0.8_L8_Chi_k.pdf")
+plt.savefig("L8_0.50_0.70_Chi_k.pdf")
 
 plt.show()
 

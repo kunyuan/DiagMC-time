@@ -35,11 +35,14 @@ MODULE vrbls_mc
   integer, parameter :: NBLCKCHECK = 2
   integer, parameter :: NBLCKWRITE = 5
 
+
   integer, parameter :: MxVol = MxL(1)**D            ! the maximum system volume
   integer, parameter :: MxT   =  128                 ! the maximum number of time segments
   integer, parameter :: MxK   = 1000000              ! the maximum momentum
 
-  double precision, parameter :: MxError = 0.50d0    ! the maximum error for MC
+  double precision, parameter :: MxError = 0.90d0    ! the maximum error for MC
+  double precision, parameter :: FIRSTSLASH = 100.d0*100.d0 !the ratio for the first slash
+  double precision, parameter :: ENDOFDAYSLASH = 10.d0 ! slash ratio after one-day calculation
   integer, parameter          :: MxNblck = 1000000   ! the maximum memory blocks in MC simulations
 
   integer, parameter :: MxOrder =  10               ! the maximum order of the diagram
@@ -64,6 +67,7 @@ MODULE vrbls_mc
   integer:: file_version
   integer:: mc_version
   double precision :: LoopTimes
+  logical :: IFSLASH
 
   type(logging) :: LogFile
   type(logging) :: LogTerm

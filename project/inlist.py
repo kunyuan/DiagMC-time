@@ -10,9 +10,9 @@ TO_DO = []
 com_dict={
     "L" :   [8,8,8],
     "Jcp" :  1.0,
-    "iniBeta" :  0.70,
+    "iniBeta" :  0.80,
     "dBeta" :  0.00,
-    "finalBeta" :  0.70,
+    "finalBeta" :  0.80,
     "Order" :  5,
     }
 
@@ -22,10 +22,10 @@ print readfile
 # monte carlo job defintion
 mc_dict={
     "__Execute" : "./gamma3.exe",
-    "__Duplicate" : 0,
+    "__Duplicate" : 1,
     "__IsCluster" : False,
     "__AutoRun" : True,
-    "IsLoad" : False,
+    "IsLoad" : True,
     "Reweight" : [1.0, 0.5,0.25,0.25,0.25],
     "ReadFile" : readfile,
     "Sample" :  5000000,
@@ -41,7 +41,7 @@ sc_dict={
     "__Execute" : ["python", "./run_loop.py"],
     "__Duplicate" : 1,
     "__IsCluster" : False,
-    "__AutoRun" : False, 
+    "__AutoRun" : True, 
     "IsLoad" : True,
     "ReadFile" : readfile,
     }

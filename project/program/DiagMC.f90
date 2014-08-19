@@ -192,7 +192,7 @@ SUBROUTINE self_consistent
     call output_Quantities
 
     call write_GWGamma
-    call write_input(.false., .true.)
+    call write_input(.false., 0)
 
     !!!======================================================================
   else if(IsLoad) then
@@ -216,7 +216,7 @@ SUBROUTINE self_consistent
     call output_Quantities
 
     call write_GWGamma
-    call write_input(ifchange, .false.)
+    call write_input(ifchange, file_version+1)
   endif
   return
 END SUBROUTINE self_consistent
@@ -359,6 +359,12 @@ SUBROUTINE monte_carlo
 
   else
     call read_monte_carlo_data(mcBeta)
+
+    call LogFile%WriteStamp()
+    call LogFile%WriteLine("before slash, the mc steps are:"+str(imc))
+    call slash_statistics(FIRSTSLASH)
+    call LogFile%WriteLine("after slash, the mc steps are:"+str(imc))
+
     !if(abs(mcBeta-Beta)>1.d-5)  then
       !call LogFile%QuickLog("Beta for Gamma is not the same with beta in input file!",'e')
       !stop -1
@@ -433,6 +439,8 @@ SUBROUTINE init_basic
   implicit none
 
   call LogFile%QuickLog("Initializing basic properties...")
+
+  IFSLASH = .false.
 
   !!================= INITIALIZATION =======================================
   Mu(1)  = 1.d0

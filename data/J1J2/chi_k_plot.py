@@ -21,6 +21,7 @@ Lx = np.arange(0, L/2)
 Ly = np.arange(0, L/2)
 
 Files=[]
+Files.append(read_data.read_array("1.50_mf_quantities.dat", Quans))
 Files.append(read_data.read_array("1.50_quantities.dat", Quans))
 
 for i in range(len(Files)):
@@ -63,13 +64,13 @@ for i in range(len(Files)):
     ax.text(ipath+1, -0.2500, r"$\Gamma$")
 
 
-    ax.plot(path, realChiK, marker='o', label=r"$\Gamma-X-M-\Gamma$ Order "+str(i+3))
+    ax.plot(path, realChiK, marker='o', label=r"$\Gamma-X-M-\Gamma$ Order "+str(5))
 
 
 ax.legend()
 
 plt.ylabel("Chi(k)")
-plt.savefig("Beta1.50_L16_Chi_k.pdf")
+plt.savefig("Beta1.50_L16_mf_Chi_k.pdf")
 
 plt.show()
 

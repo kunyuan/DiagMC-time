@@ -54,6 +54,7 @@ SUBROUTINE read_input(ifmust)
   read(11, *) Beta
   read(11, *) MCOrder
   read(11, *) file_version
+  read(11, *) IFSLASH
   close(11)
 
   if(ios/=0) then
@@ -70,39 +71,30 @@ SUBROUTINE read_input(ifmust)
 END SUBROUTINE read_input
 
 
-SUBROUTINE write_input(changeBeta, iffirst)
+SUBROUTINE write_input(changeBeta, filenum)
   implicit none
   integer :: ios 
-  logical, intent(in) :: changeBeta, iffirst
+  logical, intent(in) :: changeBeta
+  integer, intent(in) :: filenum
 
-
-  if(.not. iffirst) then
-    call read_input(.true.)
-
-    open(10, status='replace', iostat= ios, file='input.inp')
-    if(changeBeta) then
-      call LogFile%QuickLog("Changing Beta:")
-      call LogFile%QuickLog("old Beta:"+str(Beta))
-      if(Beta+dBeta<=finalBeta) then
-        write(10, *) Beta+dBeta
-        call LogFile%QuickLog("change to new Beta:"+str(Beta+dBeta))
-      else if(Beta>=finalBeta) then
-        write(10, *) Beta
-        call LogFile%QuickLog("already the target Beta!"+str(Beta))
-      endif
-    else 
+  open(10, status='replace', iostat= ios, file='input.inp')
+  if(changeBeta) then
+    call LogFile%QuickLog("Changing Beta:")
+    call LogFile%QuickLog("old Beta:"+str(Beta))
+    if(Beta+dBeta<=finalBeta) then
+      write(10, *) Beta+dBeta
+      call LogFile%QuickLog("change to new Beta:"+str(Beta+dBeta))
+    else if(Beta>=finalBeta) then
       write(10, *) Beta
+      call LogFile%QuickLog("already the target Beta!"+str(Beta))
     endif
-
-    write(10, *) MCOrder
-    write(10, *) file_version+1
-
   else 
-    open(10, status='replace', iostat= ios, file='input.inp')
     write(10, *) Beta
-    write(10, *) MCOrder
-    write(10, *) 0
   endif
+
+  write(10, *) MCOrder
+  write(10, *) filenum
+  write(10, *) IFSLASH
 
   close(10)
 
