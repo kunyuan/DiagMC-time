@@ -27,7 +27,7 @@ Quan1D=["GammaDiag1","GammaDiag2","GammaDiag3","GammaDiag4","GammaDiag5","GammaD
 Quan=Quan2D+Quan1D
 
 DiagGamma=[]
-DiagGamma.append(read_data.read_array("L8_0.70_6/0.70_quantities.dat", Quan))
+DiagGamma.append(read_data.read_array("L8_0.70_6_quantities.dat", Quan))
 
 fig = plt.figure()
 ax = plt.subplot(111)

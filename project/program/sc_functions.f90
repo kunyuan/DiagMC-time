@@ -198,20 +198,23 @@ END FUNCTION d_times_cd
 
 
 !================ find the lowest denominator in brillouin zone ===========
-COMPLEX*16 FUNCTION find_lowest_in_bz(Matrix, klow)
+COMPLEX*16 FUNCTION find_lowest_W(Matrix, klow, omega)
   implicit none
-  complex*16, intent(in) :: Matrix(0:Vol-1)
-  integer, intent(out) :: klow(1:D)
-  integer :: ik
-  find_lowest_in_bz = Matrix(0)
-  do  ik = 0, Vol-1
-    if(real(Matrix(ik))-real(find_lowest_in_bz)<-1.d-12) then
-      find_lowest_in_bz = Matrix(ik)
-      klow = get_cord_from_site(D, ik)
-    endif
+  complex*16, intent(in) :: Matrix(0:Vol-1, 0:MxT-1)
+  integer, intent(out) :: klow(1:D), omega
+  integer :: ik, iomega
+  find_lowest_W = Matrix(0, 0)
+  do iomega = 0, MxT-1
+    do  ik = 0, Vol-1
+      if(real(Matrix(ik, iomega))-real(find_lowest_W)<-1.d-12) then
+        find_lowest_W = Matrix(ik, iomega)
+        klow = get_cord_from_site(D, ik)
+        omega = iomega
+      endif
+    enddo
   enddo
   return 
-END FUNCTION find_lowest_in_bz
+END FUNCTION find_lowest_W
 
 
 

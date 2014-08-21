@@ -34,6 +34,7 @@ MODULE vrbls_mc
   integer, parameter :: ININLOOP = 20
   integer, parameter :: NBLCKCHECK = 2
   integer, parameter :: NBLCKWRITE = 5
+  integer, parameter :: NBLCKREWEI = 5*NBLCKWRITE
 
 
   integer, parameter :: MxVol = MxL(1)**D            ! the maximum system volume
