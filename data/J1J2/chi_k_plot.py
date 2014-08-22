@@ -21,21 +21,26 @@ Lx = np.arange(0, L/2)
 Ly = np.arange(0, L/2)
 
 Files=[]
-#Files.append(read_data.read_array("1.50/1.50_quantities.dat", Quans))
-#Files.append(read_data.read_array("1.75/1.75_quantities.dat", Quans))
-#Files.append(read_data.read_array("2.00/2.00_quantities.dat", Quans))
-Files.append(read_data.read_array("1.00_mf/1.00_quantities.dat", Quans))
-Files.append(read_data.read_array("1.50_mf/1.50_quantities.dat", Quans))
-Files.append(read_data.read_array("2.00_mf/2.00_quantities.dat", Quans))
-Files.append(read_data.read_array("2.50_mf/2.50_quantities.dat", Quans))
-Files.append(read_data.read_array("2.75_mf/2.75_quantities.dat", Quans))
+Files.append(read_data.read_array("1.50/1.50_quantities.dat", Quans))
+Files.append(read_data.read_array("1.75/1.75_quantities.dat", Quans))
+Files.append(read_data.read_array("2.00/2.00_quantities.dat", Quans))
+Files.append(read_data.read_array("2.25/2.25_quantities.dat", Quans))
+#Files.append(read_data.read_array("1.00_mf/1.00_quantities.dat", Quans))
+#Files.append(read_data.read_array("1.50_mf/1.50_quantities.dat", Quans))
+#Files.append(read_data.read_array("2.00_mf/2.00_quantities.dat", Quans))
+#Files.append(read_data.read_array("2.50_mf/2.50_quantities.dat", Quans))
+#Files.append(read_data.read_array("2.75_mf/2.75_quantities.dat", Quans))
 
 Beta=[]
-Beta.append(1.00)
 Beta.append(1.50)
+Beta.append(1.75)
 Beta.append(2.00)
-Beta.append(2.50)
-Beta.append(2.75)
+Beta.append(2.25)
+#Beta.append(1.00)
+#Beta.append(1.50)
+#Beta.append(2.00)
+#Beta.append(2.50)
+#Beta.append(2.75)
 
 for i in range(len(Files)):
 
@@ -44,7 +49,7 @@ for i in range(len(Files)):
     realChiK = []
     imagChiK = []
     ipath = 0
-    ax.text(ipath+1, -0.225000, r"$\Gamma$")
+    ax.text(ipath+1, -0.1000, r"$\Gamma$")
     for y in Ly:
         ipath = ipath + 1
         path.append(ipath)
@@ -52,7 +57,7 @@ for i in range(len(Files)):
         realChiK.append(Files[i][key][0][r].real)
         imagChiK.append(Files[i][key][0][r].imag)
 
-    ax.text(ipath+1, -0.22500, r"$X$")
+    ax.text(ipath+1, -0.100, r"$X$")
 
 #######X-M
     for x in Lx:
@@ -62,7 +67,7 @@ for i in range(len(Files)):
         realChiK.append(Files[i][key][0][r].real)
         imagChiK.append(Files[i][key][0][r].imag)
 
-    ax.text(ipath+1, -0.2500, r"$M$")
+    ax.text(ipath+1, -0.1000, r"$M$")
 
 
 #######M-Gamma
@@ -74,7 +79,7 @@ for i in range(len(Files)):
         realChiK.append(Files[i][key][0][r].real)
         imagChiK.append(Files[i][key][0][r].imag)
 
-    ax.text(ipath+1, -0.2500, r"$\Gamma$")
+    ax.text(ipath+1, -0.1000, r"$\Gamma$")
 
 
     ax.plot(path, realChiK, marker='o', label=r"$\Gamma-X-M-\Gamma$ Beta="+str(Beta[i]))

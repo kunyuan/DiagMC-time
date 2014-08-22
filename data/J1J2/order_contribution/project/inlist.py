@@ -8,11 +8,11 @@ TO_DO = []
 
 #common dictionary for all jobs
 com_dict={
-    "L" :   [8,8,8],
-    "Jcp" :  1.0,
-    "iniBeta" :  0.50,
+    "L" :   [16,16],
+    "Jcp" :  0.5,
+    "iniBeta" :  1.50,
     "dBeta" :  0.00,
-    "finalBeta" :  0.50,
+    "finalBeta" :  1.50,
     "Order" :  5,
     }
 
@@ -22,16 +22,16 @@ print readfile
 # monte carlo job defintion
 mc_dict={
     "__Execute" : "./gamma3.exe",
-    "__Duplicate" : 1,
+    "__Duplicate" : 0,
     "__IsCluster" : False,
     "__AutoRun" : True,
-    "IsLoad" : False,
-    "Reweight" : [1.65, 1.00, 0.5, 0.5, 0.5],
+    "IsLoad" : True,
+    "Reweight" : [1.0, 1.0, 1.0, 1.0, 1.0],
     "ReadFile" : readfile,
     "Sample" :  5000000,
     "Sweep" : 10,
     "Toss" : 10000,
-    "Worm/Norm" : 0.100 
+    "Worm/Norm" : 0.5 
     }
 mc_dict.update(com_dict)
 TO_DO.append(job.JobMonteCarlo(mc_dict))
@@ -89,7 +89,7 @@ TO_DO.append(job.JobIntegration(ni_dict))
 # output order job definition
 oo_dict={
     "__Execute" : ["./gamma3.exe"],
-    "__Duplicate" : 0,
+    "__Duplicate" : 1,
     "__IsCluster" : False,
     "__AutoRun" : False,
     "IsLoad" : True,

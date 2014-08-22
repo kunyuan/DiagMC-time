@@ -6,14 +6,14 @@ from matplotlib import cm
 from matplotlib.ticker import LinearLocator, FormatStrFormatter
 import matplotlib.pyplot as plt
 
-Beta = 1.50
+Beta = 0.70
 N =128
 
 tau = np.arange(0, Beta, Beta/N)
 target=["Sigma1", "Sigma2","Sigma3","Sigma4","Sigma5"]
 
 BoldSigma=[]
-BoldSigma.append(read_data.read_array("1.50/1.50_order_quantities.dat",target))
+BoldSigma.append(read_data.read_array("L8_0.70_5_Sigma_quantities.dat",target))
 
 fig = plt.figure()
 ax = plt.subplot(111)
@@ -27,5 +27,5 @@ ax.legend()
 plt.xlabel("tau")
 plt.ylabel("Sigma")
 
-plt.savefig("Beta1.50_L16_J1J2_Sigma.pdf")
+plt.savefig("Beta0.70_L8_Sigma.pdf")
 plt.show()
