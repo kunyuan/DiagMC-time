@@ -41,6 +41,7 @@ MODULE vrbls_mc
   integer, parameter :: MxT   =  128                 ! the maximum number of time segments
   integer, parameter :: MxK   = 1000000              ! the maximum momentum
 
+  double precision, parameter :: HISTRATIO = 0.5d0
   double precision, parameter :: MxError = 0.90d0    ! the maximum error for MC
   double precision, parameter :: FIRSTSLASH = 1.d0*4.d0 !the ratio for the first slash
   double precision, parameter :: ENDOFDAYSLASH = 10.d0 ! slash ratio after one-day calculation

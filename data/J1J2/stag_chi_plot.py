@@ -18,9 +18,6 @@ Quans=["ChiK0t1", "ChiK0t2", "ChiK0t3", "ChiK0t4", "ChiK0t5"]
 
 Files=[]
 Files.append(read_data.read_array("1.50/1.50_order_quantities.dat", Quans))
-#Files.append(read_data.read_array("L8_0.70_5/0.70_order_quantities.dat", Quans))
-#Files.append(read_data.read_array("L8_0.60_5/0.60_order_quantities.dat", Quans))
-#Files.append(read_data.read_array("L8_0.50_5/0.50_order_quantities.dat", Quans))
 
 Order=np.arange(1, MxOrder+1)
 

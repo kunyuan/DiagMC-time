@@ -198,17 +198,12 @@ SUBROUTINE self_consistent
   else if(IsLoad) then
 
     call read_input(.true.)
-
     call update_T_dependent
 
     call LogFile%QuickLog("Reading G, W...")
     if(read_GW()) call LogFile%QuickLog("Read G, W done!")
 
     call read_Gamma_MC(ifchange, mcBeta)
-    !if(abs(mcBeta-Beta)>1.d-5)  then
-      !call LogFile%QuickLog("Beta for Gamma is not the same with beta in input file!",'e')
-      !stop -1
-    !endif
     call LogFile%QuickLog("Reading Gamma done!")
 
     flag = self_consistent_GW(NLOOP)
@@ -239,13 +234,10 @@ LOGICAL FUNCTION self_consistent_GW(iloop)
   istag = get_site_from_cord(D, L(1:D)/2)
   self_consistent_GW = .true.
 
-  !WOld = (10.d0, 0.d0)
-  !WNow = W(1, istag, 0)
   call calculate_Polar
   call calculate_W
 
   do i = 1, iloop
-    !WOld = WNow
 
     call calculate_Sigma
     call calculate_Polar
@@ -256,10 +248,6 @@ LOGICAL FUNCTION self_consistent_GW(iloop)
     call calculate_Denom
     call calculate_Chi
 
-    !WNow = W(1, istag, 0)
-    !call LogFile%QuickLog("G-W loop:"//str(i)//str(WNow/W0PF(istag, 0)))
-
-
     denominator = find_lowest_W(Denom(:, :), klow, omegalow)
     call LogFile%WriteStamp()
     call LogFile%QuickLog("G-W loop:"//str(i))
@@ -268,7 +256,7 @@ LOGICAL FUNCTION self_consistent_GW(iloop)
     call LogFile%WriteLine("at omega="+str(omegalow))
 
     !!for test
-    !call output_denominator
+    call output_denominator
 
     if(real(denominator)<1.d-14)  then
       self_consistent_GW = .false.

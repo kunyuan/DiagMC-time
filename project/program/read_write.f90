@@ -553,7 +553,7 @@ SUBROUTINE output_Quantities
   write(104, *) "##################################ChiK"
   write(104, *) "#k:", Vol
   write(104, *) "#Beta", Beta, "L", L(1), "Order", MCOrder
-  ratio = 1.d0/dble(MxT)
+  ratio = Beta/dble(MxT)
   do isite = 0, Vol-1
     write(104, *) ratio*real(SUM(Chi(isite, :))),ratio*dimag(SUM(Chi(isite, :)))
   enddo
@@ -564,12 +564,10 @@ SUBROUTINE output_Quantities
   do isite = 0, Vol-1
     write(104, *) real(Chi(isite, 0)), dimag(Chi(isite, 0))
   enddo
-
   call transfer_Chi_r(-1)
 
   close(104)
 
-  call output_denominator
 END SUBROUTINE output_Quantities
 
 SUBROUTINE output_Quantities_Order(iorder)
@@ -602,7 +600,7 @@ SUBROUTINE output_Quantities_Order(iorder)
   write(104, *) "##################################ChiK",trim(adjustl(str(iorder)))
   write(104, *) "#k:", Vol
   write(104, *) "#Beta", Beta, "L", L(1), "Order", MCOrder
-  ratio = 1.d0/dble(MxT)
+  ratio = Beta/dble(MxT)
   do isite = 0, Vol-1
     write(104, *) ratio*real(SUM(Chi(isite, :))),ratio*dimag(SUM(Chi(isite, :)))
   enddo
@@ -621,11 +619,15 @@ END SUBROUTINE output_Quantities_Order
 SUBROUTINE output_denominator
   implicit none
   integer :: ip
-
   ip = get_site_from_cord(D, L(1:D)/2)
+
   open(104, access='append', file=trim(title_loop)//"_denom.dat") 
   write(104, *) real(Denom(ip, 0)),dimag(Denom(ip, 0))
   close(104)
+
+  open(105, access='append', file=trim(title_loop)//"_stag_chi.dat") 
+  write(105, *) real(Chi(ip, 0)),dimag(Chi(ip, 0))
+  close(105)
 END SUBROUTINE output_denominator
 
 SUBROUTINE output_Gam1

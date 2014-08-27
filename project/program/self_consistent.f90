@@ -152,28 +152,30 @@ END SUBROUTINE calculate_Sigma
 SUBROUTINE calculate_W
   implicit none
   integer :: omega, p
+  complex*16, dimension(NTypeW, 0:Vol-1, 0:MxT-1) :: newW
 
   !-------- calculate W = W0/(1-W0*G^2*Gamma) ----------------------------
-  W(:,:,:) = (0.d0, 0.d0)
+  newW(:,:,:) = (0.d0, 0.d0)
 
   do  omega = 0, MxT-1
     do p = 0, Vol-1
       Denom(p,omega) = (1.d0, 0.d0) -W0PF(p,omega)*Polar(p,omega)
-      W(1,p,omega) = W0PF(p,omega)/Denom(p,omega)
-      if(W(1,p,omega)/=W(1,p,omega)) then
+      newW(1,p,omega) = W0PF(p,omega)/Denom(p,omega)
+      if(newW(1,p,omega)/=newW(1,p,omega)) then
         call LogFile%QuickLog("calculate_W NaN appears!")
         stop
       endif
-      W(3,p,omega) = d_times_cd(-1.d0,W(1,p,omega))
-      W(5,p,omega) = d_times_cd( 2.d0,W(1,p,omega))
+      newW(3,p,omega) = d_times_cd(-1.d0,newW(1,p,omega))
+      newW(5,p,omega) = d_times_cd( 2.d0,newW(1,p,omega))
     enddo
   enddo
 
-  W(2,:,:) = W(1,:,:)
-  W(4,:,:) = W(3,:,:)
-  W(6,:,:) = W(5,:,:)
+  newW(2,:,:) = newW(1,:,:)
+  newW(4,:,:) = newW(3,:,:)
+  newW(6,:,:) = newW(5,:,:)
 
-  !!-------------- update the matrix and tail ------------
+  W(:,:,:) = HISTRATIO*W(:,:,:)+(1.d0-HISTRATIO)*newW(:,:,:)
+
 END SUBROUTINE calculate_W
 
 !!--------- calculate weight for G matrix ---------
@@ -181,23 +183,24 @@ SUBROUTINE calculate_G
   implicit none
   complex(kind=8) :: G0
   integer :: omega
+  complex*16, dimension(NTypeG, 0:MxT-1) :: newG
 
-  G(:,:) = (0.d0, 0.d0)
+  newG(:,:) = (0.d0, 0.d0)
 
   !--------- G = G0/(1-G0*Sigma)----------------------
   do omega = 0, MxT-1
 
-    G(1, omega) =  G0F(omega)/((1.d0,0.d0)-G0F(omega)*Sigma(omega))
+    newG(1, omega) =  G0F(omega)/((1.d0,0.d0)-G0F(omega)*Sigma(omega))
 
-    if(G(1,omega)/=G(1,omega)) then
+    if(newG(1,omega)/=newG(1,omega)) then
       call LogFile%QuickLog("calculate_G NaN appears!")
       stop
     endif
 
-    G(2, omega) =  G(1, omega)
+    newG(2, omega) =  newG(1, omega)
   enddo
 
-  !!-------------- update the matrix and tail ------------
+  G(:, :) = HISTRATIO*G(:, :) + (1.d0-HISTRATIO)*newG(:, :)
 END SUBROUTINE calculate_G
 
 
