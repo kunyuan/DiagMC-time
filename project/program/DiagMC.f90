@@ -235,15 +235,15 @@ LOGICAL FUNCTION self_consistent_GW(iloop)
   self_consistent_GW = .true.
 
   call calculate_Polar
-  call calculate_W
+  call calculate_W(0)
 
   do i = 1, iloop
 
     call calculate_Sigma
     call calculate_Polar
 
-    call calculate_G
-    call calculate_W
+    call calculate_G(i)
+    call calculate_W(i)
 
     call calculate_Denom
     call calculate_Chi

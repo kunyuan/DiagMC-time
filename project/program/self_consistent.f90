@@ -149,9 +149,11 @@ END SUBROUTINE calculate_Sigma
 
 
 !!--------- calculate weight for W matrix ---------
-SUBROUTINE calculate_W
+SUBROUTINE calculate_W(iloop)
   implicit none
+  integer, intent(in) :: iloop
   integer :: omega, p
+  double precision :: ratio
   complex*16, dimension(NTypeW, 0:Vol-1, 0:MxT-1) :: newW
 
   !-------- calculate W = W0/(1-W0*G^2*Gamma) ----------------------------
@@ -174,15 +176,18 @@ SUBROUTINE calculate_W
   newW(4,:,:) = newW(3,:,:)
   newW(6,:,:) = newW(5,:,:)
 
-  W(:,:,:) = HISTRATIO*W(:,:,:)+(1.d0-HISTRATIO)*newW(:,:,:)
+  ratio = dble(iloop)/(1.d0+dble(iloop))
+  W(:,:,:) = ratio*W(:,:,:)+(1.d0-ratio)*newW(:,:,:)
 
 END SUBROUTINE calculate_W
 
 !!--------- calculate weight for G matrix ---------
-SUBROUTINE calculate_G
+SUBROUTINE calculate_G(iloop)
   implicit none
+  integer, intent(in) :: iloop
   complex(kind=8) :: G0
   integer :: omega
+  double precision :: ratio
   complex*16, dimension(NTypeG, 0:MxT-1) :: newG
 
   newG(:,:) = (0.d0, 0.d0)
@@ -200,7 +205,8 @@ SUBROUTINE calculate_G
     newG(2, omega) =  newG(1, omega)
   enddo
 
-  G(:, :) = HISTRATIO*G(:, :) + (1.d0-HISTRATIO)*newG(:, :)
+  ratio = dble(iloop)/(1.d0+dble(iloop))
+  G(:, :) = ratio*G(:, :) + (1.d0-ratio)*newG(:, :)
 END SUBROUTINE calculate_G
 
 
