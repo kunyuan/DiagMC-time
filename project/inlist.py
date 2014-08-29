@@ -10,9 +10,9 @@ TO_DO = []
 com_dict={
     "L" :   [8,8,8],
     "Jcp" :  1.0,
-    "iniBeta" :  0.50,
+    "iniBeta" :  0.70,
     "dBeta" :  0.00,
-    "finalBeta" :  0.50,
+    "finalBeta" :  0.70,
     "Order" :  5,
     }
 
@@ -39,9 +39,9 @@ TO_DO.append(job.JobMonteCarlo(mc_dict))
 # self consist loop job definition
 sc_dict={
     "__Execute" : ["python", "./run_loop.py"],
-    "__Duplicate" : 0,
+    "__Duplicate" : 1,
     "__IsCluster" : False,
-    "__AutoRun" : True, 
+    "__AutoRun" : False, 
     "IsLoad" : True,
     "ReadFile" : readfile,
     }
@@ -51,7 +51,7 @@ TO_DO.append(job.JobConsistLoop(sc_dict))
 # self consist loop job to initialize the simulation
 sc_ini_dict={
     "__Execute" : ["python", "./run_loop.py"],
-    "__Duplicate" : 1,
+    "__Duplicate" : 0,
     "__IsCluster" : False,
     "__AutoRun" : False, 
     "IsLoad" : False,
@@ -89,7 +89,7 @@ TO_DO.append(job.JobIntegration(ni_dict))
 # output order job definition
 oo_dict={
     "__Execute" : ["./gamma3.exe"],
-    "__Duplicate" : 0,
+    "__Duplicate" : 1,
     "__IsCluster" : False,
     "__AutoRun" : False,
     "IsLoad" : True,

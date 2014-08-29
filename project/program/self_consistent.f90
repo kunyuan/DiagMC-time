@@ -154,7 +154,6 @@ SUBROUTINE calculate_W(iloop)
   integer, intent(in) :: iloop
   integer :: omega, p
   double precision :: ratio
-  complex*16, dimension(NTypeW, 0:Vol-1, 0:MxT-1) :: newW
 
   !-------- calculate W = W0/(1-W0*G^2*Gamma) ----------------------------
   newW(:,:,:) = (0.d0, 0.d0)
@@ -188,7 +187,6 @@ SUBROUTINE calculate_G(iloop)
   complex(kind=8) :: G0
   integer :: omega
   double precision :: ratio
-  complex*16, dimension(NTypeG, 0:MxT-1) :: newG
 
   newG(:,:) = (0.d0, 0.d0)
 

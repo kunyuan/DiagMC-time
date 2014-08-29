@@ -404,6 +404,7 @@ END SUBROUTINE init_space
 SUBROUTINE init_matrix
   implicit none
 
+  allocate(newW(NTypeW, 0:Vol-1, 0:MxT-1))
   allocate(W(NTypeW, 0:Vol-1, 0:MxT-1))
   allocate(Gam(NTypeGam, 0:Vol-1, 0:MxT-1, 0:MxT-1))
   allocate(GamBasis(NTypeGam, 0:Vol-1, 1:NbinGam, 1:NBasisGam))

@@ -3,6 +3,7 @@ MODULE vrbls_mc
   USE logging_module
   IMPLICIT NONE
 
+  !logical, parameter  ::  IS_J1J2=.true.
   logical, parameter  ::  IS_J1J2=.false.
   logical, parameter  ::  IS_BOLD=.false.
 
@@ -30,7 +31,7 @@ MODULE vrbls_mc
   integer, parameter          :: Mxint = 2147483647
   integer, parameter          :: Mnint =-2147483647
 
-  integer, parameter :: NLOOP = 5
+  integer, parameter :: NLOOP = 20
   integer, parameter :: ININLOOP = 20
   integer, parameter :: NBLCKCHECK = 2
   integer, parameter :: NBLCKWRITE = 2*NBLCKCHECK
@@ -41,7 +42,6 @@ MODULE vrbls_mc
   integer, parameter :: MxT   =  128                 ! the maximum number of time segments
   integer, parameter :: MxK   = 1000000              ! the maximum momentum
 
-  double precision, parameter :: HISTRATIO = 0.5d0
   double precision, parameter :: MxError = 0.90d0    ! the maximum error for MC
   double precision, parameter :: FIRSTSLASH = 1.d0*4.d0 !the ratio for the first slash
   double precision, parameter :: ENDOFDAYSLASH = 10.d0 ! slash ratio after one-day calculation
@@ -141,10 +141,12 @@ MODULE vrbls_mc
 
   !========================= Self-consistent loop ========================
   !============== unfinished =============================================
+  complex(kind=8) :: newG(NtypeG, 0:MxT-1)
   complex(kind=8) :: G(NtypeG, 0:MxT-1)
   complex(kind=8) :: G0F(0:MxT-1)
   complex(kind=8) :: Sigma(0:MxT-1)
 
+  complex(kind=8), allocatable :: newW(:,:,:)
   complex(kind=8), allocatable :: W(:,:,:)
   complex(kind=8), allocatable :: Gam(:,:,:,:)
   complex(kind=8), allocatable :: GamBasis(:,:,:,:)

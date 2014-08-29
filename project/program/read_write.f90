@@ -564,6 +564,14 @@ SUBROUTINE output_Quantities
   do isite = 0, Vol-1
     write(104, *) real(Chi(isite, 0)), dimag(Chi(isite, 0))
   enddo
+
+  write(104, *) "##################################StagChit"
+  write(104, *) "#tau:", MxT
+  write(104, *) "#Beta", Beta, "L", L(1), "Order", MCOrder
+  isite = get_site_from_cord(D, L(1:D)/2)
+  do it = 0, MxT-1
+    write(104, *) real(Chi(isite, it)), dimag(Chi(isite, it))
+  enddo
   call transfer_Chi_r(-1)
 
   close(104)
@@ -619,14 +627,16 @@ END SUBROUTINE output_Quantities_Order
 SUBROUTINE output_denominator
   implicit none
   integer :: ip
+  double precision :: ratio
   ip = get_site_from_cord(D, L(1:D)/2)
 
   open(104, access='append', file=trim(title_loop)//"_denom.dat") 
   write(104, *) real(Denom(ip, 0)),dimag(Denom(ip, 0))
   close(104)
 
+  ratio = Beta/dble(MxT)
   open(105, access='append', file=trim(title_loop)//"_stag_chi.dat") 
-  write(105, *) real(Chi(ip, 0)),dimag(Chi(ip, 0))
+  write(105, *) ratio*real(Chi(ip, 0)),ratio*dimag(Chi(ip, 0))
   close(105)
 END SUBROUTINE output_denominator
 
