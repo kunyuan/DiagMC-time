@@ -13,7 +13,7 @@ com_dict={
     "iniBeta" :  0.70,
     "dBeta" :  0.00,
     "finalBeta" :  0.70,
-    "Order" :  5,
+    "Order" :  6,
     }
 
 readfile="{0:4.2f}_{1}_coll".format(com_dict["finalBeta"],com_dict["Order"])
@@ -26,7 +26,7 @@ mc_dict={
     "__IsCluster" : False,
     "__AutoRun" : True,
     "IsLoad" : False,
-    "Reweight" : [1.65, 1.00, 0.5, 0.5, 0.5],
+    "Reweight" : [1.65, 1.00, 0.5, 0.5, 0.5, 0.5],
     "ReadFile" : readfile,
     "Sample" :  5000000,
     "Sweep" : 10,

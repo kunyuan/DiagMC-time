@@ -127,8 +127,8 @@ SUBROUTINE output_Order
   call read_input(.true.)
   call update_T_dependent
 
-  call LogFile%QuickLog("Reading G, W...")
-  if(read_GW()) call LogFile%QuickLog("Read G, W done!")
+  !call LogFile%QuickLog("Reading G, W...")
+  !if(read_GW()) call LogFile%QuickLog("Read G, W done!")
 
   call LogFile%QuickLog("read monte carlo data from collapse")
   call read_monte_carlo_data(mcBeta)
@@ -140,9 +140,11 @@ SUBROUTINE output_Order
 
     call transfer_r(1)
     call transfer_t(1)
+    call plus_minus_W0(1)
 
     call calculate_Sigma
 
+    call plus_minus_W0(-1)
     call transfer_r(-1)
     call transfer_t(-1)
     call transfer_Sigma_t(-1)
@@ -153,6 +155,7 @@ SUBROUTINE output_Order
 
     call transfer_r(1)
     call transfer_t(1)
+    call plus_minus_W0(1)
     call plus_minus_Gam0(1)
 
     call calculate_Polar
@@ -160,6 +163,7 @@ SUBROUTINE output_Order
     call calculate_Chi
 
     call plus_minus_Gam0(-1)
+    call plus_minus_W0(-1)
     call transfer_r(-1)
     call transfer_t(-1)
 
@@ -204,6 +208,7 @@ SUBROUTINE self_consistent
 
     flag = self_consistent_GW(NLOOP)
 
+    call calculate_Sigma_t
     call output_Quantities
 
     call write_GWGamma
@@ -399,6 +404,7 @@ SUBROUTINE init_matrix
   implicit none
 
   allocate(newW(NTypeW, 0:Vol-1, 0:MxT-1))
+
   allocate(W(NTypeW, 0:Vol-1, 0:MxT-1))
   allocate(Gam(NTypeGam, 0:Vol-1, 0:MxT-1, 0:MxT-1))
   allocate(GamInt(NTypeGam, 0:Vol-1, 0:MxT-1, 0:MxT-1))

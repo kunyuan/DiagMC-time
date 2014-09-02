@@ -45,6 +45,7 @@ SUBROUTINE initialize_Gam
   integer :: ityp, it1, it2
 
   Gam(:,:,:,:) = (0.d0, 0.d0)
+  GamInt(:,:,:,:) = (0.d0, 0.d0)
 END SUBROUTINE initialize_Gam
  
 !!------- Initialization of G0 in frequency ----------
@@ -119,7 +120,7 @@ END SUBROUTINE calculate_Polar
 
 SUBROUTINE calculate_Sigma
   implicit none
-  integer :: p, omega
+  integer :: p, omega, vp(1:D), minusp
   integer :: omegaG, omegaW
   complex(kind=8) :: G1, W0, W1, intGam, halfGam
   double precision :: ratio
@@ -127,6 +128,7 @@ SUBROUTINE calculate_Sigma
   Sigma(:) = (0.d0, 0.d0)
 
   ratio = -3.d0/(Vol*real(MxT))*(Beta/real(MxT))**4.d0
+
   do omega = 0, MxT-1
     do omegaG = 0, MxT-1
       do p = 0, Vol-1
@@ -463,40 +465,35 @@ COMPLEX*16 FUNCTION Gam_basis(it1, it2, GammaBasis)
   implicit none
   integer, intent(in) :: it1, it2
   complex*16, intent(in) :: GammaBasis(1:NbinGam, 1:NBasisGam)
-  double precision :: tau1, tau2
   integer :: ibin, ibasis, jt1, jt2
   complex*16 :: cgam
 
   ibin = get_bin_Gam(it1, it2)
 
-  tau1 = (dble(it1)+0.5d0)/dble(MxT)
-  tau2 = (dble(it2)+0.5d0)/dble(MxT)
-
   if(ibin==1) then
     cgam = (0.d0, 0.d0)
     do ibasis = 1, NBasisGam
       cgam = cgam + GammaBasis(ibin,ibasis)* weight_basis_Gam( &
-        & CoefGam(0:BasisOrderGam,0:BasisOrderGam,ibasis,ibin), tau1, tau2)
+        & CoefGam(0:BasisOrderGam,0:BasisOrderGam,ibasis,ibin), (dble(it1)+0.5d0)/dble(MxT), &
+        & (dble(it2)+0.5d0)/dble(MxT))
     enddo
     Gam_basis = cgam
   else if(it1+it2==MxT-1) then
     cgam = (0.d0, 0.d0)
     do ibasis = 1, NBasisGam
       cgam = cgam + GammaBasis(ibin,ibasis)* weight_basis_Gam( &
-        & CoefGam(0:BasisOrderGam,0:BasisOrderGam,ibasis,ibin), tau1, tau2)
+        & CoefGam(0:BasisOrderGam,0:BasisOrderGam,ibasis,ibin), (dble(it1)+0.5d0)/dble(MxT), &
+        & (dble(it2)+0.5d0)/dble(MxT))
     enddo
     Gam_basis = dcmplx(real(cgam), 0.d0)
   else if(ibin==2) then
     jt1 = MxT-1-it1
     jt2 = MxT-1-it2
-
-    tau1 = (dble(jt1)+0.5d0)/dble(MxT)
-    tau2 = (dble(jt2)+0.5d0)/dble(MxT)
-
     cgam = (0.d0, 0.d0)
     do ibasis = 1, NBasisGam
       cgam = cgam + GammaBasis(1,ibasis)* weight_basis_Gam( &
-        & CoefGam(0:BasisOrderGam,0:BasisOrderGam,ibasis,1), tau1, tau2)
+        & CoefGam(0:BasisOrderGam,0:BasisOrderGam,ibasis,1), (dble(jt1)+0.5d0)/dble(MxT),  &
+        & (dble(jt2)+0.5d0)/dble(MxT))
     enddo
     Gam_basis = dcmplx(real(cgam), -dimag(cgam))
   endif

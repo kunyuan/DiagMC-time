@@ -25,12 +25,12 @@ Files.append(read_data.read_array("L8_0.70_6/0.70_order_quantities.dat", Quans))
 Order=np.arange(1, MxOrder+1)
 
 L = 8
-#stag = (L**2+L+1)*(L/2)
-unif = 0
+stag = (L**2+L+1)*(L/2)
+#unif = 0
 
 ChiL8=[]
 for key in Quans:
-    ChiL8.append(Files[0][key][0][unif].real)
+    ChiL8.append(Files[0][key][0][stag].real)
 print ChiL8[MxOrder-1]
 
 ax.plot(1.0/Order, ChiL8, marker='o', label="L=8, beta="+str(Beta))

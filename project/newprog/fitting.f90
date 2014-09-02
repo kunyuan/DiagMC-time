@@ -310,7 +310,7 @@ SUBROUTINE test_basis_Gam(t1min, t1max, t2min, t2max, Coef)
     do  t1 = t1min, t1max
       do  t2 = t2min(t1), t2max(t1)
         y = y + (1.d0/dble(MxT))**2.d0*weight_basis_Gam(Coef(:, :, i),  &
-          &  (dble(t1)+0.5d0)/dble(MxT), (dble(t2)+0.5d0)/dble(MxT))**2.d0
+          & (dble(t1)+0.5d0)/dble(MxT), (dble(t2)+0.5d0)/dble(MxT))**2.d0
       enddo
     enddo
     if(dabs(y-1.d0)>1.d-8) then

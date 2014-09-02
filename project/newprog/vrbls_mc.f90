@@ -7,10 +7,10 @@ MODULE vrbls_mc
   logical, parameter  ::  IS_J1J2=.false.
   logical, parameter  ::  IS_BOLD=.false.
 
-  !integer, parameter :: D = 2                            ! 2-dimensional system
-  !integer, parameter,dimension(D) :: MxL =(/64,64/)      ! the largest system
-  integer, parameter :: D = 3                             ! 3-dimensional system 
-  integer, parameter,dimension(D) :: MxL =(/16,16,16/)    ! the largest system
+  integer, parameter :: D = 2                            ! 2-dimensional system
+  integer, parameter,dimension(D) :: MxL =(/64,64/)      ! the largest system
+  !integer, parameter :: D = 3                             ! 3-dimensional system 
+  !integer, parameter,dimension(D) :: MxL =(/16,16,16/)    ! the largest system
 
   !======================== code mode control ============================
   logical, parameter  ::  DEBUG=.true.          
@@ -33,7 +33,7 @@ MODULE vrbls_mc
 
   integer, parameter :: NLOOP = 20
   integer, parameter :: ININLOOP = 20
-  integer, parameter :: NBLCKCHECK = 2
+  integer, parameter :: NBLCKCHECK = 5
   integer, parameter :: NBLCKWRITE = 2*NBLCKCHECK
   integer, parameter :: NBLCKREWEI = 5*NBLCKWRITE
 
@@ -145,10 +145,11 @@ MODULE vrbls_mc
   complex(kind=8) :: G(NtypeG, 0:MxT-1)
   complex(kind=8) :: G0F(0:MxT-1)
   complex(kind=8) :: Sigma(0:MxT-1)
+  complex(kind=8) :: SigmaT(0:MxT-1)
 
   complex(kind=8), allocatable :: newW(:,:,:)
   complex(kind=8), allocatable :: W(:,:,:)
-  complex(kind=8), allocatable :: Gam(:,:,:,:)
+  complex(kind=8), allocatable :: Gam(:,:,:,:)      !Gamma with half integers
   complex(kind=8), allocatable :: GamInt(:,:,:,:)   !Gamma with integers
   complex(kind=8), allocatable :: GamBasis(:,:,:,:)
 

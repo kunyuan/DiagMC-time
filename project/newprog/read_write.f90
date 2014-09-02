@@ -439,6 +439,17 @@ SUBROUTINE output_Quantities
   enddo
   write(104, *)
 
+  write(104, *) "##################################GammaInt"
+  write(104, *) "#tau1:", MxT, ",tau2:", MxT
+  write(104, *) "#Beta", Beta, "L", L(1), "Order", MCOrder
+  do it2 = 0, MxT-1
+    do it1 = 0, MxT-1
+      write(104, *)  real(GamInt(1, 0, it1, it2)), dimag(GamInt(1, 0, it1, it2))
+    enddo
+  enddo
+  write(104, *)
+
+
   write(104, *) "##################################GammaR"
   write(104, *) "#r:", Vol
   write(104, *) "#Beta", Beta, "L", L(1), "Order", MCOrder
@@ -472,11 +483,32 @@ SUBROUTINE output_Quantities
     write(104, *)
   enddo
 
+  do iorder = 1, MCOrder
+    write(104, *) "##################################GammaR",trim(adjustl(str(iorder)))
+    write(104, *) "#r:", Vol
+    write(104, *) "#Beta", Beta, "L", L(1), "Order", MCOrder
+    do isite = 0, Vol-1
+      it1 = MxT/2
+      it2 = MxT/2 
+      gam1 = Gam_basis(it1, it2, GamMCBasis(iorder, 1, isite, :, :))
+      write(104, *) real(gam1*normal), dimag(gam1*normal)
+    enddo
+    write(104, *)
+  enddo
+
   write(104, *) "##################################G"
   write(104, *) "#tau:", MxT
   write(104, *) "#Beta", Beta, "L", L(1), "Order", MCOrder
   do it1 = 0, MxT-1
     write(104, *)  real(G(1, it1)), dimag(G(1,it1))
+  enddo
+  write(104, *)
+
+  write(104, *) "##################################G0"
+  write(104, *) "#tau:", MxT
+  write(104, *) "#Beta", Beta, "L", L(1), "Order", MCOrder
+  do it1 = 0, MxT-1
+    write(104, *)  real(G0F(it1)), dimag(G0F(it1))
   enddo
   write(104, *)
 
@@ -510,6 +542,13 @@ SUBROUTINE output_Quantities
   do it = 0, MxT-1
     write(104, *) Vol*(MxT/Beta)**2.d0*real(Sigma(it)),  &
       & Vol*(MxT/Beta)**2.d0*dimag(Sigma(it))
+  enddo
+
+  write(104, *) "##################################SigmaT"
+  write(104, *) "#tau:", MxT
+  write(104, *) "#Beta", Beta, "L", L(1), "Order", MCOrder
+  do it = 0, MxT-1
+    write(104, *) real(SigmaT(it)), dimag(SigmaT(it))
   enddo
 
   write(104, *) "##################################SUMChi"
@@ -554,6 +593,7 @@ SUBROUTINE output_Quantities
   call transfer_Chi_r(-1)
 
   close(104)
+
 END SUBROUTINE output_Quantities
 
 SUBROUTINE output_Quantities_Order(iorder)

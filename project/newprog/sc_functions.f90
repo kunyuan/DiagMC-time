@@ -473,6 +473,7 @@ SUBROUTINE FFT_tau_single(XR,Ntype,Nz,IsAntiSym,BackForth)
       if(IsAntiSym) then
         do it = 0, MxT-1
           XR(:,:,it) = XR(:,:,it)* cdexp(dcmplx(0.d0,-Pi*(real(it))/real(MxT)))
+          !XR(:,:,it) = XR(:,:,it)* cdexp(dcmplx(0.d0,-Pi*(real(it)+0.5d0)/real(MxT)))
         enddo
       endif
     else
@@ -508,6 +509,7 @@ SUBROUTINE FFT_tau_single(XR,Ntype,Nz,IsAntiSym,BackForth)
       if(IsAntiSym) then
         do it = 0, MxT-1
           XR(:,:,it) = XR(:,:,it)* cdexp(dcmplx(0.d0,Pi*(real(it))/real(MxT)))
+          !XR(:,:,it) = XR(:,:,it)* cdexp(dcmplx(0.d0,Pi*(real(it)+0.5d0)/real(MxT)))
         enddo
       endif
     endif
@@ -533,6 +535,7 @@ SUBROUTINE FFT_tau_double(XR,Ntype,Nz,IsAntiSym,BackForth)
         do it2 = 0, MxT-1
           do it1 = 0, MxT-1
             XR(:,:,it1, it2) = XR(:,:,it1, it2)* cdexp(dcmplx(0.d0,-Pi*real(it1+it2)/real(MxT)))
+            !XR(:,:,it1, it2) = XR(:,:,it1, it2)* cdexp(dcmplx(0.d0,-Pi*real(it1+it2+1.d0)/real(MxT)))
           enddo
         enddo
       endif
@@ -592,6 +595,7 @@ SUBROUTINE FFT_tau_double(XR,Ntype,Nz,IsAntiSym,BackForth)
         do it2 = 0, MxT-1
           do it1 = 0, MxT-1
             XR(:,:,it1, it2) = XR(:,:,it1, it2)* cdexp(dcmplx(0.d0,Pi*real(it1+it2)/real(MxT)))
+            !XR(:,:,it1, it2) = XR(:,:,it1, it2)* cdexp(dcmplx(0.d0,Pi*real(it1+it2+1.d0)/real(MxT)))
           enddo
         enddo
       endif
