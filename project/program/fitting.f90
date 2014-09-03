@@ -17,7 +17,7 @@ SUBROUTINE initialize_bins
   ToGamT1(1) = MxT-1
   do t1 = FromGamT1(1), ToGamT1(1)
     FromGamT2(t1, 1) = 0
-    ToGamT2(t1, 1)   = MxT-1-t1
+    ToGamT2(t1, 1)   = MxT-2-t1
   enddo
   
 
@@ -73,6 +73,7 @@ INTEGER FUNCTION get_bin_Gam_int(it1, it2)
   integer :: it1, it2
   if(it1+it2<MxT)  get_bin_Gam_int = 1
   if(it1+it2>MxT)  get_bin_Gam_int = 2
+  if(it1+it2==MxT) get_bin_Gam_int = 3
   return
 END FUNCTION get_bin_Gam_int
 

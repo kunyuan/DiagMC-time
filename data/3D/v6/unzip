@@ -1,0 +1,10 @@
+read -p "System size :" L
+read -p "Beta :" Beta
+read -p "lowest order :" Order1
+read -p "highest order :" Order2
+
+for ((i=$Order1; i<=$Order2; i++))
+do
+    unzip L"$L"_"$Beta"_"$i".zip
+    rm L"$L"_"$Beta"_"$i".zip
+done
