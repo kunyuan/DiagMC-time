@@ -1,4 +1,4 @@
-scp chen-huang-zhang@210.45.78.184:~/transfer/3D/J2_0.00/L*.zip .
+scp chen-huang-zhang@210.45.78.184:~/transfer/2D/J2_0.50/L*.zip .
 
 read -p "System size :" L
 read -p "Beta :" Beta

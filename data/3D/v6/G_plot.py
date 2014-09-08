@@ -22,8 +22,7 @@ BoldSigma=[]
 #BoldSigma.append(read_data.read_array("./bare_L4_0.50_4_quantities.dat",target))
 #BoldSigma.append(read_data.read_array("../../project/0.80_quantities.dat",target))
 
-BoldSigma.append(read_data.read_array("../../../../old_program/0.50_quantities.dat",target))
-BoldSigma.append(read_data.read_array("../../../../project/0.50_quantities.dat",target))
+BoldSigma.append(read_data.read_array("./L8_0.70_6/0.70_quantities.dat",target))
 
 fig = plt.figure()
 ax = plt.subplot(111)

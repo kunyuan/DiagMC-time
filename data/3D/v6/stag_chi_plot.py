@@ -13,12 +13,13 @@ tau = np.arange(0, Beta, Beta/MxT)
 fig = plt.figure()
 ax = plt.subplot(111)
 
-MnOrder = 3
+MnOrder = 2
 MxOrder = 6
 Quans=["ChiK0t"]
 key="ChiK0t"
 
 Files=[]
+Files.append(read_data.read_array("L8_0.70_2/0.70_quantities.dat", Quans))
 Files.append(read_data.read_array("L8_0.70_3/0.70_quantities.dat", Quans))
 Files.append(read_data.read_array("L8_0.70_4/0.70_quantities.dat", Quans))
 Files.append(read_data.read_array("L8_0.70_5/0.70_quantities.dat", Quans))
@@ -35,10 +36,25 @@ for i in range(len(Files)):
     ChiL8.append(Files[i][key][0][stag].real)
 
 ax.plot(1.0/Order, ChiL8, marker='o', label="L=8, beta="+str(Beta))
+
+#Files=[]
+#Files.append(read_data.read_array("L8_0.50_3/0.50_quantities.dat", Quans))
+
+#Beta=0.50
+#MnOrder = 3
+#MxOrder = 3
+#Order=np.arange(MnOrder, MxOrder+1)
+
+#ChiL8=[]
+#for i in range(len(Files)):
+    #ChiL8.append(Files[i][key][0][stag].real)
+
+#ax.plot(1.0/Order, ChiL8, marker='o', label="L=8, beta="+str(Beta))
 ########################################################################################
 
 ax.legend()
 ax.set_xlim((0.0, 1.0))
+ax.set_ylim((3.25, 4.02))
 
 plt.xlabel("1/N")
 plt.ylabel("staggered susceptibility")

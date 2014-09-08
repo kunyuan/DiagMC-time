@@ -28,12 +28,12 @@ Files.append(read_data.read_array("L16_2.00_5/2.00_quantities.dat", Quans))
 Order=np.arange(MnOrder, MxOrder+1)
 
 L = 16 
-stag = (L+1)*(L/2)
-#unif = 0
+#stag = (L+1)*(L/2)
+unif = 0
 
 Chi=[]
 for i in range(len(Files)):
-    Chi.append(Files[i][key][0][stag].real)
+    Chi.append(Files[i][key][0][unif].real)
 
 ax.plot(1.0/Order, Chi, marker='o', label="L=16, beta="+str(Beta))
 ########################################################################################
@@ -42,8 +42,8 @@ ax.legend()
 ax.set_xlim((0.0, 1.0))
 
 plt.xlabel("1/N")
-plt.ylabel("staggered susceptibility")
+plt.ylabel("uniform susceptibility")
 
-plt.savefig("Beta2.0_static_staggered_chi.pdf")
-#plt.savefig("Beta1.5_static_staggered_chi.pdf")
+plt.savefig("Beta2.0_static_uniform_chi.pdf")
+#plt.savefig("Beta1.5_static_uniform_chi.pdf")
 plt.show()
