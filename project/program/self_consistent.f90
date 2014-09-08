@@ -103,10 +103,10 @@ SUBROUTINE calculate_Polar
         Gin = G(1, omegaGin)
         if(omegaGout>=0) then
           Gout = G(1, omegaGout)
-          Gam1 = Gam(5, p, omegaGin, omegaGout)
+          Gam1 = GamInt(5, p, omegaGin, omegaGout)
         else
           Gout = -1.d0*G(1, omegaGout+MxT)
-          Gam1 = -1.d0*Gam(5, p, omegaGin, omegaGout+MxT)
+          Gam1 = -1.d0*GamInt(5, p, omegaGin, omegaGout+MxT)
         endif
         Polar(p, omega) = Polar(p, omega)+d_times_cd(ratio, cdexp(dcmplx(0.d0, -1.d0)* &
           & (omegaGout*2.d0+1.d0)*Pi/MxT) *Gin*Gout*Gam1)
@@ -166,8 +166,11 @@ SUBROUTINE calculate_W(iloop)
 
   do  omega = 0, MxT-1
     do p = 0, Vol-1
-      Denom(p,omega) = (1.d0, 0.d0) -W0PF(p,omega)*Polar(p,omega)
-      newW(1,p,omega) = W0PF(p,omega)/Denom(p,omega)
+
+      Denom(p,omega) = (1.d0, 0.d0) -(0.5d0+0.5d0*cdexp(dcmplx(0.d0,  &
+        & -2.d0*Pi*omega/dble(MxT))))*W0PF(p,omega)*Polar(p,omega)
+
+      newW(1,p,omega) = W0PF(p,omega)*Polar(p,omega)*W0PF(p,omega)/Denom(p,omega)
       if(newW(1,p,omega)/=newW(1,p,omega)) then
         call LogFile%QuickLog("calculate_W NaN appears!")
         stop
@@ -180,8 +183,6 @@ SUBROUTINE calculate_W(iloop)
   newW(2,:,:) = newW(1,:,:)
   newW(4,:,:) = newW(3,:,:)
   newW(6,:,:) = newW(5,:,:)
-
-  call plus_minus_W0(-1)
 
   ratio = dble(iloop)/(1.d0+dble(iloop))
   W(:,:,:) = ratio*W(:,:,:)+(1.d0-ratio)*newW(:,:,:)
@@ -200,7 +201,8 @@ SUBROUTINE calculate_G(iloop)
   !--------- G = G0/(1-G0*Sigma)----------------------
   do omega = 0, MxT-1
 
-    newG(1, omega) =  G0F(omega)/((1.d0,0.d0)-G0F(omega)*Sigma(omega))
+    newG(1, omega) =  G0F(omega)/((1.d0,0.d0)-cdexp(dcmplx(0.d0,  &
+      & -(2.d0*omega+1.d0)*Pi/dble(MxT))) *G0F(omega)*Sigma(omega))
 
     if(newG(1,omega)/=newG(1,omega)) then
       call LogFile%QuickLog("calculate_G NaN appears!")
