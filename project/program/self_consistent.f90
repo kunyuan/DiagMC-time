@@ -477,15 +477,15 @@ COMPLEX*16 FUNCTION Gam_basis(it1, it2, GammaBasis)
   if(ibin==1) then
     cgam = (0.d0, 0.d0)
     do ibasis = 1, NBasisGam
-      cgam = cgam + GammaBasis(ibin,ibasis)* weight_basis_Gam( &
-        & CoefGam(0:BasisOrderGam,0:BasisOrderGam,ibasis,ibin), tau1, tau2)
+      cgam = cgam + GammaBasis(1,ibasis)* weight_basis_Gam( &
+        & CoefGam(0:BasisOrderGam,0:BasisOrderGam,ibasis,1), tau1, tau2)
     enddo
     Gam_basis = cgam
   else if(it1+it2==MxT-1) then
     cgam = (0.d0, 0.d0)
     do ibasis = 1, NBasisGam
-      cgam = cgam + GammaBasis(ibin,ibasis)* weight_basis_Gam( &
-        & CoefGam(0:BasisOrderGam,0:BasisOrderGam,ibasis,ibin), tau1, tau2)
+      cgam = cgam + GammaBasis(1,ibasis)* weight_basis_Gam( &
+        & CoefGam(0:BasisOrderGam,0:BasisOrderGam,ibasis,1), tau1, tau2)
     enddo
     Gam_basis = dcmplx(real(cgam), 0.d0)
   else if(ibin==2) then
@@ -502,6 +502,9 @@ COMPLEX*16 FUNCTION Gam_basis(it1, it2, GammaBasis)
     enddo
     Gam_basis = dcmplx(real(cgam), -dimag(cgam))
   endif
+
+  !!!!TEST
+  Gam_basis = dcmplx(real(Gam_basis), 0.d0)
   return
 END FUNCTION Gam_basis
 
@@ -517,8 +520,8 @@ COMPLEX*16 FUNCTION Gam_basis_int(it1, it2, GammaBasis)
   if(ibin==1) then
     cgam = (0.d0, 0.d0)
     do ibasis = 1, NBasisGam
-      cgam = cgam + GammaBasis(ibin,ibasis)* weight_basis_Gam( &
-        & CoefGam(0:BasisOrderGam,0:BasisOrderGam,ibasis,ibin), dble(it1)/dble(MxT), &
+      cgam = cgam + GammaBasis(1,ibasis)* weight_basis_Gam( &
+        & CoefGam(0:BasisOrderGam,0:BasisOrderGam,ibasis,1), dble(it1)/dble(MxT), &
         & dble(it2)/dble(MxT))
     enddo
     Gam_basis_int = cgam
@@ -537,12 +540,14 @@ COMPLEX*16 FUNCTION Gam_basis_int(it1, it2, GammaBasis)
   else if(ibin==3) then
     cgam = (0.d0, 0.d0)
     do ibasis = 1, NBasisGam
-      cgam = cgam + GammaBasis(ibin,ibasis)* weight_basis_Gam( &
-        & CoefGam(0:BasisOrderGam,0:BasisOrderGam,ibasis,ibin), dble(it1)/dble(MxT), &
+      cgam = cgam + GammaBasis(1,ibasis)* weight_basis_Gam( &
+        & CoefGam(0:BasisOrderGam,0:BasisOrderGam,ibasis,1), dble(it1)/dble(MxT), &
         & dble(it2)/dble(MxT))
     enddo
     Gam_basis_int = dcmplx(real(cgam), 0.d0)
   endif
+  !!!!TEST
+  Gam_basis_int = dcmplx(real(Gam_basis_int), 0.d0)
   return
 END FUNCTION Gam_basis_int
 

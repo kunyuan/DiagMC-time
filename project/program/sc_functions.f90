@@ -583,7 +583,6 @@ SUBROUTINE FFT_tau_double(XR,Ntype,Nz,IsAntiSym,BackForth)
       !multiply  exp(-i*Pi*(m1+m2)/MxT) term to omega function
       !do it2 = 0, MxT-1
         !do it1 = 0, MxT-1
-          !XR(:,:,it1, it2) = XR(:,:,it1, it2)* cdexp(dcmplx(0.d0,-Pi*real(it1+it2)/real(MxT)))
         !enddo
       !enddo
     else

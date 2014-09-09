@@ -462,6 +462,7 @@ COMPLEX*16 FUNCTION weight_G(typ1, tau1)
   if(tau1<=1.d-14)  weight_G = -1.d0* weight_G
 END FUNCTION weight_G
 
+
 !!--------- extract weight for W ---------
 COMPLEX*16 FUNCTION weight_W(typ1, site, tau1)
   implicit none
@@ -469,6 +470,7 @@ COMPLEX*16 FUNCTION weight_W(typ1, site, tau1)
   double precision, intent(in) :: tau1
   call interpolation_GW(tau1, W(typ1, site, :), weight_W)
 END FUNCTION weight_W
+
 
 !!--------- extract weight for Gamma ---------
 COMPLEX*16 FUNCTION weight_Gam(typ1, site, tau1, tau2)
