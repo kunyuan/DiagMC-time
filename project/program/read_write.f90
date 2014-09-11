@@ -607,15 +607,12 @@ SUBROUTINE output_denominator
   integer :: ip
   double precision :: ratio
   ip = get_site_from_cord(D, L(1:D)/2)
-
-  open(104, access='append', file=trim(title_loop)//"_denom.dat") 
-  write(104, *) real(Denom(ip, 0)),dimag(Denom(ip, 0))
-  close(104)
-
   ratio = Beta/dble(MxT)
-  open(105, access='append', file=trim(title_loop)//"_stag_chi.dat") 
-  write(105, *) ratio*real(Chi(ip, 0)),ratio*dimag(Chi(ip, 0))
-  close(105)
+
+  open(104, access='append', file=trim(title_loop)//"_history.dat") 
+  write(104, "(i4,4f17.7)",advance='no') file_version+1, real(Denom(ip, 0)),dimag(Denom(ip, 0)), &
+    & ratio*real(Chi(ip, 0)),ratio*dimag(Chi(ip, 0))
+  close(104)
 END SUBROUTINE output_denominator
 
 SUBROUTINE output_Gam1

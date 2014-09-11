@@ -221,6 +221,8 @@ LOGICAL FUNCTION self_consistent_GW(iloop)
 
   klow = 0
 
+  call LogFile%QuickLog("Start Dyson")
+  call LogFile%QuickLog("FileVersion:"+str(file_version+1))
   call transfer_r(1)
   call transfer_t(1)
   call plus_minus_Gam0(1)
