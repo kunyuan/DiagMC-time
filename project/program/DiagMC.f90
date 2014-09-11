@@ -199,6 +199,7 @@ SUBROUTINE self_consistent
   return
 END SUBROUTINE self_consistent
 
+
 LOGICAL FUNCTION self_consistent_GW(iloop)
   implicit none
   integer, intent(in) :: iloop
