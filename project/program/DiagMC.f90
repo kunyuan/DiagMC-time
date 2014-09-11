@@ -135,34 +135,21 @@ SUBROUTINE output_Order
 
   do iorder=1,MCOrder
     call LogFile%QuickLog("get the new Gamma function...")
-    call Gam_mc2matrix_mc_by_order(iorder)
-    call LogFile%QuickLog("Reading order"+str(iorder)+" Gamma done!")
-
-    call transfer_r(1)
-    call transfer_t(1)
-
-    call calculate_Sigma
-
-    call transfer_r(-1)
-    call transfer_t(-1)
-    call transfer_Sigma_t(-1)
-
-    call LogFile%QuickLog("get the new Gamma function...")
     call Gam_mc2matrix_mc_up2order(iorder)
     call logfile%quicklog("reading order"+str(iorder)+" gamma done!")
 
     call transfer_r(1)
     call transfer_t(1)
-    call plus_minus_Gam0(1)
 
+    call calculate_Sigma
     call calculate_Polar
     call calculate_Denom
     call calculate_Chi
 
-    call plus_minus_Gam0(-1)
     call transfer_r(-1)
     call transfer_t(-1)
 
+    call transfer_Sigma_t(-1)
     call transfer_Chi_r(-1)
     call transfer_Chi_t(-1)
     call output_Quantities_Order(iorder)
@@ -225,24 +212,24 @@ LOGICAL FUNCTION self_consistent_GW(iloop)
   call LogFile%QuickLog("FileVersion:"+str(file_version+1))
   call transfer_r(1)
   call transfer_t(1)
-  call plus_minus_Gam0(1)
 
   !!------ calculate G, W in momentum domain --------------
   istag = get_site_from_cord(D, L(1:D)/2)
   self_consistent_GW = .true.
 
   call calculate_Polar
+  call calculate_Denom
   call calculate_W(0)
 
   do i = 1, iloop
 
     call calculate_Sigma
     call calculate_Polar
+    call calculate_Denom
 
     call calculate_G(i)
     call calculate_W(i)
 
-    call calculate_Denom
     call calculate_Chi
 
     denominator = find_lowest_W(Denom(:, :), klow, omegalow)
@@ -264,8 +251,6 @@ LOGICAL FUNCTION self_consistent_GW(iloop)
 
 
   !!-------------------------------------------------------
-  call plus_minus_Gam0(-1)
-
   call transfer_r(-1)
   call transfer_t(-1)
 
@@ -403,7 +388,6 @@ SUBROUTINE init_matrix
   allocate(newW(NTypeW, 0:Vol-1, 0:MxT-1))
   allocate(W(NTypeW, 0:Vol-1, 0:MxT-1))
   allocate(Gam(NTypeGam, 0:Vol-1, 0:MxT-1, 0:MxT-1))
-  allocate(GamInt(NTypeGam, 0:Vol-1, 0:MxT-1, 0:MxT-1))
   allocate(GamBasis(NTypeGam, 0:Vol-1, 1:NbinGam, 1:NBasisGam))
 
   allocate(W0PF(0:Vol-1, 0:MxT-1))

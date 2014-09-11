@@ -534,7 +534,7 @@ SUBROUTINE interpolation_Gam(tau1, tau2, Table, Val)
     ts(i) = Floor((ptau(i)-0.5d0*Beta/MxT)*MxT/Beta)
     if(ts(i)<0) then
       ts(i) = 0
-    else if(ts(i)>=MxT) then
+    else if(ts(i)>=MxT-1) then
       ts(i) = MxT-2
     endif
 

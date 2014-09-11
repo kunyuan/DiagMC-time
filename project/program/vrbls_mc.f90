@@ -31,7 +31,7 @@ MODULE vrbls_mc
   integer, parameter          :: Mxint = 2147483647
   integer, parameter          :: Mnint =-2147483647
 
-  integer, parameter :: NLOOP = 20
+  integer, parameter :: NLOOP = 5
   integer, parameter :: ININLOOP = 20
   integer, parameter :: NBLCKCHECK = 2
   integer, parameter :: NBLCKWRITE = 2*NBLCKCHECK
@@ -149,7 +149,6 @@ MODULE vrbls_mc
   complex(kind=8), allocatable :: newW(:,:,:)
   complex(kind=8), allocatable :: W(:,:,:)
   complex(kind=8), allocatable :: Gam(:,:,:,:)
-  complex(kind=8), allocatable :: GamInt(:,:,:,:)   !Gamma with integers
   complex(kind=8), allocatable :: GamBasis(:,:,:,:)
 
   complex(kind=8), allocatable :: W0PF(:,:)

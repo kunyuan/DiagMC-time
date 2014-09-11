@@ -1,8 +1,0 @@
-
-version: v3.2.2
-compare the beta=0.9 susceptibility data with path-integral for 1-4 order diagrams
-L=4
-
-Path-Integral Data: Cor0.9.dat
-plots: 0.90_chi_bold.pdf; 0.90_chi_bare.pdf
-**************************************************************

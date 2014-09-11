@@ -68,15 +68,6 @@ INTEGER FUNCTION get_bin_Gam(it1, it2)
   return
 END FUNCTION get_bin_Gam
 
-INTEGER FUNCTION get_bin_Gam_int(it1, it2)
-  implicit none
-  integer :: it1, it2
-  if(it1+it2<MxT)  get_bin_Gam_int = 1
-  if(it1+it2>MxT)  get_bin_Gam_int = 2
-  if(it1+it2==MxT) get_bin_Gam_int = 3
-  return
-END FUNCTION get_bin_Gam_int
-
 INTEGER FUNCTION get_bin_W(it1)
   implicit none
   integer :: it1
