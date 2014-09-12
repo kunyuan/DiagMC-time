@@ -139,7 +139,7 @@ SUBROUTINE calculate_Sigma
           W1 = W(1, p, omegaW)
           W0 = W0PF(p, omegaW)
         else
-          W1 = W(1, p, omegaW+MxT)
+          W1 = -1.d0*W(1, p, omegaW+MxT)
           W0 = W0PF(p, omegaW+MxT)
         endif
 
