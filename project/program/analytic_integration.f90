@@ -73,9 +73,6 @@ SUBROUTINE calculate_Gam1
   call transfer_W_t(1)
   call transfer_Gam_t(1)
 
-  call transfer_Gam0_r(-1)
-  call plus_minus_Gam0(1)
-
   tg(1:4)  = 1;   tgam2(1:4) = 1
   tgam1(1) = 1;   tgam3(1)   = 1;        tw(1) = 1
   tgam1(4) = 3;   tgam3(4)   = 3;        tw(4) = 2
@@ -102,14 +99,14 @@ SUBROUTINE calculate_Gam1
 
           Gin = G(tg(ityp), omega3)
           Gout = G(tg(ityp), omegaout)
-          Gam2 = Gam(tgam2(ityp), 0, omega3, omegaout)
+          Gam2 = Gam(tgam2(ityp), 0, omega3, omegaout)+weight_Gam0(tgam2(ityp), 0)
 
           do isite1 = 0, Vol-1
             do isite3 = 0, Vol-1
 
               isiteW = diff_r(D, isite1, isite3)
-              Gam1 = Gam(tgam1(ityp), isite1, omega1, omega3)
-              Gam3 = Gam(tgam3(ityp), isite3, omegaout, omega2)
+              Gam1 = Gam(tgam1(ityp), isite1, omega1, omega3)+weight_Gam0(tgam1(ityp), 0)
+              Gam3 = Gam(tgam3(ityp), isite3, omegaout, omega2)+weight_Gam0(tgam3(ityp), 0)
               iW = W(tw(ityp), isiteW, omegaW)
 
               weight = Gin *Gout *iW *Gam1 *Gam2 *Gam3
@@ -122,9 +119,6 @@ SUBROUTINE calculate_Gam1
 
     enddo
   enddo
-
-  call plus_minus_Gam0(-1)
-  call transfer_Gam0_r(1)
 
   call transfer_G_t(-1)
   call transfer_W_t(-1)

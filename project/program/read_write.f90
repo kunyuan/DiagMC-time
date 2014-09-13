@@ -55,6 +55,7 @@ SUBROUTINE read_input(ifmust)
   read(11, *) MCOrder
   read(11, *) file_version
   read(11, *) IFSLASH
+  read(11, *) ACCOrder
   close(11)
 
   if(ios/=0) then
@@ -95,6 +96,7 @@ SUBROUTINE write_input(changeBeta, filenum)
   write(10, *) MCOrder
   write(10, *) filenum
   write(10, *) IFSLASH
+  write(10, *) ACCOrder
 
   close(10)
 

@@ -5,12 +5,15 @@ MODULE vrbls_mc
 
   !logical, parameter  ::  IS_J1J2=.true.
   logical, parameter  ::  IS_J1J2=.false.
-  logical, parameter  ::  IS_BOLD=.true.
+  !logical, parameter  ::  IS_BOLD=.true.
+  logical, parameter  ::  IS_BOLD=.false.
 
   integer, parameter :: D = 2                            ! 2-dimensional system
   integer, parameter,dimension(D) :: MxL =(/64,64/)      ! the largest system
+  integer, parameter ::  GamL = 16
   !integer, parameter :: D = 3                             ! 3-dimensional system 
   !integer, parameter,dimension(D) :: MxL =(/16,16,16/)    ! the largest system
+  !integer, parameter ::  GamL = 8
 
   !======================== code mode control ============================
   logical, parameter  ::  DEBUG=.true.          
@@ -31,6 +34,7 @@ MODULE vrbls_mc
   integer, parameter          :: Mxint = 2147483647
   integer, parameter          :: Mnint =-2147483647
 
+  integer :: AccOrder              
   integer, parameter :: NLOOP = 5
   integer, parameter :: ININLOOP = 20
   integer, parameter :: NBLCKCHECK = 2
@@ -140,7 +144,6 @@ MODULE vrbls_mc
 
 
   !========================= Self-consistent loop ========================
-  !============== unfinished =============================================
   complex(kind=8) :: newG(NtypeG, 0:MxT-1)
   complex(kind=8) :: G(NtypeG, 0:MxT-1)
   complex(kind=8) :: G0F(0:MxT-1)
@@ -151,8 +154,8 @@ MODULE vrbls_mc
   complex(kind=8), allocatable :: Gam(:,:,:,:)
   complex(kind=8), allocatable :: GamBasis(:,:,:,:)
 
-  complex(kind=8), allocatable :: W0PF(:,:)
-  complex(kind=8), allocatable :: Gam0PF(:,:,:)
+  complex(kind=8) :: Gam0PF
+  complex(kind=8), allocatable :: W0PF(:)
 
   complex(kind=8), allocatable :: Polar(:,:)
   complex(kind=8), allocatable :: Chi(:,:)

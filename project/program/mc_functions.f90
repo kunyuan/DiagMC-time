@@ -713,12 +713,10 @@ SUBROUTINE undo_insert_line(occline, knd)
   StatusLn(occline) = -1
   TailLn = occline
 
-
   if(TailLn == -1) then
     call LogFile%QuickLog("undo_insert_line error! tail=-1!", 'e')
     stop
   endif
-
 
   return
 END SUBROUTINE undo_insert_line

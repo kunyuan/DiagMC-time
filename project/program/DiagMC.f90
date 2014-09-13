@@ -386,13 +386,13 @@ END SUBROUTINE init_space
 SUBROUTINE init_matrix
   implicit none
 
+  allocate(W0PF(0:Vol-1))
+
   allocate(newW(NTypeW, 0:Vol-1, 0:MxT-1))
   allocate(W(NTypeW, 0:Vol-1, 0:MxT-1))
   allocate(Gam(NTypeGam, 0:Vol-1, 0:MxT-1, 0:MxT-1))
   allocate(GamBasis(NTypeGam, 0:Vol-1, 1:NbinGam, 1:NBasisGam))
 
-  allocate(W0PF(0:Vol-1, 0:MxT-1))
-  allocate(Gam0PF(0:Vol-1, 0:MxT-1, 0:MxT-1))
   allocate(Polar(0:Vol-1, 0:MxT-1))
   allocate(Denom(0:Vol-1, 0:MxT-1))
   allocate(Chi(0:Vol-1, 0:MxT-1))

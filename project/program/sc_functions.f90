@@ -250,15 +250,8 @@ END SUBROUTINE
 SUBROUTINE transfer_W0_r(BackForth)
     implicit none
     integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
-    call FFT_r(W0PF,1,MxT,BackForth)
+    call FFT_r(W0PF,1,1,BackForth)
 END SUBROUTINE
-
-SUBROUTINE transfer_Gam0_r(BackForth)
-    implicit none
-    integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
-    integer :: it1, it2
-    call FFT_r(Gam0PF,1,MxT**2,BackForth)
-end SUBROUTINE
 
 SUBROUTINE transfer_W_r(BackForth)
     implicit none

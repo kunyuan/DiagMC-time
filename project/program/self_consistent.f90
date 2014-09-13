@@ -66,10 +66,10 @@ SUBROUTINE initialize_W0PF
   integer :: site
   double precision :: ratio
 
-  W0PF(:,:) = (0.d0, 0.d0)
+  W0PF(:) = (0.d0, 0.d0)
   ratio = real(MxT)/Beta
   do site = 0, Vol-1
-    W0PF(site, 0:MxT-1) = ratio *weight_W0(1, site)
+    W0PF(site) = ratio *weight_W0(1, site)
   enddo
   call transfer_W0_r(1)
 END SUBROUTINE initialize_W0PF
@@ -80,7 +80,7 @@ SUBROUTINE initialize_Gam0PF
   double precision :: ratio
 
   ratio = (real(MxT)/Beta)**2.d0
-  Gam0PF(0:Vol-1,0:MxT-1,0:MxT-1) = ratio*weight_Gam0(1, 0)
+  Gam0PF = ratio*weight_Gam0(1, 0)
 END SUBROUTINE initialize_Gam0PF
  
 !!============== WEIGHT CALCULATING ==================================
@@ -101,13 +101,12 @@ SUBROUTINE calculate_Polar
         omegaGout = omegaGin - omega
 
         Gin = G(1, omegaGin)
+        Gam0 = Gam0PF
         if(omegaGout>=0) then
           Gout = G(1, omegaGout)
-          Gam0 = Gam0PF(p, omegaGin, omegaGout)
           Gam1 = Gam(5, p, omegaGin, omegaGout)
         else
           Gout = -1.d0*G(1, omegaGout+MxT)
-          Gam0 = Gam0PF(p, omegaGin, omegaGout+MxT)
           Gam1 = -1.d0*Gam(5, p, omegaGin, omegaGout+MxT)
         endif
         Polar(p, omega) = Polar(p, omega)+ratio*Gin*Gout*Gam1*dcos(omega*Pi/MxT)
@@ -135,16 +134,15 @@ SUBROUTINE calculate_Sigma
         omegaW = omega-omegaG
         G1 = G(1, omegaG)
 
+        W0 = W0PF(p)
         if(omegaW>=0) then
           W1 = W(1, p, omegaW)
-          W0 = W0PF(p, omegaW)
         else
           W1 = -1.d0*W(1, p, omegaW+MxT)
-          W0 = W0PF(p, omegaW+MxT)
         endif
 
+        Gam0 = Gam0PF
         Gam1 = Gam(5, p, omegaG, omega)
-        Gam0 = Gam0PF(p, omegaG, omega)
 
         Sigma(omega) = Sigma(omega)+ ratio*G1*W0*Gam1
         Sigma(omega) = Sigma(omega)+ ratio*G1*W1*Gam1*dcos(omegaW*Pi/MxT)
@@ -168,7 +166,7 @@ SUBROUTINE calculate_W(iloop)
 
   do  omega = 0, MxT-1
     do p = 0, Vol-1
-      newW(1,p,omega) = W0PF(p,omega)*Polar(p,omega)*W0PF(p,omega)/Denom(p,omega)
+      newW(1,p,omega) = W0PF(p)*Polar(p,omega)*W0PF(p)/Denom(p,omega)
       if(newW(1,p,omega)/=newW(1,p,omega)) then
         call LogFile%QuickLog("calculate_W NaN appears!")
         stop
@@ -219,7 +217,7 @@ SUBROUTINE calculate_Denom
   implicit none
   integer :: omega
   do omega = 0, MxT-1
-    Denom(:,omega) = (1.d0, 0.d0) -W0PF(:,omega)*Polar(:,omega)*dcos(omega*Pi/MxT)
+    Denom(:,omega) = (1.d0, 0.d0) -W0PF(:)*Polar(:,omega)*dcos(omega*Pi/MxT)
   enddo
   return
 END SUBROUTINE calculate_Denom
@@ -246,46 +244,6 @@ SUBROUTINE calculate_Chi
 END SUBROUTINE calculate_Chi
 
 !!====================================================================
-
-SUBROUTINE plus_minus_W0(Backforth)
-  implicit none
-  integer, intent(in) :: Backforth
-
-  if(Backforth/=-1) then
-    newW(1,:,:) = newW(1,:,:) + W0PF(:,:)
-  else 
-    newW(1,:,:) = newW(1,:,:) - W0PF(:,:)
-  endif
-
-  newW(3,:,:) = -1.d0 * newW(1,:,:)
-  newW(5,:,:) =  2.d0 * newW(1,:,:)
-
-  newW(2,:,:) = newW(1,:,:)
-  newW(4,:,:) = newW(3,:,:)
-  newW(6,:,:) = newW(5,:,:)
-
-  return
-END SUBROUTINE
-
-SUBROUTINE plus_minus_Gam0(Backforth)
-  implicit none
-  integer, intent(in) :: Backforth
-  integer :: ityp, px, py, omega1, omega2
-
-  if(Backforth/=-1) then
-    Gam(1,:,:,:) = Gam(1,:,:,:) + Gam0PF(:,:,:)
-    Gam(2,:,:,:) = Gam(2,:,:,:) + Gam0PF(:,:,:)
-    Gam(5,:,:,:) = Gam(5,:,:,:) + Gam0PF(:,:,:)
-    Gam(6,:,:,:) = Gam(6,:,:,:) + Gam0PF(:,:,:)
-  else 
-    Gam(1,:,:,:) = Gam(1,:,:,:) - Gam0PF(:,:,:)
-    Gam(2,:,:,:) = Gam(2,:,:,:) - Gam0PF(:,:,:)
-    Gam(5,:,:,:) = Gam(5,:,:,:) - Gam0PF(:,:,:)
-    Gam(6,:,:,:) = Gam(6,:,:,:) - Gam0PF(:,:,:)
-  endif
-
-  return
-END SUBROUTINE plus_minus_Gam0
 
  
 SUBROUTINE Gam_mc2matrix_mc(changeBeta)
@@ -349,10 +307,11 @@ SUBROUTINE Gam_mc2matrix_mc(changeBeta)
       flag(iorder)=.true.
     endif
 
-    call LogFile%WriteLine("Order "+str(iorder)+" relative error: "+str(rpercenterr,'(f6.3)')+","+str(ipercenterr,'(f6.3)')+", accept: "+str(flag(iorder)))
+    if(iorder<=ACCOrder .or. flag(iorder)) then
+      call LogFile%WriteLine("Order "+str(iorder)+" relative error: "+ &
+        & str(rpercenterr,'(f6.3)')+","+str(ipercenterr,'(f6.3)')+", accept: "+str(flag(iorder)))
 
-
-    if(flag(iorder)) then
+      if(iorder>ACCOrder)  ACCOrder = iorder
       do ityp = 1, NTypeGam/2
         typ = 2*(ityp-1) + 1
         do dr = 0, Vol-1
@@ -465,9 +424,6 @@ COMPLEX*16 FUNCTION Gam_basis(it1, it2, GammaBasis)
     enddo
     Gam_basis = dcmplx(real(cgam), -dimag(cgam))
   endif
-
-  !!!!TEST
-  Gam_basis = dcmplx(real(Gam_basis), 0.d0)
   return
 END FUNCTION Gam_basis
 
