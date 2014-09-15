@@ -375,6 +375,23 @@ SUBROUTINE init_space
     dVol(i) = Vol
   enddo
 
+  if(D==2) then
+    GamL(1:D) = 16
+    GamL(3) = 1
+  else if(D==3) then
+    GamL(1:D) = 8
+  endif
+
+  GamVol = 1.d0
+  do i = 1, D
+    dGamVol(i) = GamVol
+    GamVol = GamVol *GamL(i)
+    dGamL(i) = Floor(GamL(i)/2.d0)
+  enddo
+  do i = D+1, 3
+    dGamVol(i) = GamVol
+  enddo
+
   logL(:)=dlog(L(:)*1.d0)
   SpatialWeight(:,:)=0.d0
 
@@ -397,13 +414,13 @@ SUBROUTINE init_matrix
   allocate(Denom(0:Vol-1, 0:MxT-1))
   allocate(Chi(0:Vol-1, 0:MxT-1))
 
-  allocate(GamMC(0:MCOrder, 0:Vol-1, 0:MxT-1))
-  allocate(ReGamSqMC(0:MCOrder, 0:Vol-1, 0:MxT-1))
-  allocate(ImGamSqMC(0:MCOrder, 0:Vol-1, 0:MxT-1))
+  allocate(GamMC(0:MCOrder, 0:GamVol-1, 0:MxT-1))
+  allocate(ReGamSqMC(0:MCOrder, 0:GamVol-1, 0:MxT-1))
+  allocate(ImGamSqMC(0:MCOrder, 0:GamVol-1, 0:MxT-1))
 
-  allocate(GamMCBasis(0:MCOrder,1:NTypeGam/2, 0:Vol-1, 1:NbinGam, 1:NBasisGam))
-  allocate(ReGamSqBasis(0:MCOrder,1:NTypeGam/2, 0:Vol-1, 1:NbinGam, 1:NBasisGam))
-  allocate(ImGamSqBasis(0:MCOrder,1:NTypeGam/2, 0:Vol-1, 1:NbinGam, 1:NBasisGam))
+  allocate(GamMCBasis(0:MCOrder,1:NTypeGam/2, 0:GamVol-1, 1:NbinGam, 1:NBasisGam))
+  allocate(ReGamSqBasis(0:MCOrder,1:NTypeGam/2, 0:GamVol-1, 1:NbinGam, 1:NBasisGam))
+  allocate(ImGamSqBasis(0:MCOrder,1:NTypeGam/2, 0:GamVol-1, 1:NbinGam, 1:NBasisGam))
 END SUBROUTINE init_matrix
 
 

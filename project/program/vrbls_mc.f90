@@ -10,10 +10,8 @@ MODULE vrbls_mc
 
   integer, parameter :: D = 2                            ! 2-dimensional system
   integer, parameter,dimension(D) :: MxL =(/64,64/)      ! the largest system
-  integer, parameter ::  GamL = 16
   !integer, parameter :: D = 3                             ! 3-dimensional system 
   !integer, parameter,dimension(D) :: MxL =(/16,16,16/)    ! the largest system
-  !integer, parameter ::  GamL = 8
 
   !======================== code mode control ============================
   logical, parameter  ::  DEBUG=.true.          
@@ -81,7 +79,9 @@ MODULE vrbls_mc
   !======================== Input parameter ==============================
   integer          ::  L(3), Vol, dVol(3)         ! System size
   integer          ::  dL(3)
-  integer          ::  VolFold, dVolFold(3)       ! System size(fold into a smaller piece)
+  integer          ::  GamL(3), GamVol, dGamVol(3)         ! System size
+  integer          ::  dGamL(3)
+
   double precision ::  logL(3)
   double precision ::  Jcp                        ! interaction
   double precision ::  Mu(2)                      ! Chem. potential for spin down & up

@@ -120,6 +120,22 @@ Integer FUNCTION diff_r(dims, site1, site2)
   return
 END FUNCTION diff_r
 
+LOGICAL FUNCTION if_inside_Vol(dims, iL, isite)
+  implicit none
+  integer, intent(in) :: dims
+  integer, intent(in) :: iL(1:dims)
+  integer, intent(in) :: isite
+  integer :: i, ir(1:dims)
+  ir = get_cord_from_site(dims, isite)
+  if_inside_Vol = .true.
+  do i = 1, dims
+    if(ir(i)>iL(i)) then
+      if_inside_Vol = .false.
+    endif
+  enddo
+  return
+END FUNCTION if_inside_Vol
+
 !!======================== WEIGHT EXTRACTING =========================
 !! most basic interface to the matrix element
 
