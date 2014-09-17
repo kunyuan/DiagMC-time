@@ -19,3 +19,5 @@ project/infile/*
 project/outfile
 project/outfile/*
 *_Gamma_file.dat
+*.dat
+*.zip
