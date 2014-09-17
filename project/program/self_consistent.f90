@@ -44,7 +44,7 @@ SUBROUTINE initialize_Gam
   implicit none
   integer :: ityp, it1, it2
 
-  Gam(:,:,:,:) = (0.d0, 0.d0)
+  Gam(:,:,:) = (0.d0, 0.d0)
 END SUBROUTINE initialize_Gam
  
 !!------- Initialization of G0 in frequency ----------
@@ -66,10 +66,10 @@ SUBROUTINE initialize_W0PF
   integer :: site
   double precision :: ratio
 
-  W0PF(:,:) = (0.d0, 0.d0)
+  W0PF(:) = (0.d0, 0.d0)
   ratio = real(MxT)/Beta
   do site = 0, Vol-1
-    W0PF(site, 0:MxT-1) = ratio *weight_W0(1, site)
+    W0PF(site) = ratio *weight_W0(1, site)
   enddo
   call transfer_W0_r(1)
 END SUBROUTINE initialize_W0PF
@@ -80,7 +80,7 @@ SUBROUTINE initialize_Gam0PF
   double precision :: ratio
 
   ratio = (real(MxT)/Beta)**2.d0
-  Gam0PF(0:Vol-1,0:MxT-1,0:MxT-1) = ratio*weight_Gam0(1, 0)
+  Gam0PF = ratio*weight_Gam0(1, 0)
 END SUBROUTINE initialize_Gam0PF
  
 !!============== WEIGHT CALCULATING ==================================
@@ -89,7 +89,7 @@ SUBROUTINE calculate_Polar
   implicit none
   integer :: p, omega
   integer :: omegaGin, omegaGout
-  complex(kind=8) :: Gin, Gout, Gam1
+  complex(kind=8) :: Gin, Gout, Gam0, Gam1
   double precision :: ratio
 
   Polar(:,:) = (0.d0, 0.d0)
@@ -101,15 +101,16 @@ SUBROUTINE calculate_Polar
         omegaGout = omegaGin - omega
 
         Gin = G(1, omegaGin)
+        Gam0 = Gam0PF
         if(omegaGout>=0) then
           Gout = G(1, omegaGout)
-          Gam1 = GamInt(5, p, omegaGin, omegaGout)
+          Gam1 = Gam(p, omegaGin, omegaGout)
         else
           Gout = -1.d0*G(1, omegaGout+MxT)
-          Gam1 = -1.d0*GamInt(5, p, omegaGin, omegaGout+MxT)
+          Gam1 = -1.d0*Gam(p, omegaGin, omegaGout+MxT)
         endif
-        Polar(p, omega) = Polar(p, omega)+d_times_cd(ratio, cdexp(dcmplx(0.d0, -1.d0)* &
-          & (omegaGout*2.d0+1.d0)*Pi/MxT) *Gin*Gout*Gam1)
+        Polar(p, omega) = Polar(p, omega)+ratio*Gin*Gout*Gam1*dcos(omega*Pi/MxT)
+        Polar(p, omega) = Polar(p, omega)+ratio*Gin*Gout*Gam0
       enddo
     enddo
   enddo
@@ -121,7 +122,7 @@ SUBROUTINE calculate_Sigma
   implicit none
   integer :: p, omega
   integer :: omegaG, omegaW
-  complex(kind=8) :: G1, W0, W1, intGam, halfGam
+  complex(kind=8) :: G1, W0, W1, Gam1, Gam0
   double precision :: ratio
 
   Sigma(:) = (0.d0, 0.d0)
@@ -133,20 +134,19 @@ SUBROUTINE calculate_Sigma
         omegaW = omega-omegaG
         G1 = G(1, omegaG)
 
+        W0 = W0PF(p)
         if(omegaW>=0) then
           W1 = W(1, p, omegaW)
-          W0 = W0PF(p, omegaW)
         else
-          W1 = W(1, p, omegaW+MxT)
-          W0 = W0PF(p, omegaW+MxT)
+          W1 = -1.d0*W(1, p, omegaW+MxT)
         endif
 
-        intGam = GamInt(5, p, omegaG, omega)
-        halfGam = Gam(5, p, omegaG, omega)
+        Gam0 = Gam0PF
+        Gam1 = Gam(p, omegaG, omega)
 
-        Sigma(omega) = Sigma(omega)+ ratio*G1*(W0*halfGam)*cdexp(dcmplx(0.d0,  &
-          & -(2.d0*omegaG+1.d0)*Pi/dble(MxT)))
-        Sigma(omega) = Sigma(omega)+ ratio*G1*(W1*intGam)
+        Sigma(omega) = Sigma(omega)+ ratio*G1*W0*Gam1
+        Sigma(omega) = Sigma(omega)+ ratio*G1*W1*Gam1*dcos(omegaW*Pi/MxT)
+        Sigma(omega) = Sigma(omega)+ ratio*G1*W1*Gam0
       enddo
     enddo
   enddo
@@ -166,11 +166,7 @@ SUBROUTINE calculate_W(iloop)
 
   do  omega = 0, MxT-1
     do p = 0, Vol-1
-
-      Denom(p,omega) = (1.d0, 0.d0) -(0.5d0+0.5d0*cdexp(dcmplx(0.d0,  &
-        & -2.d0*Pi*omega/dble(MxT))))*W0PF(p,omega)*Polar(p,omega)
-
-      newW(1,p,omega) = W0PF(p,omega)*Polar(p,omega)*W0PF(p,omega)/Denom(p,omega)
+      newW(1,p,omega) = W0PF(p)*Polar(p,omega)*W0PF(p)/Denom(p,omega)
       if(newW(1,p,omega)/=newW(1,p,omega)) then
         call LogFile%QuickLog("calculate_W NaN appears!")
         stop
@@ -201,15 +197,14 @@ SUBROUTINE calculate_G(iloop)
   !--------- G = G0/(1-G0*Sigma)----------------------
   do omega = 0, MxT-1
 
-    newG(1, omega) =  G0F(omega)/((1.d0,0.d0)-cdexp(dcmplx(0.d0,  &
-      & -(2.d0*omega+1.d0)*Pi/dble(MxT))) *G0F(omega)*Sigma(omega))
+    newG(1, omega) = G0F(omega)/((1.d0,0.d0)-G0F(omega)*Sigma(omega))
 
     if(newG(1,omega)/=newG(1,omega)) then
       call LogFile%QuickLog("calculate_G NaN appears!")
       stop
     endif
 
-    newG(2, omega) =  newG(1, omega)
+    newG(2, omega) = newG(1, omega)
   enddo
 
   ratio = dble(iloop)/(1.d0+dble(iloop))
@@ -220,7 +215,10 @@ END SUBROUTINE calculate_G
 !!------------- calculate the denominator of the susceptibility ---------
 SUBROUTINE calculate_Denom
   implicit none
-  Denom(:,:) = (1.d0, 0.d0) -W0PF(:,:)*Polar(:,:)
+  integer :: omega
+  do omega = 0, MxT-1
+    Denom(:,omega) = (1.d0, 0.d0) -W0PF(:)*Polar(:,omega)*dcos(omega*Pi/MxT)
+  enddo
   return
 END SUBROUTINE calculate_Denom
 
@@ -236,7 +234,7 @@ SUBROUTINE calculate_Chi
   !!--------- already sum over the spins -----------------------
   ratio = -1.d0*(real(MxT)/Beta)**2.d0*0.75d0
 
-  do  omega = 0, MxT-1
+  do omega = 0, MxT-1
     do p = 0, Vol-1
       Chi(p,omega) = Polar(p,omega)/Denom(p,omega)
       Chi(p,omega) = d_times_cd(ratio, Chi(p,omega))
@@ -246,58 +244,6 @@ SUBROUTINE calculate_Chi
 END SUBROUTINE calculate_Chi
 
 !!====================================================================
-
-SUBROUTINE plus_minus_W0(Backforth)
-  implicit none
-  integer, intent(in) :: Backforth
-
-  if(Backforth/=-1) then
-    newW(1,:,:) = newW(1,:,:) + W0PF(:,:)
-  else 
-    newW(1,:,:) = newW(1,:,:) - W0PF(:,:)
-  endif
-
-  newW(3,:,:) = -1.d0 * newW(1,:,:)
-  newW(5,:,:) =  2.d0 * newW(1,:,:)
-
-  newW(2,:,:) = newW(1,:,:)
-  newW(4,:,:) = newW(3,:,:)
-  newW(6,:,:) = newW(5,:,:)
-
-  return
-END SUBROUTINE
-
-SUBROUTINE plus_minus_Gam0(Backforth)
-  implicit none
-  integer, intent(in) :: Backforth
-  integer :: ityp, px, py, omega1, omega2
-
-  if(Backforth/=-1) then
-    Gam(1,:,:,:) = Gam(1,:,:,:) + Gam0PF(:,:,:)
-    Gam(2,:,:,:) = Gam(2,:,:,:) + Gam0PF(:,:,:)
-    Gam(5,:,:,:) = Gam(5,:,:,:) + Gam0PF(:,:,:)
-    Gam(6,:,:,:) = Gam(6,:,:,:) + Gam0PF(:,:,:)
-  else 
-    Gam(1,:,:,:) = Gam(1,:,:,:) - Gam0PF(:,:,:)
-    Gam(2,:,:,:) = Gam(2,:,:,:) - Gam0PF(:,:,:)
-    Gam(5,:,:,:) = Gam(5,:,:,:) - Gam0PF(:,:,:)
-    Gam(6,:,:,:) = Gam(6,:,:,:) - Gam0PF(:,:,:)
-  endif
-
-  if(Backforth/=-1) then
-    GamInt(1,:,:,:) = GamInt(1,:,:,:) + Gam0PF(:,:,:)
-    GamInt(2,:,:,:) = GamInt(2,:,:,:) + Gam0PF(:,:,:)
-    GamInt(5,:,:,:) = GamInt(5,:,:,:) + Gam0PF(:,:,:)
-    GamInt(6,:,:,:) = GamInt(6,:,:,:) + Gam0PF(:,:,:)
-  else 
-    GamInt(1,:,:,:) = GamInt(1,:,:,:) - Gam0PF(:,:,:)
-    GamInt(2,:,:,:) = GamInt(2,:,:,:) - Gam0PF(:,:,:)
-    GamInt(5,:,:,:) = GamInt(5,:,:,:) - Gam0PF(:,:,:)
-    GamInt(6,:,:,:) = GamInt(6,:,:,:) - Gam0PF(:,:,:)
-  endif
-
-  return
-END SUBROUTINE plus_minus_Gam0
 
  
 SUBROUTINE Gam_mc2matrix_mc(changeBeta)
@@ -361,25 +307,18 @@ SUBROUTINE Gam_mc2matrix_mc(changeBeta)
       flag(iorder)=.true.
     endif
 
-    call LogFile%WriteLine("Order "+str(iorder)+" relative error: "+str(rpercenterr,'(f6.3)')+","+str(ipercenterr,'(f6.3)')+", accept: "+str(flag(iorder)))
+    if(iorder<=ACCOrder .or. flag(iorder)) then
+      call LogFile%WriteLine("Order "+str(iorder)+" relative error: "+ &
+        & str(rpercenterr,'(f6.3)')+","+str(ipercenterr,'(f6.3)')+", accept: "+str(flag(iorder)))
 
-
-    if(flag(iorder)) then
-      do ityp = 1, NTypeGam/2
-        typ = 2*(ityp-1) + 1
-        do dr = 0, Vol-1
-          ir = diff_r(D, dr, 0)
-          GamBasis(typ,dr,:,:) = GamBasis(typ,dr,:,:) + normal*GamMCBasis(iorder,ityp,ir,:,:)
-        enddo
+      if(iorder>ACCOrder)  ACCOrder = iorder
+      do dr = 0, GamVol-1
+        GamBasis(:,dr,:,:) = GamBasis(:,dr,:,:) + normal*GamMCBasis(iorder,:,dr,:,:)
       enddo
     else 
       exit looporder
     endif
   enddo looporder
-
-  GamBasis(2,:,:,:) = GamBasis(1,:,:,:)
-  GamBasis(4,:,:,:) = GamBasis(3,:,:,:)
-  GamBasis(6,:,:,:) = GamBasis(5,:,:,:)
 
   changeBeta = .false.
   if((MCOrder<3 .and. flag(MCOrder)) .or.(MCOrder>=3 .and. flag(3))) then
@@ -389,31 +328,6 @@ SUBROUTINE Gam_mc2matrix_mc(changeBeta)
   call Gam_basis2matrix
 
 END SUBROUTINE Gam_mc2matrix_mc
-
-SUBROUTINE Gam_mc2matrix_mc_by_order(iorder)
-  implicit none
-  integer, intent(in) :: iorder
-  integer :: ir, dr, ityp, typ
-  complex*16 :: normal
-
-  normal = GamNormWeight/GamNorm
-
-  GamBasis = (0.d0, 0.d0)
-
-  do ityp = 1, NTypeGam/2
-    typ = 2*(ityp-1) + 1
-    do dr = 0, Vol-1
-      ir = diff_r(D, dr, 0)
-      GamBasis(typ,dr,:,:) = normal*GamMCBasis(iorder,ityp,ir,:,:)
-    enddo
-  enddo
-
-  GamBasis(2,:,:,:) = GamBasis(1,:,:,:)
-  GamBasis(4,:,:,:) = GamBasis(3,:,:,:)
-  GamBasis(6,:,:,:) = GamBasis(5,:,:,:)
-
-  call Gam_basis2matrix
-END SUBROUTINE Gam_mc2matrix_mc_by_order
 
 SUBROUTINE Gam_mc2matrix_mc_up2order(iorder)
   implicit none
@@ -425,54 +339,57 @@ SUBROUTINE Gam_mc2matrix_mc_up2order(iorder)
 
   GamBasis = (0.d0, 0.d0)
 
-  do ityp = 1, NTypeGam/2
-    typ = 2*(ityp-1) + 1
-    do dr = 0, Vol-1
-      ir = diff_r(D, dr, 0)
-      do i = 1, iorder
-        GamBasis(typ,dr,:,:) = GamBasis(typ,dr,:,:) + normal*GamMCBasis(i,ityp,ir,:,:)
-      enddo
+  do dr = 0, GamVol-1
+    do i = 1, iorder
+      GamBasis(:,dr,:,:) = GamBasis(:,dr,:,:) + normal*GamMCBasis(i,:,dr,:,:)
     enddo
   enddo
-
-  GamBasis(2,:,:,:) = GamBasis(1,:,:,:)
-  GamBasis(4,:,:,:) = GamBasis(3,:,:,:)
-  GamBasis(6,:,:,:) = GamBasis(5,:,:,:)
 
   call Gam_basis2matrix
 END SUBROUTINE Gam_mc2matrix_mc_up2order
 
 SUBROUTINE Gam_basis2matrix
   implicit none
-  integer :: ityp, ir, it1, it2
+  integer :: ir, it1, it2, dr
+  double precision :: tau1, tau2
 
   call initialize_Gam
+  Gam = (0.d0, 0.d0)
 
   do it2 = 0, MxT-1
     do it1 = 0, MxT-1
-      do ir = 0, Vol-1
-        do ityp = 1, NtypeGam
-          Gam(ityp, ir, it1, it2) = Gam_basis(it1, it2, GamBasis(ityp, ir, :,:))
-          GamInt(ityp, ir, it1, it2) = Gam_basis_int(it1, it2, GamBasis(ityp, ir, :,:))
-        enddo
+      do dr = 0, Vol-1
+        tau1 = (dble(it1)+0.5d0)/dble(MxT)
+        tau2 = (dble(it2)+0.5d0)/dble(MxT)
+        ir = diff_r(D, dr, 0)
+        if(if_inside_Vol(D, dGamL(1:D), ir)) then
+          ir = convert_r(D, L, GamL, ir)
+          Gam(dr, it1, it2) = 0.5d0*(Gam_basis(tau1, tau2, GamBasis(3, ir, :,:))+ &
+            & Gam_basis(tau2, tau1, GamBasis(3,ir, :,:)))
+        endif
+
+        !if(dr/=0 .and. abs(Gam(dr,it1,it2))>1.d-10) then
+          !write(*, *) get_cord_from_site(D,L,dr), it1, it2, Gam(dr,it1,it2)
+          !write(*, *) GamBasis(3, ir, 1, 1)
+        !endif
       enddo
     enddo
   enddo
   return
 END SUBROUTINE Gam_basis2matrix
 
-COMPLEX*16 FUNCTION Gam_basis(it1, it2, GammaBasis)
+COMPLEX*16 FUNCTION Gam_basis(tau1, tau2, GammaBasis)
   implicit none
-  integer, intent(in) :: it1, it2
   complex*16, intent(in) :: GammaBasis(1:NbinGam, 1:NBasisGam)
-  double precision :: tau1, tau2
-  integer :: ibin, ibasis, jt1, jt2
+  double precision, intent(in) :: tau1, tau2
+  integer :: ibin, ibasis, it1, it2, jt1, jt2
+  double precision :: jtau1, jtau2
   complex*16 :: cgam
 
-  ibin = get_bin_Gam(it1, it2)
+  it1 = Floor(tau1*MxT)
+  it2 = Floor(tau2*MxT)
 
-  tau1 = (dble(it1)+0.5d0)/dble(MxT)
-  tau2 = (dble(it2)+0.5d0)/dble(MxT)
+  ibin = get_bin_Gam(it1, it2)
 
   if(ibin==1) then
     cgam = (0.d0, 0.d0)
@@ -492,62 +409,38 @@ COMPLEX*16 FUNCTION Gam_basis(it1, it2, GammaBasis)
     jt1 = MxT-1-it1
     jt2 = MxT-1-it2
 
-    tau1 = (dble(jt1)+0.5d0)/dble(MxT)
-    tau2 = (dble(jt2)+0.5d0)/dble(MxT)
+    jtau1 = (dble(jt1)+0.5d0)/dble(MxT)
+    jtau2 = (dble(jt2)+0.5d0)/dble(MxT)
 
     cgam = (0.d0, 0.d0)
     do ibasis = 1, NBasisGam
       cgam = cgam + GammaBasis(1,ibasis)* weight_basis_Gam( &
-        & CoefGam(0:BasisOrderGam,0:BasisOrderGam,ibasis,1), tau1, tau2)
+        & CoefGam(0:BasisOrderGam,0:BasisOrderGam,ibasis,1), jtau1, jtau2)
     enddo
     Gam_basis = dcmplx(real(cgam), -dimag(cgam))
   endif
-
-  !!!!TEST
-  Gam_basis = dcmplx(real(Gam_basis), 0.d0)
   return
 END FUNCTION Gam_basis
 
-COMPLEX*16 FUNCTION Gam_basis_int(it1, it2, GammaBasis)
+SUBROUTINE Gam_MC_basis2matrix
   implicit none
-  integer, intent(in) :: it1, it2
-  complex*16, intent(in) :: GammaBasis(1:NbinGam, 1:NBasisGam)
-  integer :: ibin, ibasis, jt1, jt2
-  complex*16 :: cgam
+  integer :: dr, it1, it2, ityp
+  double precision :: tau1, tau2
 
-  ibin = get_bin_Gam_int(it1, it2)
+  GamMCInput = (0.d0, 0.d0)
 
-  if(ibin==1) then
-    cgam = (0.d0, 0.d0)
-    do ibasis = 1, NBasisGam
-      cgam = cgam + GammaBasis(1,ibasis)* weight_basis_Gam( &
-        & CoefGam(0:BasisOrderGam,0:BasisOrderGam,ibasis,1), dble(it1)/dble(MxT), &
-        & dble(it2)/dble(MxT))
+  do it2 = 0, MxT-1
+    do it1 = 0, MxT-1
+      tau1 = (dble(it1)+0.5d0)/dble(MxT)
+      tau2 = (dble(it2)+0.5d0)/dble(MxT)
+      do dr = 0, GamVol-1
+        do ityp = 1, NTypeGam/2
+          GamMCInput(ityp, dr, it1, it2) = 0.5d0*(Gam_basis(tau1, tau2, GamBasis(ityp, dr, :,:))+ &
+            & Gam_basis(tau2, tau1, GamBasis(ityp,dr, :,:)))
+        enddo
+      enddo
     enddo
-    Gam_basis_int = cgam
-
-  else if(ibin==2) then
-    jt1 = MxT-it1
-    jt2 = MxT-it2
-    cgam = (0.d0, 0.d0)
-    do ibasis = 1, NBasisGam
-      cgam = cgam + GammaBasis(1,ibasis)* weight_basis_Gam( &
-        & CoefGam(0:BasisOrderGam,0:BasisOrderGam,ibasis,1), dble(jt1)/dble(MxT),  &
-        & dble(jt2)/dble(MxT))
-    enddo
-    Gam_basis_int = dcmplx(real(cgam), -dimag(cgam))
-
-  else if(ibin==3) then
-    cgam = (0.d0, 0.d0)
-    do ibasis = 1, NBasisGam
-      cgam = cgam + GammaBasis(1,ibasis)* weight_basis_Gam( &
-        & CoefGam(0:BasisOrderGam,0:BasisOrderGam,ibasis,1), dble(it1)/dble(MxT), &
-        & dble(it2)/dble(MxT))
-    enddo
-    Gam_basis_int = dcmplx(real(cgam), 0.d0)
-  endif
-  !!!!TEST
-  Gam_basis_int = dcmplx(real(Gam_basis_int), 0.d0)
+  enddo
   return
-END FUNCTION Gam_basis_int
+END SUBROUTINE Gam_MC_basis2matrix
 

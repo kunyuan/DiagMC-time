@@ -55,6 +55,7 @@ SUBROUTINE read_input(ifmust)
   read(11, *) MCOrder
   read(11, *) file_version
   read(11, *) IFSLASH
+  read(11, *) ACCOrder
   close(11)
 
   if(ios/=0) then
@@ -95,6 +96,7 @@ SUBROUTINE write_input(changeBeta, filenum)
   write(10, *) MCOrder
   write(10, *) filenum
   write(10, *) IFSLASH
+  write(10, *) ACCOrder
 
   close(10)
 
@@ -211,16 +213,16 @@ LOGICAL FUNCTION read_Gamma
     stop -1
   endif
 
-  allocate(GamBasistmp(1:NtypeGam, 0:Vol-1, 1:NbinGam, 1:NbasisGam))
+  allocate(GamBasistmp(1:NtypeGam/2, 0:Vol-1, 1:NbinGam, 1:NbasisGam))
 
   open(102, status="old", file=trim(title_loop)//"_Gam_file.dat")
 
   do ibasis = 1, NBasisGam
     do ibin = 1, NbinGam
-      do isite = 0, Vol-1
-        read(102, *,iostat=ios) GamBasistmp(1, isite, ibin, ibasis)
-        read(102, *,iostat=ios) GamBasistmp(3, isite, ibin, ibasis)
-        read(102, *,iostat=ios) GamBasistmp(5, isite, ibin, ibasis)
+      do isite = 0, GamVol-1
+        do ityp = 1, NTypeGam/2
+          read(102, *,iostat=ios) GamBasistmp(ityp, isite, ibin, ibasis)
+        enddo
       enddo
     enddo
   enddo
@@ -237,19 +239,14 @@ LOGICAL FUNCTION read_Gamma
       stop -1
     endif
   else
-    GamBasistmp(2,:,:,:)=GamBasistmp(1,:,:,:)
-    GamBasistmp(4,:,:,:)=GamBasistmp(3,:,:,:)
-    GamBasistmp(6,:,:,:)=GamBasistmp(5,:,:,:)
     GamBasis = GamBasistmp;    
     deallocate(GamBasistmp)
     read_Gamma = .true.
   endif
+
+  if(read_Gamma)  call Gam_MC_basis2matrix
+
   close(102)
-
-  if(read_Gamma) then
-    call Gam_basis2matrix
-  endif
-
   return
 END FUNCTION read_Gamma
 
@@ -279,14 +276,13 @@ SUBROUTINE write_GWGamma
 
   do ibasis = 1, NBasisGam
     do ibin = 1, NbinGam
-      do isite = 0, Vol-1
-        write(102, *) GamBasis(1, isite, ibin, ibasis)
-        write(102, *) GamBasis(3, isite, ibin, ibasis)
-        write(102, *) GamBasis(5, isite, ibin, ibasis)
+      do isite = 0, GamVol-1
+        do ityp = 1, NTypeGam/2
+          write(102, *) GamBasis(ityp, isite, ibin, ibasis)
+        enddo
       enddo
     enddo
   enddo
-
 
   close(100)
   close(101)
@@ -324,11 +320,11 @@ SUBROUTINE write_monte_carlo_data
   open(104, status="replace", &
     & file=trim(title_mc)//"_monte_carlo_data.bin.dat",form="binary")
 
-  write(104) finalBeta, Beta, MCOrder, L(1:D)
+  write(104) finalBeta, Beta, MCOrder, GamL(1:D)
   write(104) imc, GamNorm, GamNormWeight
   write(104) Z_normal, ratioerr
   do it1 = 0, MxT-1
-    do ir = 0, Vol-1
+    do ir = 0, GamVol-1
       do iorder = 0, MCOrder
         write(104)  GamMC(iorder, ir, it1)
         write(104)  ReGamSqMC(iorder, ir, it1)
@@ -339,7 +335,7 @@ SUBROUTINE write_monte_carlo_data
 
   do ibasis = 1, NBasisGam
     do ibin = 1, NbinGam
-      do ir = 0, Vol-1
+      do ir = 0, GamVol-1
         do ityp = 1, NtypeGam/2
           do iorder = 0, MCOrder
             write(104) GamMCBasis(iorder, ityp, ir, ibin, ibasis)
@@ -380,7 +376,7 @@ SUBROUTINE read_monte_carlo_data(mcBeta)
   read(105,iostat=ios) Z_normal, ratioerr
 
   do it1 = 0, MxT-1
-    do ir = 0, Vol-1
+    do ir = 0, GamVol-1
       do iorder = 0, MCOrder
         read(105,iostat=ios)  GamMC(iorder, ir, it1)
         read(105,iostat=ios)  ReGamSqMC(iorder,  ir, it1)
@@ -391,7 +387,7 @@ SUBROUTINE read_monte_carlo_data(mcBeta)
 
   do ibasis = 1, NBasisGam
     do ibin = 1, NbinGam
-      do ir = 0, Vol-1
+      do ir = 0, GamVol-1
         do ityp = 1, NtypeGam/2
           do iorder = 0, MCOrder
             read(105) GamMCBasis(iorder, ityp, ir, ibin, ibasis)
@@ -434,7 +430,7 @@ SUBROUTINE output_Quantities
   write(104, *) "#Beta", Beta, "L", L(1), "Order", MCOrder
   do it2 = 0, MxT-1
     do it1 = 0, MxT-1
-      write(104, *)  real(Gam(1, 0, it1, it2)), dimag(Gam(1, 0, it1, it2))
+      write(104, *)  real(Gam(0, it1, it2)), dimag(Gam(0, it1, it2))
     enddo
   enddo
   write(104, *)
@@ -443,8 +439,8 @@ SUBROUTINE output_Quantities
   write(104, *) "#r:", Vol
   write(104, *) "#Beta", Beta, "L", L(1), "Order", MCOrder
   do isite = 0, Vol-1
-    write(104, *)  real(sum(Gam(1, isite, :, :))/(MxT)**2.d0),  &
-      &  dimag(sum(Gam(1, isite, :, :))/(MxT)**2.d0)
+    write(104, *)  real(sum(Gam(isite, :, :))/(MxT)**2.d0),  &
+      &  dimag(sum(Gam(isite, :, :))/(MxT)**2.d0)
   enddo
   write(104, *)
 
@@ -465,7 +461,8 @@ SUBROUTINE output_Quantities
     write(104, *) "#Beta", Beta, "L", L(1), "Order", MCOrder
     do it2 = 0, MxT-1
       do it1 = 0, MxT-1
-        gam1 = Gam_basis(it1, it2, GamMCBasis(iorder, 1, 0, :, :))
+        gam1 = Gam_basis((dble(it1)+0.5d0)/MxT, (dble(it2)+0.5d0)/MxT, &
+          & GamMCBasis(iorder, 3, 0, :, :))
         write(104, *) real(gam1*normal), dimag(gam1*normal)
       enddo
     enddo
@@ -547,7 +544,7 @@ SUBROUTINE output_Quantities
   write(104, *) "##################################StagChit"
   write(104, *) "#tau:", MxT
   write(104, *) "#Beta", Beta, "L", L(1), "Order", MCOrder
-  isite = get_site_from_cord(D, L(1:D)/2)
+  isite = get_site_from_cord(D, L, L(1:D)/2)
   do it = 0, MxT-1
     write(104, *) real(Chi(isite, it)), dimag(Chi(isite, it))
   enddo
@@ -606,16 +603,13 @@ SUBROUTINE output_denominator
   implicit none
   integer :: ip
   double precision :: ratio
-  ip = get_site_from_cord(D, L(1:D)/2)
-
-  open(104, access='append', file=trim(title_loop)//"_denom.dat") 
-  write(104, *) real(Denom(ip, 0)),dimag(Denom(ip, 0))
-  close(104)
-
+  ip = get_site_from_cord(D, L, L(1:D)/2)
   ratio = Beta/dble(MxT)
-  open(105, access='append', file=trim(title_loop)//"_stag_chi.dat") 
-  write(105, *) ratio*real(Chi(ip, 0)),ratio*dimag(Chi(ip, 0))
-  close(105)
+
+  open(104, access='append', file=trim(title_loop)//"_history.dat") 
+  write(104, "(i4,4f17.7)",advance='no') file_version+1, real(Denom(ip, 0)),dimag(Denom(ip, 0)), &
+    & ratio*real(Chi(ip, 0)),ratio*dimag(Chi(ip, 0))
+  close(104)
 END SUBROUTINE output_denominator
 
 SUBROUTINE output_Gam1
@@ -637,35 +631,6 @@ SUBROUTINE output_Gam1
   enddo
   write(104, *)
 
-  !write(104, *) "##################################GammaBasis"
-  !write(104, *) "#tau1:", MxT, ",tau2:", MxT
-  !write(104, *) "#Beta", Beta, "L", L(1), L(2), "Order", MCOrder
-  !do it2 = 0, MxT-1
-    !do it1 = 0, MxT-1
-
-      !ibin = get_bin_Gam(it1, it2)
-
-      !tau1 = dble(it1)*Beta/dble(MxT)
-      !tau2 = dble(it2)*Beta/dble(MxT)
-
-      !if(IsBasis2D(ibin)) then
-        !gam1 = (0.d0, 0.d0)
-        !do  ibasis = 1, NBasisGam
-          !gam1 = gam1 + GamMCBasis(1, 1, 0, ibin, ibasis)* weight_basis_Gam( &
-            !& CoefGam(0:BasisOrderGam,0:BasisOrderGam,ibasis,ibin), tau1, tau2)
-        !enddo
-      !else
-        !gam1 = (0.d0, 0.d0)
-        !do  ibasis = 1, NBasis
-          !gam1 = gam1 + GamMCBasis(1, 1, 0, ibin, ibasis)* weight_basis( &
-            !& CoefGam(0:BasisOrder,0,ibasis,ibin), tau1)
-        !enddo
-      !endif
-
-      !write(104, *) real(gam1), dimag(gam1)
-    !enddo
-  !enddo
-  !write(104, *)
   close(104)
   return
 END SUBROUTINE output_Gam1

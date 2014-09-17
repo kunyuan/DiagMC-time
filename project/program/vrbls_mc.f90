@@ -5,12 +5,15 @@ MODULE vrbls_mc
 
   !logical, parameter  ::  IS_J1J2=.true.
   logical, parameter  ::  IS_J1J2=.false.
-  logical, parameter  ::  IS_BOLD=.true.
+  !logical, parameter  ::  IS_BOLD=.true.
+  logical, parameter  ::  IS_BOLD=.false.
 
-  integer, parameter :: D = 2                            ! 2-dimensional system
-  integer, parameter,dimension(D) :: MxL =(/64,64/)      ! the largest system
-  !integer, parameter :: D = 3                             ! 3-dimensional system 
-  !integer, parameter,dimension(D) :: MxL =(/16,16,16/)    ! the largest system
+  !integer, parameter :: D = 2                            ! 2-dimensional system
+  !integer, parameter,dimension(D) :: MxL =(/64,64/)      ! the largest system
+  !integer, parameter :: GamSize = 16
+  integer, parameter :: D = 3                             ! 3-dimensional system 
+  integer, parameter,dimension(D) :: MxL =(/16,16,16/)    ! the largest system
+  integer, parameter :: GamSize = 8
 
   !======================== code mode control ============================
   logical, parameter  ::  DEBUG=.true.          
@@ -31,7 +34,8 @@ MODULE vrbls_mc
   integer, parameter          :: Mxint = 2147483647
   integer, parameter          :: Mnint =-2147483647
 
-  integer, parameter :: NLOOP = 20
+  integer :: AccOrder              
+  integer, parameter :: NLOOP = 5
   integer, parameter :: ININLOOP = 20
   integer, parameter :: NBLCKCHECK = 2
   integer, parameter :: NBLCKWRITE = 2*NBLCKCHECK
@@ -39,7 +43,8 @@ MODULE vrbls_mc
 
 
   integer, parameter :: MxVol = MxL(1)**D            ! the maximum system volume
-  integer, parameter :: MxT   =  128                 ! the maximum number of time segments
+  integer, parameter :: MxT   =  32                 ! the maximum number of time segments
+  integer, parameter :: MxTGamInput = 32             ! the maximum number of time segments
   integer, parameter :: MxK   = 1000000              ! the maximum momentum
 
   double precision, parameter :: MxError = 0.90d0    ! the maximum error for MC
@@ -77,7 +82,9 @@ MODULE vrbls_mc
   !======================== Input parameter ==============================
   integer          ::  L(3), Vol, dVol(3)         ! System size
   integer          ::  dL(3)
-  integer          ::  VolFold, dVolFold(3)       ! System size(fold into a smaller piece)
+  integer          ::  GamL(3), GamVol, dGamVol(3)         ! System size
+  integer          ::  dGamL(3)
+
   double precision ::  logL(3)
   double precision ::  Jcp                        ! interaction
   double precision ::  Mu(2)                      ! Chem. potential for spin down & up
@@ -140,7 +147,6 @@ MODULE vrbls_mc
 
 
   !========================= Self-consistent loop ========================
-  !============== unfinished =============================================
   complex(kind=8) :: newG(NtypeG, 0:MxT-1)
   complex(kind=8) :: G(NtypeG, 0:MxT-1)
   complex(kind=8) :: G0F(0:MxT-1)
@@ -148,12 +154,11 @@ MODULE vrbls_mc
 
   complex(kind=8), allocatable :: newW(:,:,:)
   complex(kind=8), allocatable :: W(:,:,:)
-  complex(kind=8), allocatable :: Gam(:,:,:,:)
-  complex(kind=8), allocatable :: GamInt(:,:,:,:)   !Gamma with integers
+  complex(kind=8), allocatable :: Gam(:,:,:)
   complex(kind=8), allocatable :: GamBasis(:,:,:,:)
 
-  complex(kind=8), allocatable :: W0PF(:,:)
-  complex(kind=8), allocatable :: Gam0PF(:,:,:)
+  complex(kind=8) :: Gam0PF
+  complex(kind=8), allocatable :: W0PF(:)
 
   complex(kind=8), allocatable :: Polar(:,:)
   complex(kind=8), allocatable :: Chi(:,:)
@@ -162,6 +167,8 @@ MODULE vrbls_mc
 
   !======================== analytic integration =========================
   complex(kind=8) :: GamOrder1(NTypeGam, 0:MxT-1, 0:MxT-1) 
+
+  complex*16, allocatable :: GamMCInput(:,:,:,:)      ! the input weight of Gamma in MC
 
   !====================== MC Simulation ==================================
   complex*16 :: GamNorm, GamNormWeight         ! the weight of the normalization diagram

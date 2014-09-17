@@ -1,4 +1,3 @@
-
 !========= MODEL OR DIMENSION DEPENDENT ==============================
 
 !!------------- definition of W0 function ----------------
@@ -10,7 +9,7 @@ Integer Function is_W0_nonzero(dims, site)
   integer :: dx, dy, dz 
   
   allocate(cord(1:dims))
-  cord = get_cord_from_site(D, site)
+  cord = get_cord_from_site(D, L, site)
   
   if(D==2) then
     dx = cord(1)
@@ -71,7 +70,7 @@ Logical Function is_Gam0_nonzero(dims, site)
   integer :: dx, dy, dz
   
   allocate(cord(1:dims))
-  cord = get_cord_from_site(D, site)
+  cord = get_cord_from_site(D, L, site)
 
   if(D==2) then
     !========2-d ============
@@ -136,8 +135,8 @@ SUBROUTINE generate_r(dims,CurrentSite,NewSite,dsite,Weight,Flag)
   !CurrentR>NewR, dR=NewR-CurrentR, dR'=CurrentR-NewR+L
   !CurrentR<NewR, dR=NewR-CurrentR+L, dR'=CurrentR-NewR
 
-  currentr = get_cord_from_site(dims, CurrentSite)
-  if(Flag .eqv. .false.)  dr = get_cord_from_site(dims, dsite)
+  currentr = get_cord_from_site(dims, L, CurrentSite)
+  if(Flag .eqv. .false.)  dr = get_cord_from_site(dims, L, dsite)
 
   newr(:) = 0
 
@@ -159,8 +158,8 @@ SUBROUTINE generate_r(dims,CurrentSite,NewSite,dsite,Weight,Flag)
     endif
   enddo
 
-  dSite = get_site_from_cord(dims, dr)
-  NewSite = get_site_from_cord(dims, newr)
+  dSite = get_site_from_cord(dims, L, dr)
+  NewSite = get_site_from_cord(dims, L, newr)
 
   return
 END SUBROUTINE generate_r
@@ -477,8 +476,16 @@ COMPLEX*16 FUNCTION weight_Gam(typ1, site, tau1, tau2)
   implicit none
   integer, intent(in)  :: site, typ1
   double precision, intent(in) :: tau1, tau2
+  integer :: ityp, isite
   double precision :: GaR
-  call interpolation_Gam(tau1, tau2, Gam(typ1,site,:,:), weight_Gam)
+  ityp = (typ1+1)/2
+  isite = diff_r(D, site, 0)
+  if(if_inside_Vol(D, dGamL(1:D), isite)) then
+    call interpolation_Gam(tau1, tau2, GamMCInput(ityp,isite,:,:), weight_Gam)
+  else
+    weight_Gam = (0.d0, 0.d0)
+  endif
+
   if(tau1<=1.d-14 .and. tau2>1.d-14) then
     weight_Gam = -1.d0 *weight_Gam
   else if(tau1>1.d-14 .and. tau2<=1.d-14) then
@@ -517,7 +524,6 @@ SUBROUTINE interpolation_GW(tau, Table, Val)
 END SUBROUTINE interpolation_GW
 
 
-
 SUBROUTINE interpolation_Gam(tau1, tau2, Table, Val)
   implicit none
   double precision, intent(in) :: tau1, tau2
@@ -534,7 +540,7 @@ SUBROUTINE interpolation_Gam(tau1, tau2, Table, Val)
     ts(i) = Floor((ptau(i)-0.5d0*Beta/MxT)*MxT/Beta)
     if(ts(i)<0) then
       ts(i) = 0
-    else if(ts(i)>=MxT) then
+    else if(ts(i)>=MxT-1) then
       ts(i) = MxT-2
     endif
 

@@ -45,7 +45,7 @@ SUBROUTINE check_topo
   implicit none
   integer :: i, j, k
   integer :: nextLn, nLn, curG
-  logical :: flag(MxNGLn)
+  logical :: flag(1:MxNLn)
   
   if(NGLn/=2*(Order+1) .or. NWLn/=Order+1 .or. NVertex/=2*(Order+1)) then
     call LogFile%WriteStamp('e')
