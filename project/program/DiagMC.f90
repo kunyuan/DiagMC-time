@@ -50,6 +50,8 @@ PROGRAM MAIN
 
   call LogFile%QuickLog("initialize basic properties done!")
 
+  !if(DEBUG)  call test_inside
+
   !!=====================================================================
   if(ISub==1) then
     call self_consistent
@@ -215,7 +217,7 @@ LOGICAL FUNCTION self_consistent_GW(iloop)
   call transfer_t(1)
 
   !!------ calculate G, W in momentum domain --------------
-  istag = get_site_from_cord(D, L(1:D)/2)
+  istag = get_site_from_cord(D, L, L(1:D)/2)
   self_consistent_GW = .true.
 
   call calculate_Polar
@@ -376,10 +378,10 @@ SUBROUTINE init_space
   enddo
 
   if(D==2) then
-    GamL(1:D) = 16
+    GamL(1:D) = GamSize
     GamL(3) = 1
   else if(D==3) then
-    GamL(1:D) = 8
+    GamL(1:D) = GamSize
   endif
 
   GamVol = 1.d0
@@ -403,16 +405,20 @@ END SUBROUTINE init_space
 SUBROUTINE init_matrix
   implicit none
 
+  allocate(GamBasis(NTypeGam/2, 0:GamVol-1, 1:NbinGam, 1:NBasisGam))
+  allocate(W(NTypeW, 0:Vol-1, 0:MxT-1))
   allocate(W0PF(0:Vol-1))
 
-  allocate(newW(NTypeW, 0:Vol-1, 0:MxT-1))
-  allocate(W(NTypeW, 0:Vol-1, 0:MxT-1))
-  allocate(Gam(NTypeGam, 0:Vol-1, 0:MxT-1, 0:MxT-1))
-  allocate(GamBasis(NTypeGam, 0:Vol-1, 1:NbinGam, 1:NBasisGam))
+  if(isub/=2) then
+    allocate(newW(NTypeW, 0:Vol-1, 0:MxT-1))
+    allocate(Gam(0:Vol-1, 0:MxT-1, 0:MxT-1))
 
-  allocate(Polar(0:Vol-1, 0:MxT-1))
-  allocate(Denom(0:Vol-1, 0:MxT-1))
-  allocate(Chi(0:Vol-1, 0:MxT-1))
+    allocate(Polar(0:Vol-1, 0:MxT-1))
+    allocate(Denom(0:Vol-1, 0:MxT-1))
+    allocate(Chi(0:Vol-1, 0:MxT-1))
+  endif
+
+  allocate(GamMCInput(1:NTypeGam/2, 0:GamVol-1, 0:MxT-1, 0:MxT-1))
 
   allocate(GamMC(0:MCOrder, 0:GamVol-1, 0:MxT-1))
   allocate(ReGamSqMC(0:MCOrder, 0:GamVol-1, 0:MxT-1))

@@ -84,41 +84,41 @@ SUBROUTINE calculate_Gam1
 
   ratio = -1.d0/MxT *(Beta/MxT)**6.d0
 
-  GamOrder1(:,:,:) = (0.d0, 0.d0)
-  do omega2 = 0, MxT-1
-    do omega1 = 0, MxT-1
+  !GamOrder1(:,:,:) = (0.d0, 0.d0)
+  !do omega2 = 0, MxT-1
+    !do omega1 = 0, MxT-1
 
-      do ityp = 1, 5
-        do omega3 = 0, MxT-1
+      !do ityp = 1, 5
+        !do omega3 = 0, MxT-1
 
-          omegaW = omega1-omega3
-          if(omegaW<0)  omegaW = omegaW+MxT
+          !omegaW = omega1-omega3
+          !if(omegaW<0)  omegaW = omegaW+MxT
 
-          omegaout = omega2-omegaW
-          if(omegaout<0)  omegaout = omegaout+MxT
+          !omegaout = omega2-omegaW
+          !if(omegaout<0)  omegaout = omegaout+MxT
 
-          Gin = G(tg(ityp), omega3)
-          Gout = G(tg(ityp), omegaout)
-          Gam2 = Gam(tgam2(ityp), 0, omega3, omegaout)+weight_Gam0(tgam2(ityp), 0)
+          !Gin = G(tg(ityp), omega3)
+          !Gout = G(tg(ityp), omegaout)
+          !Gam2 = Gam(tgam2(ityp), 0, omega3, omegaout)+weight_Gam0(tgam2(ityp), 0)
 
-          do isite1 = 0, Vol-1
-            do isite3 = 0, Vol-1
+          !do isite1 = 0, Vol-1
+            !do isite3 = 0, Vol-1
 
-              isiteW = diff_r(D, isite1, isite3)
-              Gam1 = Gam(tgam1(ityp), isite1, omega1, omega3)+weight_Gam0(tgam1(ityp), 0)
-              Gam3 = Gam(tgam3(ityp), isite3, omegaout, omega2)+weight_Gam0(tgam3(ityp), 0)
-              iW = W(tw(ityp), isiteW, omegaW)
+              !isiteW = diff_r(D, isite1, isite3)
+              !Gam1 = Gam(tgam1(ityp), isite1, omega1, omega3)+weight_Gam0(tgam1(ityp), 0)
+              !Gam3 = Gam(tgam3(ityp), isite3, omegaout, omega2)+weight_Gam0(tgam3(ityp), 0)
+              !iW = W(tw(ityp), isiteW, omegaW)
 
-              weight = Gin *Gout *iW *Gam1 *Gam2 *Gam3
-              GamOrder1(1,omega1, omega2)=GamOrder1(1, omega1, omega2)+ratio*weight
-            enddo
-          enddo
+              !weight = Gin *Gout *iW *Gam1 *Gam2 *Gam3
+              !GamOrder1(1,omega1, omega2)=GamOrder1(1, omega1, omega2)+ratio*weight
+            !enddo
+          !enddo
 
-        enddo
-      enddo
+        !enddo
+      !enddo
 
-    enddo
-  enddo
+    !enddo
+  !enddo
 
   call transfer_G_t(-1)
   call transfer_W_t(-1)

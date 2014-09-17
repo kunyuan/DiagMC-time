@@ -1,48 +1,57 @@
 
 !!====== transfer to a D-dimensional coordinates from a 1-d array =============
-function get_cord_from_site(dims, site)
+function get_cord_from_site(dims, iL, site)
   implicit none
   integer, intent(in) :: dims, site
+  integer, intent(in) :: iL(1:dims)
   integer, dimension(dims) :: get_cord_from_site
-  integer :: i, tmp
+  integer :: i, tmp, j, dV
 
   tmp = site
   do i = dims, 1, -1
-    get_cord_from_site(i) =  tmp/dVol(i)
-    tmp = tmp - get_cord_from_site(i)*dVol(i)
+    dV = 1
+    do j = 1, i-1
+      dV = dV*iL(j)
+    enddo
+    get_cord_from_site(i) =  tmp/dV
+    tmp = tmp - get_cord_from_site(i)*dV
   enddo
   return
 END FUNCTION get_cord_from_site
 
 !!====== transfer a D-dimensional space into a 1-d array =============
-integer function get_site_from_cord(dims, cord)
+integer function get_site_from_cord(dims, iL, cord)
   implicit none
-  integer :: dims
-  integer, dimension(dims) :: cord
-  integer :: i, j
+  integer , intent(in):: dims
+  integer, dimension(dims), intent(in) :: iL, cord
+  integer :: i, j, dV
 
   get_site_from_cord = 0
   do i = 1, dims
-    get_site_from_cord = get_site_from_cord + cord(i)*dVol(i)
+    dV = 1
+    do j = 1, i-1
+      dV = dV *iL(j)
+    enddo
+    get_site_from_cord = get_site_from_cord + cord(i)*dV
   enddo
   return
 END FUNCTION get_site_from_cord
 
 
 !======= decompose a matrix from 1d array to D-dimensional matrix ==============
-SUBROUTINE decompose_matrix(Ntyp, Lx, Ly, Lz,Nleft, Mat1D, Mat)
+SUBROUTINE decompose_matrix(Ntyp, iL, Nleft, Mat1D, Mat)
   implicit none
-  integer, intent(in) :: Ntyp, Lx, Ly, Lz, Nleft
-  complex*16, intent(in) :: Mat1D(Ntyp,0:Lx*Ly*Lz-1,0:Nleft-1)
-  complex*16, intent(out):: Mat(Ntyp,0:Lx-1,0:Ly-1,0:Lz-1,0:Nleft-1)
-  integer :: it, il, ix, iy, iz, site
+  integer, intent(in) :: Ntyp, iL(1:3), Nleft
+  complex*16, intent(in) :: Mat1D(Ntyp,0:iL(1)*iL(2)*iL(3)-1,0:Nleft-1)
+  complex*16, intent(out):: Mat(Ntyp,0:iL(1)-1,0:iL(2)-1,0:iL(3)-1,0:Nleft-1)
+  integer :: it, ilef, ix, iy, iz, site
   do it = 1, Ntyp
-    do il = 0, Nleft-1
-      do ix = 0, Lx-1
-        do iy = 0, Ly-1
-          do iz = 0, Lz-1
-            site = get_site_from_cord(3, (/ix, iy, iz/))
-            Mat(it, ix, iy, iz, il) = Mat1D(it, site, il)
+    do ilef = 0, Nleft-1
+      do ix = 0, iL(1)-1
+        do iy = 0, iL(2)-1
+          do iz = 0, iL(3)-1
+            site = get_site_from_cord(3, iL, (/ix, iy, iz/))
+            Mat(it, ix, iy, iz, ilef) = Mat1D(it, site, ilef)
           enddo
         enddo
       enddo
@@ -53,18 +62,19 @@ END SUBROUTINE decompose_matrix
 
 
 
-!======= combine a matrix from D-dimensional matrix to 1-d matrix ==============
-SUBROUTINE combine_matrix(Ntyp, Lx, Ly, Lz, Nleft, Mat, Mat1D)
+!!======= combine a matrix from D-dimensional matrix to 1-d matrix ==============
+SUBROUTINE combine_matrix(Ntyp, iL, Nleft, Mat, Mat1D)
   implicit none
-  integer, intent(in) :: Ntyp, Lx, Ly, Lz, Nleft
-  complex*16, intent(in):: Mat(Ntyp,0:Lx-1,0:Ly-1,0:Lz-1,0:Nleft-1)
-  complex*16, intent(out) :: Mat1D(Ntyp,0:Lx*Ly*Lz-1,0:Nleft-1)
-  integer :: it, il, ir(3), site
+  integer, intent(in) :: Ntyp, iL(1:3), Nleft
+  complex*16, intent(in):: Mat(Ntyp,0:iL(1)-1,0:iL(2)-1,0:iL(3)-1,0:Nleft-1)
+  complex*16, intent(out) :: Mat1D(Ntyp,0:iL(1)*iL(2)*iL(3)-1,0:Nleft-1)
+  integer :: it, ilef, ir(3), site, iVol
+  iVol = iL(1)*iL(2)*iL(3)
   do it = 1, Ntyp
-    do il = 0, Nleft-1
-      do site = 0, Lx*Ly*Lz-1
-        ir = get_cord_from_site(3, site)
-        Mat1D(it, site, il) = Mat(it, ir(1), ir(2), ir(3), il) 
+    do ilef = 0, Nleft-1
+      do site = 0, iVol-1
+        ir = get_cord_from_site(3, iL, site)
+        Mat1D(it, site, ilef) = Mat(it, ir(1), ir(2), ir(3), ilef) 
       enddo
     enddo
   enddo
@@ -82,7 +92,7 @@ SUBROUTINE def_symmetry
   CoefOfSymmetry(:, :, :) = 2.d0   !typ 1,2; 3,4; 5,6
   
   do site = 0, Vol-1
-    dr = get_cord_from_site(D, site)
+    dr = get_cord_from_site(D, L, site)
     do i = 1, D
       if(dr(i)/=0 .and. dr(i)/=L(i)/2) then
         CoefOfSymmetry(site, :, :) = CoefOfSymmetry(site, :, :)*2.d0
@@ -106,8 +116,8 @@ Integer FUNCTION diff_r(dims, site1, site2)
   integer, intent(in) :: dims
   integer :: r1(dims), r2(dims), dr(dims)
 
-  r1 = get_cord_from_site(dims, site1)
-  r2 = get_cord_from_site(dims, site2)
+  r1 = get_cord_from_site(dims, L, site1)
+  r2 = get_cord_from_site(dims, L, site2)
 
   dr = r1 - r2
 
@@ -116,9 +126,25 @@ Integer FUNCTION diff_r(dims, site1, site2)
     if(dr(i)>dL(i))  dr(i) = L(i)-dr(i)
   enddo
 
-  diff_r = get_site_from_cord(dims, dr)
+  diff_r = get_site_from_cord(dims, L, dr)
   return
 END FUNCTION diff_r
+
+SUBROUTINE test_inside
+  implicit none
+  integer :: site, ir(1:D), isite
+  write(*, *) L(1), GamL(1), dGamL(1)
+  do site = 0, Vol-1
+    isite = diff_r(D, site, 0)
+    ir = get_cord_from_site(D, L, site)
+    if(if_inside_Vol(D, dGamL(1:D), isite)) then
+      write(*, *) ir, "Yes"
+    else
+      write(*, *) ir, "No"
+    endif
+  enddo
+END SUBROUTINE
+
 
 LOGICAL FUNCTION if_inside_Vol(dims, iL, isite)
   implicit none
@@ -126,7 +152,8 @@ LOGICAL FUNCTION if_inside_Vol(dims, iL, isite)
   integer, intent(in) :: iL(1:dims)
   integer, intent(in) :: isite
   integer :: i, ir(1:dims)
-  ir = get_cord_from_site(dims, isite)
+
+  ir = get_cord_from_site(dims, L, isite)
   if_inside_Vol = .true.
   do i = 1, dims
     if(ir(i)>iL(i)) then
@@ -135,6 +162,18 @@ LOGICAL FUNCTION if_inside_Vol(dims, iL, isite)
   enddo
   return
 END FUNCTION if_inside_Vol
+
+INTEGER FUNCTION convert_r(dims, oldL, newL, isite)
+  implicit none
+  integer, intent(in) :: dims
+  integer, intent(in) :: oldL(1:dims), newL(1:dims)
+  integer, intent(in) :: isite
+  integer :: i, ir(1:dims)
+
+  ir = get_cord_from_site(dims, oldL, isite)
+  convert_r = get_site_from_cord(dims, newL, ir)
+  return
+END FUNCTION convert_r
 
 !!======================== WEIGHT EXTRACTING =========================
 !! most basic interface to the matrix element
@@ -224,7 +263,7 @@ COMPLEX*16 FUNCTION find_lowest_W(Matrix, klow, omega)
     do  ik = 0, Vol-1
       if(real(Matrix(ik, iomega))-real(find_lowest_W)<-1.d-12) then
         find_lowest_W = Matrix(ik, iomega)
-        klow = get_cord_from_site(D, ik)
+        klow = get_cord_from_site(D, L, ik)
         omega = iomega
       endif
     enddo
@@ -279,7 +318,7 @@ END SUBROUTINE transfer_W_r
 SUBROUTINE transfer_Gam_r(BackForth)
     implicit none
     integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
-    call FFT_r(Gam,NtypeGam,MxT**2,BackForth)
+    call FFT_r(Gam,1,MxT**2,BackForth)
 END SUBROUTINE
 
 SUBROUTINE transfer_Chi_r(BackForth)
@@ -324,7 +363,7 @@ SUBROUTINE transfer_Gam_t(BackForth)
     implicit none
     integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
     integer :: it1, it2
-    call FFT_tau_double(Gam,NtypeGam,Vol,.true.,BackForth)
+    call FFT_tau_double(Gam,1,Vol,.true.,BackForth)
 END SUBROUTINE
 
 SUBROUTINE transfer_Sigma_t(BackForth)
@@ -375,7 +414,7 @@ SUBROUTINE FFT_r(XR,Ntype,Nz,BackForth)
 
     allocate(XR3D(Ntype,0:FL(1)-1, 0:FL(2)-1, 0:FL(3)-1, 0:Nz-1))
     
-    call decompose_matrix(Ntype, FL(1), FL(2), FL(3), Nz, XR, XR3D)
+    call decompose_matrix(Ntype, FL, Nz, XR, XR3D)
 
 
     !do FFT in x direction
@@ -439,7 +478,7 @@ SUBROUTINE FFT_r(XR,Ntype,Nz,BackForth)
       deallocate(Real1,Im1)
     endif
 
-    call combine_matrix(Ntype, FL(1), FL(2), FL(3), Nz, XR3D, XR)
+    call combine_matrix(Ntype, FL, Nz, XR3D, XR)
     deallocate(XR3D)
 
 end SUBROUTINE FFT_r

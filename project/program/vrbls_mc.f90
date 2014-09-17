@@ -8,10 +8,12 @@ MODULE vrbls_mc
   !logical, parameter  ::  IS_BOLD=.true.
   logical, parameter  ::  IS_BOLD=.false.
 
-  integer, parameter :: D = 2                            ! 2-dimensional system
-  integer, parameter,dimension(D) :: MxL =(/64,64/)      ! the largest system
-  !integer, parameter :: D = 3                             ! 3-dimensional system 
-  !integer, parameter,dimension(D) :: MxL =(/16,16,16/)    ! the largest system
+  !integer, parameter :: D = 2                            ! 2-dimensional system
+  !integer, parameter,dimension(D) :: MxL =(/64,64/)      ! the largest system
+  !integer, parameter :: GamSize = 16
+  integer, parameter :: D = 3                             ! 3-dimensional system 
+  integer, parameter,dimension(D) :: MxL =(/16,16,16/)    ! the largest system
+  integer, parameter :: GamSize = 8
 
   !======================== code mode control ============================
   logical, parameter  ::  DEBUG=.true.          
@@ -41,7 +43,8 @@ MODULE vrbls_mc
 
 
   integer, parameter :: MxVol = MxL(1)**D            ! the maximum system volume
-  integer, parameter :: MxT   =  128                 ! the maximum number of time segments
+  integer, parameter :: MxT   =  32                 ! the maximum number of time segments
+  integer, parameter :: MxTGamInput = 32             ! the maximum number of time segments
   integer, parameter :: MxK   = 1000000              ! the maximum momentum
 
   double precision, parameter :: MxError = 0.90d0    ! the maximum error for MC
@@ -151,7 +154,7 @@ MODULE vrbls_mc
 
   complex(kind=8), allocatable :: newW(:,:,:)
   complex(kind=8), allocatable :: W(:,:,:)
-  complex(kind=8), allocatable :: Gam(:,:,:,:)
+  complex(kind=8), allocatable :: Gam(:,:,:)
   complex(kind=8), allocatable :: GamBasis(:,:,:,:)
 
   complex(kind=8) :: Gam0PF
@@ -164,6 +167,8 @@ MODULE vrbls_mc
 
   !======================== analytic integration =========================
   complex(kind=8) :: GamOrder1(NTypeGam, 0:MxT-1, 0:MxT-1) 
+
+  complex*16, allocatable :: GamMCInput(:,:,:,:)      ! the input weight of Gamma in MC
 
   !====================== MC Simulation ==================================
   complex*16 :: GamNorm, GamNormWeight         ! the weight of the normalization diagram
