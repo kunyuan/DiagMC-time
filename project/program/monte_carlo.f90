@@ -2626,7 +2626,7 @@ SUBROUTINE accumulate_Gamma(ityp, dr, dt1, dt2, Phase, factorM, flag)
   integer :: ibin, ibasis
 
   !============  the diagonal Gamma ================================
-  if(dt1==dt2 .and. ityp==3) then
+  if(dt1==dt2 .and. ityp==1) then
     if(flag) then
       GamMC(Order, dr, dt1) = GamMC(Order, dr, dt1) + dcmplx(real(Phase/factorM),  &
         & -dimag(Phase/factorM))

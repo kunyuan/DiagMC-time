@@ -10,10 +10,10 @@ TO_DO = []
 com_dict={
     "L" :   [8,8,8],
     "Jcp" :  1.0,
-    "iniBeta" :  1.00,
+    "iniBeta" :  0.50,
     "dBeta" :  0.00,
-    "finalBeta" :  1.00,
-    "Order" :  2,
+    "finalBeta" :  0.50,
+    "Order" :  1,
     }
 
 readfile="{0:4.2f}_{1}_coll".format(com_dict["finalBeta"],com_dict["Order"])
@@ -22,11 +22,11 @@ print readfile
 # monte carlo job defintion
 mc_dict={
     "__Execute" : "./gamma3.exe",
-    "__Duplicate" : 0,
+    "__Duplicate" : 3,
     "__IsCluster" : False,
     "__AutoRun" : True,
     "IsLoad" : False,
-    "Reweight" : [1.5, 1.0],
+    "Reweight" : [1.5],
     "ReadFile" : readfile,
     "Sample" :  5000000,
     "Sweep" : 10,
@@ -77,7 +77,7 @@ TO_DO.append(job.JobOutputLoop(ol_dict))
 # output numerical integration job definition
 ni_dict={
     "__Execute" : ["./gamma3.exe"],
-    "__Duplicate" : 0,
+    "__Duplicate" : 1,
     "__IsCluster" : False,
     "__AutoRun" : False,
     "IsLoad" : False,

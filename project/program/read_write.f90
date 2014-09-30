@@ -462,7 +462,7 @@ SUBROUTINE output_Quantities
     do it2 = 0, MxT-1
       do it1 = 0, MxT-1
         gam1 = Gam_basis((dble(it1)+0.5d0)/MxT, (dble(it2)+0.5d0)/MxT, &
-          & GamMCBasis(iorder, 3, 0, :, :))
+          & GamMCBasis(iorder, 1, 0, :, :))
         write(104, *) real(gam1*normal), dimag(gam1*normal)
       enddo
     enddo

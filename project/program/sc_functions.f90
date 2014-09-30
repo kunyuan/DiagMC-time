@@ -366,6 +366,13 @@ SUBROUTINE transfer_Gam_t(BackForth)
     call FFT_tau_double(Gam,1,Vol,.true.,BackForth)
 END SUBROUTINE
 
+SUBROUTINE transfer_GamMCInput_t(BackForth)
+    implicit none
+    integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation
+    integer :: it1, it2
+    call FFT_tau_double(GamMCInput,1,GamVol,.true.,BackForth)
+END SUBROUTINE
+
 SUBROUTINE transfer_Sigma_t(BackForth)
     implicit none
     integer,intent(in) :: BackForth    !Backforth=-1 reverse tranformation

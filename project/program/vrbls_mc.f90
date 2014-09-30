@@ -5,8 +5,8 @@ MODULE vrbls_mc
 
   !logical, parameter  ::  IS_J1J2=.true.
   logical, parameter  ::  IS_J1J2=.false.
-  !logical, parameter  ::  IS_BOLD=.true.
-  logical, parameter  ::  IS_BOLD=.false.
+  logical, parameter  ::  IS_BOLD=.true.
+  !logical, parameter  ::  IS_BOLD=.false.
 
   !integer, parameter :: D = 2                            ! 2-dimensional system
   !integer, parameter,dimension(D) :: MxL =(/64,64/)      ! the largest system
