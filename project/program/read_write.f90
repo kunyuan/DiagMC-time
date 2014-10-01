@@ -516,6 +516,13 @@ SUBROUTINE output_Quantities
     write(104, *) real(SUM(Chi(:, it))),dimag(SUM(Chi(:, it)))
   enddo
 
+  write(104, *) "##################################Energy"
+  write(104, *) "#tau:", MxT
+  write(104, *) "#Beta", Beta, "L", L(1), "Order", MCOrder
+  do it = 0, MxT-1
+    write(104, *) real(Chi(1, it)),dimag(Chi(1, it))
+  enddo
+
   write(104, *) "##################################Denom"
   write(104, *) "#p:", Vol, ",omega:", MxT
   write(104, *) "#Beta", Beta, "L", L(1), "Order", MCOrder
