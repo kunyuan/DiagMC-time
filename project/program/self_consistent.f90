@@ -1,5 +1,6 @@
 
 
+
 !============ Initialization of the self consistent loop ==========
 SUBROUTINE initialize_self_consistent
   implicit none

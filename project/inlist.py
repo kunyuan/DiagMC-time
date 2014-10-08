@@ -28,10 +28,10 @@ mc_dict={
     "IsLoad" : False,
     "Reweight" : [1.5, 1.0, 0.7],
     "ReadFile" : readfile,
-    "Sample" :  5000000,
+    "Sample" : 10000000,
     "Sweep" : 10,
-    "Toss" : 10000,
-    "Worm/Norm" : 0.100 
+    "Toss" : 50000,
+    "Worm/Norm" : 0.01 
     }
 mc_dict.update(com_dict)
 TO_DO.append(job.JobMonteCarlo(mc_dict))
